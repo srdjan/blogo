@@ -71,7 +71,7 @@ export const renderDocument = (
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/JetBrainsMono/2.3.1/web/jetbrainsmono.min.css" />
 
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
-  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="/js/htmx.min.js"></script>
 </head>
 <body>
   <header>
