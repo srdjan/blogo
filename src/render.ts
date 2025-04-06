@@ -67,7 +67,7 @@ export const renderDocument = (
   
   <link rel="stylesheet" href="/css/main.css">
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
-  <script src="/js/htmx.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
   <header>

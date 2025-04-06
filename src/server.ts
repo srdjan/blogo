@@ -1,5 +1,3 @@
-// src/server.ts - Server implementation using Deno.serve
-import { Result } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
   renderDocument,
@@ -8,13 +6,12 @@ import {
   renderNotFound,
   renderAbout,
   renderTagIndex,
-  renderSearchForm,
   renderSearchResults,
   renderErrorPage,
 } from "./render.ts";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
-import { resultToResponse, createError, tryCatch, match } from "./error.ts";
+import { resultToResponse, createError, tryCatch } from "./error.ts";
 import type { AppError } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
