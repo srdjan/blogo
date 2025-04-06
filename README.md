@@ -45,7 +45,7 @@ The project follows a functional architecture with clean separation of concerns:
 
 ### Prerequisites
 
-- [Deno](https://deno.land/) 1.38 or higher
+- [Deno](https://deno.land/) v2.2 or higher
 
 ### Installation
 
