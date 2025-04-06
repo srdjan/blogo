@@ -9,10 +9,10 @@
   --color-border: #000000;
   --color-card: #FFFFFF;
 
-  /* Raw typography */
-  --font-sans: "Inter", Helvetica, Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
-  --font-display: "Basement Grotesque", "Space Grotesk", Impact, sans-serif;
+  /* Typography using system fonts */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  --font-display: system-ui, sans-serif;
 
   /* Exaggerated spacing */
   --space-3xs: 0.25rem;
@@ -225,12 +225,11 @@ nav {
   box-shadow: 4px 4px 0 0 var(--color-border);
 }
 
-/* Create spacer for fixed header */
+/* Create spacer for fixed header - using CSS custom property for dynamic adjustment */
 .header-spacer {
   display: block;
   width: 100%;
-  height: 160px;
-  /* Set to match header height + desired margin */
+  height: var(--header-height, 160px);
   visibility: hidden;
 }
 
@@ -837,6 +836,7 @@ footer {
 @media (max-width: 640px) {
   :root {
     --content-padding: 1rem;
+    --header-height: 210px; /* Dynamic header height for mobile */
   }
 
   html {
@@ -856,11 +856,25 @@ footer {
     padding: var(--space-md);
   }
 
+  .site-title {
+    font-size: 1.5rem; /* Smaller title on mobile */
+    width: 100%;
+    margin-bottom: var(--space-xs);
+  }
+
   .nav-links {
     margin-top: var(--space-md);
     width: 100%;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+  
+  .nav-links a,
+  .search-toggle,
+  .rss-link {
+    font-size: 0.9rem;
+    padding: var(--space-2xs) var(--space-xs);
   }
 
   .post-card {
@@ -881,10 +895,5 @@ footer {
   .pagination {
     flex-direction: column;
     gap: var(--space-sm);
-  }
-
-  .header-spacer {
-    height: 200px;
-    /* Taller spacer for mobile layout */
   }
 }

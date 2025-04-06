@@ -14,6 +14,7 @@ export interface PostMeta {
 
 export interface Post extends PostMeta {
   content: string;
+  formattedDate?: string; // Pre-formatted date string
 }
 
 export interface TagInfo {

@@ -56,10 +56,7 @@ export const renderDocument = (
   <title>${pageTitle}</title>
   <meta name="description" content="${pageDescription}">
   
-  <!-- Neobrutalist typography -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css" />
-  <link rel="stylesheet" href="https://fonts.cdnjs.com/css2?family=Space+Grotesk:wght@400;700&display=swap" />
-  <link rel="stylesheet" href="https://fonts.cdnjs.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
+  <!-- System fonts -->
   
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -76,13 +73,74 @@ export const renderDocument = (
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
   <script src="/js/htmx.min.js"></script>
   
-  <!-- HTMX scroll management -->
+  <!-- HTMX scroll and accessibility management -->
   <script>
     document.addEventListener('htmx:afterSwap', function(event) {
       if (event.detail.target.tagName === 'MAIN') {
         window.scrollTo({top: 0, behavior: 'smooth'});
       }
     });
+    
+    // Accessibility: Modal focus trap for search popup
+    document.addEventListener('htmx:afterSettle', function(event) {
+      if (event.target.id === 'search-popup' && event.target.querySelector('.search-modal')) {
+        trapFocus(event.target.querySelector('.search-modal'));
+      }
+    });
+    
+    // Focus trap implementation
+    function trapFocus(element) {
+      // Find all focusable elements
+      const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+      const focusableContent = element.querySelectorAll(focusableElements);
+      const firstFocusableElement = focusableContent[0];
+      const lastFocusableElement = focusableContent[focusableContent.length - 1];
+      
+      // Focus the first element
+      if (firstFocusableElement) {
+        firstFocusableElement.focus();
+      }
+      
+      // Save last active element to restore focus when modal closes
+      const previouslyFocused = document.activeElement;
+      
+      // Handle keydown events for tab key to create a focus trap
+      element.addEventListener('keydown', function(e) {
+        // If Escape is pressed, close the modal
+        if (e.key === 'Escape') {
+          const closeButton = element.querySelector('.search-close');
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        
+        // Only handle Tab key
+        if (e.key !== 'Tab') return;
+        
+        // If Shift + Tab on first element, move to last element
+        if (e.shiftKey && document.activeElement === firstFocusableElement) {
+          e.preventDefault();
+          lastFocusableElement.focus();
+        } 
+        // If Tab on last element, move to first element
+        else if (!e.shiftKey && document.activeElement === lastFocusableElement) {
+          e.preventDefault();
+          firstFocusableElement.focus();
+        }
+      });
+      
+      // Clean up when modal closes
+      document.addEventListener('htmx:beforeSwap', function cleanup(evt) {
+        if (evt.target.id === 'search-popup' && !evt.detail.xhr.responseText) {
+          // Restore focus to previously focused element
+          if (previouslyFocused) {
+            previouslyFocused.focus();
+          }
+          // Remove this event listener
+          document.removeEventListener('htmx:beforeSwap', cleanup);
+        }
+      });
+    }
   </script>
 </head>
 <body>
@@ -136,9 +194,8 @@ export const renderPostList = (
   return `
     <section class="post-list content-section">
       <div class="content-wrapper">
-        <h1>${activeTag ? `Posts Tagged "${activeTag}"` : "Latest Posts"}</h1>
-        
         ${activeTag ? `
+          <h1>Posts Tagged "${activeTag}"</h1>
           <div class="tag-filter-header">
             <p>Showing ${posts.length} post${posts.length !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
             <a href="/" class="button" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
@@ -157,7 +214,7 @@ export const renderPostList = (
       <article class="post-card">
         <h2><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
         <div class="post-meta">
-          <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
         ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
@@ -257,7 +314,7 @@ export const renderPost = (post: Post): string => {
       <header class="post-header">
         <h1>${post.title}</h1>
         <div class="post-meta">
-          <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
       </header>
@@ -333,10 +390,18 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
 export const renderSearchPopup = (): string => {
   return `
     <div class="search-container" hx-swap-oob="true">
-      <div class="search-overlay" hx-get="/search-close" hx-target="#search-popup" hx-trigger="click"></div>
-      <div class="search-modal">
+      <div class="search-overlay" 
+           hx-get="/search-close" 
+           hx-target="#search-popup" 
+           hx-trigger="click"
+           role="button"
+           aria-label="Close search overlay"></div>
+      <div class="search-modal" 
+           role="dialog" 
+           aria-modal="true" 
+           aria-labelledby="search-heading">
         <div class="search-header">
-          <h2>Search Posts</h2>
+          <h2 id="search-heading">Search Posts</h2>
           <button 
             class="search-close" 
             aria-label="Close search" 
@@ -346,7 +411,11 @@ export const renderSearchPopup = (): string => {
             Close
           </button>
         </div>
-        <form class="search-form" hx-get="/search" hx-trigger="submit" hx-target="#search-results" hx-swap="innerHTML">
+        <form class="search-form" 
+              hx-get="/search" 
+              hx-trigger="submit" 
+              hx-target="#search-results" 
+              hx-swap="innerHTML">
           <input 
             type="search" 
             name="q" 
@@ -357,10 +426,11 @@ export const renderSearchPopup = (): string => {
             hx-target="#search-results"
             hx-include="closest form"
             autofocus
+            aria-labelledby="search-heading"
           >
           <button type="submit">Search</button>
         </form>
-        <div id="search-results" class="search-results"></div>
+        <div id="search-results" class="search-results" aria-live="polite"></div>
       </div>
     </div>
   `;
@@ -399,7 +469,7 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
       <article class="search-result">
         <h3><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
         <div class="post-meta">
-          <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
         ${post.excerpt ? `<p class="search-excerpt">${post.excerpt}</p>` : ""}

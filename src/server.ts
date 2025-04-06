@@ -1,5 +1,6 @@
 // src/server.ts - Type-safe server implementation using Deno.serve
 import { Result } from "./types.ts";
+import type { Post, TagInfo } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
   renderDocument,
@@ -58,6 +59,11 @@ const handleRequest = (
   });
 };
 
+// Global cache for posts to avoid re-loading on every request
+let postsCache: Post[] | null = null;
+let postsCacheTime: number = 0;
+const CACHE_TTL = 60 * 1000; // 1 minute cache TTL
+
 /**
  * Handle request with proper error boundaries using functional error handling
  */
@@ -76,8 +82,23 @@ const handleRequestSafe = async (
     return await serveStaticFile(`./public${path}`);
   }
 
-  // Load all posts for navigation and listing
-  const postsResult = await loadPosts();
+  // Load all posts with caching
+  const currentTime = Date.now();
+  let postsResult;
+  
+  if (postsCache && (currentTime - postsCacheTime) < CACHE_TTL) {
+    // Use cached posts if available and not expired
+    postsResult = { ok: true, value: postsCache };
+  } else {
+    // Otherwise load posts from disk
+    postsResult = await loadPosts();
+    
+    // Update cache if successful
+    if (postsResult.ok) {
+      postsCache = postsResult.value;
+      postsCacheTime = currentTime;
+    }
+  }
 
   // Handle posts loading error with functional pattern matching
   if (!postsResult.ok) {
@@ -330,9 +351,18 @@ const serveStaticFile = async (filePath: string): Promise<Response> => {
   return resultToResponse(fileResult, {
     onSuccess: (file) => {
       const contentType = getContentType(filePath);
-      return new Response(file, {
-        headers: { "Content-Type": contentType },
-      });
+      const headers = new Headers({ "Content-Type": contentType });
+      
+      // Add caching headers for static assets
+      if (filePath.endsWith('.css') || filePath.endsWith('.js')) {
+        // Cache for 1 week (in seconds)
+        headers.set('Cache-Control', 'public, max-age=604800');
+      } else if (filePath.includes('/fonts/')) {
+        // Cache fonts for 1 month (in seconds)
+        headers.set('Cache-Control', 'public, max-age=2592000');
+      }
+      
+      return new Response(file, { headers });
     },
     onError: () => new Response("Not Found", { status: 404 }),
   });
@@ -367,5 +397,3 @@ export const startServer = async (port: number, config: Config): Promise<void> =
   }, (request) => handleRequest(request, config));
 };
 
-// Import types using explicit type imports
-import type { Post, TagInfo } from "./types.ts";

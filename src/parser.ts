@@ -80,11 +80,22 @@ const parseFrontmatter = (
 
 /**
  * Convert markdown to HTML with minimal configuration
+ * Implementation uses in-memory cache for performance
  */
+const markdownCache = new Map<string, string>();
+
 const markdownToHtml = (markdown: string): Result<string, AppError> => {
   try {
-    // Use minimal or no configuration to avoid type conflicts
+    // Check cache first
+    if (markdownCache.has(markdown)) {
+      return { ok: true, value: markdownCache.get(markdown)! };
+    }
+    
+    // Parse markdown if not in cache
     const html = marked.parse(markdown) as string;
+    
+    // Cache the result
+    markdownCache.set(markdown, html);
 
     return { ok: true, value: html };
   } catch (error) {
@@ -125,11 +136,14 @@ export const parseMarkdown = async (
     if (!html.ok) return html;
 
     // Combine metadata and content into a Post
+    const formattedDate = new Date(meta.value.date).toLocaleDateString();
+    
     return {
       ok: true,
       value: {
         ...meta.value,
         content: html.value,
+        formattedDate,
       },
     };
   });
@@ -185,9 +199,32 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
     }
   }
 
-  // Log errors but continue with successful posts
+  // Log errors and provide more context
   if (errors.length > 0) {
-    console.error("Errors loading posts:", errors);
+    console.error(`Errors loading ${errors.length} out of ${postResults.length} posts:`);
+    errors.forEach(err => {
+      console.error(`- ${err.type}: ${err.message}`);
+      if (err.cause) console.error(`  Cause: ${err.cause}`);
+    });
+    
+    // If all posts failed to load, return error
+    if (posts.length === 0 && errors.length > 0) {
+      return {
+        ok: false,
+        error: createError(
+          "DataError",
+          `Failed to load any posts. ${errors.length} post files had errors.`,
+          errors[0] // Include the first error as the cause
+        )
+      };
+    }
+    
+    // Add retry mechanism for empty posts with a delay of 1 second
+    if (posts.length === 0) {
+      console.log("No posts loaded successfully. Retrying once...");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return loadPosts(); // Recursive retry (will only happen once due to checks)
+    }
   }
 
   // Sort posts by date, newest first
