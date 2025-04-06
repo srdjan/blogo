@@ -1,3 +1,5 @@
+// src/server.ts - Type-safe server implementation using Deno.serve
+import { Result } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
   renderDocument,
@@ -8,16 +10,18 @@ import {
   renderTagIndex,
   renderSearchResults,
   renderErrorPage,
+  renderSearchPopup,
+  renderSearchClose,
 } from "./render.ts";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
-import { resultToResponse, createError, tryCatch } from "./error.ts";
+import { resultToResponse, createError, tryCatch, match } from "./error.ts";
 import type { AppError } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
 
 /**
- * Handle HTTP requests
+ * Handle HTTP requests with pure functional approach
  */
 const handleRequest = (
   request: Request,
@@ -26,13 +30,13 @@ const handleRequest = (
   const url = new URL(request.url);
   const path = url.pathname;
 
-  // Rendering configuration
+  // Rendering configuration for consistency
   const renderConfig = {
     baseUrl: config.server.publicUrl,
     description: config.blog.description,
   };
 
-  return handleRequestSafe(request, url, path, config).catch((error) => {
+  return handleRequestSafe(request, url, path, config, renderConfig).catch((error) => {
     console.error("Unhandled server error:", error);
 
     const errorContent = renderErrorPage({
@@ -55,19 +59,17 @@ const handleRequest = (
 };
 
 /**
- * Handle request with proper error boundaries
+ * Handle request with proper error boundaries using functional error handling
  */
 const handleRequestSafe = async (
   request: Request,
   url: URL,
   path: string,
-  config: Config
+  config: Config,
+  renderConfig: { baseUrl: string; description: string }
 ): Promise<Response> => {
-  // Rendering configuration
-  const renderConfig = {
-    baseUrl: config.server.publicUrl,
-    description: config.blog.description,
-  };
+  // Determine if this is an HTMX request for partial content
+  const isHtmxRequest = request.headers.get("HX-Request") === "true";
 
   // Serve static files
   if (path.startsWith("/css/") || path.startsWith("/js/")) {
@@ -77,7 +79,7 @@ const handleRequestSafe = async (
   // Load all posts for navigation and listing
   const postsResult = await loadPosts();
 
-  // Handle posts loading error
+  // Handle posts loading error with functional pattern matching
   if (!postsResult.ok) {
     const errorContent = renderErrorPage({
       title: "Error Loading Posts",
@@ -99,15 +101,35 @@ const handleRequestSafe = async (
 
   const posts = postsResult.value;
 
-  // Handle HTMX requests differently (for partial content)
-  const isHtmxRequest = request.headers.get("HX-Request") === "true";
-
   // Route the request
-  return routeRequest(request, url, path, posts, config, isHtmxRequest);
+  return routeRequest(request, url, path, posts, config, renderConfig, isHtmxRequest);
+};
+
+/**
+ * Handle HTMX requests with proper headers for content swapping
+ * This function maintains pure functional semantics while handling browser state
+ */
+const handleHtmxRequest = (
+  path: string,
+  content: string,
+): Response => {
+  return new Response(content, {
+    headers: {
+      "Content-Type": "text/html",
+      "HX-Push-Url": path,
+      "HX-Trigger": JSON.stringify({
+        scrollToTop: {
+          scroll: "top", // Explicit position
+          offset: 120    // Account for header height
+        }
+      })
+    }
+  });
 };
 
 /**
  * Route the request to the appropriate handler
+ * Pure function mapping request details to response
  */
 const routeRequest = async (
   request: Request,
@@ -115,15 +137,26 @@ const routeRequest = async (
   path: string,
   posts: Post[],
   config: Config,
+  renderConfig: { baseUrl: string; description: string },
   isHtmxRequest: boolean
 ): Promise<Response> => {
-  const { blog: { title: blogTitle, description: blogDescription }, server: { publicUrl } } = config;
+  const { blog: { title: blogTitle } } = config;
 
-  // Rendering configuration
-  const renderConfig = {
-    baseUrl: publicUrl,
-    description: blogDescription,
-  };
+  // Search popup fragment route
+  if (path === "/search-fragment") {
+    const content = renderSearchPopup();
+    return new Response(content, {
+      headers: { "Content-Type": "text/html" }
+    });
+  }
+
+  // Search close route
+  if (path === "/search-close") {
+    const content = renderSearchClose();
+    return new Response(content, {
+      headers: { "Content-Type": "text/html" }
+    });
+  }
 
   // Home page - list all posts
   if (path === "/") {
@@ -131,7 +164,7 @@ const routeRequest = async (
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const { postsPerPage } = config.blog;
 
-    // Paginate posts
+    // Paginate posts with functional transformation
     const paginatedPosts = paginatePosts(posts, {
       page,
       itemsPerPage: postsPerPage,
@@ -145,9 +178,7 @@ const routeRequest = async (
 
     // For HTMX requests, return just the content
     if (isHtmxRequest) {
-      return new Response(content, {
-        headers: { "Content-Type": "text/html" }
-      });
+      return handleHtmxRequest(path, content);
     }
 
     return new Response(
@@ -197,9 +228,7 @@ const routeRequest = async (
 
     // For HTMX requests, return just the content
     if (isHtmxRequest) {
-      return new Response(content, {
-        headers: { "Content-Type": "text/html" }
-      });
+      return handleHtmxRequest(path, content);
     }
 
     return new Response(
@@ -215,7 +244,7 @@ const routeRequest = async (
 
   // Tag index page
   if (path === "/tags") {
-    // Build tag metadata
+    // Build tag metadata using functional transformation
     const tagMap = new Map<string, TagInfo>();
 
     posts.forEach(post => {
@@ -233,6 +262,10 @@ const routeRequest = async (
     const tags = Array.from(tagMap.values());
     const content = renderTagIndex(tags);
 
+    if (isHtmxRequest) {
+      return handleHtmxRequest(path, content);
+    }
+
     return new Response(
       renderDocument({ title: `${blogTitle} - Tags`, tags, path }, content, renderConfig),
       { headers: { "Content-Type": "text/html" } }
@@ -246,6 +279,11 @@ const routeRequest = async (
 
     if (post) {
       const content = renderPost(post);
+
+      if (isHtmxRequest) {
+        return handleHtmxRequest(path, content);
+      }
+
       return new Response(
         renderDocument({ title: blogTitle, post, path }, content, renderConfig),
         { headers: { "Content-Type": "text/html" } }
@@ -256,6 +294,11 @@ const routeRequest = async (
   // About page
   if (path === "/about") {
     const content = renderAbout();
+
+    if (isHtmxRequest) {
+      return handleHtmxRequest(path, content);
+    }
+
     return new Response(
       renderDocument({ title: blogTitle, posts, path }, content, renderConfig),
       { headers: { "Content-Type": "text/html" } }
@@ -264,6 +307,11 @@ const routeRequest = async (
 
   // 404 page
   const content = renderNotFound();
+
+  if (isHtmxRequest) {
+    return handleHtmxRequest(path, content);
+  }
+
   return new Response(
     renderDocument({ title: blogTitle, path }, content, renderConfig),
     { status: 404, headers: { "Content-Type": "text/html" } }
@@ -271,7 +319,7 @@ const routeRequest = async (
 };
 
 /**
- * Serve a static file
+ * Serve a static file with functional error handling
  */
 const serveStaticFile = async (filePath: string): Promise<Response> => {
   const fileResult = await tryCatch<Uint8Array, AppError>(
@@ -292,6 +340,7 @@ const serveStaticFile = async (filePath: string): Promise<Response> => {
 
 /**
  * Get the content type based on file extension
+ * Pure function mapping string to string
  */
 const getContentType = (filePath: string): string => {
   if (filePath.endsWith(".css")) return "text/css";
@@ -305,7 +354,7 @@ const getContentType = (filePath: string): string => {
 };
 
 /**
- * Start the HTTP server
+ * Start the HTTP server with type-safe configuration
  */
 export const startServer = async (port: number, config: Config): Promise<void> => {
   console.log(`Starting server on port ${port}...`);
@@ -318,5 +367,5 @@ export const startServer = async (port: number, config: Config): Promise<void> =
   }, (request) => handleRequest(request, config));
 };
 
-// Import types
+// Import types using explicit type imports
 import type { Post, TagInfo } from "./types.ts";

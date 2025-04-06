@@ -1,3 +1,4 @@
+// src/render.ts - HTML rendering functions with type-safe functional approach
 import { RenderContext, Post, TagInfo } from "./types.ts";
 import type { Pagination } from "./pagination.ts";
 import {
@@ -8,7 +9,8 @@ import {
 } from "./metadata.ts";
 
 /**
- * Render the HTML document shell
+ * Render the HTML document shell with neobrutalist styling
+ * Uses a pure functional approach with explicit type signatures
  */
 export const renderDocument = (
   context: RenderContext,
@@ -54,6 +56,11 @@ export const renderDocument = (
   <title>${pageTitle}</title>
   <meta name="description" content="${pageDescription}">
   
+  <!-- Neobrutalist typography -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css" />
+  <link rel="stylesheet" href="https://fonts.cdnjs.com/css2?family=Space+Grotesk:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.cdnjs.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
+  
   <!-- Structured Data -->
   <script type="application/ld+json">
     ${structuredData}
@@ -66,40 +73,60 @@ export const renderDocument = (
   ${twitterTags}
   
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectral/7.0.0/spectral.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/JetBrainsMono/2.3.1/web/jetbrainsmono.min.css" />
-
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
   <script src="/js/htmx.min.js"></script>
+  
+  <!-- HTMX scroll management -->
+  <script>
+    document.addEventListener('htmx:afterSwap', function(event) {
+      if (event.detail.target.tagName === 'MAIN') {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      }
+    });
+  </script>
 </head>
 <body>
-  <header>
-  <nav>
-    <a href="/" class="site-title" hx-boost="true" hx-target="main" hx-swap="innerHTML">
-      ${context.title}
-    </a>
-    <div class="nav-links">
-      <a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML">Home</a>
-      <a href="/tags" hx-boost="true" hx-target="main" hx-swap="innerHTML">Tags</a>
-      <a href="/about" hx-boost="true" hx-target="main" hx-swap="innerHTML">About</a>
-      <a href="/feed.xml" class="rss-link">RSS</a>
-    </div>
-  </nav>
-    ${renderSearchForm()}
+  <header id="site-header">
+    <nav>
+      <a href="/" class="site-title" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
+        ${context.title}
+      </a>
+      <div class="nav-links">
+        <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
+        <a href="/tags" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
+        <a href="/about" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
+        <button 
+          class="search-toggle" 
+          aria-label="Search" 
+          aria-expanded="false"
+          hx-get="/search-fragment"
+          hx-target="#search-popup"
+          hx-trigger="click"
+          hx-swap="innerHTML">
+          Search
+        </button>
+        <a href="/feed.xml" class="rss-link">RSS</a>
+      </div>
+    </nav>
+    <div id="search-popup" class="search-popup"></div>
   </header>
-  <main>
+  
+  <!-- Explicit spacer element to maintain header clearance -->
+  <div class="header-spacer" aria-hidden="true"></div>
+  
+  <main id="content-main" class="htmx-swappable">
     ${content}
   </main>
   <footer>
-    <p>Built with Deno, HTMX and Markdown</p>
+    <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">⊣˚∆˚⊢</a> & Cloude</p>
   </footer>
-  </body>
+</body>
 </html>`;
 };
 
 /**
  * Render the post list for the home page or filtered by tag
+ * Pure function implementation with explicit type modeling
  */
 export const renderPostList = (
   posts: Post[],
@@ -107,15 +134,16 @@ export const renderPostList = (
   pagination?: Pagination
 ): string => {
   return `
-    <section class="post-list">
-      <h1>${activeTag ? `Posts Tagged "${activeTag}"` : "Latest Posts"}</h1>
-      
-      ${activeTag ? `
-        <div class="tag-filter-header">
-          <p>Showing ${posts.length} post${posts.length !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
-          <a href="/" class="button" hx-boost="true">Show All Posts</a>
-        </div>
-      ` : ''}
+    <section class="post-list content-section">
+      <div class="content-wrapper">
+        <h1>${activeTag ? `Posts Tagged "${activeTag}"` : "Latest Posts"}</h1>
+        
+        ${activeTag ? `
+          <div class="tag-filter-header">
+            <p>Showing ${posts.length} post${posts.length !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
+            <a href="/" class="button" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
+          </div>
+        ` : ''}
       
       ${posts.length === 0 ? `
         <div class="empty-state">
@@ -127,11 +155,7 @@ export const renderPostList = (
       .map(
         post => `
       <article class="post-card">
-        <h2>
-          <a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">
-            ${post.title}
-          </a>
-        </h2>
+        <h2><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
         <div class="post-meta">
           <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
@@ -148,6 +172,7 @@ export const renderPostList = (
 
 /**
  * Render pagination controls
+ * Type-safe implementation with proper accessibility support
  */
 export const renderPagination = (pagination: Pagination): string => {
   const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
@@ -184,14 +209,14 @@ export const renderPagination = (pagination: Pagination): string => {
   }
 
   return `
-    <nav class="pagination" aria-label="Pagination Navigation">
+    <nav class="pagination content-section" aria-label="Pagination Navigation">
       ${hasPrevPage ? `
-        <a href="?page=${currentPage - 1}" class="pagination-prev" hx-boost="true" aria-label="Previous page">
-          &larr; Previous
+        <a href="?page=${currentPage - 1}" class="pagination-prev" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
+          Previous
         </a>
       ` : `
         <span class="pagination-prev pagination-disabled" aria-disabled="true">
-          &larr; Previous
+          Previous
         </span>
       `}
       
@@ -201,17 +226,17 @@ export const renderPagination = (pagination: Pagination): string => {
       ? `<span class="pagination-ellipsis">&hellip;</span>`
       : page === currentPage
         ? `<span class="pagination-current" aria-current="page">${page}</span>`
-        : `<a href="?page=${page}" hx-boost="true">${page}</a>`
+        : `<a href="?page=${page}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${page}</a>`
   ).join('')}
       </div>
       
       ${hasNextPage ? `
-        <a href="?page=${currentPage + 1}" class="pagination-next" hx-boost="true" aria-label="Next page">
-          Next &rarr;
+        <a href="?page=${currentPage + 1}" class="pagination-next" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
+          Next
         </a>
       ` : `
         <span class="pagination-next pagination-disabled" aria-disabled="true">
-          Next &rarr;
+          Next
         </span>
       `}
       
@@ -224,10 +249,11 @@ export const renderPagination = (pagination: Pagination): string => {
 
 /**
  * Render a single post
+ * Pure function that transforms Post -> HTML
  */
 export const renderPost = (post: Post): string => {
   return `
-    <article class="post">
+    <article class="post content-section">
       <header class="post-header">
         <h1>${post.title}</h1>
         <div class="post-meta">
@@ -244,35 +270,40 @@ export const renderPost = (post: Post): string => {
 
 /**
  * Render a 404 page
+ * Stateless function with implicit unit input
  */
 export const renderNotFound = (): string => {
   return `
-    <section class="not-found">
+    <section class="not-found content-section">
       <h1>404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
-      <p><a href="/">Return to home</a></p>
+      <p><a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML" class="button">Return Home</a></p>
     </section>
   `;
 };
 
 /**
  * Render the about page
+ * Stateless function with implicit unit input
  */
 export const renderAbout = (): string => {
   return `
-    <section class="about">
+    <section class="about content-section">
       <h1>About This Blog</h1>
       <p>This is a minimal blog built with Deno, HTMX, and Markdown.</p>
+      <p>The architecture follows functional programming principles with immutable data structures, pure functions, and strong type safety throughout.</p>
+      <p>The design uses a neobrutalist approach with bold colors, thick borders, and raw typography.</p>
     </section>
   `;
 };
 
 /**
  * Render the tag index page
+ * Type-safe function mapping TagInfo[] -> HTML
  */
 export const renderTagIndex = (tags: TagInfo[]): string => {
   return `
-    <section class="tag-index">
+    <section class="tag-index content-section">
       <h1>Tags</h1>
       <div class="tag-cloud">
         ${tags
@@ -282,6 +313,8 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
         <a href="/tags/${tag.name}" 
           class="tag tag-${sizeClassForCount(tag.count)}" 
           hx-boost="true"
+          hx-target="main"
+          hx-swap="innerHTML"
           title="${tag.count} posts">
           ${tag.name}
           <span class="tag-count">${tag.count}</span>
@@ -294,31 +327,56 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
 };
 
 /**
- * Render search form
+ * Render search popup fragment
+ * Pure function for HTMX-driven modal
  */
-export const renderSearchForm = (): string => {
+export const renderSearchPopup = (): string => {
   return `
-    <div class="search-container">
-      <form class="search-form" hx-get="/search" hx-trigger="submit" hx-target="#search-results" hx-swap="innerHTML">
-        <input 
-          type="search" 
-          name="q" 
-          placeholder="Search posts..." 
-          required
-          hx-get="/search" 
-          hx-trigger="keyup changed delay:500ms" 
-          hx-target="#search-results"
-          hx-include="closest form"
-        >
-        <button type="submit">Search</button>
-      </form>
-      <div id="search-results" class="search-results"></div>
+    <div class="search-container" hx-swap-oob="true">
+      <div class="search-overlay" hx-get="/search-close" hx-target="#search-popup" hx-trigger="click"></div>
+      <div class="search-modal">
+        <div class="search-header">
+          <h2>Search Posts</h2>
+          <button 
+            class="search-close" 
+            aria-label="Close search" 
+            hx-get="/search-close" 
+            hx-target="#search-popup" 
+            hx-trigger="click">
+            Close
+          </button>
+        </div>
+        <form class="search-form" hx-get="/search" hx-trigger="submit" hx-target="#search-results" hx-swap="innerHTML">
+          <input 
+            type="search" 
+            name="q" 
+            placeholder="Search posts..." 
+            required
+            hx-get="/search" 
+            hx-trigger="keyup changed delay:500ms" 
+            hx-target="#search-results"
+            hx-include="closest form"
+            autofocus
+          >
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-results" class="search-results"></div>
+      </div>
     </div>
   `;
 };
 
 /**
+ * Render empty search fragment (for closing)
+ * Zero-output function for modal dismissal
+ */
+export const renderSearchClose = (): string => {
+  return '';
+};
+
+/**
  * Render search results
+ * Pure function with Posts and query string -> HTML
  */
 export const renderSearchResults = (posts: Post[], query: string): string => {
   if (!query || query.trim().length === 0) {
@@ -327,19 +385,19 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
   if (posts.length === 0) {
     return `
-      <div class="search-results-summary">
+      <div class="search-results-summary content-section">
         No posts found matching "${query}"
       </div>
     `;
   }
 
   return `
-    <div class="search-results-summary">
+    <div class="search-results-summary content-section">
       Found ${posts.length} post${posts.length !== 1 ? 's' : ''} matching "${query}"
     </div>
     ${posts.map(post => `
       <article class="search-result">
-        <h3><a href="/posts/${post.slug}" hx-boost="true">${post.title}</a></h3>
+        <h3><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
         <div class="post-meta">
           <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
@@ -352,6 +410,7 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
 /**
  * Render an error page
+ * Type-safe error display with optional stack trace
  */
 export const renderErrorPage = (error: {
   title: string;
@@ -359,7 +418,7 @@ export const renderErrorPage = (error: {
   stackTrace?: string;
 }): string => {
   return `
-    <section class="error-page">
+    <section class="error-page content-section">
       <h1>${error.title}</h1>
       <div class="error-message">
         <p>${error.message}</p>
@@ -370,21 +429,22 @@ export const renderErrorPage = (error: {
           <pre class="error-stack">${error.stackTrace}</pre>
         </details>
       ` : ''}
-      <p><a href="/" class="button">Return Home</a></p>
+      <p><a href="/" class="button" hx-boost="true" hx-target="main" hx-swap="innerHTML">Return Home</a></p>
     </section>
   `;
 };
 
 /**
  * Helper function to render tags
+ * Pure function that maps string[] -> HTML
  */
 const renderTags = (tags: string[]): string => {
   return `
-    <div class="tags">
+    <div class="tags content-section">
       ${tags.map(tag => `
-      <a href="/tags/${tag}" class="tag" hx-boost="true" hx-target="main" hx-swap="innerHTML">
-        ${tag}
-      </a>
+        <a href="/tags/${tag}" class="tag" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+          ${tag}
+        </a>
       `).join("")}
     </div>
   `;
@@ -392,6 +452,7 @@ const renderTags = (tags: string[]): string => {
 
 /**
  * Helper function to determine tag size class based on count
+ * Pure function with numeric input -> string output
  */
 const sizeClassForCount = (count: number): string => {
   if (count >= 10) return "lg";
