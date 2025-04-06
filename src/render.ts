@@ -66,20 +66,26 @@ export const renderDocument = (
   ${twitterTags}
   
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectral/7.0.0/spectral.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/JetBrainsMono/2.3.1/web/jetbrainsmono.min.css" />
+
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
   <header>
-    <nav>
-      <a href="/" class="site-title" hx-boost="true">${context.title}</a>
-      <div class="nav-links">
-        <a href="/" hx-boost="true">Home</a>
-        <a href="/tags" hx-boost="true">Tags</a>
-        <a href="/about" hx-boost="true">About</a>
-        <a href="/feed.xml" class="rss-link">RSS</a>
-      </div>
-    </nav>
+  <nav>
+    <a href="/" class="site-title" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+      ${context.title}
+    </a>
+    <div class="nav-links">
+      <a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML">Home</a>
+      <a href="/tags" hx-boost="true" hx-target="main" hx-swap="innerHTML">Tags</a>
+      <a href="/about" hx-boost="true" hx-target="main" hx-swap="innerHTML">About</a>
+      <a href="/feed.xml" class="rss-link">RSS</a>
+    </div>
+  </nav>
     ${renderSearchForm()}
   </header>
   <main>
@@ -121,7 +127,11 @@ export const renderPostList = (
       .map(
         post => `
       <article class="post-card">
-        <h2><a href="/posts/${post.slug}" hx-boost="true">${post.title}</a></h2>
+        <h2>
+          <a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+            ${post.title}
+          </a>
+        </h2>
         <div class="post-meta">
           <time datetime="${post.date}">${new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
@@ -372,9 +382,9 @@ const renderTags = (tags: string[]): string => {
   return `
     <div class="tags">
       ${tags.map(tag => `
-        <a href="/tags/${tag}" class="tag" hx-boost="true">
-          ${tag}
-        </a>
+      <a href="/tags/${tag}" class="tag" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+        ${tag}
+      </a>
       `).join("")}
     </div>
   `;
