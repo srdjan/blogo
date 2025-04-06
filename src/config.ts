@@ -1,6 +1,6 @@
 // src/config.ts - Typed configuration with functional loading
 import { Result } from "./types.ts";
-import { tryCatch, createError } from "./error.ts";
+import { createError } from "./error.ts";
 import type { AppError } from "./error.ts";
 
 // Application environment

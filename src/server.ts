@@ -163,21 +163,7 @@ const routeRequest = async (
 ): Promise<Response> => {
   const { blog: { title: blogTitle } } = config;
 
-  // Search popup fragment route
-  if (path === "/search-fragment") {
-    const content = renderSearchPopup();
-    return new Response(content, {
-      headers: { "Content-Type": "text/html" }
-    });
-  }
-
-  // Search close route
-  if (path === "/search-close") {
-    const content = renderSearchClose();
-    return new Response(content, {
-      headers: { "Content-Type": "text/html" }
-    });
-  }
+  // We no longer need these routes as search is now handled client-side
 
   // Home page - list all posts
   if (path === "/") {

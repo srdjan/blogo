@@ -81,66 +81,78 @@ export const renderDocument = (
       }
     });
     
-    // Accessibility: Modal focus trap for search popup
-    document.addEventListener('htmx:afterSettle', function(event) {
-      if (event.target.id === 'search-popup' && event.target.querySelector('.search-modal')) {
-        trapFocus(event.target.querySelector('.search-modal'));
+    // Handle Escape key for search modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const searchModal = document.getElementById('search-modal');
+        if (searchModal && searchModal.style.display === 'flex') {
+          searchModal.style.display = 'none';
+        }
       }
     });
     
-    // Focus trap implementation
-    function trapFocus(element) {
-      // Find all focusable elements
-      const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-      const focusableContent = element.querySelectorAll(focusableElements);
-      const firstFocusableElement = focusableContent[0];
-      const lastFocusableElement = focusableContent[focusableContent.length - 1];
+    // Set up search form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchForm = document.getElementById('search-form');
+      const searchInput = document.getElementById('search-input');
+      const searchResults = document.getElementById('search-results');
       
-      // Focus the first element
-      if (firstFocusableElement) {
-        firstFocusableElement.focus();
-      }
-      
-      // Save last active element to restore focus when modal closes
-      const previouslyFocused = document.activeElement;
-      
-      // Handle keydown events for tab key to create a focus trap
-      element.addEventListener('keydown', function(e) {
-        // If Escape is pressed, close the modal
-        if (e.key === 'Escape') {
-          const closeButton = element.querySelector('.search-close');
-          if (closeButton) {
-            closeButton.click();
-          }
-        }
+      searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        // Only handle Tab key
-        if (e.key !== 'Tab') return;
+        const query = searchInput.value.trim();
+        if (!query) return;
         
-        // If Shift + Tab on first element, move to last element
-        if (e.shiftKey && document.activeElement === firstFocusableElement) {
-          e.preventDefault();
-          lastFocusableElement.focus();
-        } 
-        // If Tab on last element, move to first element
-        else if (!e.shiftKey && document.activeElement === lastFocusableElement) {
-          e.preventDefault();
-          firstFocusableElement.focus();
+        // Show loading indicator
+        searchResults.innerHTML = 'Searching...';
+        
+        // Fetch search results
+        fetch('/search?q=' + encodeURIComponent(query))
+          .then(response => response.text())
+          .then(html => {
+            searchResults.innerHTML = html;
+          })
+          .catch(error => {
+            searchResults.innerHTML = 'Error: Could not perform search.';
+            console.error('Search error:', error);
+          });
+      });
+      
+      // Also search on typing with delay
+      let searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = searchInput.value.trim();
+        
+        if (query.length > 2) {
+          searchTimeout = setTimeout(function() {
+            // Show loading indicator
+            searchResults.innerHTML = 'Searching...';
+            
+            // Fetch search results
+            fetch('/search?q=' + encodeURIComponent(query))
+              .then(response => response.text())
+              .then(html => {
+                searchResults.innerHTML = html;
+              })
+              .catch(error => {
+                searchResults.innerHTML = 'Error: Could not perform search.';
+                console.error('Search error:', error);
+              });
+          }, 300);
+        } else if (!query) {
+          searchResults.innerHTML = '';
         }
       });
       
-      // Clean up when modal closes
-      document.addEventListener('htmx:beforeSwap', function cleanup(evt) {
-        if (evt.target.id === 'search-popup' && !evt.detail.xhr.responseText) {
-          // Restore focus to previously focused element
-          if (previouslyFocused) {
-            previouslyFocused.focus();
-          }
-          // Remove this event listener
-          document.removeEventListener('htmx:beforeSwap', cleanup);
-        }
+      // Focus input when modal opens
+      document.querySelector('.search-toggle').addEventListener('click', function() {
+        // Give the browser a moment to display the modal before focusing
+        setTimeout(function() {
+          searchInput.focus();
+        }, 10);
       });
-    }
+    });
   </script>
 </head>
 <body>
@@ -157,16 +169,30 @@ export const renderDocument = (
           class="search-toggle" 
           aria-label="Search" 
           aria-expanded="false"
-          hx-get="/search-fragment"
-          hx-target="#search-popup"
-          hx-trigger="click"
-          hx-swap="innerHTML">
+          onclick="document.getElementById('search-modal').style.display='flex'"
+          >
           Search
         </button>
         <a href="/feed.xml" class="rss-link">RSS</a>
       </div>
     </nav>
-    <div id="search-popup" class="search-popup"></div>
+    <div id="search-modal" class="search-modal-overlay" style="display:none">
+      <div class="search-modal-content">
+        <form class="search-form" id="search-form">
+          <input 
+            type="search" 
+            name="q" 
+            placeholder="Search posts..." 
+            required
+            id="search-input"
+            autofocus
+            aria-labelledby="search-heading"
+          >
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-results" class="search-results" aria-live="polite"></div>
+      </div>
+    </div>
   </header>
   
   <!-- Explicit spacer element to maintain header clearance -->
@@ -383,66 +409,8 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
   `;
 };
 
-/**
- * Render search popup fragment
- * Pure function for HTMX-driven modal
- */
-export const renderSearchPopup = (): string => {
-  return `
-    <div class="search-container" hx-swap-oob="true">
-      <div class="search-overlay" 
-           hx-get="/search-close" 
-           hx-target="#search-popup" 
-           hx-trigger="click"
-           role="button"
-           aria-label="Close search overlay"></div>
-      <div class="search-modal" 
-           role="dialog" 
-           aria-modal="true" 
-           aria-labelledby="search-heading">
-        <div class="search-header">
-          <h2 id="search-heading">Search Posts</h2>
-          <button 
-            class="search-close" 
-            aria-label="Close search" 
-            hx-get="/search-close" 
-            hx-target="#search-popup" 
-            hx-trigger="click">
-            Close
-          </button>
-        </div>
-        <form class="search-form" 
-              hx-get="/search" 
-              hx-trigger="submit" 
-              hx-target="#search-results" 
-              hx-swap="innerHTML">
-          <input 
-            type="search" 
-            name="q" 
-            placeholder="Search posts..." 
-            required
-            hx-get="/search" 
-            hx-trigger="keyup changed delay:500ms" 
-            hx-target="#search-results"
-            hx-include="closest form"
-            autofocus
-            aria-labelledby="search-heading"
-          >
-          <button type="submit">Search</button>
-        </form>
-        <div id="search-results" class="search-results" aria-live="polite"></div>
-      </div>
-    </div>
-  `;
-};
-
-/**
- * Render empty search fragment (for closing)
- * Zero-output function for modal dismissal
- */
-export const renderSearchClose = (): string => {
-  return '';
-};
+// The search functionality is now handled client-side
+// These functions are kept as stubs for now to avoid breaking imports
 
 /**
  * Render search results
