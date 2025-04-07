@@ -29,9 +29,9 @@
   --content-padding: clamp(1rem, 5vw, 2.5rem);
 
   /* Brutalist design elements */
-  --border-thick: 4px solid var(--color-border);
-  --border-medium: 3px solid var(--color-border);
-  --border-thin: 2px solid var(--color-border);
+  --border-thick: 3px solid var(--color-border);
+  --border-medium: 2px solid var(--color-border);
+  --border-thin: 1px solid var(--color-border);
   --shadow-brutal: 6px 6px 0px 0px var(--color-border);
   --radius-none: 0;
 
@@ -222,7 +222,7 @@ nav {
 
 .nav-links a:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 /* Create spacer for fixed header - using CSS custom property for dynamic adjustment */
@@ -280,7 +280,7 @@ footer {
 }
 
 .post-card:hover {
-  transform: translate(-4px, -4px);
+  transform: translate(-2px, -2px);
   box-shadow: 10px 10px 0 0 var(--color-border);
 }
 
@@ -355,7 +355,7 @@ footer {
   padding: var(--space-2xs) var(--space-xs);
   background-color: var(--color-accent);
   border: var(--border-thin);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 .post-content p {
@@ -388,7 +388,7 @@ footer {
 
 .tag:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -452,7 +452,7 @@ footer {
 
 .button:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
   text-decoration: none;
 }
 
@@ -482,7 +482,7 @@ footer {
 
 .search-toggle:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 /* Search modal overlay */
@@ -496,7 +496,7 @@ footer {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -547,7 +547,7 @@ footer {
 
 .search-close:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 /* Search form */
@@ -570,7 +570,7 @@ footer {
 
 .search-form input[type="search"]:focus {
   outline: none;
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 .search-form button {
@@ -629,7 +629,7 @@ footer {
 }
 
 .search-result:hover {
-  transform: translate(-4px, -4px);
+  transform: translate(-2px, -2px);
   box-shadow: 10px 10px 0 0 var(--color-border);
 }
 
@@ -671,7 +671,7 @@ footer {
 
 .rss-link:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -737,7 +737,7 @@ footer {
 
 .pagination-pages a:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -766,7 +766,7 @@ footer {
 .pagination-prev:not(.pagination-disabled):hover,
 .pagination-next:not(.pagination-disabled):hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--color-border);
+  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -833,7 +833,8 @@ footer {
 @media (max-width: 640px) {
   :root {
     --content-padding: 1rem;
-    --header-height: 210px; /* Dynamic header height for mobile */
+    --header-height: 210px;
+    /* Dynamic header height for mobile */
   }
 
   html {
@@ -854,7 +855,8 @@ footer {
   }
 
   .site-title {
-    font-size: 1.5rem; /* Smaller title on mobile */
+    font-size: 1.5rem;
+    /* Smaller title on mobile */
     width: 100%;
     margin-bottom: var(--space-xs);
   }
@@ -866,7 +868,7 @@ footer {
     justify-content: space-between;
     gap: var(--space-xs);
   }
-  
+
   .nav-links a,
   .search-toggle,
   .rss-link {

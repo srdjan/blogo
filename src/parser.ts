@@ -1,4 +1,3 @@
-// src/parser.ts - Parse markdown files into Post objects
 import { Result, Post, PostMeta } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
 import { marked } from "https://esm.sh/marked@15.0.7";

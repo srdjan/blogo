@@ -1,9 +1,7 @@
-// main.ts - Entry point
 import { startServer } from "./src/server.ts";
 import { loadConfig } from "./src/config.ts";
 import { match } from "./src/error.ts";
 
-// Load configuration
 const configResult = await loadConfig();
 
 // Match on the configuration result

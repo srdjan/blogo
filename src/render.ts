@@ -1,4 +1,3 @@
-// src/render.ts - HTML rendering functions with type-safe functional approach
 import { RenderContext, Post, TagInfo } from "./types.ts";
 import type { Pagination } from "./pagination.ts";
 import {
@@ -408,9 +407,6 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
     </section>
   `;
 };
-
-// The search functionality is now handled client-side
-// These functions are kept as stubs for now to avoid breaking imports
 
 /**
  * Render search results

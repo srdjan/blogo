@@ -1,5 +1,3 @@
-// src/server.ts - Type-safe server implementation using Deno.serve
-import { Result } from "./types.ts";
 import type { Post, TagInfo } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
@@ -11,12 +9,10 @@ import {
   renderTagIndex,
   renderSearchResults,
   renderErrorPage,
-  renderSearchPopup,
-  renderSearchClose,
 } from "./render.ts";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
-import { resultToResponse, createError, tryCatch, match } from "./error.ts";
+import { resultToResponse, createError, tryCatch } from "./error.ts";
 import type { AppError } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
@@ -85,15 +81,10 @@ const handleRequestSafe = async (
   // Load all posts with caching
   const currentTime = Date.now();
   let postsResult;
-  
   if (postsCache && (currentTime - postsCacheTime) < CACHE_TTL) {
-    // Use cached posts if available and not expired
     postsResult = { ok: true, value: postsCache };
   } else {
-    // Otherwise load posts from disk
     postsResult = await loadPosts();
-    
-    // Update cache if successful
     if (postsResult.ok) {
       postsCache = postsResult.value;
       postsCacheTime = currentTime;
@@ -162,8 +153,6 @@ const routeRequest = async (
   isHtmxRequest: boolean
 ): Promise<Response> => {
   const { blog: { title: blogTitle } } = config;
-
-  // We no longer need these routes as search is now handled client-side
 
   // Home page - list all posts
   if (path === "/") {
