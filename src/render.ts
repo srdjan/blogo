@@ -54,24 +54,25 @@ export const renderDocument = (
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${pageTitle}</title>
   <meta name="description" content="${pageDescription}">
-  
+
   <!-- System fonts -->
-  
+
   <!-- Structured Data -->
   <script type="application/ld+json">
     ${structuredData}
   </script>
-  
+
   <!-- Open Graph tags -->
   ${ogTags}
-  
+
   <!-- Twitter Card tags -->
   ${twitterTags}
-  
+
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/color-override.css">
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
   <script src="/js/htmx.min.js"></script>
-  
+
   <!-- HTMX scroll and accessibility management -->
   <script>
     document.addEventListener('htmx:afterSwap', function(event) {
@@ -79,7 +80,7 @@ export const renderDocument = (
         window.scrollTo({top: 0, behavior: 'smooth'});
       }
     });
-    
+
     // Handle Escape key for search modal
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
@@ -89,22 +90,22 @@ export const renderDocument = (
         }
       }
     });
-    
+
     // Set up search form submission
     document.addEventListener('DOMContentLoaded', function() {
       const searchForm = document.getElementById('search-form');
       const searchInput = document.getElementById('search-input');
       const searchResults = document.getElementById('search-results');
-      
+
       searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const query = searchInput.value.trim();
         if (!query) return;
-        
+
         // Show loading indicator
         searchResults.innerHTML = 'Searching...';
-        
+
         // Fetch search results
         fetch('/search?q=' + encodeURIComponent(query))
           .then(response => response.text())
@@ -116,18 +117,18 @@ export const renderDocument = (
             console.error('Search error:', error);
           });
       });
-      
+
       // Also search on typing with delay
       let searchTimeout;
       searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         const query = searchInput.value.trim();
-        
+
         if (query.length > 2) {
           searchTimeout = setTimeout(function() {
             // Show loading indicator
             searchResults.innerHTML = 'Searching...';
-            
+
             // Fetch search results
             fetch('/search?q=' + encodeURIComponent(query))
               .then(response => response.text())
@@ -143,7 +144,7 @@ export const renderDocument = (
           searchResults.innerHTML = '';
         }
       });
-      
+
       // Focus input when modal opens
       document.querySelector('.search-toggle').addEventListener('click', function() {
         // Give the browser a moment to display the modal before focusing
@@ -156,32 +157,44 @@ export const renderDocument = (
 </head>
 <body>
   <header id="site-header">
-    <nav>
-      <a href="/" class="site-title" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
+    <h1 class="site-title">
+      <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
         ${context.title}
       </a>
+    </h1>
+    <nav>
       <div class="nav-links">
-        <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
-        <a href="/tags" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
-        <a href="/about" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
-        <button 
-          class="search-toggle" 
-          aria-label="Search" 
+        <a href="/" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
+        <a href="/tags" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
+        <a href="/about" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
+        <button
+          class="search-toggle link"
+          aria-label="Search"
           aria-expanded="false"
           onclick="document.getElementById('search-modal').style.display='flex'"
           >
           Search
         </button>
-        <a href="/feed.xml" class="rss-link">RSS</a>
+        <a href="/feed.xml" class="link">RSS</a>
       </div>
     </nav>
-    <div id="search-modal" class="search-modal-overlay" style="display:none">
+    <div id="search-modal" class="search-modal-overlay" style="display:none" onclick="if(event.target === this) this.style.display='none'">
       <div class="search-modal-content">
+        <div class="search-header">
+          <h2>Search</h2>
+          <button
+            class="search-close"
+            aria-label="Close search"
+            onclick="document.getElementById('search-modal').style.display='none'"
+          >
+            ✕ Close
+          </button>
+        </div>
         <form class="search-form" id="search-form">
-          <input 
-            type="search" 
-            name="q" 
-            placeholder="Search posts..." 
+          <input
+            type="search"
+            name="q"
+            placeholder="Search posts..."
             required
             id="search-input"
             autofocus
@@ -193,15 +206,15 @@ export const renderDocument = (
       </div>
     </div>
   </header>
-  
+
   <!-- Explicit spacer element to maintain header clearance -->
   <div class="header-spacer" aria-hidden="true"></div>
-  
+
   <main id="content-main" class="htmx-swappable">
     ${content}
   </main>
   <footer>
-    <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">⊣˚∆˚⊢</a> & Cloude</p>
+    <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer"><span class="avatar">⊣˚∆˚⊢</span></a> & Claude</p>
   </footer>
 </body>
 </html>`;
@@ -223,21 +236,21 @@ export const renderPostList = (
           <h1>Posts Tagged "${activeTag}"</h1>
           <div class="tag-filter-header">
             <p>Showing ${posts.length} post${posts.length !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
-            <a href="/" class="button" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
+            <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
           </div>
         ` : ''}
-      
+
       ${posts.length === 0 ? `
         <div class="empty-state">
           <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ''}.</p>
         </div>
       ` : ''}
-      
+
       ${posts
       .map(
         post => `
       <article class="post-card">
-        <h2><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
+        <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
         <div class="post-meta">
           <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
@@ -246,7 +259,7 @@ export const renderPostList = (
       </article>`
       )
       .join("")}
-      
+
       ${pagination ? renderPagination(pagination) : ''}
     </section>
   `;
@@ -293,7 +306,7 @@ export const renderPagination = (pagination: Pagination): string => {
   return `
     <nav class="pagination content-section" aria-label="Pagination Navigation">
       ${hasPrevPage ? `
-        <a href="?page=${currentPage - 1}" class="pagination-prev" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
+        <a href="?page=${currentPage - 1}" class="pagination-prev link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
           Previous
         </a>
       ` : `
@@ -301,19 +314,19 @@ export const renderPagination = (pagination: Pagination): string => {
           Previous
         </span>
       `}
-      
+
       <div class="pagination-pages">
         ${pageNumbers.map(page =>
     page === null
       ? `<span class="pagination-ellipsis">&hellip;</span>`
       : page === currentPage
         ? `<span class="pagination-current" aria-current="page">${page}</span>`
-        : `<a href="?page=${page}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${page}</a>`
+        : `<a href="?page=${page}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${page}</a>`
   ).join('')}
       </div>
-      
+
       ${hasNextPage ? `
-        <a href="?page=${currentPage + 1}" class="pagination-next" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
+        <a href="?page=${currentPage + 1}" class="pagination-next link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
           Next
         </a>
       ` : `
@@ -321,7 +334,7 @@ export const renderPagination = (pagination: Pagination): string => {
           Next
         </span>
       `}
-      
+
       <div class="pagination-info">
         <p>Page ${currentPage} of ${totalPages}</p>
       </div>
@@ -359,7 +372,7 @@ export const renderNotFound = (): string => {
     <section class="not-found content-section">
       <h1>404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
-      <p><a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML" class="button">Return Home</a></p>
+      <p><a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML" class="button link">Return Home</a></p>
     </section>
   `;
 };
@@ -392,8 +405,8 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
       .sort((a, b) => b.count - a.count)
       .map(
         tag => `
-        <a href="/tags/${tag.name}" 
-          class="tag tag-${sizeClassForCount(tag.count)}" 
+        <a href="/tags/${tag.name}"
+          class="tag tag-${sizeClassForCount(tag.count)} link"
           hx-boost="true"
           hx-target="main"
           hx-swap="innerHTML"
@@ -431,7 +444,7 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
     </div>
     ${posts.map(post => `
       <article class="search-result">
-        <h3><a href="/posts/${post.slug}" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
+        <h3><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
         <div class="post-meta">
           <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
           ${post.tags ? renderTags(post.tags) : ""}
@@ -463,7 +476,7 @@ export const renderErrorPage = (error: {
           <pre class="error-stack">${error.stackTrace}</pre>
         </details>
       ` : ''}
-      <p><a href="/" class="button" hx-boost="true" hx-target="main" hx-swap="innerHTML">Return Home</a></p>
+      <p><a href="/" class="button link" hx-boost="true" hx-target="main" hx-swap="innerHTML">Return Home</a></p>
     </section>
   `;
 };
@@ -476,7 +489,7 @@ const renderTags = (tags: string[]): string => {
   return `
     <div class="tags content-section">
       ${tags.map(tag => `
-        <a href="/tags/${tag}" class="tag" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+        <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="main" hx-swap="innerHTML">
           ${tag}
         </a>
       `).join("")}
