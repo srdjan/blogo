@@ -7,11 +7,11 @@
   --text-color: whitesmoke;
   --accent-color: #c9fcc9;
   --link-hover-bg: rgb(59, 105, 105);
-  
+
   /* Typography */
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  
+
   /* Responsive font sizes */
   --h1-size: clamp(3rem, 2.7273rem + 1.0909vw, 3.6rem);
   --h2-size: clamp(2.25rem, 2.0455rem + 0.8182vw, 2.7rem);
@@ -20,7 +20,7 @@
   --h5-size: clamp(1.25rem, 1.1364rem + 0.4545vw, 1.5rem);
   --h6-size: clamp(1.125rem, 1.0227rem + 0.4091vw, 1.35rem);
   --p-size: clamp(0.8333rem, 0.7576rem + 0.303vw, 1rem);
-  
+
   /* Layout */
   --max-width: 70ch;
   --content-padding: 3em 1em;
@@ -43,41 +43,51 @@ body {
 }
 
 /* Typography */
-h1, .fs-h1 {
+h1,
+.fs-h1 {
   font-size: var(--h1-size);
 }
 
-h2, .fs-h2 {
+h2,
+.fs-h2 {
   font-size: var(--h2-size);
 }
 
-h3, .fs-h3 {
+h3,
+.fs-h3 {
   font-size: var(--h3-size);
 }
 
-h4, .fs-h4 {
+h4,
+.fs-h4 {
   font-size: var(--h4-size);
 }
 
-h5, .fs-h5 {
+h5,
+.fs-h5 {
   font-size: var(--h5-size);
 }
 
-h6, .fs-h6 {
+h6,
+.fs-h6 {
   font-size: var(--h6-size);
 }
 
-p, .fs-p {
+p,
+.fs-p {
   font-size: var(--p-size);
 }
 
 /* Links */
-a, a:visited {
+a,
+a:visited {
   text-decoration: none;
   color: var(--text-color);
 }
 
-a:hover, a:focus, a:active {
+a:hover,
+a:focus,
+a:active {
   background-color: var(--link-hover-bg);
 }
 
@@ -89,7 +99,8 @@ a:hover, a:focus, a:active {
   transition: all 0.5s;
 }
 
-.link:after, .link:before {
+.link:after,
+.link:before {
   content: " ";
   width: 30%;
   height: 25%;
@@ -104,7 +115,8 @@ a:hover, a:focus, a:active {
   border-right: 2px solid var(--accent-color);
 }
 
-.link:hover:before, .link:hover:after {
+.link:hover:before,
+.link:hover:after {
   width: 100%;
   height: 100%;
 }
@@ -163,7 +175,9 @@ footer {
   gap: 1rem;
 }
 
-.nav-links a, .search-toggle, .rss-link {
+.nav-links a,
+.search-toggle,
+.rss-link {
   color: var(--text-color);
   text-decoration: none;
   padding: 0.25rem 0.5rem;
@@ -171,7 +185,9 @@ footer {
   border: none;
 }
 
-.nav-links a:hover, .search-toggle:hover, .rss-link:hover {
+.nav-links a:hover,
+.search-toggle:hover,
+.rss-link:hover {
   background-color: var(--link-hover-bg);
   color: var(--text-color);
 }
@@ -256,7 +272,9 @@ footer {
   border: 1px solid var(--accent-color);
 }
 
-.post-content h2, .post-content h3, .post-content h4 {
+.post-content h2,
+.post-content h3,
+.post-content h4 {
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
@@ -354,12 +372,12 @@ blockquote {
   html {
     padding: 1.5em 1em;
   }
-  
+
   .nav-links {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   ul {
     column-count: 1;
   }

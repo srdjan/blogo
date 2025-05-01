@@ -1,5 +1,6 @@
-// src/pagination.ts - Type-safe pagination utilities
+// src/pagination.ts - Type-safe pagination utilities with optimized filtering
 import type { Post } from "./types.ts";
+import { tryCatchSync } from "./error.ts";
 
 /**
  * Pagination metadata
@@ -22,6 +23,26 @@ export interface PaginatedResult<T> {
 }
 
 /**
+ * Filter options for paginating collections
+ */
+export interface FilterOptions {
+  tag?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  sortBy?: 'date' | 'title';
+  sortDir?: 'asc' | 'desc';
+}
+
+/**
+ * Pagination options
+ */
+export interface PaginationOptions extends FilterOptions {
+  page: number;
+  itemsPerPage: number;
+}
+
+/**
  * Create a paginated result from a collection of items
  */
 export const paginate = <T>(
@@ -35,8 +56,8 @@ export const paginate = <T>(
 
   // Calculate pagination metadata
   const totalItems = items.length;
-  const totalPages = Math.ceil(totalItems / safeItemsPerPage);
-  const currentPage = Math.min(safePage, totalPages || 1); // Ensure we don't exceed total pages
+  const totalPages = Math.ceil(totalItems / safeItemsPerPage) || 1; // At least 1 page
+  const currentPage = Math.min(safePage, totalPages); // Ensure we don't exceed total pages
 
   // Calculate start and end indices
   const startIndex = (currentPage - 1) * safeItemsPerPage;
@@ -63,7 +84,8 @@ export const paginate = <T>(
  */
 export const generatePaginationLinks = (
   pagination: Pagination,
-  baseUrl: string
+  baseUrl: string,
+  extraParams?: Record<string, string>
 ): Record<string, string | null> => {
   const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
 
@@ -71,6 +93,14 @@ export const generatePaginationLinks = (
   const formatPageUrl = (page: number): string => {
     const url = new URL(baseUrl);
     url.searchParams.set("page", page.toString());
+    
+    // Add any extra query parameters
+    if (extraParams) {
+      Object.entries(extraParams).forEach(([key, value]) => {
+        if (value) url.searchParams.set(key, value);
+      });
+    }
+    
     return url.toString();
   };
 
@@ -84,49 +114,96 @@ export const generatePaginationLinks = (
 };
 
 /**
+ * Apply filters to a collection of posts
+ */
+export const filterPosts = (
+  posts: Post[],
+  options: FilterOptions = {}
+): Post[] => {
+  const { tag, search, dateFrom, dateTo, sortBy = 'date', sortDir = 'desc' } = options;
+  
+  // Create a safe wrapper to handle potential errors in filtering
+  return tryCatchSync(() => {
+    let filteredPosts = [...posts]; // Create a copy to avoid mutating original
+    
+    // Filter by tag if specified
+    if (tag) {
+      filteredPosts = filteredPosts.filter(post => 
+        post.tags?.includes(tag)
+      );
+    }
+    
+    // Filter by date range if specified
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom).getTime();
+      filteredPosts = filteredPosts.filter(post => 
+        new Date(post.date).getTime() >= fromDate
+      );
+    }
+    
+    if (dateTo) {
+      const toDate = new Date(dateTo).getTime();
+      filteredPosts = filteredPosts.filter(post => 
+        new Date(post.date).getTime() <= toDate
+      );
+    }
+    
+    // Filter by search query if specified
+    if (search && search.trim() !== "") {
+      const searchTerms = search.toLowerCase().trim().split(/\s+/);
+      
+      filteredPosts = filteredPosts.filter(post => {
+        // Pre-compute lowercase versions for performance
+        const titleLower = post.title.toLowerCase();
+        const contentLower = post.content.toLowerCase();
+        const excerptLower = (post.excerpt || "").toLowerCase();
+        const tagsLower = (post.tags || []).join(" ").toLowerCase();
+        
+        // Match if ANY search term is found in ANY searchable field
+        return searchTerms.some(term =>
+          titleLower.includes(term) ||
+          contentLower.includes(term) ||
+          excerptLower.includes(term) ||
+          tagsLower.includes(term)
+        );
+      });
+    }
+    
+    // Sort the posts
+    filteredPosts.sort((a, b) => {
+      let comparison: number;
+      
+      if (sortBy === 'date') {
+        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else if (sortBy === 'title') {
+        comparison = a.title.localeCompare(b.title);
+      } else {
+        comparison = 0;
+      }
+      
+      return sortDir === 'desc' ? -comparison : comparison;
+    });
+    
+    return filteredPosts;
+  }, () => {
+    // Fallback to original posts if any error occurs
+    console.error("Error filtering posts, returning unfiltered");
+    return posts;
+  }).value;
+};
+
+/**
  * Paginate posts with type-safe filtering options
  */
 export const paginatePosts = (
   posts: Post[],
-  options: {
-    page: number;
-    itemsPerPage: number;
-    tag?: string;
-    search?: string;
-  }
+  options: PaginationOptions
 ): PaginatedResult<Post> => {
-  const { page, itemsPerPage, tag, search } = options;
-
-  // Apply filters if needed
-  let filteredPosts = posts;
-
-  // Filter by tag
-  if (tag) {
-    filteredPosts = filteredPosts.filter(post =>
-      post.tags?.includes(tag)
-    );
-  }
-
-  // Filter by search query
-  if (search && search.trim() !== "") {
-    const searchTerms = search.toLowerCase().trim().split(/\s+/);
-
-    filteredPosts = filteredPosts.filter(post => {
-      const titleLower = post.title.toLowerCase();
-      const contentLower = post.content.toLowerCase();
-      const excerptLower = (post.excerpt || "").toLowerCase();
-      const tagsLower = (post.tags || []).join(" ").toLowerCase();
-
-      // Match if ANY search term is found in ANY searchable field
-      return searchTerms.some(term =>
-        titleLower.includes(term) ||
-        contentLower.includes(term) ||
-        excerptLower.includes(term) ||
-        tagsLower.includes(term)
-      );
-    });
-  }
-
-  // Apply pagination
+  const { page, itemsPerPage, ...filterOptions } = options;
+  
+  // First apply all filters
+  const filteredPosts = filterPosts(posts, filterOptions);
+  
+  // Then paginate the filtered results
   return paginate(filteredPosts, page, itemsPerPage);
 };

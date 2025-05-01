@@ -1,4 +1,4 @@
-// src/error.ts - Advanced error handling with pattern matching
+// src/error.ts - Advanced error handling with pattern matching and enhanced tracing
 import type { Result } from "./types.ts";
 
 /**
@@ -8,30 +8,65 @@ export type AppErrorKind =
   | "NotFound"
   | "ParseError"
   | "IOError"
-  | "ValidationError";
+  | "ValidationError"
+  | "CacheError"
+  | "NetworkError"
+  | "RenderError";
 
 export interface AppError {
   kind: AppErrorKind;
   message: string;
   cause?: unknown;
+  timestamp?: number;  // When the error occurred
+  path?: string;       // Path or context where error happened
+  retryable?: boolean; // Whether this error can be retried
 }
 
 /**
- * Create a new application error
+ * Create a new application error with enhanced metadata
  */
 export const createError = (
   kind: AppErrorKind,
   message: string,
-  cause?: unknown
+  cause?: unknown,
+  options?: {
+    path?: string;
+    retryable?: boolean;
+  }
 ): AppError => ({
   kind,
   message,
   cause,
+  timestamp: Date.now(),
+  path: options?.path,
+  retryable: options?.retryable
 });
 
 /**
+ * Format error details for logging
+ */
+export const formatError = (error: AppError): string => {
+  const time = error.timestamp 
+    ? new Date(error.timestamp).toISOString() 
+    : new Date().toISOString();
+  
+  let message = `[${time}] ${error.kind}: ${error.message}`;
+  
+  if (error.path) {
+    message += ` (path: ${error.path})`;
+  }
+  
+  if (error.cause) {
+    message += `\nCause: ${error.cause instanceof Error 
+      ? `${error.cause.name}: ${error.cause.message}`
+      : String(error.cause)}`;
+  }
+  
+  return message;
+};
+
+/**
  * Match on a Result type and handle both success and error cases
- * This is a simplified version of the match pattern from ts-pattern
  */
 export function match<T, E, U>(
   result: Result<T, E>,
@@ -80,13 +115,61 @@ export function chain<T, E, U>(
  */
 export async function tryCatch<T, E = AppError>(
   fn: () => Promise<T>,
-  errorFn: (error: unknown) => E = (e) => createError("IOError", String(e), e) as E
+  errorFn: (error: unknown) => E = (e) => createError(
+    "IOError", 
+    String(e), 
+    e
+  ) as E
 ): Promise<Result<T, E>> {
   try {
     const value = await fn();
     return { ok: true, value };
   } catch (error) {
     return { ok: false, error: errorFn(error) };
+  }
+}
+
+/**
+ * Synchronous version of tryCatch for operations that don't need async
+ */
+export function tryCatchSync<T, E = AppError>(
+  fn: () => T,
+  errorFn: (error: unknown) => E = (e) => createError(
+    "IOError", 
+    String(e), 
+    e
+  ) as E
+): Result<T, E> {
+  try {
+    const value = fn();
+    return { ok: true, value };
+  } catch (error) {
+    return { ok: false, error: errorFn(error) };
+  }
+}
+
+/**
+ * Handle Result objects with a logging wrapper
+ */
+export function handleResult<T, E extends AppError>(
+  result: Result<T, E>,
+  {
+    onSuccess,
+    onError,
+    logError = true,
+  }: {
+    onSuccess: (value: T) => void;
+    onError: (error: E) => void;
+    logError?: boolean;
+  }
+): void {
+  if (result.ok) {
+    onSuccess(result.value);
+  } else {
+    if (logError) {
+      console.error(formatError(result.error));
+    }
+    onError(result.error);
   }
 }
 

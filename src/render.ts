@@ -8,6 +8,115 @@ import {
 } from "./metadata.ts";
 
 /**
+ * Shared HTML templates for reuse across rendering functions
+ */
+const TEMPLATES = {
+  // HTML head with meta, css, js
+  head: (
+    title: string, 
+    description: string, 
+    structuredData: string, 
+    ogTags: string, 
+    twitterTags: string,
+    siteName: string
+  ) => `
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <meta name="description" content="${description}">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">${structuredData}</script>
+    
+    <!-- Open Graph tags -->
+    ${ogTags}
+    
+    <!-- Twitter Card tags -->
+    ${twitterTags}
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/color-override.css">
+    <link rel="alternate" type="application/rss+xml" title="${siteName} RSS Feed" href="/feed.xml">
+    <script src="/js/htmx.min.js"></script>
+    <script>
+      document.addEventListener('htmx:afterSwap',event=>{event.detail.target.tagName==='MAIN'&&window.scrollTo({top:0,behavior:'smooth'})});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('search-modal');m&&m.style.display==='flex'&&(m.style.display='none')}});
+      document.addEventListener('DOMContentLoaded',function(){
+        const f=document.getElementById('search-form'),i=document.getElementById('search-input'),r=document.getElementById('search-results');
+        f.addEventListener('submit',e=>{
+          e.preventDefault();
+          const q=i.value.trim();
+          if(!q)return;
+          r.innerHTML='Searching...';
+          fetch('/search?q='+encodeURIComponent(q))
+            .then(res=>res.text())
+            .then(html=>r.innerHTML=html)
+            .catch(err=>{r.innerHTML='Error: Could not perform search.';console.error('Search error:',err)});
+        });
+        let t;
+        i.addEventListener('input',()=>{
+          clearTimeout(t);
+          const q=i.value.trim();
+          if(q.length>2){
+            t=setTimeout(()=>{
+              r.innerHTML='Searching...';
+              fetch('/search?q='+encodeURIComponent(q))
+                .then(res=>res.text())
+                .then(html=>r.innerHTML=html)
+                .catch(err=>{r.innerHTML='Error: Could not perform search.';console.error('Search error:',err)});
+            },300);
+          }else if(!q){r.innerHTML=''}
+        });
+        document.querySelector('.search-toggle').addEventListener('click',()=>setTimeout(()=>i.focus(),10));
+      });
+    </script>
+  </head>`,
+
+  // Navigation
+  nav: (title: string) => `
+  <header id="site-header">
+    <h1 class="site-title">
+      <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${title}</a>
+    </h1>
+    <nav>
+      <div class="nav-links">
+        <a href="/" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
+        <a href="/tags" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
+        <a href="/about" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
+        <button class="search-toggle link" aria-label="Search" aria-expanded="false" 
+          onclick="document.getElementById('search-modal').style.display='flex'">Search</button>
+        <a href="/feed.xml" class="link">RSS</a>
+      </div>
+    </nav>
+    <div id="search-modal" class="search-modal-overlay" style="display:none" 
+      onclick="if(event.target === this) this.style.display='none'">
+      <div class="search-modal-content">
+        <div class="search-header">
+          <h2>Search</h2>
+          <button class="search-close" aria-label="Close search" 
+            onclick="document.getElementById('search-modal').style.display='none'">✕ Close</button>
+        </div>
+        <form class="search-form" id="search-form">
+          <input type="search" name="q" placeholder="Search posts..." required id="search-input" 
+            autofocus aria-labelledby="search-heading">
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-results" class="search-results" aria-live="polite"></div>
+      </div>
+    </div>
+  </header>
+  <div class="header-spacer" aria-hidden="true"></div>`,
+
+  // Footer
+  footer: () => `
+  <footer>
+    <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
+      <span class="avatar">⊣˚∆˚⊢</span></a> & Claude</p>
+  </footer>`
+};
+
+/**
  * Render the HTML document shell with neobrutalist styling
  * Uses a pure functional approach with explicit type signatures
  */
@@ -47,177 +156,46 @@ export const renderDocument = (
     pageDescription
   );
 
+  // Compose the full HTML document from template parts
   return `<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${pageTitle}</title>
-  <meta name="description" content="${pageDescription}">
-
-  <!-- System fonts -->
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-    ${structuredData}
-  </script>
-
-  <!-- Open Graph tags -->
-  ${ogTags}
-
-  <!-- Twitter Card tags -->
-  ${twitterTags}
-
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/color-override.css">
-  <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
-  <script src="/js/htmx.min.js"></script>
-
-  <!-- HTMX scroll and accessibility management -->
-  <script>
-    document.addEventListener('htmx:afterSwap', function(event) {
-      if (event.detail.target.tagName === 'MAIN') {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-      }
-    });
-
-    // Handle Escape key for search modal
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        const searchModal = document.getElementById('search-modal');
-        if (searchModal && searchModal.style.display === 'flex') {
-          searchModal.style.display = 'none';
-        }
-      }
-    });
-
-    // Set up search form submission
-    document.addEventListener('DOMContentLoaded', function() {
-      const searchForm = document.getElementById('search-form');
-      const searchInput = document.getElementById('search-input');
-      const searchResults = document.getElementById('search-results');
-
-      searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const query = searchInput.value.trim();
-        if (!query) return;
-
-        // Show loading indicator
-        searchResults.innerHTML = 'Searching...';
-
-        // Fetch search results
-        fetch('/search?q=' + encodeURIComponent(query))
-          .then(response => response.text())
-          .then(html => {
-            searchResults.innerHTML = html;
-          })
-          .catch(error => {
-            searchResults.innerHTML = 'Error: Could not perform search.';
-            console.error('Search error:', error);
-          });
-      });
-
-      // Also search on typing with delay
-      let searchTimeout;
-      searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        const query = searchInput.value.trim();
-
-        if (query.length > 2) {
-          searchTimeout = setTimeout(function() {
-            // Show loading indicator
-            searchResults.innerHTML = 'Searching...';
-
-            // Fetch search results
-            fetch('/search?q=' + encodeURIComponent(query))
-              .then(response => response.text())
-              .then(html => {
-                searchResults.innerHTML = html;
-              })
-              .catch(error => {
-                searchResults.innerHTML = 'Error: Could not perform search.';
-                console.error('Search error:', error);
-              });
-          }, 300);
-        } else if (!query) {
-          searchResults.innerHTML = '';
-        }
-      });
-
-      // Focus input when modal opens
-      document.querySelector('.search-toggle').addEventListener('click', function() {
-        // Give the browser a moment to display the modal before focusing
-        setTimeout(function() {
-          searchInput.focus();
-        }, 10);
-      });
-    });
-  </script>
-</head>
+${TEMPLATES.head(pageTitle, pageDescription, structuredData, ogTags, twitterTags, context.title)}
 <body>
-  <header id="site-header">
-    <h1 class="site-title">
-      <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
-        ${context.title}
-      </a>
-    </h1>
-    <nav>
-      <div class="nav-links">
-        <a href="/" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
-        <a href="/tags" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
-        <a href="/about" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
-        <button
-          class="search-toggle link"
-          aria-label="Search"
-          aria-expanded="false"
-          onclick="document.getElementById('search-modal').style.display='flex'"
-          >
-          Search
-        </button>
-        <a href="/feed.xml" class="link">RSS</a>
-      </div>
-    </nav>
-    <div id="search-modal" class="search-modal-overlay" style="display:none" onclick="if(event.target === this) this.style.display='none'">
-      <div class="search-modal-content">
-        <div class="search-header">
-          <h2>Search</h2>
-          <button
-            class="search-close"
-            aria-label="Close search"
-            onclick="document.getElementById('search-modal').style.display='none'"
-          >
-            ✕ Close
-          </button>
-        </div>
-        <form class="search-form" id="search-form">
-          <input
-            type="search"
-            name="q"
-            placeholder="Search posts..."
-            required
-            id="search-input"
-            autofocus
-            aria-labelledby="search-heading"
-          >
-          <button type="submit">Search</button>
-        </form>
-        <div id="search-results" class="search-results" aria-live="polite"></div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Explicit spacer element to maintain header clearance -->
-  <div class="header-spacer" aria-hidden="true"></div>
-
-  <main id="content-main" class="htmx-swappable">
-    ${content}
-  </main>
-  <footer>
-    <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer"><span class="avatar">⊣˚∆˚⊢</span></a> & Claude</p>
-  </footer>
+  ${TEMPLATES.nav(context.title)}
+  <main id="content-main" class="htmx-swappable">${content}</main>
+  ${TEMPLATES.footer()}
 </body>
 </html>`;
+};
+
+/**
+ * Additional template components to render post-related UI
+ */
+const POST_TEMPLATES = {
+  // Post card component
+  postCard: (post: Post): string => `
+    <article class="post-card">
+      <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
+      <div class="post-meta">
+        <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
+        ${post.tags ? renderTags(post.tags) : ""}
+      </div>
+      ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
+    </article>`,
+
+  // Empty state component
+  emptyState: (activeTag?: string): string => `
+    <div class="empty-state">
+      <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ''}.</p>
+    </div>`,
+
+  // Tag filter header component
+  tagHeader: (activeTag: string, postCount: number): string => `
+    <h1>Posts Tagged "${activeTag}"</h1>
+    <div class="tag-filter-header">
+      <p>Showing ${postCount} post${postCount !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
+      <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
+    </div>`
 };
 
 /**
@@ -229,38 +207,27 @@ export const renderPostList = (
   activeTag?: string,
   pagination?: Pagination
 ): string => {
+  // Prepare post cards - only generate HTML when needed
+  const postCards = posts.length > 0 
+    ? posts.map(post => POST_TEMPLATES.postCard(post)).join("")
+    : POST_TEMPLATES.emptyState(activeTag);
+    
+  // Prepare tag header if needed
+  const tagHeader = activeTag 
+    ? POST_TEMPLATES.tagHeader(activeTag, posts.length)
+    : '';
+    
+  // Prepare pagination if needed
+  const paginationHtml = pagination ? renderPagination(pagination) : '';
+  
+  // Compose the final HTML
   return `
     <section class="post-list content-section">
       <div class="content-wrapper">
-        ${activeTag ? `
-          <h1>Posts Tagged "${activeTag}"</h1>
-          <div class="tag-filter-header">
-            <p>Showing ${posts.length} post${posts.length !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
-            <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
-          </div>
-        ` : ''}
-
-      ${posts.length === 0 ? `
-        <div class="empty-state">
-          <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ''}.</p>
-        </div>
-      ` : ''}
-
-      ${posts
-      .map(
-        post => `
-      <article class="post-card">
-        <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
-        <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
-          ${post.tags ? renderTags(post.tags) : ""}
-        </div>
-        ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
-      </article>`
-      )
-      .join("")}
-
-      ${pagination ? renderPagination(pagination) : ''}
+        ${tagHeader}
+        ${postCards}
+        ${paginationHtml}
+      </div>
     </section>
   `;
 };
