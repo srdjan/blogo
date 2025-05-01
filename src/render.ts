@@ -102,8 +102,7 @@ const TEMPLATES = {
         <div id="search-results" class="search-results" aria-live="polite"></div>
       </div>
     </div>
-  </header>
-  <div class="header-spacer" aria-hidden="true"></div>`,
+  </header>`,
 
   // Footer
   footer: () => `

@@ -15,36 +15,31 @@
   --color-secondary: var(--light-background);
   --color-accent: var(--link-hover-bg);
   --color-card: var(--light-background);
+  --color-border: var(--text-color);
 }
 
-/* Basic overrides for text and background colors */
-body {
+/* Basic color overrides */
+body,
+html {
   color: var(--text-color);
   background: var(--main-background);
 }
 
-/* Header and navigation */
+/* Header and navigation colors */
 header {
+  background-color: var(--main-background);
+}
+
+header::after {
   background-color: var(--main-background);
 }
 
 nav {
   background-color: var(--main-background);
   border-color: var(--text-color);
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
-/* Nav links */
-.nav-links {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-/* Links */
+/* Link colors */
 a {
   color: var(--text-color);
   border-bottom-color: var(--accent-color);
@@ -55,12 +50,7 @@ a:hover {
   color: var(--main-background);
 }
 
-/* Header spacer */
-.header-spacer {
-  height: 150px;
-}
-
-/* Cards and content areas */
+/* Card and content area colors */
 .post-card,
 .post-header,
 blockquote,
@@ -80,7 +70,7 @@ pre,
   color: var(--accent-color);
 }
 
-/* Tags */
+/* Tag colors */
 .tag {
   background-color: var(--main-background);
   color: var(--text-color);
@@ -97,7 +87,7 @@ pre,
   color: var(--main-background);
 }
 
-/* Buttons */
+/* Button colors */
 .button,
 .search-toggle {
   background-color: var(--main-background);
@@ -110,13 +100,13 @@ pre,
   background-color: var(--link-hover-bg);
 }
 
-/* Footer */
+/* Footer colors */
 footer {
   color: var(--accent-color);
   border-top-color: var(--accent-color);
 }
 
-/* Code blocks */
+/* Code block colors */
 code {
   background-color: var(--link-hover-bg);
   color: var(--text-color);
@@ -126,7 +116,7 @@ pre code {
   color: var(--text-color);
 }
 
-/* Search modal */
+/* Search modal colors */
 .search-modal-overlay {
   background-color: rgba(9, 41, 64, 0.8);
 }
@@ -137,33 +127,21 @@ pre code {
 }
 
 .search-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--accent-color);
-  padding-bottom: 0.5rem;
+  border-bottom-color: var(--accent-color);
 }
 
 .search-header h2 {
-  margin: 0;
   color: var(--text-color);
 }
 
 .search-close {
   background-color: var(--main-background);
   color: var(--text-color);
-  border: 1px solid var(--accent-color);
-  padding: 0.25rem 0.75rem;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s ease;
+  border-color: var(--accent-color);
 }
 
 .search-close:hover {
   background-color: var(--link-hover-bg);
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);
 }
 
 .search-form input[type="search"] {
