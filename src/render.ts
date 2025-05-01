@@ -13,10 +13,10 @@ import {
 const TEMPLATES = {
   // HTML head with meta, css, js
   head: (
-    title: string, 
-    description: string, 
-    structuredData: string, 
-    ogTags: string, 
+    title: string,
+    description: string,
+    structuredData: string,
+    ogTags: string,
     twitterTags: string,
     siteName: string
   ) => `
@@ -28,13 +28,13 @@ const TEMPLATES = {
 
     <!-- Structured Data -->
     <script type="application/ld+json">${structuredData}</script>
-    
+
     <!-- Open Graph tags -->
     ${ogTags}
-    
+
     <!-- Twitter Card tags -->
     ${twitterTags}
-    
+
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/color-override.css">
     <link rel="alternate" type="application/rss+xml" title="${siteName} RSS Feed" href="/feed.xml">
@@ -74,31 +74,28 @@ const TEMPLATES = {
   </head>`,
 
   // Navigation
-  nav: (title: string) => `
+  nav: (_title: string) => `
   <header id="site-header">
-    <h1 class="site-title">
-      <a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${title}</a>
-    </h1>
     <nav>
       <div class="nav-links">
         <a href="/" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
         <a href="/tags" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
         <a href="/about" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
-        <button class="search-toggle link" aria-label="Search" aria-expanded="false" 
+        <button class="search-toggle link" aria-label="Search" aria-expanded="false"
           onclick="document.getElementById('search-modal').style.display='flex'">Search</button>
         <a href="/feed.xml" class="link">RSS</a>
       </div>
     </nav>
-    <div id="search-modal" class="search-modal-overlay" style="display:none" 
+    <div id="search-modal" class="search-modal-overlay" style="display:none"
       onclick="if(event.target === this) this.style.display='none'">
       <div class="search-modal-content">
         <div class="search-header">
           <h2>Search</h2>
-          <button class="search-close" aria-label="Close search" 
+          <button class="search-close" aria-label="Close search"
             onclick="document.getElementById('search-modal').style.display='none'">✕ Close</button>
         </div>
         <form class="search-form" id="search-form">
-          <input type="search" name="q" placeholder="Search posts..." required id="search-input" 
+          <input type="search" name="q" placeholder="Search posts..." required id="search-input"
             autofocus aria-labelledby="search-heading">
           <button type="submit">Search</button>
         </form>
@@ -208,18 +205,18 @@ export const renderPostList = (
   pagination?: Pagination
 ): string => {
   // Prepare post cards - only generate HTML when needed
-  const postCards = posts.length > 0 
+  const postCards = posts.length > 0
     ? posts.map(post => POST_TEMPLATES.postCard(post)).join("")
     : POST_TEMPLATES.emptyState(activeTag);
-    
+
   // Prepare tag header if needed
-  const tagHeader = activeTag 
+  const tagHeader = activeTag
     ? POST_TEMPLATES.tagHeader(activeTag, posts.length)
     : '';
-    
+
   // Prepare pagination if needed
   const paginationHtml = pagination ? renderPagination(pagination) : '';
-  
+
   // Compose the final HTML
   return `
     <section class="post-list content-section">

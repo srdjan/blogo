@@ -167,14 +167,14 @@ blockquote {
 /* Layout with fixed header and proper spacing */
 header {
   position: fixed;
-  top: 0;
+  top: 5px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - (var(--content-padding) * 2));
   max-width: var(--max-width);
   z-index: 1000;
   background-color: var(--color-bg);
-  padding: var(--space-md) 0;
+  /* padding: var(--space-md) 0; */
   margin: 0;
 }
 

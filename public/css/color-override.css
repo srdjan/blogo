@@ -31,14 +31,17 @@ header {
 nav {
   background-color: var(--main-background);
   border-color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
-.site-title {
-  color: var(--text-color);
-}
-
-.site-title:hover {
-  color: var(--accent-color);
+/* Nav links */
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
 }
 
 /* Links */
@@ -50,6 +53,11 @@ a {
 a:hover {
   background-color: var(--accent-color);
   color: var(--main-background);
+}
+
+/* Header spacer */
+.header-spacer {
+  height: 100px;
 }
 
 /* Cards and content areas */
