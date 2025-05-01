@@ -229,7 +229,7 @@ nav {
 .header-spacer {
   display: block;
   width: 100%;
-  height: var(--header-height, 160px);
+  height: var(--header-height, 170px);
   visibility: hidden;
 }
 
@@ -271,13 +271,13 @@ footer {
   overflow: hidden;
 }
 
-.post-card:nth-child(odd) {
+/* .post-card:nth-child(odd) {
   border-color: var(--color-primary);
 }
 
 .post-card:nth-child(even) {
   border-color: var(--color-secondary);
-}
+} */
 
 .post-card:hover {
   transform: translate(-2px, -2px);
@@ -834,7 +834,7 @@ footer {
 @media (max-width: 640px) {
   :root {
     --content-padding: 1rem;
-    --header-height: 210px;
+    --header-height: 150px;
     /* Dynamic header height for mobile */
   }
 
