@@ -42,7 +42,7 @@ const TEMPLATES = {
   </head>`,
 
   // Navigation
-  nav: (_title: string) => `
+  nav: () => `
   <header id="site-header">
     <nav>
       <div class="nav-links">
@@ -54,19 +54,19 @@ const TEMPLATES = {
         <a href="/feed.xml" class="link">RSS</a>
       </div>
     </nav>
-    <div id="search-modal" class="search-modal-overlay" style="display:none">
+    <div id="search-modal" class="search-modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="search-heading">
       <div class="search-modal-content">
         <div class="search-header">
-          <h2>Search</h2>
+          <h2 id="search-heading">Search</h2>
           <button class="search-close" aria-label="Close search"
             onclick="document.getElementById('search-modal').style.display='none'">✕ Close</button>
         </div>
-        <form class="search-form" id="search-form">
+        <form class="search-form" id="search-form" role="search">
           <input type="search" name="q" placeholder="Search posts..." required id="search-input"
             autofocus aria-labelledby="search-heading">
-          <button type="submit">Search</button>
+          <button type="submit" aria-label="Submit search">Search</button>
         </form>
-        <div id="search-results" class="search-results" aria-live="polite"></div>
+        <div id="search-results" class="search-results" aria-live="polite" role="region" aria-label="Search results"></div>
       </div>
     </div>
   </header>`,
@@ -122,18 +122,17 @@ export const renderDocument = (
   // Compose the full HTML document from template parts
   return `<!DOCTYPE html>
 <html lang="en">
-${
-    TEMPLATES.head(
-      pageTitle,
-      pageDescription,
-      structuredData,
-      ogTags,
-      twitterTags,
-      context.title,
-    )
-  }
+${TEMPLATES.head(
+    pageTitle,
+    pageDescription,
+    structuredData,
+    ogTags,
+    twitterTags,
+    context.title,
+  )
+    }
 <body>
-  ${TEMPLATES.nav(context.title)}
+  ${TEMPLATES.nav()}
   <main id="content-main" class="htmx-swappable content-main">${content}</main>
   ${TEMPLATES.footer()}
 </body>
@@ -147,14 +146,15 @@ const POST_TEMPLATES = {
   // Post card component
   postCard: (post: Post): string => `
     <article class="post-card">
-      <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
-      <div class="post-meta">
-        <time datetime="${post.date}">${
-    post.formattedDate || new Date(post.date).toLocaleDateString()
-  }</time>
-        ${post.tags ? renderTags(post.tags) : ""}
+      <div class="post-card-inner">
+        <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${post.title}</a></h2>
+        <div class="post-meta">
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
+    }</time>
+          ${post.tags ? renderTags(post.tags) : ""}
+        </div>
+        ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
       </div>
-      ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
     </article>`,
 
   // Empty state component
@@ -167,9 +167,8 @@ const POST_TEMPLATES = {
   tagHeader: (activeTag: string, postCount: number): string => `
     <h1>Posts Tagged "${activeTag}"</h1>
     <div class="tag-filter-header">
-      <p>Showing ${postCount} post${
-    postCount !== 1 ? "s" : ""
-  } tagged with <strong>${activeTag}</strong></p>
+      <p>Showing ${postCount} post${postCount !== 1 ? "s" : ""
+    } tagged with <strong>${activeTag}</strong></p>
       <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
     </div>`,
 };
@@ -201,7 +200,9 @@ export const renderPostList = (
     <section class="post-list content-section">
       <div class="content-wrapper">
         ${tagHeader}
-        ${postCards}
+        <div class="post-cards-container">
+          ${postCards}
+        </div>
         ${paginationHtml}
       </div>
     </section>
@@ -252,12 +253,10 @@ export const renderPagination = (pagination: Pagination): string => {
 
   return `
     <nav class="pagination content-section" aria-label="Pagination Navigation">
-      ${
-    hasPrevPage
+      ${hasPrevPage
       ? `
-        <a href="?page=${
-        currentPage - 1
-      }" class="pagination-prev link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
+        <a href="?page=${currentPage - 1
+      }" class="pagination-prev link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Previous page">
           Previous
         </a>
       `
@@ -266,26 +265,23 @@ export const renderPagination = (pagination: Pagination): string => {
           Previous
         </span>
       `
-  }
+    }
 
       <div class="pagination-pages">
-        ${
-    pageNumbers.map((page) =>
+        ${pageNumbers.map((page) =>
       page === null
         ? `<span class="pagination-ellipsis">&hellip;</span>`
         : page === currentPage
-        ? `<span class="pagination-current" aria-current="page">${page}</span>`
-        : `<a href="?page=${page}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${page}</a>`
+          ? `<span class="pagination-current" aria-current="page">${page}</span>`
+          : `<a href="?page=${page}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${page}</a>`
     ).join("")
-  }
+    }
       </div>
 
-      ${
-    hasNextPage
+      ${hasNextPage
       ? `
-        <a href="?page=${
-        currentPage + 1
-      }" class="pagination-next link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
+        <a href="?page=${currentPage + 1
+      }" class="pagination-next link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Next page">
           Next
         </a>
       `
@@ -294,7 +290,7 @@ export const renderPagination = (pagination: Pagination): string => {
           Next
         </span>
       `
-  }
+    }
 
       <div class="pagination-info">
         <p>Page ${currentPage} of ${totalPages}</p>
@@ -313,9 +309,8 @@ export const renderPost = (post: Post): string => {
       <header class="post-header">
         <h1>${post.title}</h1>
         <div class="post-meta">
-          <time datetime="${post.date}">${
-    post.formattedDate || new Date(post.date).toLocaleDateString()
-  }</time>
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
+    }</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
       </header>
@@ -335,7 +330,7 @@ export const renderNotFound = (): string => {
     <section class="not-found content-section">
       <h1>404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
-      <p><a href="/" hx-boost="true" hx-target="main" hx-swap="innerHTML" class="button link">Return Home</a></p>
+      <p><a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" class="button link">Return Home</a></p>
     </section>
   `;
 };
@@ -364,15 +359,14 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
     <section class="tag-index content-section">
       <h1>Tags</h1>
       <div class="tag-cloud">
-        ${
-    tags
+        ${tags
       .sort((a, b) => b.count - a.count)
       .map(
         (tag) => `
         <a href="/tags/${tag.name}"
           class="tag tag-${sizeClassForCount(tag.count)} link"
           hx-boost="true"
-          hx-target="main"
+          hx-target="#content-main"
           hx-swap="innerHTML"
           title="${tag.count} posts">
           ${tag.name}
@@ -380,7 +374,7 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
         </a>`,
       )
       .join("")
-  }
+    }
       </div>
     </section>
   `;
@@ -405,24 +399,21 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
   return `
     <div class="search-results-summary content-section">
-      Found ${posts.length} post${
-    posts.length !== 1 ? "s" : ""
-  } matching "${query}"
+      Found ${posts.length} post${posts.length !== 1 ? "s" : ""
+    } matching "${query}"
     </div>
-    ${
-    posts.map((post) => `
+    ${posts.map((post) => `
       <article class="search-result">
-        <h3><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
+        <h3><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${post.title}</a></h3>
         <div class="post-meta">
-          <time datetime="${post.date}">${
-      post.formattedDate || new Date(post.date).toLocaleDateString()
-    }</time>
+          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
+      }</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
         ${post.excerpt ? `<p class="search-excerpt">${post.excerpt}</p>` : ""}
       </article>
     `).join("")
-  }
+    }
   `;
 };
 
@@ -441,8 +432,7 @@ export const renderErrorPage = (error: {
       <div class="error-message">
         <p>${error.message}</p>
       </div>
-      ${
-    error.stackTrace
+      ${error.stackTrace
       ? `
         <details class="error-details">
           <summary>Technical Details</summary>
@@ -450,8 +440,8 @@ export const renderErrorPage = (error: {
         </details>
       `
       : ""
-  }
-      <p><a href="/" class="button link" hx-boost="true" hx-target="main" hx-swap="innerHTML">Return Home</a></p>
+    }
+      <p><a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Return Home</a></p>
     </section>
   `;
 };
@@ -463,13 +453,12 @@ export const renderErrorPage = (error: {
 const renderTags = (tags: string[]): string => {
   return `
     <div class="tags content-section">
-      ${
-    tags.map((tag) => `
-        <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="main" hx-swap="innerHTML">
+      ${tags.map((tag) => `
+        <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
           ${tag}
         </a>
       `).join("")
-  }
+    }
     </div>
   `;
 };

@@ -1,53 +1,43 @@
 /* Color override based on srdjan.github.io */
 
 :root {
-  /* Original colors from srdjan.github.io */
-  --main-background: #092940d6;
-  --light-background: #4e5587;
-  --text-color: whitesmoke;
-  --accent-color: #c9fcc9;
-  --link-hover-bg: rgb(59, 105, 105);
+  /* Color palette directly from srdjan.github.io */
+  --color-bg: #092940d6;
+  --color-text: whitesmoke;
+  --color-primary: #c9fcc9;
+  --color-secondary: #4e5587;
+  --color-accent: rgb(59, 105, 105);
+  --color-card: var(--color-secondary);
+  --color-border: var(--color-text);
 
-  /* Override the original color variables */
-  --color-bg: var(--main-background);
-  --color-text: var(--text-color);
-  --color-primary: var(--accent-color);
-  --color-secondary: var(--light-background);
-  --color-accent: var(--link-hover-bg);
-  --color-card: var(--light-background);
-  --color-border: var(--text-color);
+  /* Design elements */
+  --border-thick: 3px solid var(--color-border);
+  --border-medium: 2px solid var(--color-border);
+  --border-thin: 1px solid var(--color-border);
+  --shadow-brutal: 6px 6px 0px 0px var(--color-border);
 }
 
 /* Basic color overrides */
 body,
 html {
-  color: var(--text-color);
-  background: var(--main-background);
-}
-
-/* Header and navigation colors */
-header {
-  background-color: var(--main-background);
-}
-
-header::after {
-  background-color: var(--main-background);
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 nav {
-  background-color: var(--main-background);
-  border-color: var(--text-color);
+  background-color: var(--color-bg);
+  border-color: var(--color-text);
 }
 
 /* Link colors */
 a {
-  color: var(--text-color);
-  border-bottom-color: var(--accent-color);
+  color: var(--color-text);
+  border-bottom-color: var(--color-primary);
 }
 
 a:hover {
-  background-color: var(--accent-color);
-  color: var(--main-background);
+  background-color: var(--color-primary);
+  color: var(--color-bg);
 }
 
 /* Card and content area colors */
@@ -58,63 +48,63 @@ pre,
 .tag-filter-header,
 .empty-state,
 .search-results {
-  background-color: var(--light-background);
-  border-color: var(--text-color);
+  background-color: var(--color-secondary);
+  border-color: var(--color-text);
 }
 
 .post-card h2 a {
-  color: var(--accent-color);
+  color: var(--color-primary);
 }
 
 .post-card h2 a:hover {
-  color: var(--accent-color);
+  color: var(--color-primary);
 }
 
 /* Tag colors */
 .tag {
-  background-color: var(--main-background);
-  color: var(--text-color);
-  border-color: var(--accent-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
 .tag:hover {
-  background-color: var(--link-hover-bg);
-  color: var(--text-color);
+  background-color: var(--color-accent);
+  color: var(--color-text);
 }
 
 .tag-count {
-  background-color: var(--accent-color);
-  color: var(--main-background);
+  background-color: var(--color-primary);
+  color: var(--color-bg);
 }
 
 /* Button colors */
 .button,
 .search-toggle {
-  background-color: var(--main-background);
-  color: var(--text-color);
-  border-color: var(--accent-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
 .button:hover,
 .search-toggle:hover {
-  background-color: var(--link-hover-bg);
+  background-color: var(--color-accent);
 }
 
 /* Footer colors */
 footer {
-  color: var(--accent-color);
-  border-top-color: var(--accent-color);
-  background-color: var(--main-background);
+  color: var(--color-primary);
+  border-top-color: var(--color-primary);
+  background-color: var(--color-bg);
 }
 
 /* Code block colors */
 code {
-  background-color: var(--link-hover-bg);
-  color: var(--text-color);
+  background-color: var(--color-accent);
+  color: var(--color-text);
 }
 
 pre code {
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 /* Search modal colors */
@@ -123,41 +113,41 @@ pre code {
 }
 
 .search-modal-content {
-  background-color: var(--main-background);
-  border-color: var(--text-color);
+  background-color: var(--color-bg);
+  border-color: var(--color-text);
 }
 
 .search-header {
-  border-bottom-color: var(--accent-color);
+  border-bottom-color: var(--color-primary);
 }
 
 .search-header h2 {
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 .search-close {
-  background-color: var(--main-background);
-  color: var(--text-color);
-  border-color: var(--accent-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
 .search-close:hover {
-  background-color: var(--link-hover-bg);
+  background-color: var(--color-accent);
 }
 
 .search-form input[type="search"] {
-  background-color: var(--main-background);
-  color: var(--text-color);
-  border-color: var(--accent-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
 .search-form button {
-  background-color: var(--main-background);
-  color: var(--text-color);
-  border-color: var(--accent-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
 /* Special avatar styling for footer */
 .avatar {
-  color: var(--accent-color);
+  color: var(--color-primary);
 }
