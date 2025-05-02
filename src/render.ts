@@ -11,7 +11,6 @@ import {
  * Shared HTML templates for reuse across rendering functions
  */
 const TEMPLATES = {
-  // HTML head with meta, css, js
   head: (
     title: string,
     description: string,
@@ -77,6 +76,67 @@ const TEMPLATES = {
     <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
       <span class="avatar">⊣˚∆˚⊢</span></a> & Claude</p>
   </footer>`,
+
+  // Post meta information (date and tags)
+  postMeta: (post: Post) => `
+  <div class="post-meta">
+    <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
+    ${post.tags ? renderTags(post.tags) : ""}
+  </div>`,
+
+  // Post excerpt
+  postExcerpt: (excerpt: string) => `<p class="post-excerpt">${excerpt}</p>`,
+
+  // Return home link
+  returnHomeLink: () => `<a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Return Home</a>`,
+
+  // Pagination components
+  pagination: {
+    prevLink: (currentPage: number) => `
+      <a href="?page=${currentPage - 1}" class="pagination-prev link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Previous page">
+        Previous
+      </a>
+    `,
+    prevDisabled: () => `
+      <span class="pagination-prev pagination-disabled" aria-disabled="true">
+        Previous
+      </span>
+    `,
+    nextLink: (currentPage: number) => `
+      <a href="?page=${currentPage + 1}" class="pagination-next link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Next page">
+        Next
+      </a>
+    `,
+    nextDisabled: () => `
+      <span class="pagination-next pagination-disabled" aria-disabled="true">
+        Next
+      </span>
+    `,
+    pageLink: (page: number) => `<a href="?page=${page}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${page}</a>`,
+    currentPage: (page: number) => `<span class="pagination-current" aria-current="page">${page}</span>`,
+    ellipsis: () => `<span class="pagination-ellipsis">&hellip;</span>`,
+    info: (currentPage: number, totalPages: number) => `<div class="pagination-info"><p>Page ${currentPage} of ${totalPages}</p></div>`,
+  },
+
+  // Tag components
+  tag: (tag: string) => `
+    <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
+      ${tag}
+    </a>
+  `,
+
+  // Tag with count for tag cloud
+  tagWithCount: (tag: TagInfo, sizeClass: string) => `
+    <a href="/tags/${tag.name}"
+      class="tag tag-${sizeClass} link"
+      hx-boost="true"
+      hx-target="#content-main"
+      hx-swap="innerHTML"
+      title="${tag.count} posts">
+      ${tag.name}
+      <span class="tag-count">${tag.count}</span>
+    </a>
+  `,
 };
 
 /**
@@ -148,12 +208,8 @@ const POST_TEMPLATES = {
     <article class="post-card">
       <div class="post-card-inner">
         <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${post.title}</a></h2>
-        <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
-    }</time>
-          ${post.tags ? renderTags(post.tags) : ""}
-        </div>
-        ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
+        ${TEMPLATES.postMeta(post)}
+        ${post.excerpt ? TEMPLATES.postExcerpt(post.excerpt) : ""}
       </div>
     </article>`,
 
@@ -167,8 +223,7 @@ const POST_TEMPLATES = {
   tagHeader: (activeTag: string, postCount: number): string => `
     <h1>Posts Tagged "${activeTag}"</h1>
     <div class="tag-filter-header">
-      <p>Showing ${postCount} post${postCount !== 1 ? "s" : ""
-    } tagged with <strong>${activeTag}</strong></p>
+      <p>Showing ${postCount} post${postCount !== 1 ? "s" : ""} tagged with <strong>${activeTag}</strong></p>
       <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
     </div>`,
 };
@@ -253,48 +308,21 @@ export const renderPagination = (pagination: Pagination): string => {
 
   return `
     <nav class="pagination content-section" aria-label="Pagination Navigation">
-      ${hasPrevPage
-      ? `
-        <a href="?page=${currentPage - 1
-      }" class="pagination-prev link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Previous page">
-          Previous
-        </a>
-      `
-      : `
-        <span class="pagination-prev pagination-disabled" aria-disabled="true">
-          Previous
-        </span>
-      `
-    }
+      ${hasPrevPage ? TEMPLATES.pagination.prevLink(currentPage) : TEMPLATES.pagination.prevDisabled()}
 
       <div class="pagination-pages">
         ${pageNumbers.map((page) =>
-      page === null
-        ? `<span class="pagination-ellipsis">&hellip;</span>`
-        : page === currentPage
-          ? `<span class="pagination-current" aria-current="page">${page}</span>`
-          : `<a href="?page=${page}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${page}</a>`
-    ).join("")
-    }
+    page === null
+      ? TEMPLATES.pagination.ellipsis()
+      : page === currentPage
+        ? TEMPLATES.pagination.currentPage(page)
+        : TEMPLATES.pagination.pageLink(page)
+  ).join("")}
       </div>
 
-      ${hasNextPage
-      ? `
-        <a href="?page=${currentPage + 1
-      }" class="pagination-next link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" aria-label="Next page">
-          Next
-        </a>
-      `
-      : `
-        <span class="pagination-next pagination-disabled" aria-disabled="true">
-          Next
-        </span>
-      `
-    }
+      ${hasNextPage ? TEMPLATES.pagination.nextLink(currentPage) : TEMPLATES.pagination.nextDisabled()}
 
-      <div class="pagination-info">
-        <p>Page ${currentPage} of ${totalPages}</p>
-      </div>
+      ${TEMPLATES.pagination.info(currentPage, totalPages)}
     </nav>
   `;
 };
@@ -308,11 +336,7 @@ export const renderPost = (post: Post): string => {
     <article class="post content-section">
       <header class="post-header">
         <h1>${post.title}</h1>
-        <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
-    }</time>
-          ${post.tags ? renderTags(post.tags) : ""}
-        </div>
+        ${TEMPLATES.postMeta(post)}
       </header>
       <div class="post-content">
         ${post.content}
@@ -330,7 +354,7 @@ export const renderNotFound = (): string => {
     <section class="not-found content-section">
       <h1>404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
-      <p><a href="/" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML" class="button link">Return Home</a></p>
+      <p>${TEMPLATES.returnHomeLink()}</p>
     </section>
   `;
 };
@@ -361,18 +385,7 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
       <div class="tag-cloud">
         ${tags
       .sort((a, b) => b.count - a.count)
-      .map(
-        (tag) => `
-        <a href="/tags/${tag.name}"
-          class="tag tag-${sizeClassForCount(tag.count)} link"
-          hx-boost="true"
-          hx-target="#content-main"
-          hx-swap="innerHTML"
-          title="${tag.count} posts">
-          ${tag.name}
-          <span class="tag-count">${tag.count}</span>
-        </a>`,
-      )
+      .map((tag) => TEMPLATES.tagWithCount(tag, sizeClassForCount(tag.count)))
       .join("")
     }
       </div>
@@ -399,21 +412,15 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
   return `
     <div class="search-results-summary content-section">
-      Found ${posts.length} post${posts.length !== 1 ? "s" : ""
-    } matching "${query}"
+      Found ${posts.length} post${posts.length !== 1 ? "s" : ""} matching "${query}"
     </div>
     ${posts.map((post) => `
       <article class="search-result">
         <h3><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${post.title}</a></h3>
-        <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()
-      }</time>
-          ${post.tags ? renderTags(post.tags) : ""}
-        </div>
-        ${post.excerpt ? `<p class="search-excerpt">${post.excerpt}</p>` : ""}
+        ${TEMPLATES.postMeta(post)}
+        ${post.excerpt ? TEMPLATES.postExcerpt(post.excerpt) : ""}
       </article>
-    `).join("")
-    }
+    `).join("")}
   `;
 };
 
@@ -441,7 +448,7 @@ export const renderErrorPage = (error: {
       `
       : ""
     }
-      <p><a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Return Home</a></p>
+      <p>${TEMPLATES.returnHomeLink()}</p>
     </section>
   `;
 };
@@ -453,12 +460,7 @@ export const renderErrorPage = (error: {
 const renderTags = (tags: string[]): string => {
   return `
     <div class="tags content-section">
-      ${tags.map((tag) => `
-        <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
-          ${tag}
-        </a>
-      `).join("")
-    }
+      ${tags.map((tag) => TEMPLATES.tag(tag)).join("")}
     </div>
   `;
 };
