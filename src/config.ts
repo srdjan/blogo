@@ -58,7 +58,7 @@ const defaultConfig: Config = {
 /**
  * Load configuration from environment variables
  */
-const loadEnvConfig = async (): Promise<Partial<Config>> => {
+const loadEnvConfig = (): Partial<Config> => {
   // Get the environment
   const env = (Deno.env.get("DENO_ENV") || "development") as Environment;
 
@@ -120,10 +120,10 @@ const mergeConfigs = (base: Config, overlay: Partial<Config>): Config => {
 /**
  * Load and validate the application configuration
  */
-export const loadConfig = async (): Promise<Result<Config, AppError>> => {
+export const loadConfig = (): Result<Config, AppError> => {
   try {
     // Load environment configuration
-    const envConfig = await loadEnvConfig();
+    const envConfig = loadEnvConfig();
 
     // Merge with defaults
     const config = mergeConfigs(defaultConfig, envConfig);
@@ -138,7 +138,7 @@ export const loadConfig = async (): Promise<Result<Config, AppError>> => {
       error: createError(
         "ValidationError",
         "Configuration validation failed",
-        error
+        error,
       ),
     };
   }

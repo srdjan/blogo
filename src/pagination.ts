@@ -30,8 +30,8 @@ export interface FilterOptions {
   search?: string;
   dateFrom?: string;
   dateTo?: string;
-  sortBy?: 'date' | 'title';
-  sortDir?: 'asc' | 'desc';
+  sortBy?: "date" | "title";
+  sortDir?: "asc" | "desc";
 }
 
 /**
@@ -48,7 +48,7 @@ export interface PaginationOptions extends FilterOptions {
 export const paginate = <T>(
   items: T[],
   page: number,
-  itemsPerPage: number
+  itemsPerPage: number,
 ): PaginatedResult<T> => {
   // Handle invalid inputs with defensive programming
   const safePage = Math.max(1, page);
@@ -85,7 +85,7 @@ export const paginate = <T>(
 export const generatePaginationLinks = (
   pagination: Pagination,
   baseUrl: string,
-  extraParams?: Record<string, string>
+  extraParams?: Record<string, string>,
 ): Record<string, string | null> => {
   const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
 
@@ -93,14 +93,14 @@ export const generatePaginationLinks = (
   const formatPageUrl = (page: number): string => {
     const url = new URL(baseUrl);
     url.searchParams.set("page", page.toString());
-    
+
     // Add any extra query parameters
     if (extraParams) {
       Object.entries(extraParams).forEach(([key, value]) => {
         if (value) url.searchParams.set(key, value);
       });
     }
-    
+
     return url.toString();
   };
 
@@ -118,49 +118,48 @@ export const generatePaginationLinks = (
  */
 export const filterPosts = (
   posts: Post[],
-  options: FilterOptions = {}
+  options: FilterOptions = {},
 ): Post[] => {
-  const { tag, search, dateFrom, dateTo, sortBy = 'date', sortDir = 'desc' } = options;
-  
+  const { tag, search, dateFrom, dateTo, sortBy = "date", sortDir = "desc" } =
+    options;
+
   // Create a safe wrapper to handle potential errors in filtering
   return tryCatchSync(() => {
     let filteredPosts = [...posts]; // Create a copy to avoid mutating original
-    
+
     // Filter by tag if specified
     if (tag) {
-      filteredPosts = filteredPosts.filter(post => 
-        post.tags?.includes(tag)
-      );
+      filteredPosts = filteredPosts.filter((post) => post.tags?.includes(tag));
     }
-    
+
     // Filter by date range if specified
     if (dateFrom) {
       const fromDate = new Date(dateFrom).getTime();
-      filteredPosts = filteredPosts.filter(post => 
+      filteredPosts = filteredPosts.filter((post) =>
         new Date(post.date).getTime() >= fromDate
       );
     }
-    
+
     if (dateTo) {
       const toDate = new Date(dateTo).getTime();
-      filteredPosts = filteredPosts.filter(post => 
+      filteredPosts = filteredPosts.filter((post) =>
         new Date(post.date).getTime() <= toDate
       );
     }
-    
+
     // Filter by search query if specified
     if (search && search.trim() !== "") {
       const searchTerms = search.toLowerCase().trim().split(/\s+/);
-      
-      filteredPosts = filteredPosts.filter(post => {
+
+      filteredPosts = filteredPosts.filter((post) => {
         // Pre-compute lowercase versions for performance
         const titleLower = post.title.toLowerCase();
         const contentLower = post.content.toLowerCase();
         const excerptLower = (post.excerpt || "").toLowerCase();
         const tagsLower = (post.tags || []).join(" ").toLowerCase();
-        
+
         // Match if ANY search term is found in ANY searchable field
-        return searchTerms.some(term =>
+        return searchTerms.some((term) =>
           titleLower.includes(term) ||
           contentLower.includes(term) ||
           excerptLower.includes(term) ||
@@ -168,22 +167,22 @@ export const filterPosts = (
         );
       });
     }
-    
+
     // Sort the posts
     filteredPosts.sort((a, b) => {
       let comparison: number;
-      
-      if (sortBy === 'date') {
+
+      if (sortBy === "date") {
         comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-      } else if (sortBy === 'title') {
+      } else if (sortBy === "title") {
         comparison = a.title.localeCompare(b.title);
       } else {
         comparison = 0;
       }
-      
-      return sortDir === 'desc' ? -comparison : comparison;
+
+      return sortDir === "desc" ? -comparison : comparison;
     });
-    
+
     return filteredPosts;
   }, () => {
     // Fallback to original posts if any error occurs
@@ -197,13 +196,13 @@ export const filterPosts = (
  */
 export const paginatePosts = (
   posts: Post[],
-  options: PaginationOptions
+  options: PaginationOptions,
 ): PaginatedResult<Post> => {
   const { page, itemsPerPage, ...filterOptions } = options;
-  
+
   // First apply all filters
   const filteredPosts = filterPosts(posts, filterOptions);
-  
+
   // Then paginate the filtered results
   return paginate(filteredPosts, page, itemsPerPage);
 };

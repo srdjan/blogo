@@ -1,14 +1,18 @@
 # Functional Minimal Blog
 
-A lightweight, type-safe, functional blog implementation built with Deno, TypeScript, HTMX, and Markdown.
+A lightweight, type-safe, functional blog implementation built with Deno,
+TypeScript, HTMX, and Markdown.
 
 ## Core Principles
 
 This blog system is built around several key architectural principles:
 
-1. **Functional Programming**: Pure functions, immutability, and type-safe data transformations
-2. **Minimal Dependencies**: Leveraging Deno's standard library with minimal external dependencies
-3. **Progressive Enhancement**: Core functionality works without JavaScript, enhanced with HTMX
+1. **Functional Programming**: Pure functions, immutability, and type-safe data
+   transformations
+2. **Minimal Dependencies**: Leveraging Deno's standard library with minimal
+   external dependencies
+3. **Progressive Enhancement**: Core functionality works without JavaScript,
+   enhanced with HTMX
 4. **Type Safety**: Comprehensive type system for robust error handling
 5. **Semantic HTML**: Clean, accessible markup following modern best practices
 6. **Pure CSS**: Minimal, responsive styling without frameworks
@@ -54,3 +58,4 @@ The project follows a functional architecture with clean separation of concerns:
 
 ```bash
 deno task setup
+```

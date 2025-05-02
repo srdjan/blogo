@@ -7,13 +7,17 @@ excerpt: A first post on our minimal blog platform built with Deno, HTMX, and Ma
 
 # Hello World
 
-Welcome to this minimal blog platform built with [Deno](https://deno.land/), [HTMX](https://htmx.org/), and Markdown.
+Welcome to this minimal blog platform built with [Deno](https://deno.land/),
+[HTMX](https://htmx.org/), and Markdown.
 
 ## Features
 
-- **Minimal Dependencies**: Using Deno's standard library and minimal external dependencies
-- **Fast Rendering**: Static HTML generation with light client-side enhancements via HTMX
-- **Content as Code**: All blog posts are stored as markdown files with frontmatter
+- **Minimal Dependencies**: Using Deno's standard library and minimal external
+  dependencies
+- **Fast Rendering**: Static HTML generation with light client-side enhancements
+  via HTMX
+- **Content as Code**: All blog posts are stored as markdown files with
+  frontmatter
 - **Semantic HTML**: Clean, accessible markup that follows best practices
 - **Responsive Design**: Works great on all devices with pure CSS
 
@@ -28,3 +32,4 @@ function greet(name: string): string {
 
 console.log(greet("World"));
 // Output: Hello, World!
+```

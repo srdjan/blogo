@@ -7,9 +7,9 @@ import { Post } from "./types.ts";
 export const generateRSS = (
   posts: Post[],
   blogTitle: string,
-  blogURL: string
+  blogURL: string,
 ): string => {
-  const items = posts.map(post => {
+  const items = posts.map((post) => {
     const postURL = `${blogURL}/posts/${post.slug}`;
     return `
     <item>
@@ -17,7 +17,11 @@ export const generateRSS = (
       <link>${postURL}</link>
       <guid>${postURL}</guid>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      ${post.excerpt ? `<description>${escapeXML(post.excerpt)}</description>` : ""}
+      ${
+      post.excerpt
+        ? `<description>${escapeXML(post.excerpt)}</description>`
+        : ""
+    }
       <content:encoded><![CDATA[${post.content}]]></content:encoded>
     </item>`;
   }).join("");
@@ -35,7 +39,7 @@ export const generateRSS = (
     <atom:link href="${blogURL}/feed.xml" rel="self" type="application/rss+xml" />
     ${items}
   </channel>
-</rss>`
+</rss>`;
 };
 
 /**

@@ -1,20 +1,27 @@
-/* Neobrutalist styling for minimal blog - Comprehensive implementation */
+/* 
+ * Neobrutalist styling for minimal blog - Consolidated CSS
+ * Dark theme based on srdjan.github.io
+ */
+
+/* Base variables */
 :root {
-  /* Bold neobrutalist color palette */
-  --color-bg: #FFFAF0;
-  --color-text: #141414;
-  --color-primary: #FF5252;
-  --color-secondary: #2196F3;
-  --color-accent: #FFD600;
-  --color-border: #000000;
-  --color-card: #FFFFFF;
+  /* Color palette */
+  --color-bg: #092940d6;
+  --color-text: whitesmoke;
+  --color-primary: #c9fcc9;
+  --color-secondary: #4e5587;
+  --color-accent: rgb(59, 105, 105);
+  --color-card: var(--color-secondary);
+  --color-border: var(--color-text);
 
   /* Typography using system fonts */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
   --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   --font-display: system-ui, sans-serif;
 
-  /* Exaggerated spacing */
+  /* Spacing */
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
   --space-xs: 0.75rem;
@@ -27,8 +34,9 @@
   /* Layout constraints */
   --max-width: 60rem;
   --content-padding: clamp(1rem, 5vw, 2.5rem);
+  --header-height: 60px;
 
-  /* Brutalist design elements */
+  /* Design elements */
   --border-thick: 3px solid var(--color-border);
   --border-medium: 2px solid var(--color-border);
   --border-thin: 1px solid var(--color-border);
@@ -40,7 +48,7 @@
   --transition-standard: 200ms ease;
 }
 
-/* Base styles with brutal typography */
+/* Base styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -68,16 +76,10 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  box-sizing: border-box;
 }
 
-/* Typography with bold brutalist styling */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   margin: var(--space-lg) 0 var(--space-md);
   line-height: 1.1;
@@ -93,7 +95,7 @@ h1 {
 }
 
 h1::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -5px;
   left: 0;
@@ -108,15 +110,11 @@ h2 {
   color: var(--color-primary);
 }
 
-p,
-ul,
-ol,
-pre,
-blockquote {
+p, ul, ol, pre, blockquote {
   margin-bottom: var(--space-md);
 }
 
-/* Links with neobrutalist hover effects */
+/* Links */
 a {
   color: var(--color-text);
   text-decoration: none;
@@ -128,21 +126,22 @@ a {
 
 a:hover {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-bg);
   text-decoration: none;
 }
 
-/* Code styling with brutalist blocks */
+/* Code styling */
 code {
   font-family: var(--font-mono);
   font-size: 0.9em;
   background: var(--color-accent);
   padding: var(--space-2xs) var(--space-xs);
   border: var(--border-thin);
+  color: var(--color-text);
 }
 
 pre {
-  background: white;
+  background: var(--color-card);
   padding: var(--space-md);
   border: var(--border-medium);
   box-shadow: var(--shadow-brutal);
@@ -154,7 +153,7 @@ pre code {
   background: none;
   padding: 0;
   border: none;
-  color: inherit;
+  color: var(--color-text);
 }
 
 blockquote {
@@ -162,13 +161,13 @@ blockquote {
   padding-left: var(--space-md);
   font-style: italic;
   margin: var(--space-lg) 0;
-  background-color: white;
+  background-color: var(--color-card);
   padding: var(--space-md);
   border: var(--border-thin);
   box-shadow: var(--shadow-brutal);
 }
 
-/* Layout with fixed header and proper spacing */
+/* Layout */
 header {
   position: fixed;
   top: 0;
@@ -178,12 +177,10 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  height: 60px;
-  box-sizing: border-box;
   background-color: var(--color-bg);
+  height: var(--header-height);
 }
 
-/* Create a container inside the header that matches the body width constraints */
 header::after {
   content: "";
   display: block;
@@ -199,11 +196,10 @@ header::after {
 nav {
   display: flex;
   justify-content: center;
-  width: calc(100% - (var(--content-padding) * 2));
+  width: calc(100% - var(--content-padding) * 2);
   max-width: var(--max-width);
   padding: 0.5rem 1rem;
   margin: 0 auto;
-  box-sizing: border-box;
   border: var(--border-thin);
   background-color: var(--color-bg);
 }
@@ -245,24 +241,19 @@ nav {
   box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
-/* Create spacer for fixed header - using CSS custom property for dynamic adjustment */
-/* .header-spacer {
-  display: block;
-  width: 100%;
-  height: var(--header-height, 170px);
-  visibility: hidden;
-} */
+/* Create a proper spacing for fixed header */
+body {
+  padding-top: calc(var(--header-height) + var(--space-xl));
+}
 
 main {
-  position: relative;
-  z-index: 10;
-  min-height: calc(100vh - 200px);
+  position: absolute;
+  top: 5rem;
+  z-index: 1;
+  min-height: calc(100vh - var(--header-height) - 60px);
   transition: opacity 0.2s ease;
   flex: 1;
-  padding-top: 80px;
-  /* Space for fixed header */
   width: 100%;
-  box-sizing: border-box;
 }
 
 main.htmx-swapping {
@@ -271,13 +262,18 @@ main.htmx-swapping {
 
 footer {
   text-align: center;
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: 0.9rem;
   border-top: var(--border-medium);
-  margin-top: auto;
-  /* Push footer to bottom with flexbox */
-  padding: 1rem 0;
   font-weight: 600;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: var(--color-bg);
+  padding: 1rem 0;
+  z-index: 100;
 }
 
 /* Post list with brutalist cards */
@@ -289,21 +285,13 @@ footer {
 .post-card {
   margin-bottom: var(--space-xl);
   padding: var(--space-lg);
-  background-color: white;
+  background-color: var(--color-card);
   border: var(--border-medium);
   box-shadow: var(--shadow-brutal);
   transition: transform var(--transition-standard);
   position: relative;
   overflow: hidden;
 }
-
-/* .post-card:nth-child(odd) {
-  border-color: var(--color-primary);
-}
-
-.post-card:nth-child(even) {
-  border-color: var(--color-secondary);
-} */
 
 .post-card:hover {
   transform: translate(-2px, -2px);
@@ -352,23 +340,18 @@ footer {
   line-height: 1.6;
 }
 
-/* Ensure consistent spacing for all content types */
-.post,
-.about,
-.tag-index,
-.not-found,
-.error-page,
-.search-results-section {
+/* Common content sections */
+.post, .about, .tag-index, .not-found, .error-page, .search-results-section {
   margin-top: 0;
   padding-top: 0;
 }
 
-/* Single post with brutalist styling */
+/* Single post styling */
 .post-header {
   margin-bottom: var(--space-xl);
   padding: var(--space-md);
   border: var(--border-medium);
-  background-color: white;
+  background-color: var(--color-card);
 }
 
 .post-content {
@@ -395,7 +378,7 @@ footer {
   box-shadow: var(--shadow-brutal);
 }
 
-/* Tags with brutalist styling */
+/* Tags */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -403,10 +386,11 @@ footer {
 }
 
 .tag {
-  background: white;
+  background: var(--color-bg);
   font-weight: 600;
   padding: var(--space-2xs) var(--space-xs);
   border: var(--border-thin);
+  border-color: var(--color-primary);
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
@@ -424,11 +408,11 @@ footer {
   font-size: 0.7rem;
   opacity: 0.8;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-bg);
   padding: 0 var(--space-2xs);
 }
 
-/* Tag cloud with brutalist approach */
+/* Tag cloud */
 .tag-cloud {
   display: flex;
   flex-wrap: wrap;
@@ -443,11 +427,9 @@ footer {
 .tag-sm {
   font-size: 0.75rem;
 }
-
 .tag-md {
   font-size: 0.85rem;
 }
-
 .tag-lg {
   font-size: 1rem;
 }
@@ -458,21 +440,23 @@ footer {
   align-items: center;
   margin-bottom: var(--space-lg);
   padding: var(--space-md);
-  background: white;
+  background: var(--color-card);
   border: var(--border-thin);
   box-shadow: var(--shadow-brutal);
 }
 
+/* Buttons */
 .button {
   display: inline-flex;
   align-items: center;
   padding: var(--space-xs) var(--space-md);
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-weight: 700;
+  border: var(--border-thin);
+  border-color: var(--color-primary);
   text-transform: uppercase;
   cursor: pointer;
-  border: var(--border-thin);
   transition: all var(--transition-fast);
 }
 
@@ -480,18 +464,19 @@ footer {
   transform: translate(-2px, -2px);
   box-shadow: 2px 2px 0 0 var(--color-border);
   text-decoration: none;
+  background-color: var(--color-accent);
 }
 
 .empty-state {
   padding: var(--space-lg);
-  background: white;
+  background: var(--color-card);
   border: var(--border-medium);
   box-shadow: var(--shadow-brutal);
   text-align: center;
   margin: var(--space-lg) 0;
 }
 
-/* Search button in navigation */
+/* Search UI */
 .search-toggle {
   display: inline-flex;
   align-items: center;
@@ -500,8 +485,9 @@ footer {
   font-weight: 700;
   text-transform: uppercase;
   border: var(--border-thin);
+  border-color: var(--color-primary);
   padding: var(--space-2xs) var(--space-xs);
-  background-color: var(--color-accent);
+  background-color: var(--color-bg);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -509,9 +495,10 @@ footer {
 .search-toggle:hover {
   transform: translate(-2px, -2px);
   box-shadow: 2px 2px 0 0 var(--color-border);
+  background-color: var(--color-accent);
 }
 
-/* Search modal overlay */
+/* Search modal */
 .search-modal-overlay {
   position: fixed;
   z-index: 1000;
@@ -521,40 +508,11 @@ footer {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(9, 41, 64, 0.8);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.search-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--color-primary);
-  padding-bottom: 0.5rem;
-}
-
-.search-header h2 {
-  margin: 0;
-}
-
-.search-close {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  border: 1px solid var(--color-primary);
-  padding: 0.25rem 0.75rem;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s ease;
-}
-
-.search-close:hover {
-  background-color: var(--color-accent);
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);
 }
 
 .search-modal-content {
@@ -570,7 +528,7 @@ footer {
   overflow-y: auto;
   z-index: 1002;
   border-radius: 2px;
-  top: 12rem;
+  top: 0;
 }
 
 .search-header {
@@ -579,6 +537,7 @@ footer {
   align-items: center;
   margin-bottom: var(--space-md);
   border-bottom: var(--border-thin);
+  border-color: var(--color-primary);
   padding-bottom: var(--space-sm);
 }
 
@@ -589,21 +548,22 @@ footer {
 }
 
 .search-close {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   border: var(--border-thin);
+  border-color: var(--color-primary);
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
   padding: var(--space-2xs) var(--space-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-brutal);
 }
 
 .search-close:hover {
   transform: translate(-2px, -2px);
   box-shadow: 2px 2px 0 0 var(--color-border);
+  background-color: var(--color-accent);
 }
 
 /* Search form */
@@ -622,6 +582,8 @@ footer {
   font-size: 1rem;
   border: var(--border-medium);
   transition: box-shadow var(--transition-fast);
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .search-form input[type="search"]:focus {
@@ -630,9 +592,10 @@ footer {
 }
 
 .search-form button {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-bg);
+  color: var(--color-text);
   border: var(--border-medium);
+  border-color: var(--color-primary);
   border-left: none;
   padding: 0 var(--space-md);
   cursor: pointer;
@@ -643,28 +606,23 @@ footer {
 }
 
 .search-form button:hover {
-  background: var(--color-text);
+  background: var(--color-accent);
 }
 
-/* Search results in modal */
-.search-modal .search-results {
-  margin-top: var(--space-md);
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
+/* Search results */
 .search-results {
   margin-top: var(--space-md);
   max-height: 300px;
   overflow-y: auto;
   border: var(--border-thin);
-  background-color: white;
+  background-color: var(--color-card);
   padding: var(--space-md);
 }
 
-.search-results-section {
-  margin-top: 0;
-  padding-top: 0;
+.search-modal .search-results {
+  margin-top: var(--space-md);
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 .search-results-summary {
@@ -679,7 +637,7 @@ footer {
   padding: var(--space-md);
   margin-bottom: var(--space-md);
   border: var(--border-medium);
-  background-color: white;
+  background-color: var(--color-card);
   transition: all var(--transition-standard);
   box-shadow: var(--shadow-brutal);
 }
@@ -705,21 +663,21 @@ footer {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* RSS link with brutalist styling */
+/* RSS link */
 .rss-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-accent);
+  background-color: var(--color-bg);
   padding: var(--space-2xs) var(--space-xs);
   border: var(--border-thin);
+  border-color: var(--color-primary);
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
@@ -746,12 +704,11 @@ footer {
   opacity: 1;
 }
 
-/* Content transition effects */
 .htmx-swappable {
   min-height: 300px;
 }
 
-/* Pagination with brutalist design */
+/* Pagination */
 .pagination {
   display: flex;
   flex-wrap: wrap;
@@ -760,7 +717,7 @@ footer {
   margin-top: var(--space-xl);
   padding: var(--space-md);
   border: var(--border-medium);
-  background-color: white;
+  background-color: var(--color-card);
   box-shadow: var(--shadow-brutal);
 }
 
@@ -787,7 +744,7 @@ footer {
 }
 
 .pagination-pages a {
-  background: white;
+  background: var(--color-bg);
   color: var(--color-text);
 }
 
@@ -800,7 +757,7 @@ footer {
 
 .pagination-current {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-bg);
   font-weight: 700;
 }
 
@@ -839,10 +796,10 @@ footer {
   margin-top: var(--space-sm);
 }
 
-/* Error pages with brutalist styling */
+/* Error pages */
 .error-page {
   padding: var(--space-lg);
-  background: white;
+  background: var(--color-card);
   border: var(--border-medium);
   box-shadow: var(--shadow-brutal);
   margin: var(--space-lg) 0;
@@ -876,8 +833,8 @@ footer {
 .error-stack {
   margin-top: var(--space-sm);
   padding: var(--space-md);
-  background: var(--color-text);
-  color: white;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: var(--font-mono);
   font-size: 0.9rem;
   overflow-x: auto;
@@ -885,12 +842,16 @@ footer {
   border: var(--border-thin);
 }
 
+/* Avatar styling for footer */
+.avatar {
+  color: var(--color-primary);
+}
+
 /* Media queries */
 @media (max-width: 640px) {
   :root {
     --content-padding: 1rem;
-    --header-height: 150px;
-    /* Dynamic header height for mobile */
+    --header-height: 70px;
   }
 
   html {
@@ -905,14 +866,16 @@ footer {
     font-size: 1.4rem;
   }
 
-  header {
-    height: 70px;
-    /* Slightly taller on mobile */
+  body {
+    padding-top: calc(var(--header-height) + var(--space-md));
+  }
+  
+  main {
+    padding-bottom: 80px;
   }
 
-  main {
-    padding-top: 90px;
-    /* Adjust for taller header on mobile */
+  footer {
+    padding: 0.75rem 0;
   }
 
   nav {
@@ -922,7 +885,6 @@ footer {
 
   .site-title {
     font-size: 1.5rem;
-    /* Smaller title on mobile */
     width: 100%;
     margin-bottom: var(--space-xs);
   }

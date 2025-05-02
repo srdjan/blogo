@@ -7,13 +7,17 @@ excerpt: Exploring Deno, a secure runtime for JavaScript and TypeScript built wi
 
 # Introduction to Deno
 
-Deno is a modern runtime for JavaScript and TypeScript, built with security, simplicity, and developer experience in mind. Created by Ryan Dahl, the original creator of Node.js, Deno addresses many of the design issues present in Node.js.
+Deno is a modern runtime for JavaScript and TypeScript, built with security,
+simplicity, and developer experience in mind. Created by Ryan Dahl, the original
+creator of Node.js, Deno addresses many of the design issues present in Node.js.
 
 ## Key Features
 
 ### Security First
 
-Unlike Node.js, Deno is secure by default. Scripts cannot access files, networks, or environment variables without explicit permissions. This sandbox approach ensures your applications remain secure:
+Unlike Node.js, Deno is secure by default. Scripts cannot access files,
+networks, or environment variables without explicit permissions. This sandbox
+approach ensures your applications remain secure:
 
 ```typescript
 // Run with network access only

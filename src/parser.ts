@@ -1,13 +1,13 @@
-import { Result, Post, PostMeta } from "./types.ts";
+import { Post, PostMeta, Result } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
 import { marked } from "https://esm.sh/marked@15.0.7";
-import { createError, tryCatch, chain } from "./error.ts";
+import { chain, createError, tryCatch } from "./error.ts";
 
 /**
  * Extract frontmatter and content from markdown text
  */
 const extractFrontmatter = (
-  text: string
+  text: string,
 ): Result<{ frontmatter: string; content: string }, AppError> => {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
 
@@ -16,7 +16,7 @@ const extractFrontmatter = (
       ok: false,
       error: createError(
         "ParseError",
-        "Invalid frontmatter format"
+        "Invalid frontmatter format",
       ),
     };
   }
@@ -35,7 +35,7 @@ const extractFrontmatter = (
  */
 const parseFrontmatter = (
   frontmatter: string,
-  slug: string
+  slug: string,
 ): Result<PostMeta, AppError> => {
   try {
     const meta = parseYaml(frontmatter) as PostMeta;
@@ -46,7 +46,7 @@ const parseFrontmatter = (
         ok: false,
         error: createError(
           "ValidationError",
-          "Post title is required in frontmatter"
+          "Post title is required in frontmatter",
         ),
       };
     }
@@ -56,7 +56,7 @@ const parseFrontmatter = (
         ok: false,
         error: createError(
           "ValidationError",
-          "Post date is required in frontmatter"
+          "Post date is required in frontmatter",
         ),
       };
     }
@@ -71,7 +71,7 @@ const parseFrontmatter = (
       error: createError(
         "ParseError",
         "Failed to parse frontmatter YAML",
-        error
+        error,
       ),
     };
   }
@@ -89,10 +89,10 @@ const markdownToHtml = (markdown: string): Result<string, AppError> => {
     if (markdownCache.has(markdown)) {
       return { ok: true, value: markdownCache.get(markdown)! };
     }
-    
+
     // Parse markdown if not in cache
     const html = marked.parse(markdown) as string;
-    
+
     // Cache the result
     markdownCache.set(markdown, html);
 
@@ -103,7 +103,7 @@ const markdownToHtml = (markdown: string): Result<string, AppError> => {
       error: createError(
         "ParseError",
         "Failed to parse markdown",
-        error
+        error,
       ),
     };
   }
@@ -114,11 +114,12 @@ const markdownToHtml = (markdown: string): Result<string, AppError> => {
  */
 export const parseMarkdown = async (
   filePath: string,
-  slug: string
+  slug: string,
 ): Promise<Result<Post, AppError>> => {
   const readFile = await tryCatch<string, AppError>(
     async () => await Deno.readTextFile(filePath),
-    (error) => createError("IOError", `Failed to read file: ${filePath}`, error)
+    (error) =>
+      createError("IOError", `Failed to read file: ${filePath}`, error),
   );
 
   return chain(readFile, (text) => {
@@ -136,7 +137,7 @@ export const parseMarkdown = async (
 
     // Combine metadata and content into a Post
     const formattedDate = new Date(meta.value.date).toLocaleDateString();
-    
+
     return {
       ok: true,
       value: {
@@ -150,8 +151,9 @@ export const parseMarkdown = async (
 
 /**
  * Type guard for Post objects
+ * Currently not used but kept for potential future use
  */
-const isPost = (obj: unknown): obj is Post => {
+const _isPost = (obj: unknown): obj is Post => {
   return obj !== null &&
     typeof obj === "object" &&
     "title" in obj &&
@@ -174,7 +176,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
       }
       return entries;
     },
-    (error) => createError("IOError", "Failed to read posts directory", error)
+    (error) => createError("IOError", "Failed to read posts directory", error),
   );
 
   if (!readDir.ok) return readDir;
@@ -183,7 +185,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
     readDir.value.map(async (entry) => {
       const slug = entry.name.replace(/\.md$/, "");
       return await parseMarkdown(`content/posts/${entry.name}`, slug);
-    })
+    }),
   );
 
   // Filter out failures and collect successful posts
@@ -200,12 +202,14 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
 
   // Log errors and provide more context
   if (errors.length > 0) {
-    console.error(`Errors loading ${errors.length} out of ${postResults.length} posts:`);
-    errors.forEach(err => {
+    console.error(
+      `Errors loading ${errors.length} out of ${postResults.length} posts:`,
+    );
+    errors.forEach((err) => {
       console.error(`- ${err.type}: ${err.message}`);
       if (err.cause) console.error(`  Cause: ${err.cause}`);
     });
-    
+
     // If all posts failed to load, return error
     if (posts.length === 0 && errors.length > 0) {
       return {
@@ -213,15 +217,15 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
         error: createError(
           "DataError",
           `Failed to load any posts. ${errors.length} post files had errors.`,
-          errors[0] // Include the first error as the cause
-        )
+          errors[0], // Include the first error as the cause
+        ),
       };
     }
-    
+
     // Add retry mechanism for empty posts with a delay of 1 second
     if (posts.length === 0) {
       console.log("No posts loaded successfully. Retrying once...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return loadPosts(); // Recursive retry (will only happen once due to checks)
     }
   }

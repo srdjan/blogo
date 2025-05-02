@@ -1,10 +1,10 @@
-import { RenderContext, Post, TagInfo } from "./types.ts";
+import { Post, RenderContext, TagInfo } from "./types.ts";
 import type { Pagination } from "./pagination.ts";
 import {
-  generateWebsiteSchema,
   generateBlogPostSchema,
   generateOpenGraphTags,
   generateTwitterCardTags,
+  generateWebsiteSchema,
 } from "./metadata.ts";
 
 /**
@@ -18,7 +18,7 @@ const TEMPLATES = {
     structuredData: string,
     ogTags: string,
     twitterTags: string,
-    siteName: string
+    siteName: string,
   ) => `
   <head>
     <meta charset="UTF-8">
@@ -36,41 +36,9 @@ const TEMPLATES = {
     ${twitterTags}
 
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/color-override.css">
     <link rel="alternate" type="application/rss+xml" title="${siteName} RSS Feed" href="/feed.xml">
     <script src="/js/htmx.min.js"></script>
-    <script>
-      document.addEventListener('htmx:afterSwap',event=>{event.detail.target.tagName==='MAIN'&&window.scrollTo({top:0,behavior:'smooth'})});
-      document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('search-modal');m&&m.style.display==='flex'&&(m.style.display='none')}});
-      document.addEventListener('DOMContentLoaded',function(){
-        const f=document.getElementById('search-form'),i=document.getElementById('search-input'),r=document.getElementById('search-results');
-        f.addEventListener('submit',e=>{
-          e.preventDefault();
-          const q=i.value.trim();
-          if(!q)return;
-          r.innerHTML='Searching...';
-          fetch('/search?q='+encodeURIComponent(q))
-            .then(res=>res.text())
-            .then(html=>r.innerHTML=html)
-            .catch(err=>{r.innerHTML='Error: Could not perform search.';console.error('Search error:',err)});
-        });
-        let t;
-        i.addEventListener('input',()=>{
-          clearTimeout(t);
-          const q=i.value.trim();
-          if(q.length>2){
-            t=setTimeout(()=>{
-              r.innerHTML='Searching...';
-              fetch('/search?q='+encodeURIComponent(q))
-                .then(res=>res.text())
-                .then(html=>r.innerHTML=html)
-                .catch(err=>{r.innerHTML='Error: Could not perform search.';console.error('Search error:',err)});
-            },300);
-          }else if(!q){r.innerHTML=''}
-        });
-        document.querySelector('.search-toggle').addEventListener('click',()=>setTimeout(()=>i.focus(),10));
-      });
-    </script>
+    <script src="/js/site.js"></script>
   </head>`,
 
   // Navigation
@@ -86,8 +54,7 @@ const TEMPLATES = {
         <a href="/feed.xml" class="link">RSS</a>
       </div>
     </nav>
-    <div id="search-modal" class="search-modal-overlay" style="display:none"
-      onclick="if(event.target === this) this.style.display='none'">
+    <div id="search-modal" class="search-modal-overlay" style="display:none">
       <div class="search-modal-content">
         <div class="search-header">
           <h2>Search</h2>
@@ -109,7 +76,7 @@ const TEMPLATES = {
   <footer>
     <p>Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
       <span class="avatar">⊣˚∆˚⊢</span></a> & Claude</p>
-  </footer>`
+  </footer>`,
 };
 
 /**
@@ -122,7 +89,7 @@ export const renderDocument = (
   config: {
     baseUrl: string;
     description: string;
-  }
+  },
 ): string => {
   // Determine title based on context
   const pageTitle = context.post
@@ -144,21 +111,30 @@ export const renderDocument = (
     pageTitle,
     `${config.baseUrl}${context.path}`,
     pageDescription,
-    context.post ? "article" : "website"
+    context.post ? "article" : "website",
   );
 
   const twitterTags = generateTwitterCardTags(
     pageTitle,
-    pageDescription
+    pageDescription,
   );
 
   // Compose the full HTML document from template parts
   return `<!DOCTYPE html>
 <html lang="en">
-${TEMPLATES.head(pageTitle, pageDescription, structuredData, ogTags, twitterTags, context.title)}
+${
+    TEMPLATES.head(
+      pageTitle,
+      pageDescription,
+      structuredData,
+      ogTags,
+      twitterTags,
+      context.title,
+    )
+  }
 <body>
   ${TEMPLATES.nav(context.title)}
-  <main id="content-main" class="htmx-swappable">${content}</main>
+  <main id="content-main" class="htmx-swappable content-main">${content}</main>
   ${TEMPLATES.footer()}
 </body>
 </html>`;
@@ -173,7 +149,9 @@ const POST_TEMPLATES = {
     <article class="post-card">
       <h2><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h2>
       <div class="post-meta">
-        <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
+        <time datetime="${post.date}">${
+    post.formattedDate || new Date(post.date).toLocaleDateString()
+  }</time>
         ${post.tags ? renderTags(post.tags) : ""}
       </div>
       ${post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : ""}
@@ -182,16 +160,18 @@ const POST_TEMPLATES = {
   // Empty state component
   emptyState: (activeTag?: string): string => `
     <div class="empty-state">
-      <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ''}.</p>
+      <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ""}.</p>
     </div>`,
 
   // Tag filter header component
   tagHeader: (activeTag: string, postCount: number): string => `
     <h1>Posts Tagged "${activeTag}"</h1>
     <div class="tag-filter-header">
-      <p>Showing ${postCount} post${postCount !== 1 ? 's' : ''} tagged with <strong>${activeTag}</strong></p>
+      <p>Showing ${postCount} post${
+    postCount !== 1 ? "s" : ""
+  } tagged with <strong>${activeTag}</strong></p>
       <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Show All Posts</a>
-    </div>`
+    </div>`,
 };
 
 /**
@@ -201,20 +181,20 @@ const POST_TEMPLATES = {
 export const renderPostList = (
   posts: Post[],
   activeTag?: string,
-  pagination?: Pagination
+  pagination?: Pagination,
 ): string => {
   // Prepare post cards - only generate HTML when needed
   const postCards = posts.length > 0
-    ? posts.map(post => POST_TEMPLATES.postCard(post)).join("")
+    ? posts.map((post) => POST_TEMPLATES.postCard(post)).join("")
     : POST_TEMPLATES.emptyState(activeTag);
 
   // Prepare tag header if needed
   const tagHeader = activeTag
     ? POST_TEMPLATES.tagHeader(activeTag, posts.length)
-    : '';
+    : "";
 
   // Prepare pagination if needed
-  const paginationHtml = pagination ? renderPagination(pagination) : '';
+  const paginationHtml = pagination ? renderPagination(pagination) : "";
 
   // Compose the final HTML
   return `
@@ -237,7 +217,7 @@ export const renderPagination = (pagination: Pagination): string => {
 
   // Don't render pagination if there's only one page
   if (totalPages <= 1) {
-    return '';
+    return "";
   }
 
   // Generate page numbers to show
@@ -252,7 +232,11 @@ export const renderPagination = (pagination: Pagination): string => {
   }
 
   // Show nearby pages
-  for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+  for (
+    let i = Math.max(2, currentPage - 1);
+    i <= Math.min(totalPages - 1, currentPage + 1);
+    i++
+  ) {
     pageNumbers.push(i);
   }
 
@@ -268,35 +252,49 @@ export const renderPagination = (pagination: Pagination): string => {
 
   return `
     <nav class="pagination content-section" aria-label="Pagination Navigation">
-      ${hasPrevPage ? `
-        <a href="?page=${currentPage - 1}" class="pagination-prev link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
+      ${
+    hasPrevPage
+      ? `
+        <a href="?page=${
+        currentPage - 1
+      }" class="pagination-prev link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Previous page">
           Previous
         </a>
-      ` : `
+      `
+      : `
         <span class="pagination-prev pagination-disabled" aria-disabled="true">
           Previous
         </span>
-      `}
+      `
+  }
 
       <div class="pagination-pages">
-        ${pageNumbers.map(page =>
-    page === null
-      ? `<span class="pagination-ellipsis">&hellip;</span>`
-      : page === currentPage
+        ${
+    pageNumbers.map((page) =>
+      page === null
+        ? `<span class="pagination-ellipsis">&hellip;</span>`
+        : page === currentPage
         ? `<span class="pagination-current" aria-current="page">${page}</span>`
         : `<a href="?page=${page}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${page}</a>`
-  ).join('')}
+    ).join("")
+  }
       </div>
 
-      ${hasNextPage ? `
-        <a href="?page=${currentPage + 1}" class="pagination-next link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
+      ${
+    hasNextPage
+      ? `
+        <a href="?page=${
+        currentPage + 1
+      }" class="pagination-next link" hx-boost="true" hx-target="main" hx-swap="innerHTML" aria-label="Next page">
           Next
         </a>
-      ` : `
+      `
+      : `
         <span class="pagination-next pagination-disabled" aria-disabled="true">
           Next
         </span>
-      `}
+      `
+  }
 
       <div class="pagination-info">
         <p>Page ${currentPage} of ${totalPages}</p>
@@ -315,7 +313,9 @@ export const renderPost = (post: Post): string => {
       <header class="post-header">
         <h1>${post.title}</h1>
         <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
+          <time datetime="${post.date}">${
+    post.formattedDate || new Date(post.date).toLocaleDateString()
+  }</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
       </header>
@@ -364,10 +364,11 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
     <section class="tag-index content-section">
       <h1>Tags</h1>
       <div class="tag-cloud">
-        ${tags
+        ${
+    tags
       .sort((a, b) => b.count - a.count)
       .map(
-        tag => `
+        (tag) => `
         <a href="/tags/${tag.name}"
           class="tag tag-${sizeClassForCount(tag.count)} link"
           hx-boost="true"
@@ -376,9 +377,10 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
           title="${tag.count} posts">
           ${tag.name}
           <span class="tag-count">${tag.count}</span>
-        </a>`
+        </a>`,
       )
-      .join("")}
+      .join("")
+  }
       </div>
     </section>
   `;
@@ -390,7 +392,7 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
  */
 export const renderSearchResults = (posts: Post[], query: string): string => {
   if (!query || query.trim().length === 0) {
-    return '';
+    return "";
   }
 
   if (posts.length === 0) {
@@ -403,18 +405,24 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
   return `
     <div class="search-results-summary content-section">
-      Found ${posts.length} post${posts.length !== 1 ? 's' : ''} matching "${query}"
+      Found ${posts.length} post${
+    posts.length !== 1 ? "s" : ""
+  } matching "${query}"
     </div>
-    ${posts.map(post => `
+    ${
+    posts.map((post) => `
       <article class="search-result">
         <h3><a href="/posts/${post.slug}" class="link" hx-boost="true" hx-target="main" hx-swap="innerHTML">${post.title}</a></h3>
         <div class="post-meta">
-          <time datetime="${post.date}">${post.formattedDate || new Date(post.date).toLocaleDateString()}</time>
+          <time datetime="${post.date}">${
+      post.formattedDate || new Date(post.date).toLocaleDateString()
+    }</time>
           ${post.tags ? renderTags(post.tags) : ""}
         </div>
         ${post.excerpt ? `<p class="search-excerpt">${post.excerpt}</p>` : ""}
       </article>
-    `).join('')}
+    `).join("")
+  }
   `;
 };
 
@@ -433,12 +441,16 @@ export const renderErrorPage = (error: {
       <div class="error-message">
         <p>${error.message}</p>
       </div>
-      ${error.stackTrace ? `
+      ${
+    error.stackTrace
+      ? `
         <details class="error-details">
           <summary>Technical Details</summary>
           <pre class="error-stack">${error.stackTrace}</pre>
         </details>
-      ` : ''}
+      `
+      : ""
+  }
       <p><a href="/" class="button link" hx-boost="true" hx-target="main" hx-swap="innerHTML">Return Home</a></p>
     </section>
   `;
@@ -451,11 +463,13 @@ export const renderErrorPage = (error: {
 const renderTags = (tags: string[]): string => {
   return `
     <div class="tags content-section">
-      ${tags.map(tag => `
+      ${
+    tags.map((tag) => `
         <a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="main" hx-swap="innerHTML">
           ${tag}
         </a>
-      `).join("")}
+      `).join("")
+  }
     </div>
   `;
 };

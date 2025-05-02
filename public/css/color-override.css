@@ -104,6 +104,7 @@ pre,
 footer {
   color: var(--accent-color);
   border-top-color: var(--accent-color);
+  background-color: var(--main-background);
 }
 
 /* Code block colors */

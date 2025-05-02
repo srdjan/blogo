@@ -1,18 +1,56 @@
-# Font Files
+# Fonts Usage
 
-Place the following WOFF2 font files in this directory:
+This blog uses a system font stack approach for optimal performance and native
+look and feel.
 
-- inter-regular.woff2
-- inter-semibold.woff2
-- inter-bold.woff2
-- space-grotesk-regular.woff2
-- space-grotesk-bold.woff2
-- ibm-plex-mono-regular.woff2
-- ibm-plex-mono-semibold.woff2
+## Font Stacks Used
 
-You can download these fonts from their official sources:
-- Inter: https://rsms.me/inter/
-- Space Grotesk: https://fonts.google.com/specimen/Space+Grotesk
-- IBM Plex Mono: https://www.ibm.com/plex/
+### Sans-serif (Primary text)
 
-Then convert them to WOFF2 format using a tool like [Font Squirrel](https://www.fontsquirrel.com/tools/webfont-generator) for optimal web performance.
+```css
+--font-sans:
+  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+  sans-serif;
+```
+
+### Monospace (Code blocks)
+
+```css
+--font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+```
+
+### Display (Headings)
+
+```css
+--font-display: system-ui, sans-serif;
+```
+
+## Benefits of System Fonts
+
+1. **Performance**: No font files to download, reducing page load time
+2. **Native look and feel**: UI matches the user's operating system
+3. **Lower maintenance**: No need to convert, compress, or keep font files
+   updated
+4. **Improved accessibility**: System fonts often have better accessibility
+   characteristics
+
+## Custom Fonts (Optional)
+
+If you want to use custom fonts in the future:
+
+1. Add the font files in WOFF2 format to this directory
+2. Create a `fonts.css` file in the `public/css` directory
+3. Add the `@font-face` declarations in the CSS file
+4. Update the main CSS file to use your custom fonts
+
+Example:
+
+```css
+@font-face {
+  font-family: "CustomFont";
+  src: url("/fonts/custom-font.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+```

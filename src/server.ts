@@ -1,18 +1,18 @@
 import type { Post, TagInfo } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
-  renderDocument,
-  renderPostList,
-  renderPost,
-  renderNotFound,
   renderAbout,
-  renderTagIndex,
-  renderSearchResults,
+  renderDocument,
   renderErrorPage,
+  renderNotFound,
+  renderPost,
+  renderPostList,
+  renderSearchResults,
+  renderTagIndex,
 } from "./render.ts";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
-import { resultToResponse, createError, tryCatch } from "./error.ts";
+import { createError, resultToResponse, tryCatch } from "./error.ts";
 import type { AppError } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
@@ -22,7 +22,7 @@ import { paginatePosts } from "./pagination.ts";
  */
 const handleRequest = (
   request: Request,
-  config: Config
+  config: Config,
 ): Promise<Response> => {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -33,47 +33,49 @@ const handleRequest = (
     description: config.blog.description,
   };
 
-  return handleRequestSafe(request, url, path, config, renderConfig).catch((error) => {
-    console.error("Unhandled server error:", error);
+  return handleRequestSafe(request, url, path, config, renderConfig).catch(
+    (error) => {
+      console.error("Unhandled server error:", error);
 
-    // Create unified error response
-    return createErrorResponse(
-      error, 
-      path, 
-      config.blog.title, 
-      renderConfig, 
-      config.debug.showStackTraces,
-      500
-    );
-  });
+      // Create unified error response
+      return createErrorResponse(
+        error,
+        path,
+        config.blog.title,
+        renderConfig,
+        config.debug.showStackTraces,
+        500,
+      );
+    },
+  );
 };
 
 /**
  * Create a standardized error response
  */
 const createErrorResponse = (
-  error: unknown, 
-  path: string, 
+  error: unknown,
+  path: string,
   blogTitle: string,
   renderConfig: { baseUrl: string; description: string },
   showStackTraces: boolean,
-  status = 500
+  status = 500,
 ): Response => {
   const errorContent = renderErrorPage({
     title: "Server Error",
     message: error instanceof Error ? error.message : String(error),
     stackTrace: showStackTraces
       ? (error instanceof Error ? error.stack : JSON.stringify(error, null, 2))
-      : undefined
+      : undefined,
   });
 
   return new Response(
     renderDocument(
       { title: `${blogTitle} - Error`, path },
       errorContent,
-      renderConfig
+      renderConfig,
     ),
-    { status, headers: { "Content-Type": "text/html" } }
+    { status, headers: { "Content-Type": "text/html" } },
   );
 };
 
@@ -82,8 +84,8 @@ const CACHE = {
   posts: {
     data: null as Post[] | null,
     timestamp: 0,
-    ttl: 60 * 1000 // 1 minute TTL
-  }
+    ttl: 60 * 1000, // 1 minute TTL
+  },
 };
 
 /**
@@ -94,18 +96,21 @@ const handleRequestSafe = async (
   url: URL,
   path: string,
   config: Config,
-  renderConfig: { baseUrl: string; description: string }
+  renderConfig: { baseUrl: string; description: string },
 ): Promise<Response> => {
   // Determine if this is an HTMX request for partial content
   const isHtmxRequest = request.headers.get("HX-Request") === "true";
 
   // Serve static files
-  if (path.startsWith("/css/") || path.startsWith("/js/") || path.startsWith("/fonts/")) {
+  if (
+    path.startsWith("/css/") || path.startsWith("/js/") ||
+    path.startsWith("/fonts/")
+  ) {
     return await serveStaticFile(`./public${path}`);
   }
 
   // Load all posts with enhanced caching
-  let postsResult = await getPostsWithCache();
+  const postsResult = await getPostsWithCache();
 
   // Handle posts loading error with functional pattern matching
   if (!postsResult.ok) {
@@ -115,14 +120,22 @@ const handleRequestSafe = async (
       config.blog.title,
       renderConfig,
       config.debug.showStackTraces,
-      500
+      500,
     );
   }
 
   const posts = postsResult.value;
 
   // Route the request
-  return routeRequest(request, url, path, posts, config, renderConfig, isHtmxRequest);
+  return routeRequest(
+    request,
+    url,
+    path,
+    posts,
+    config,
+    renderConfig,
+    isHtmxRequest,
+  );
 };
 
 /**
@@ -130,21 +143,23 @@ const handleRequestSafe = async (
  */
 const getPostsWithCache = async (): Promise<Result<Post[], AppError>> => {
   const currentTime = Date.now();
-  
+
   // Return from cache if valid
-  if (CACHE.posts.data && (currentTime - CACHE.posts.timestamp) < CACHE.posts.ttl) {
+  if (
+    CACHE.posts.data && (currentTime - CACHE.posts.timestamp) < CACHE.posts.ttl
+  ) {
     return { ok: true, value: CACHE.posts.data };
   }
-  
+
   // Cache miss or expired, load fresh data
   const postsResult = await loadPosts();
-  
+
   // Update cache on success
   if (postsResult.ok) {
     CACHE.posts.data = postsResult.value;
     CACHE.posts.timestamp = currentTime;
   }
-  
+
   return postsResult;
 };
 
@@ -163,10 +178,10 @@ const handleHtmxRequest = (
       "HX-Trigger": JSON.stringify({
         scrollToTop: {
           scroll: "top", // Explicit position
-          offset: 120    // Account for header height
-        }
-      })
-    }
+          offset: 120, // Account for header height
+        },
+      }),
+    },
   });
 };
 
@@ -174,61 +189,85 @@ const handleHtmxRequest = (
  * Route the request to the appropriate handler
  * Pure function mapping request details to response
  */
-const routeRequest = async (
-  request: Request,
+const routeRequest = (
+  _request: Request,
   url: URL,
   path: string,
   posts: Post[],
   config: Config,
   renderConfig: { baseUrl: string; description: string },
-  isHtmxRequest: boolean
+  isHtmxRequest: boolean,
 ): Promise<Response> => {
   const { blog: { title: blogTitle } } = config;
 
   // Define route handlers in a map for cleaner routing
   const routes: Record<string, () => Promise<Response>> = {
     // Home page - list all posts
-    "/": async () => {
-      return handlePostList(posts, url, path, blogTitle, config, renderConfig, isHtmxRequest);
+    "/": () => {
+      return handlePostList(
+        posts,
+        url,
+        path,
+        blogTitle,
+        config,
+        renderConfig,
+        isHtmxRequest,
+      );
     },
-    
+
     // RSS feed
-    "/feed.xml": async () => {
+    "/feed.xml": () => {
       const rssContent = generateRSS(posts, blogTitle, config.server.publicUrl);
-      return new Response(rssContent, {
-        headers: { 
-          "Content-Type": "application/xml",
-          "Cache-Control": "max-age=300" // 5 minutes cache
-        }
-      });
+      return Promise.resolve(
+        new Response(rssContent, {
+          headers: {
+            "Content-Type": "application/xml",
+            "Cache-Control": "max-age=300", // 5 minutes cache
+          },
+        }),
+      );
     },
-    
+
     // Search endpoint
-    "/search": async () => {
+    "/search": () => {
       const query = url.searchParams.get("q") || "";
       const results = searchPosts(posts, query);
       const content = renderSearchResults(results, query);
-      return new Response(content, {
-        headers: { "Content-Type": "text/html" }
-      });
+      return Promise.resolve(
+        new Response(content, {
+          headers: { "Content-Type": "text/html" },
+        }),
+      );
     },
-    
+
     // Tag index page
-    "/tags": async () => {
-      return handleTagIndex(posts, path, blogTitle, renderConfig, isHtmxRequest);
+    "/tags": () => {
+      return handleTagIndex(
+        posts,
+        path,
+        blogTitle,
+        renderConfig,
+        isHtmxRequest,
+      );
     },
-    
+
     // About page
-    "/about": async () => {
+    "/about": () => {
       const content = renderAbout();
       if (isHtmxRequest) {
         return handleHtmxRequest(path, content);
       }
-      return new Response(
-        renderDocument({ title: blogTitle, posts, path }, content, renderConfig),
-        { headers: { "Content-Type": "text/html" } }
+      return Promise.resolve(
+        new Response(
+          renderDocument(
+            { title: blogTitle, posts, path },
+            content,
+            renderConfig,
+          ),
+          { headers: { "Content-Type": "text/html" } },
+        ),
       );
-    }
+    },
   };
 
   // Check for exact route match
@@ -237,16 +276,24 @@ const routeRequest = async (
   }
 
   // Handle pattern routes
-  
+
   // Tag page
   if (path.startsWith("/tags/")) {
-    return handleTagPage(posts, path, url, blogTitle, config, renderConfig, isHtmxRequest);
+    return handleTagPage(
+      posts,
+      path,
+      url,
+      blogTitle,
+      config,
+      renderConfig,
+      isHtmxRequest,
+    );
   }
 
   // Single post page
   if (path.startsWith("/posts/")) {
     const slug = path.substring("/posts/".length);
-    const post = posts.find(p => p.slug === slug);
+    const post = posts.find((p) => p.slug === slug);
 
     if (post) {
       const content = renderPost(post);
@@ -255,7 +302,7 @@ const routeRequest = async (
       }
       return new Response(
         renderDocument({ title: blogTitle, post, path }, content, renderConfig),
-        { headers: { "Content-Type": "text/html" } }
+        { headers: { "Content-Type": "text/html" } },
       );
     }
   }
@@ -267,21 +314,21 @@ const routeRequest = async (
   }
   return new Response(
     renderDocument({ title: blogTitle, path }, content, renderConfig),
-    { status: 404, headers: { "Content-Type": "text/html" } }
+    { status: 404, headers: { "Content-Type": "text/html" } },
   );
 };
 
 /**
  * Handle the home page and post listings
  */
-const handlePostList = async (
+const handlePostList = (
   posts: Post[],
   url: URL,
   path: string,
   blogTitle: string,
   config: Config,
   renderConfig: { baseUrl: string; description: string },
-  isHtmxRequest: boolean
+  isHtmxRequest: boolean,
 ): Promise<Response> => {
   // Get pagination parameters
   const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -296,7 +343,7 @@ const handlePostList = async (
   const content = renderPostList(
     paginatedPosts.items,
     undefined,
-    paginatedPosts.pagination
+    paginatedPosts.pagination,
   );
 
   // For HTMX requests, return just the content
@@ -306,26 +353,26 @@ const handlePostList = async (
 
   return new Response(
     renderDocument({ title: blogTitle, posts, path }, content, renderConfig),
-    { 
-      headers: { 
+    {
+      headers: {
         "Content-Type": "text/html",
-        "Cache-Control": "max-age=60" // 1 minute cache
-      } 
-    }
+        "Cache-Control": "max-age=60", // 1 minute cache
+      },
+    },
   );
 };
 
 /**
  * Handle tag page
  */
-const handleTagPage = async (
+const handleTagPage = (
   posts: Post[],
   path: string,
   url: URL,
   blogTitle: string,
   config: Config,
   renderConfig: { baseUrl: string; description: string },
-  isHtmxRequest: boolean
+  isHtmxRequest: boolean,
 ): Promise<Response> => {
   const tag = path.substring("/tags/".length);
   const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -341,7 +388,7 @@ const handleTagPage = async (
   const content = renderPostList(
     paginatedPosts.items,
     tag,
-    paginatedPosts.pagination
+    paginatedPosts.pagination,
   );
 
   // For HTMX requests, return just the content
@@ -350,31 +397,35 @@ const handleTagPage = async (
   }
 
   return new Response(
-    renderDocument({
-      title: `${blogTitle} - Posts tagged "${tag}"`,
-      posts: paginatedPosts.items,
-      activeTag: tag,
-      path
-    }, content, renderConfig),
-    { headers: { "Content-Type": "text/html" } }
+    renderDocument(
+      {
+        title: `${blogTitle} - Posts tagged "${tag}"`,
+        posts: paginatedPosts.items,
+        activeTag: tag,
+        path,
+      },
+      content,
+      renderConfig,
+    ),
+    { headers: { "Content-Type": "text/html" } },
   );
 };
 
 /**
  * Handle tag index page
  */
-const handleTagIndex = async (
+const handleTagIndex = (
   posts: Post[],
   path: string,
   blogTitle: string,
   renderConfig: { baseUrl: string; description: string },
-  isHtmxRequest: boolean
+  isHtmxRequest: boolean,
 ): Promise<Response> => {
   // Build tag metadata using functional transformation
   const tagMap = new Map<string, TagInfo>();
 
-  posts.forEach(post => {
-    post.tags?.forEach(tag => {
+  posts.forEach((post) => {
+    post.tags?.forEach((tag) => {
       if (!tagMap.has(tag)) {
         tagMap.set(tag, { name: tag, count: 0, posts: [] });
       }
@@ -393,15 +444,22 @@ const handleTagIndex = async (
   }
 
   return new Response(
-    renderDocument({ title: `${blogTitle} - Tags`, tags, path }, content, renderConfig),
-    { headers: { "Content-Type": "text/html" } }
+    renderDocument(
+      { title: `${blogTitle} - Tags`, tags, path },
+      content,
+      renderConfig,
+    ),
+    { headers: { "Content-Type": "text/html" } },
   );
 };
 
 /**
  * Cache for static files to improve performance
  */
-const staticCache = new Map<string, { data: Uint8Array; contentType: string }>();
+const staticCache = new Map<
+  string,
+  { data: Uint8Array; contentType: string }
+>();
 
 /**
  * Serve a static file with functional error handling and caching
@@ -415,19 +473,19 @@ const serveStaticFile = async (filePath: string): Promise<Response> => {
 
   const fileResult = await tryCatch<Uint8Array, AppError>(
     async () => await Deno.readFile(filePath),
-    (error) => createError("NotFound", `File not found: ${filePath}`, error)
+    (error) => createError("NotFound", `File not found: ${filePath}`, error),
   );
 
   return resultToResponse(fileResult, {
     onSuccess: (file) => {
       const contentType = getContentType(filePath);
-      
+
       // Cache the file contents in memory for subsequent requests
       // Only cache smaller files (< 1MB) to avoid memory issues
       if (file.length < 1024 * 1024) {
         staticCache.set(filePath, { data: file, contentType });
       }
-      
+
       return createStaticResponse(file, contentType, filePath);
     },
     onError: () => new Response("Not Found", { status: 404 }),
@@ -438,31 +496,33 @@ const serveStaticFile = async (filePath: string): Promise<Response> => {
  * Create a static file response with appropriate caching headers
  */
 const createStaticResponse = (
-  file: Uint8Array, 
-  contentType: string, 
-  filePath: string
+  file: Uint8Array,
+  contentType: string,
+  filePath: string,
 ): Response => {
   const headers = new Headers({ "Content-Type": contentType });
-  
+
   // Set appropriate caching headers based on file type
-  if (filePath.endsWith('.css') || filePath.endsWith('.js')) {
+  if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
     // Cache styles and scripts for 1 week
-    headers.set('Cache-Control', 'public, max-age=604800');
-  } else if (filePath.includes('/fonts/')) {
+    headers.set("Cache-Control", "public, max-age=604800");
+  } else if (filePath.includes("/fonts/")) {
     // Cache fonts for 1 month (virtually immutable)
-    headers.set('Cache-Control', 'public, max-age=2592000, immutable');
-  } else if (filePath.endsWith('.svg') || filePath.endsWith('.png') || 
-            filePath.endsWith('.jpg') || filePath.endsWith('.gif')) {
+    headers.set("Cache-Control", "public, max-age=2592000, immutable");
+  } else if (
+    filePath.endsWith(".svg") || filePath.endsWith(".png") ||
+    filePath.endsWith(".jpg") || filePath.endsWith(".gif")
+  ) {
     // Cache images for 2 weeks
-    headers.set('Cache-Control', 'public, max-age=1209600');
+    headers.set("Cache-Control", "public, max-age=1209600");
   } else {
     // Default cache for 1 day
-    headers.set('Cache-Control', 'public, max-age=86400');
+    headers.set("Cache-Control", "public, max-age=86400");
   }
-  
+
   // Add compression hint
-  headers.set('Vary', 'Accept-Encoding');
-  
+  headers.set("Vary", "Accept-Encoding");
+
   return new Response(file, { headers });
 };
 
@@ -476,7 +536,9 @@ const getContentType = (filePath: string): string => {
   if (filePath.endsWith(".json")) return "application/json";
   if (filePath.endsWith(".svg")) return "image/svg+xml";
   if (filePath.endsWith(".png")) return "image/png";
-  if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) return "image/jpeg";
+  if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
   if (filePath.endsWith(".gif")) return "image/gif";
   return "application/octet-stream";
 };
@@ -484,14 +546,13 @@ const getContentType = (filePath: string): string => {
 /**
  * Start the HTTP server with type-safe configuration
  */
-export const startServer = async (port: number, config: Config): Promise<void> => {
+export const startServer = (port: number, config: Config): void => {
   console.log(`Starting server on port ${port}...`);
 
   Deno.serve({
     port,
     onListen: ({ hostname, port }) => {
       console.log(`Server running at http://${hostname}:${port}/`);
-    }
+    },
   }, (request) => handleRequest(request, config));
 };
-
