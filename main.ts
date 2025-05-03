@@ -1,4 +1,4 @@
-import { startServer } from "./src/server.ts";
+import { startServer } from "./src/server-improved.ts";
 import { CONFIG } from "./src/config.ts";
 import { logger } from "./src/utils.ts";
 
