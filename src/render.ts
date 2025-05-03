@@ -151,13 +151,9 @@ export const renderPost = (post: Post): string => {
   const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
 
   return `<article class="post content-section">
-  <header class="post-header">
-    <h1>${post.title}</h1>
-    <div class="post-meta">
-      <time datetime="${post.date}">${formattedDate}</time>
-      ${tags}
-    </div>
-  </header>
+  <div class="post-meta-subtle">
+    <time datetime="${post.date}">${formattedDate} ${tags}</time>
+  </div>
   <div class="post-content">${post.content}</div>
 </article>`;
 };
