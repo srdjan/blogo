@@ -526,10 +526,6 @@ const createStaticResponse = (
   return new Response(file, { headers });
 };
 
-/**
- * Get the content type based on file extension
- * Pure function mapping string to string
- */
 const getContentType = (filePath: string): string => {
   if (filePath.endsWith(".css")) return "text/css";
   if (filePath.endsWith(".js")) return "text/javascript";
@@ -543,9 +539,6 @@ const getContentType = (filePath: string): string => {
   return "application/octet-stream";
 };
 
-/**
- * Start the HTTP server with type-safe configuration
- */
 export const startServer = (port: number, config: Config): void => {
   console.log(`Starting server on port ${port}...`);
 

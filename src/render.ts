@@ -142,10 +142,6 @@ export const renderDocument = (
 </html>`;
 };
 
-/**
- * Render a single post
- * Pure function that transforms Post -> HTML
- */
 export const renderPost = (post: Post): string => {
   const tags = post.tags ? renderTags(post.tags) : "";
   const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
@@ -158,18 +154,12 @@ export const renderPost = (post: Post): string => {
 </article>`;
 };
 
-/**
- * Render a list of tags
- */
 const renderTags = (tags: string[]): string => {
   return `<div class="tags">
     ${tags.map(tag => `<a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${tag}</a>`).join("")}
   </div>`;
 };
 
-/**
- * Render a 404 page
- */
 export const renderNotFound = (): string => {
   return `<section class="not-found content-section">
   <h1>404 - Page Not Found</h1>
@@ -178,9 +168,6 @@ export const renderNotFound = (): string => {
 </section>`;
 };
 
-/**
- * Render the about page
- */
 export const renderAbout = (): string => {
   return `<section class="about content-section">
   <h1>About This Blog</h1>
@@ -190,9 +177,6 @@ export const renderAbout = (): string => {
 </section>`;
 };
 
-/**
- * Render the tag index page
- */
 export const renderTagIndex = (tags: TagInfo[]): string => {
   const sortedTags = [...tags].sort((a, b) => b.count - a.count);
 
@@ -217,18 +201,12 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
 </section>`;
 };
 
-/**
- * Helper function to determine tag size class based on count
- */
 const sizeClassForCount = (count: number): string => {
   if (count >= 10) return "lg";
   if (count >= 5) return "md";
   return "sm";
 };
 
-/**
- * Render the post list for the home page or filtered by tag
- */
 export const renderPostList = (
   posts: Post[],
   activeTag?: string,
@@ -299,9 +277,6 @@ export const renderPostList = (
   </section>`;
 };
 
-/**
- * Render pagination controls
- */
 const renderPagination = (pagination: Pagination): string => {
   const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
 
@@ -405,9 +380,6 @@ const renderPagination = (pagination: Pagination): string => {
   </nav>`;
 };
 
-/**
- * Render search results
- */
 export const renderSearchResults = (posts: Post[], query: string): string => {
   if (!query || query.trim().length === 0) {
     return "";
@@ -450,9 +422,6 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
   ${resultsHtml}`;
 };
 
-/**
- * Render an error page
- */
 export const renderErrorPage = (error: {
   title: string;
   message: string;
