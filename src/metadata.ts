@@ -1,5 +1,6 @@
 // src/metadata.ts - Structured metadata generation for SEO and discovery
 import type { Post } from "./types.ts";
+import { escapeHtml, stripHtml } from "./utils.ts";
 
 /**
  * Generate JSON-LD schema for the blog
@@ -35,11 +36,7 @@ export const generateBlogPostSchema = (
   const postUrl = `${baseUrl}/posts/${post.slug}`;
 
   // Extract plain text from HTML content for the description
-  const plainTextContent = post.content
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .substring(0, 200) + "...";
+  const plainTextContent = stripHtml(post.content).substring(0, 200) + "...";
 
   const schema = {
     "@context": "https://schema.org",
@@ -97,14 +94,4 @@ export const generateTwitterCardTags = (
   `;
 };
 
-/**
- * Escape HTML special characters to prevent XSS
- */
-const escapeHtml = (text: string): string => {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-};
+// Using escapeHtml from utils.ts

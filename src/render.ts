@@ -6,6 +6,7 @@ import {
   generateTwitterCardTags,
   generateWebsiteSchema,
 } from "./metadata.ts";
+import { formatDate } from "./utils.ts";
 
 /**
  * Render the HTML document shell
@@ -144,7 +145,7 @@ export const renderDocument = (
 
 export const renderPost = (post: Post): string => {
   const tags = post.tags ? renderTags(post.tags) : "";
-  const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
+  const formattedDate = post.formattedDate || formatDate(post.date);
 
   return `<article class="post content-section">
   <div class="post-meta-subtle">
@@ -231,7 +232,7 @@ export const renderPostList = (
   if (posts.length > 0) {
     postCards = posts.map(post => {
       const tags = post.tags ? renderTags(post.tags) : "";
-      const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
+      const formattedDate = post.formattedDate || formatDate(post.date);
       const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
 
       return `<article class="post-card">
@@ -393,7 +394,7 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
 
   const resultsHtml = posts.map(post => {
     const tags = post.tags ? renderTags(post.tags) : "";
-    const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
+    const formattedDate = post.formattedDate || formatDate(post.date);
     const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
 
     return `<article class="search-result">

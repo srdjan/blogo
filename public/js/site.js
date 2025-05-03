@@ -1,88 +1,109 @@
 /**
- * Site-wide JavaScript functionality
+ * Site-wide JavaScript functionality - modular organization
  */
 
-// Handle HTMX swaps and scrolling
-document.addEventListener("htmx:afterSwap", (event) => {
-  if (event.detail.target.tagName === "MAIN") {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-});
+// Core module for general functionality
+const Core = {
+  init() {
+    this.setupEventListeners();
+  },
 
-// Handle ESC key to close modals
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    const searchModal = document.getElementById("search-modal");
-    if (searchModal && searchModal.style.display === "flex") {
-      searchModal.style.display = "none";
-    }
-  }
-});
-
-// Initialize search functionality when DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
-  const searchForm = document.getElementById("search-form");
-  const searchInput = document.getElementById("search-input");
-  const searchResults = document.getElementById("search-results");
-
-  if (!searchForm || !searchInput || !searchResults) return;
-
-  // Handle search form submission
-  searchForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const query = searchInput.value.trim();
-    if (!query) return;
-
-    performSearch(query, searchResults);
-  });
-
-  // Debounced search on input
-  let searchTimeout;
-  searchInput.addEventListener("input", () => {
-    clearTimeout(searchTimeout);
-    const query = searchInput.value.trim();
-
-    if (query.length > 2) {
-      searchTimeout = setTimeout(() => {
-        performSearch(query, searchResults);
-      }, 300);
-    } else if (!query) {
-      searchResults.innerHTML = "";
-    }
-  });
-
-  // Auto-focus search input when modal opens
-  const searchToggle = document.querySelector(".search-toggle");
-  if (searchToggle) {
-    searchToggle.addEventListener("click", () => {
-      setTimeout(() => searchInput.focus(), 10);
+  setupEventListeners() {
+    // Handle HTMX swaps and scrolling
+    document.addEventListener("htmx:afterSwap", (event) => {
+      if (event.detail.target.tagName === "MAIN") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
-  }
 
-  // Close search modal when clicking outside content
-  const searchModal = document.getElementById("search-modal");
-  if (searchModal) {
-    searchModal.addEventListener("click", (e) => {
-      if (e.target === searchModal) {
-        searchModal.style.display = "none";
+    // Handle ESC key to close modals
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const searchModal = document.getElementById("search-modal");
+        if (searchModal && searchModal.style.display === "flex") {
+          searchModal.style.display = "none";
+        }
       }
     });
   }
-});
+};
 
-/**
- * Perform search and update results
- */
-function performSearch(query, resultsElement) {
-  resultsElement.innerHTML = "Searching...";
-
-  fetch("/search?q=" + encodeURIComponent(query))
-    .then((res) => res.text())
-    .then((html) => {
-      resultsElement.innerHTML = html;
-    })
-    .catch((err) => {
-      resultsElement.innerHTML = "Error: Could not perform search.";
-      console.error("Search error:", err);
+// Search module for search functionality
+const Search = {
+  init() {
+    this.searchForm = document.getElementById("search-form");
+    this.searchInput = document.getElementById("search-input");
+    this.searchResults = document.getElementById("search-results");
+    this.searchModal = document.getElementById("search-modal");
+    this.searchToggle = document.querySelector(".search-toggle");
+    
+    if (!this.searchForm || !this.searchInput || !this.searchResults) return;
+    
+    this.setupEventListeners();
+  },
+  
+  setupEventListeners() {
+    // Handle search form submission
+    this.searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const query = this.searchInput.value.trim();
+      if (!query) return;
+      
+      this.performSearch(query);
     });
-}
+    
+    // Debounced search on input
+    let searchTimeout;
+    this.searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimeout);
+      const query = this.searchInput.value.trim();
+      
+      if (query.length > 2) {
+        searchTimeout = setTimeout(() => {
+          this.performSearch(query);
+        }, 300);
+      } else if (!query) {
+        this.searchResults.innerHTML = "";
+      }
+    });
+    
+    // Auto-focus search input when modal opens
+    if (this.searchToggle) {
+      this.searchToggle.addEventListener("click", () => {
+        setTimeout(() => this.searchInput.focus(), 10);
+      });
+    }
+    
+    // Close search modal when clicking outside content
+    if (this.searchModal) {
+      this.searchModal.addEventListener("click", (e) => {
+        if (e.target === this.searchModal) {
+          this.searchModal.style.display = "none";
+        }
+      });
+    }
+  },
+  
+  performSearch(query) {
+    this.searchResults.innerHTML = "Searching...";
+    
+    fetch("/search?q=" + encodeURIComponent(query))
+      .then((res) => res.text())
+      .then((html) => {
+        this.searchResults.innerHTML = html;
+      })
+      .catch((err) => {
+        this.searchResults.innerHTML = "Error: Could not perform search.";
+        // Only log errors in development
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          console.error("Search error:", err);
+        }
+      });
+  }
+};
+
+// Initialize all modules when DOM is loaded
+document.addEventListener("DOMContentLoaded", function() {
+  Core.init();
+  Search.init();
+});

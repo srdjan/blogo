@@ -2,6 +2,8 @@ import { Post, PostMeta, Result } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
 import { marked } from "https://esm.sh/marked@15.0.7";
 import { chain, createError, tryCatch } from "./error.ts";
+import { CONFIG } from "./config.ts";
+import { logger, formatDate } from "./utils.ts";
 
 /**
  * Extract frontmatter and content from markdown text
@@ -136,7 +138,7 @@ export const parseMarkdown = async (
     if (!html.ok) return html;
 
     // Combine metadata and content into a Post
-    const formattedDate = new Date(meta.value.date).toLocaleDateString();
+    const formattedDate = formatDate(meta.value.date);
 
     return {
       ok: true,
@@ -166,7 +168,7 @@ const _isPost = (obj: unknown): obj is Post => {
  * Load all posts from the content directory
  */
 export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
-  const postsDir = "content/posts"; // Hardcoded posts directory
+  const postsDir = CONFIG.blog.postsDir;
 
   const readDir = await tryCatch<Deno.DirEntry[], AppError>(
     async () => {
@@ -178,7 +180,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
       }
       return entries;
     },
-    (error) => createError("IOError", "Failed to read posts directory", error),
+    (error) => createError("IOError", `Failed to read posts directory: ${postsDir}`, error),
   );
 
   if (!readDir.ok) return readDir;
@@ -204,12 +206,12 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
 
   // Log errors and provide more context
   if (errors.length > 0) {
-    console.error(
+    logger.error(
       `Errors loading ${errors.length} out of ${postResults.length} posts:`,
     );
     errors.forEach((err) => {
-      console.error(`- ${err.type}: ${err.message}`);
-      if (err.cause) console.error(`  Cause: ${err.cause}`);
+      logger.error(`- ${err.kind}: ${err.message}`);
+      if (err.cause) logger.error(`  Cause: ${err.cause}`);
     });
 
     // If all posts failed to load, return error
@@ -226,7 +228,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
 
     // Add retry mechanism for empty posts with a delay of 1 second
     if (posts.length === 0) {
-      console.log("No posts loaded successfully. Retrying once...");
+      logger.info("No posts loaded successfully. Retrying once...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return loadPosts(); // Recursive retry (will only happen once due to checks)
     }

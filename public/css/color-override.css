@@ -14,19 +14,19 @@
   --color-border: #1a1a1a;
   --color-muted: #6c757d;
   
-  /* Link colors */
-  --color-link: #0066cc;
+  /* Link colors (derived from primary) */
+  --color-link: var(--color-primary);
   --color-link-hover: #004c99;
   
   /* Code colors */
   --color-code-bg: #f8f9fa;
-  --color-code-text: #212529;
+  --color-code-text: var(--color-text);
   
   /* Selection color */
   --color-selection: #b3d4fc;
 }
 
-/* Dark mode example (commented out by default) */
+/* Dark mode example - uncomment to enable */
 /*
 @media (prefers-color-scheme: dark) {
   :root {
@@ -38,16 +38,16 @@
     --color-card: #1e1e1e;
     --color-border: #e0e0e0;
     --color-muted: #a0a0a0;
-    --color-link: #4d9fff;
+    --color-link: var(--color-primary);
     --color-link-hover: #80bdff;
     --color-code-bg: #2a2a2a;
-    --color-code-text: #e0e0e0;
+    --color-code-text: var(--color-text);
     --color-selection: #264f78;
   }
 }
 */
 
-/* Custom theme example (commented out by default) */
+/* Custom theme example - uncomment to apply */
 /*
 :root {
   --color-bg: #fffaf0;
@@ -58,10 +58,10 @@
   --color-card: #ffffff;
   --color-border: #2d2d2d;
   --color-muted: #7f8c8d;
-  --color-link: #d35400;
+  --color-link: var(--color-primary);
   --color-link-hover: #a04000;
   --color-code-bg: #f5f2f0;
-  --color-code-text: #2d2d2d;
+  --color-code-text: var(--color-text);
   --color-selection: #f9e7d2;
 }
 */

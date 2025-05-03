@@ -1,6 +1,7 @@
 // src/pagination.ts - Type-safe pagination utilities with optimized filtering
 import type { Post } from "./types.ts";
 import { tryCatchSync } from "./error.ts";
+import { logger } from "./utils.ts";
 
 /**
  * Pagination metadata
@@ -186,7 +187,7 @@ export const filterPosts = (
     return filteredPosts;
   }, () => {
     // Fallback to original posts if any error occurs
-    console.error("Error filtering posts, returning unfiltered");
+    logger.error("Error filtering posts, returning unfiltered");
     return posts;
   }).value;
 };

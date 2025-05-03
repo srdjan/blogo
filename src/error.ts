@@ -171,6 +171,7 @@ export function handleResult<T, E extends AppError>(
     onSuccess(result.value);
   } else {
     if (logError) {
+      // Use standard console.error here to avoid circular dependency
       console.error(formatError(result.error));
     }
     onError(result.error);

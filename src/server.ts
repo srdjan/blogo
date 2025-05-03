@@ -16,6 +16,7 @@ import { createError, resultToResponse, tryCatch } from "./error.ts";
 import type { AppError } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
+import { logger } from "./utils.ts";
 
 /**
  * Handle HTTP requests with pure functional approach
@@ -35,7 +36,7 @@ const handleRequest = (
 
   return handleRequestSafe(request, url, path, config, renderConfig).catch(
     (error) => {
-      console.error("Unhandled server error:", error);
+      logger.error("Unhandled server error:", error);
 
       // Create unified error response
       return createErrorResponse(
@@ -540,12 +541,12 @@ const getContentType = (filePath: string): string => {
 };
 
 export const startServer = (port: number, config: Config): void => {
-  console.log(`Starting server on port ${port}...`);
+  logger.info(`Starting server on port ${port}...`);
 
   Deno.serve({
     port,
     onListen: ({ hostname, port }) => {
-      console.log(`Server running at http://${hostname}:${port}/`);
+      logger.info(`Server running at http://${hostname}:${port}/`);
     },
   }, (request) => handleRequest(request, config));
 };
