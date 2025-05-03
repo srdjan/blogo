@@ -77,9 +77,9 @@ export const renderDocument = (
     <header id="site-header">
       <nav>
         <div class="nav-links">
-          <a href="/" class="link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML">Home</a>
-          <a href="/tags" class="link" hx-get="/tags" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Tags</a>
-          <a href="/about" class="link" hx-get="/about" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">About</a>
+          <a href="/" class="link${context.path === '/' ? ' active' : ''}" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Home</a>
+          <a href="/tags" class="link${context.path === '/tags' ? ' active' : ''}" hx-get="/tags" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Tags</a>
+          <a href="/about" class="link${context.path === '/about' ? ' active' : ''}" hx-get="/about" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">About</a>
           <button
             class="search-toggle link"
             aria-label="Search"

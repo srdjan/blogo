@@ -6,13 +6,16 @@
 const Core = {
   init() {
     this.setupEventListeners();
-    
+
     // Initialize home link to have correct behavior on first page load
     const homeLink = document.querySelector('a[href="/"].link');
     if (homeLink && window.location.pathname === "/") {
       // On the home page, we don't need push-url for the home link
       homeLink.removeAttribute("hx-push-url");
     }
+
+    // Set active nav link on initial page load
+    this.updateActiveNavLink();
   },
 
   setupEventListeners() {
@@ -21,7 +24,7 @@ const Core = {
       // Scroll to top after content swap
       if (event.detail.target.id === "content-area") {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        
+
         // Prevent duplicate rendering for home page
         if (event.detail.pathInfo.path === "/") {
           // Ensure we don't add event handlers multiple times
@@ -31,6 +34,9 @@ const Core = {
             homeLink.removeAttribute("hx-push-url");
           }
         }
+
+        // Update active navigation link
+        this.updateActiveNavLink();
 
         // Log successful content swap (for debugging)
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
@@ -51,6 +57,38 @@ const Core = {
         }
       }
     });
+  },
+
+  updateActiveNavLink() {
+    // Get current path
+    const currentPath = window.location.pathname;
+
+    // Remove active class from all nav links
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.classList.remove('active');
+    });
+
+    // Add active class to current nav link
+    let activeLink;
+
+    if (currentPath === '/') {
+      // Home page
+      activeLink = document.querySelector('.nav-links a[href="/"]');
+    } else if (currentPath.startsWith('/tags')) {
+      // Tags page
+      activeLink = document.querySelector('.nav-links a[href="/tags"]');
+    } else if (currentPath === '/about') {
+      // About page
+      activeLink = document.querySelector('.nav-links a[href="/about"]');
+    } else if (currentPath.startsWith('/posts')) {
+      // Individual post - highlight Home
+      activeLink = document.querySelector('.nav-links a[href="/"]');
+    }
+
+    // Add active class if we found a matching link
+    if (activeLink) {
+      activeLink.classList.add('active');
+    }
   }
 };
 

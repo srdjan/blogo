@@ -230,6 +230,13 @@ nav {
   box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
+.nav-links a.active {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 0 var(--color-border);
+}
+
 /* App layout */
 #app-layout {
   display: flex;
