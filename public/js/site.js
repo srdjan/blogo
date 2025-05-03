@@ -1,8 +1,3 @@
-/**
- * Site-wide JavaScript functionality - modular organization
- */
-
-// Core module for general functionality
 const Core = {
   init() {
     this.setupEventListeners();
@@ -11,7 +6,7 @@ const Core = {
     const homeLink = document.querySelector('a[href="/"].link');
     if (homeLink && window.location.pathname === "/") {
       // On the home page, we don't need push-url for the home link
-      homeLink.removeAttribute("hx-push-url");
+      // homeLink.removeAttribute("hx-push-url");
     }
 
     // Set active nav link on initial page load
@@ -19,7 +14,27 @@ const Core = {
   },
 
   setupEventListeners() {
-    // Handle HTMX swaps and scrolling
+    // Handle HTMX before swaps to filter content
+    document.addEventListener("htmx:beforeSwap", (event) => {
+      if (event.detail.target.id === "content-area") {
+        // Create a temporary div to parse the response
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = event.detail.serverResponse;
+
+        // Check if the response contains a full page (has #content-area)
+        const contentAreaInResponse = tempDiv.querySelector('#content-area');
+        if (contentAreaInResponse) {
+          // Extract only the content from within #content-area
+          event.detail.serverResponse = contentAreaInResponse.innerHTML;
+
+          if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            console.log("Filtered full page response to content-area only");
+          }
+        }
+      }
+    });
+
+    // Handle HTMX after swaps for scrolling and active link updates
     document.addEventListener("htmx:afterSwap", (event) => {
       // Scroll to top after content swap
       if (event.detail.target.id === "content-area") {
