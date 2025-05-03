@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env --allow-write main.ts --unstable-kv ",
-    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch main.ts --unstable-kv ",
+    "start": "deno run --allow-net --allow-read --allow-env --allow-write main.ts",
+    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch main.ts",
     "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
   },
   "fmt": {
@@ -18,7 +18,8 @@
     ]
   },
   "imports": {
-    "mono-jsx": "npm:mono-jsx@^0.3.2"
+    "mono-jsx": "npm:mono-jsx@^0.3.2",
+    "@srdjan/mixon": "jsr:@srdjan/mixon@^1.0.2"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

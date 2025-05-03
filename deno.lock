@@ -1,10 +1,37 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@srdjan/mixon@*": "1.0.6",
+    "jsr:@srdjan/mixon@^1.0.2": "1.0.6",
+    "npm:arktype@2.1.19": "2.1.19",
     "npm:mono-jsx@*": "0.3.2",
     "npm:mono-jsx@~0.3.2": "0.3.2"
   },
+  "jsr": {
+    "@srdjan/mixon@1.0.6": {
+      "integrity": "cb13aa18d5a5140ff2fa1c76541a148ef61640fd247aba5e31d8783e582b7be0",
+      "dependencies": [
+        "npm:arktype"
+      ]
+    }
+  },
   "npm": {
+    "@ark/schema@0.45.9": {
+      "integrity": "sha512-rG0v/JI0sibn/0wERAHTYVLCtEqoMP2IIlxnb+S5DrEjCI5wpubbZSWMDW50tZ8tV6FANu6zzHDeeKbp6lsZdg==",
+      "dependencies": [
+        "@ark/util"
+      ]
+    },
+    "@ark/util@0.45.9": {
+      "integrity": "sha512-0WYNAb8aRGp7dNt6xIvIrRzL7V1XL3u3PK2vcklhtTrdaP235DjC9qJhzidrxtWr68mA5ySSjUrgrXk622bKkw=="
+    },
+    "arktype@2.1.19": {
+      "integrity": "sha512-notORSuTSpfLV7rq0kYC4mTgIVlVR0xQuvtFxOaE9aKiXyON/kgoIBwZZcKeSSb4BebNcfJoGlxJicAUl/HMdw==",
+      "dependencies": [
+        "@ark/schema",
+        "@ark/util"
+      ]
+    },
     "mono-jsx@0.3.2": {
       "integrity": "sha512-rmZL3d4X5fW1y21SQDiCZgBLlBwaST8myUfOX9371Gyw9j5dsylzU8gDX3k+1tEfvwEZcbYEZoj9Lxzt5m9wzQ=="
     }
@@ -122,6 +149,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@srdjan/mixon@^1.0.2",
       "npm:mono-jsx@~0.3.2"
     ]
   }
