@@ -6,6 +6,13 @@
 const Core = {
   init() {
     this.setupEventListeners();
+    
+    // Initialize home link to have correct behavior on first page load
+    const homeLink = document.querySelector('a[href="/"].link');
+    if (homeLink && window.location.pathname === "/") {
+      // On the home page, we don't need push-url for the home link
+      homeLink.removeAttribute("hx-push-url");
+    }
   },
 
   setupEventListeners() {
@@ -14,6 +21,16 @@ const Core = {
       // Scroll to top after content swap
       if (event.detail.target.id === "content-area") {
         window.scrollTo({ top: 0, behavior: "smooth" });
+        
+        // Prevent duplicate rendering for home page
+        if (event.detail.pathInfo.path === "/") {
+          // Ensure we don't add event handlers multiple times
+          const homeLink = document.querySelector('a[href="/"].link');
+          if (homeLink) {
+            // Remove the push-url attribute to prevent history duplication on home
+            homeLink.removeAttribute("hx-push-url");
+          }
+        }
 
         // Log successful content swap (for debugging)
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
