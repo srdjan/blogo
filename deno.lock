@@ -1,5 +1,14 @@
 {
   "version": "4",
+  "specifiers": {
+    "npm:mono-jsx@*": "0.3.2",
+    "npm:mono-jsx@~0.3.2": "0.3.2"
+  },
+  "npm": {
+    "mono-jsx@0.3.2": {
+      "integrity": "sha512-rmZL3d4X5fW1y21SQDiCZgBLlBwaST8myUfOX9371Gyw9j5dsylzU8gDX3k+1tEfvwEZcbYEZoj9Lxzt5m9wzQ=="
+    }
+  },
   "redirects": {
     "https://deno.land/std/yaml/mod.ts": "https://deno.land/std@0.224.0/yaml/mod.ts",
     "https://esm.sh/@types/marked@~5.0.2/index.d.mts": "https://esm.sh/@types/marked@5.0.2/index.d.mts"
@@ -45,5 +54,10 @@
     "https://esm.sh/marked@15.0.7/denonext/marked.mjs": "ea38f723598408458f5345bec4a87384dc57615f9f18fc1e12659144062cde91",
     "https://esm.sh/marked@5.0.2": "e9afc1ed2b97b021b2bebac2c2fb67d6619202681ec49ae69fdbcf3da348637c",
     "https://esm.sh/marked@5.0.2/denonext/marked.mjs": "de98c71b6ba32b1cabe82123f066cebc3a4d0c4e80da03e347b5963bad39b20c"
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:mono-jsx@~0.3.2"
+    ]
   }
 }

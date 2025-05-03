@@ -12,6 +12,16 @@
     }
   },
   "lint": {
-    "include": ["src/", "main.ts"]
+    "include": [
+      "src/",
+      "main.ts"
+    ]
+  },
+  "imports": {
+    "mono-jsx": "npm:mono-jsx@^0.3.2"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "mono-jsx"
   }
 }
