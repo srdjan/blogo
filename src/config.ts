@@ -1,19 +1,12 @@
-/**
- * Simplified configuration with hardcoded values
- */
-
 export type Environment = "development" | "production" | "test";
 
-// Core configuration interface with strong typing
 export interface Config {
-  // Server settings
   server: {
     port: number;
     host: string;
     publicUrl: string;
   };
 
-  // Blog settings
   blog: {
     title: string;
     description: string;
@@ -30,9 +23,6 @@ export interface Config {
   };
 }
 
-/**
- * Hardcoded default configuration
- */
 export const CONFIG: Config = {
   server: {
     port: 8000,
