@@ -55,17 +55,18 @@ export const renderDocument = (
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${pageTitle}</title>
   <meta name="description" content="${pageDescription}">
-  
+
   <!-- Structured Data -->
   <script type="application/ld+json">${structuredData}</script>
-  
+
   <!-- Open Graph tags -->
   ${ogTags}
-  
+
   <!-- Twitter Card tags -->
   ${twitterTags}
-  
+
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/color-override.css">
   <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
   <script src="/js/htmx.min.js"></script>
   <script src="/js/site.js"></script>
@@ -108,7 +109,7 @@ export const renderDocument = (
           </button>
         </div>
         <form class="search-form" id="search-form" role="search">
-          <input 
+          <input
             type="search"
             name="q"
             placeholder="Search posts..."
@@ -148,7 +149,7 @@ export const renderDocument = (
 export const renderPost = (post: Post): string => {
   const tags = post.tags ? renderTags(post.tags) : "";
   const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
-  
+
   return `<article class="post content-section">
   <header class="post-header">
     <h1>${post.title}</h1>
@@ -198,24 +199,24 @@ export const renderAbout = (): string => {
  */
 export const renderTagIndex = (tags: TagInfo[]): string => {
   const sortedTags = [...tags].sort((a, b) => b.count - a.count);
-  
+
   return `<section class="tag-index content-section">
   <h1>Tags</h1>
   <div class="tag-cloud">
     ${sortedTags.map(tag => {
-      const sizeClass = sizeClassForCount(tag.count);
-      return `<a 
-        href="/tags/${tag.name}" 
-        class="tag tag-${sizeClass} link" 
-        hx-boost="true" 
-        hx-target="#content-main" 
-        hx-swap="innerHTML" 
+    const sizeClass = sizeClassForCount(tag.count);
+    return `<a
+        href="/tags/${tag.name}"
+        class="tag tag-${sizeClass} link"
+        hx-boost="true"
+        hx-target="#content-main"
+        hx-swap="innerHTML"
         title="${tag.count} posts"
       >
         ${tag.name}
         <span class="tag-count">${tag.count}</span>
       </a>`;
-    }).join("")}
+  }).join("")}
   </div>
 </section>`;
 };
@@ -258,15 +259,15 @@ export const renderPostList = (
       const tags = post.tags ? renderTags(post.tags) : "";
       const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
       const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
-      
+
       return `<article class="post-card">
         <div class="post-card-inner">
           <h2>
-            <a 
-              href="/posts/${post.slug}" 
-              class="link" 
-              hx-boost="true" 
-              hx-target="#content-main" 
+            <a
+              href="/posts/${post.slug}"
+              class="link"
+              hx-boost="true"
+              hx-target="#content-main"
               hx-swap="innerHTML"
             >
               ${post.title}
@@ -345,12 +346,12 @@ const renderPagination = (pagination: Pagination): string => {
 
   // Render previous button
   const prevButton = hasPrevPage
-    ? `<a 
-        href="?page=${currentPage - 1}" 
-        class="pagination-prev link" 
-        hx-boost="true" 
-        hx-target="#content-main" 
-        hx-swap="innerHTML" 
+    ? `<a
+        href="?page=${currentPage - 1}"
+        class="pagination-prev link"
+        hx-boost="true"
+        hx-target="#content-main"
+        hx-swap="innerHTML"
         aria-label="Previous page"
       >
         Previous
@@ -364,16 +365,16 @@ const renderPagination = (pagination: Pagination): string => {
     if (page === null) {
       return `<span class="pagination-ellipsis">&hellip;</span>`;
     }
-    
+
     if (page === currentPage) {
       return `<span class="pagination-current" aria-current="page">${page}</span>`;
     }
-    
-    return `<a 
-      href="?page=${page}" 
-      class="link" 
-      hx-boost="true" 
-      hx-target="#content-main" 
+
+    return `<a
+      href="?page=${page}"
+      class="link"
+      hx-boost="true"
+      hx-target="#content-main"
       hx-swap="innerHTML"
     >
       ${page}
@@ -382,12 +383,12 @@ const renderPagination = (pagination: Pagination): string => {
 
   // Render next button
   const nextButton = hasNextPage
-    ? `<a 
-        href="?page=${currentPage + 1}" 
-        class="pagination-next link" 
-        hx-boost="true" 
-        hx-target="#content-main" 
-        hx-swap="innerHTML" 
+    ? `<a
+        href="?page=${currentPage + 1}"
+        class="pagination-next link"
+        hx-boost="true"
+        hx-target="#content-main"
+        hx-swap="innerHTML"
         aria-label="Next page"
       >
         Next
@@ -426,14 +427,14 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
     const tags = post.tags ? renderTags(post.tags) : "";
     const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
     const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
-    
+
     return `<article class="search-result">
       <h3>
-        <a 
-          href="/posts/${post.slug}" 
-          class="link" 
-          hx-boost="true" 
-          hx-target="#content-main" 
+        <a
+          href="/posts/${post.slug}"
+          class="link"
+          hx-boost="true"
+          hx-target="#content-main"
           hx-swap="innerHTML"
         >
           ${post.title}

@@ -1,0 +1,67 @@
+/**
+ * Color override CSS
+ * This file allows easy customization of the color scheme without modifying main.css
+ */
+
+:root {
+  /* Main colors */
+  --color-bg: #f5f5f5;
+  --color-text: #1a1a1a;
+  --color-primary: #0066cc;
+  --color-secondary: #6c757d;
+  --color-accent: #e9ecef;
+  --color-card: #ffffff;
+  --color-border: #1a1a1a;
+  --color-muted: #6c757d;
+  
+  /* Link colors */
+  --color-link: #0066cc;
+  --color-link-hover: #004c99;
+  
+  /* Code colors */
+  --color-code-bg: #f8f9fa;
+  --color-code-text: #212529;
+  
+  /* Selection color */
+  --color-selection: #b3d4fc;
+}
+
+/* Dark mode example (commented out by default) */
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121212;
+    --color-text: #e0e0e0;
+    --color-primary: #4d9fff;
+    --color-secondary: #a0a0a0;
+    --color-accent: #2a2a2a;
+    --color-card: #1e1e1e;
+    --color-border: #e0e0e0;
+    --color-muted: #a0a0a0;
+    --color-link: #4d9fff;
+    --color-link-hover: #80bdff;
+    --color-code-bg: #2a2a2a;
+    --color-code-text: #e0e0e0;
+    --color-selection: #264f78;
+  }
+}
+*/
+
+/* Custom theme example (commented out by default) */
+/*
+:root {
+  --color-bg: #fffaf0;
+  --color-text: #2d2d2d;
+  --color-primary: #d35400;
+  --color-secondary: #7f8c8d;
+  --color-accent: #f9e7d2;
+  --color-card: #ffffff;
+  --color-border: #2d2d2d;
+  --color-muted: #7f8c8d;
+  --color-link: #d35400;
+  --color-link-hover: #a04000;
+  --color-code-bg: #f5f2f0;
+  --color-code-text: #2d2d2d;
+  --color-selection: #f9e7d2;
+}
+*/
