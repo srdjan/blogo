@@ -167,23 +167,26 @@ const getPostsWithCache = async (): Promise<Result<Post[], AppError>> => {
 /**
  * Handle HTMX requests with proper headers for content swapping
  * This function maintains pure functional semantics while handling browser state
+ * Now it only returns the content to be swapped into the #content-area div
  */
 const handleHtmxRequest = (
   path: string,
   content: string,
-): Response => {
-  return new Response(content, {
-    headers: {
-      "Content-Type": "text/html",
-      "HX-Push-Url": path,
-      "HX-Trigger": JSON.stringify({
-        scrollToTop: {
-          scroll: "top", // Explicit position
-          offset: 120, // Account for header height
-        },
-      }),
-    },
-  });
+): Promise<Response> => {
+  return Promise.resolve(
+    new Response(content, {
+      headers: {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top", // Explicit position
+            offset: 120, // Account for header height
+          },
+        }),
+      },
+    })
+  );
 };
 
 /**
@@ -301,9 +304,11 @@ const routeRequest = (
       if (isHtmxRequest) {
         return handleHtmxRequest(path, content);
       }
-      return new Response(
-        renderDocument({ title: blogTitle, post, path }, content, renderConfig),
-        { headers: { "Content-Type": "text/html" } },
+      return Promise.resolve(
+        new Response(
+          renderDocument({ title: blogTitle, post, path }, content, renderConfig),
+          { headers: { "Content-Type": "text/html" } },
+        )
       );
     }
   }
@@ -313,9 +318,11 @@ const routeRequest = (
   if (isHtmxRequest) {
     return handleHtmxRequest(path, content);
   }
-  return new Response(
-    renderDocument({ title: blogTitle, path }, content, renderConfig),
-    { status: 404, headers: { "Content-Type": "text/html" } },
+  return Promise.resolve(
+    new Response(
+      renderDocument({ title: blogTitle, path }, content, renderConfig),
+      { status: 404, headers: { "Content-Type": "text/html" } },
+    )
   );
 };
 
@@ -352,14 +359,16 @@ const handlePostList = (
     return handleHtmxRequest(path, content);
   }
 
-  return new Response(
-    renderDocument({ title: blogTitle, posts, path }, content, renderConfig),
-    {
-      headers: {
-        "Content-Type": "text/html",
-        "Cache-Control": "max-age=60", // 1 minute cache
+  return Promise.resolve(
+    new Response(
+      renderDocument({ title: blogTitle, posts, path }, content, renderConfig),
+      {
+        headers: {
+          "Content-Type": "text/html",
+          "Cache-Control": "max-age=60", // 1 minute cache
+        },
       },
-    },
+    )
   );
 };
 
@@ -397,18 +406,20 @@ const handleTagPage = (
     return handleHtmxRequest(path, content);
   }
 
-  return new Response(
-    renderDocument(
-      {
-        title: `${blogTitle} - Posts tagged "${tag}"`,
-        posts: paginatedPosts.items,
-        activeTag: tag,
-        path,
-      },
-      content,
-      renderConfig,
-    ),
-    { headers: { "Content-Type": "text/html" } },
+  return Promise.resolve(
+    new Response(
+      renderDocument(
+        {
+          title: `${blogTitle} - Posts tagged "${tag}"`,
+          posts: paginatedPosts.items,
+          activeTag: tag,
+          path,
+        },
+        content,
+        renderConfig,
+      ),
+      { headers: { "Content-Type": "text/html" } },
+    )
   );
 };
 
@@ -444,13 +455,15 @@ const handleTagIndex = (
     return handleHtmxRequest(path, content);
   }
 
-  return new Response(
-    renderDocument(
-      { title: `${blogTitle} - Tags`, tags, path },
-      content,
-      renderConfig,
-    ),
-    { headers: { "Content-Type": "text/html" } },
+  return Promise.resolve(
+    new Response(
+      renderDocument(
+        { title: `${blogTitle} - Tags`, tags, path },
+        content,
+        renderConfig,
+      ),
+      { headers: { "Content-Type": "text/html" } },
+    )
   );
 };
 

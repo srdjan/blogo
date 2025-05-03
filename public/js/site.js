@@ -11,8 +11,17 @@ const Core = {
   setupEventListeners() {
     // Handle HTMX swaps and scrolling
     document.addEventListener("htmx:afterSwap", (event) => {
-      if (event.detail.target.tagName === "MAIN") {
+      // Scroll to top after content swap
+      if (event.detail.target.id === "content-area") {
         window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Log successful content swap (for debugging)
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          console.log("HTMX content swap successful:", {
+            path: event.detail.pathInfo.path,
+            target: event.detail.target.id
+          });
+        }
       }
     });
 
@@ -36,28 +45,28 @@ const Search = {
     this.searchResults = document.getElementById("search-results");
     this.searchModal = document.getElementById("search-modal");
     this.searchToggle = document.querySelector(".search-toggle");
-    
+
     if (!this.searchForm || !this.searchInput || !this.searchResults) return;
-    
+
     this.setupEventListeners();
   },
-  
+
   setupEventListeners() {
     // Handle search form submission
     this.searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const query = this.searchInput.value.trim();
       if (!query) return;
-      
+
       this.performSearch(query);
     });
-    
+
     // Debounced search on input
     let searchTimeout;
     this.searchInput.addEventListener("input", () => {
       clearTimeout(searchTimeout);
       const query = this.searchInput.value.trim();
-      
+
       if (query.length > 2) {
         searchTimeout = setTimeout(() => {
           this.performSearch(query);
@@ -66,14 +75,14 @@ const Search = {
         this.searchResults.innerHTML = "";
       }
     });
-    
+
     // Auto-focus search input when modal opens
     if (this.searchToggle) {
       this.searchToggle.addEventListener("click", () => {
         setTimeout(() => this.searchInput.focus(), 10);
       });
     }
-    
+
     // Close search modal when clicking outside content
     if (this.searchModal) {
       this.searchModal.addEventListener("click", (e) => {
@@ -83,10 +92,10 @@ const Search = {
       });
     }
   },
-  
+
   performSearch(query) {
     this.searchResults.innerHTML = "Searching...";
-    
+
     fetch("/search?q=" + encodeURIComponent(query))
       .then((res) => res.text())
       .then((html) => {
@@ -103,7 +112,7 @@ const Search = {
 };
 
 // Initialize all modules when DOM is loaded
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
 });

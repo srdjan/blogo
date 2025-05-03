@@ -73,72 +73,78 @@ export const renderDocument = (
   <script src="/js/site.js"></script>
 </head>
 <body>
-  <header id="site-header">
-    <nav>
-      <div class="nav-links">
-        <a href="/" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Home</a>
-        <a href="/tags" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Tags</a>
-        <a href="/about" class="link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">About</a>
-        <button
-          class="search-toggle link"
-          aria-label="Search"
-          aria-expanded="false"
-          onclick="document.getElementById('search-modal').style.display='flex'"
-        >
-          Search
-        </button>
-        <a href="/feed.xml" class="link">RSS</a>
-      </div>
-    </nav>
-    <div
-      id="search-modal"
-      class="search-modal-overlay"
-      style="display:none"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="search-heading"
-    >
-      <div class="search-modal-content">
-        <div class="search-header">
-          <h2 id="search-heading">Search</h2>
+  <div id="app-layout">
+    <header id="site-header">
+      <nav>
+        <div class="nav-links">
+          <a href="/" class="link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Home</a>
+          <a href="/tags" class="link" hx-get="/tags" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Tags</a>
+          <a href="/about" class="link" hx-get="/about" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">About</a>
           <button
-            class="search-close"
-            aria-label="Close search"
-            onclick="document.getElementById('search-modal').style.display='none'"
+            class="search-toggle link"
+            aria-label="Search"
+            aria-expanded="false"
+            onclick="document.getElementById('search-modal').style.display='flex'"
           >
-            ✕ Close
+            Search
           </button>
+          <a href="/feed.xml" class="link">RSS</a>
         </div>
-        <form class="search-form" id="search-form" role="search">
-          <input
-            type="search"
-            name="q"
-            placeholder="Search posts..."
-            required
-            id="search-input"
-            autofocus
-            aria-labelledby="search-heading"
-          />
-          <button type="submit" aria-label="Submit search">Search</button>
-        </form>
-        <div
-          id="search-results"
-          class="search-results"
-          aria-live="polite"
-          role="region"
-          aria-label="Search results"
-        ></div>
+      </nav>
+      <div
+        id="search-modal"
+        class="search-modal-overlay"
+        style="display:none"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="search-heading"
+      >
+        <div class="search-modal-content">
+          <div class="search-header">
+            <h2 id="search-heading">Search</h2>
+            <button
+              class="search-close"
+              aria-label="Close search"
+              onclick="document.getElementById('search-modal').style.display='none'"
+            >
+              ✕ Close
+            </button>
+          </div>
+          <form class="search-form" id="search-form" role="search">
+            <input
+              type="search"
+              name="q"
+              placeholder="Search posts..."
+              required
+              id="search-input"
+              autofocus
+              aria-labelledby="search-heading"
+            />
+            <button type="submit" aria-label="Submit search">Search</button>
+          </form>
+          <div
+            id="search-results"
+            class="search-results"
+            aria-live="polite"
+            role="region"
+            aria-label="Search results"
+          ></div>
+        </div>
       </div>
-    </div>
-  </header>
-  <main id="content-main" class="htmx-swappable content-main">${content}</main>
-  <footer>
-    <p>
-      Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
-        <span class="avatar">⊣˚∆˚⊢</span>
-      </a> & Claude
-    </p>
-  </footer>
+    </header>
+
+    <main id="content-main" class="content-main">
+      <div id="content-area" class="htmx-swappable">${content}</div>
+    </main>
+
+    <footer>
+      <p>
+        Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
+          <span class="avatar">⊣˚∆˚⊢</span>
+        </a> & Claude
+      </p>
+    </footer>
+  </div>
 </body>
 </html>`;
 };
@@ -157,7 +163,7 @@ export const renderPost = (post: Post): string => {
 
 const renderTags = (tags: string[]): string => {
   return `<div class="tags">
-    ${tags.map(tag => `<a href="/tags/${tag}" class="tag link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">${tag}</a>`).join("")}
+    ${tags.map(tag => `<a href="/tags/${tag}" class="tag link" hx-get="/tags/${tag}" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">${tag}</a>`).join("")}
   </div>`;
 };
 
@@ -165,7 +171,7 @@ export const renderNotFound = (): string => {
   return `<section class="not-found content-section">
   <h1>404 - Page Not Found</h1>
   <p>The page you're looking for doesn't exist.</p>
-  <p><a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Return Home</a></p>
+  <p><a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Return Home</a></p>
 </section>`;
 };
 
@@ -189,9 +195,10 @@ export const renderTagIndex = (tags: TagInfo[]): string => {
     return `<a
         href="/tags/${tag.name}"
         class="tag tag-${sizeClass} link"
-        hx-boost="true"
-        hx-target="#content-main"
+        hx-get="/tags/${tag.name}"
+        hx-target="#content-area"
         hx-swap="innerHTML"
+        hx-push-url="true"
         title="${tag.count} posts"
       >
         ${tag.name}
@@ -221,7 +228,7 @@ export const renderPostList = (
         <p>
           Showing ${posts.length} post${posts.length !== 1 ? "s" : ""} tagged with <strong>${activeTag}</strong>
         </p>
-        <a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">
+        <a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">
           Show All Posts
         </a>
       </div>
@@ -241,9 +248,10 @@ export const renderPostList = (
             <a
               href="/posts/${post.slug}"
               class="link"
-              hx-boost="true"
-              hx-target="#content-main"
+              hx-get="/posts/${post.slug}"
+              hx-target="#content-area"
               hx-swap="innerHTML"
+              hx-push-url="true"
             >
               ${post.title}
             </a>
@@ -321,9 +329,10 @@ const renderPagination = (pagination: Pagination): string => {
     ? `<a
         href="?page=${currentPage - 1}"
         class="pagination-prev link"
-        hx-boost="true"
-        hx-target="#content-main"
+        hx-get="?page=${currentPage - 1}"
+        hx-target="#content-area"
         hx-swap="innerHTML"
+        hx-push-url="true"
         aria-label="Previous page"
       >
         Previous
@@ -345,9 +354,10 @@ const renderPagination = (pagination: Pagination): string => {
     return `<a
       href="?page=${page}"
       class="link"
-      hx-boost="true"
-      hx-target="#content-main"
+      hx-get="?page=${page}"
+      hx-target="#content-area"
       hx-swap="innerHTML"
+      hx-push-url="true"
     >
       ${page}
     </a>`;
@@ -358,9 +368,10 @@ const renderPagination = (pagination: Pagination): string => {
     ? `<a
         href="?page=${currentPage + 1}"
         class="pagination-next link"
-        hx-boost="true"
-        hx-target="#content-main"
+        hx-get="?page=${currentPage + 1}"
+        hx-target="#content-area"
         hx-swap="innerHTML"
+        hx-push-url="true"
         aria-label="Next page"
       >
         Next
@@ -402,9 +413,10 @@ export const renderSearchResults = (posts: Post[], query: string): string => {
         <a
           href="/posts/${post.slug}"
           class="link"
-          hx-boost="true"
-          hx-target="#content-main"
+          hx-get="/posts/${post.slug}"
+          hx-target="#content-area"
           hx-swap="innerHTML"
+          hx-push-url="true"
         >
           ${post.title}
         </a>
@@ -441,6 +453,6 @@ export const renderErrorPage = (error: {
       <p>${error.message}</p>
     </div>
     ${stackTraceHtml}
-    <p><a href="/" class="button link" hx-boost="true" hx-target="#content-main" hx-swap="innerHTML">Return Home</a></p>
+    <p><a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Return Home</a></p>
   </section>`;
 };
