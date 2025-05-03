@@ -1,26 +1,8 @@
 import { startServer } from "./src/server.ts";
-import { loadConfig } from "./src/config.ts";
-import { match } from "./src/error.ts";
+import { CONFIG } from "./src/config.ts";
 
-const configResult = loadConfig();
+console.log(`Starting ${CONFIG.blog.title} in ${CONFIG.env} mode...`);
+console.log(`Server will run at ${CONFIG.server.publicUrl}`);
 
-// Match on the configuration result
-match(configResult, {
-  ok: (config) => {
-    console.log(`Starting ${config.blog.title} in ${config.env} mode...`);
-    console.log(`Server will run at ${config.server.publicUrl}`);
-
-    // Start the server with config
-    startServer(config.server.port, config);
-  },
-  error: (error) => {
-    console.error("Failed to start server:");
-    console.error(error.message);
-
-    if (error.cause) {
-      console.error("Cause:", error.cause);
-    }
-
-    Deno.exit(1);
-  },
-});
+// Start the server with hardcoded config
+startServer(CONFIG.server.port, CONFIG);

@@ -166,10 +166,12 @@ const _isPost = (obj: unknown): obj is Post => {
  * Load all posts from the content directory
  */
 export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
+  const postsDir = "content/posts"; // Hardcoded posts directory
+
   const readDir = await tryCatch<Deno.DirEntry[], AppError>(
     async () => {
       const entries: Deno.DirEntry[] = [];
-      for await (const entry of Deno.readDir("content/posts")) {
+      for await (const entry of Deno.readDir(postsDir)) {
         if (entry.isFile && entry.name.endsWith(".md")) {
           entries.push(entry);
         }
@@ -184,7 +186,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
   const postResults = await Promise.all(
     readDir.value.map(async (entry) => {
       const slug = entry.name.replace(/\.md$/, "");
-      return await parseMarkdown(`content/posts/${entry.name}`, slug);
+      return await parseMarkdown(`${postsDir}/${entry.name}`, slug);
     }),
   );
 
