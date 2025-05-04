@@ -43,21 +43,41 @@ const PostContentBody = ({ post }: { post: PostType }) => {
   }
   
   // Fallback to converting HTML to JSX
-  return <div class="post-content">{htmlToJsx(post.content)}</div>;
+  return <div class="post-content">{html`${post.content}`}</div>;
 };
 
 // Component for rendering a single post
-export const PostContent = ({ post }: { post: PostType }) => {
-  const formattedDate = getFormattedDate(post);
+export const PostContent = ({ post }: { post: PostType }): string | JSX.Element => {
+  try {
+    const formattedDate = getFormattedDate(post);
 
-  return (
-    <article class="post content-section">
-      <div class="post-meta-subtle">
-        <time dateTime={post.date}>
-          {formattedDate} {post.tags && <Tags tags={post.tags} />}
-        </time>
-      </div>
-      <PostContentBody post={post} />
-    </article>
-  );
+    const element = (
+      <article class="post content-section">
+        <div class="post-meta-subtle">
+          <time dateTime={post.date}>
+            {formattedDate} {post.tags && <Tags tags={post.tags} />}
+          </time>
+        </div>
+        <PostContentBody post={post} />
+      </article>
+    );
+    
+    // Return the JSX element directly
+    // The renderComponent utility will handle conversion to string
+    return element;
+  } catch (error) {
+    console.error("Error in PostContent component:", error);
+    
+    // Return a fallback HTML string
+    return `
+      <article class="post content-section">
+        <div class="post-meta-subtle">
+          <time datetime="${post.date}">${post.formattedDate || post.date}</time>
+        </div>
+        <div class="post-content">
+          ${post.content}
+        </div>
+      </article>
+    `;
+  }
 };

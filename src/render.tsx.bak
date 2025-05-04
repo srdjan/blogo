@@ -6,15 +6,24 @@ import {
   generateTwitterCardTags,
   generateWebsiteSchema,
 } from "./metadata.ts";
+import { Document } from "./components/Document.tsx";
+import { PostContent } from "./components/Post.tsx";
 import { renderPostListHtml } from "./components/PostListHtml.tsx";
 import { renderAboutHtml } from "./components/AboutHtml.tsx";
 import { renderNotFoundHtml } from "./components/NotFoundHtml.tsx";
 import { renderTagIndexHtml } from "./components/TagIndexHtml.tsx";
 import { renderSearchResultsHtml } from "./components/SearchResultsHtml.tsx";
 import { renderErrorPageHtml } from "./components/ErrorPageHtml.tsx";
+import { Navigation } from "./components/Navigation.tsx";
+import { Layout } from "./components/Layout.tsx";
+import { renderComponent } from "./utils/jsx-to-string.ts";
+import { logError } from "./utils/debug.ts";
+
+// These helper functions are no longer needed as they've been replaced by JSX components
 
 /**
  * Render the HTML document shell
+ * Uses JSX for declarative UI composition
  */
 export const renderDocument = (
   context: RenderContext,
@@ -146,12 +155,48 @@ export const renderDocument = (
     ${layoutHTML}
   </body>
 </html>`;
+    <title>${pageTitle}</title>
+    <meta name="description" content="${pageDescription}">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/color-override.css">
+    <link rel="stylesheet" href="/css/fonts.css">
+    <script src="/js/htmx.min.js"></script>
+    <script src="/js/site.js"></script>
+  </head>
+  <body>
+    <div id="app-layout">
+      <header id="site-header">
+        <nav>
+          <div class="nav-links">
+            <a href="/" class="link${context.path === '/' ? ' active' : ''}">Home</a>
+            <a href="/tags" class="link${context.path === '/tags' ? ' active' : ''}">Tags</a>
+            <a href="/about" class="link${context.path === '/about' ? ' active' : ''}">About</a>
+            <a href="/feed.xml" class="link">RSS</a>
+          </div>
+        </nav>
+      </header>
+      <main id="content-main" class="content-main">
+        <div id="content-area" class="htmx-swappable">
+          ${content}
+        </div>
+      </main>
+      <footer>
+        <p>Cooked with ❤️ by <a href="https://srdjan.github.io">⊣˚∆˚⊢</a> & Claude</p>
+      </footer>
+    </div>
+  </body>
+</html>`;
+  }
 };
 
 export const renderPost = (post: Post): string => {
   try {
-    // Use plain HTML rendering rather than JSX component
-    return `
+    // Try to use the PostContent component first
+    return renderComponent(
+      PostContent,
+      { post },
+      // Fallback to direct HTML content if component rendering fails
+      `
       <article class="post content-section">
         <div class="post-meta-subtle">
           <time datetime="${post.date}">${post.formattedDate || post.date}</time>
@@ -176,9 +221,10 @@ export const renderPost = (post: Post): string => {
           ${post.content}
         </div>
       </article>
-    `;
+      `
+    );
   } catch (error) {
-    console.error("Error rendering post:", error);
+    logError("Error rendering post:", error);
     // Fallback content
     return `<div class="post-error">Error rendering content</div>`;
   }
