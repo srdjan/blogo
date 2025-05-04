@@ -142,6 +142,8 @@
     "https://deno.land/std@0.224.0/yaml/schema/mod.ts": "0e1558a4823834f106675e48ddc15338e04f6f18469d1a7d6b3f0e1ab06abcb2",
     "https://deno.land/std@0.224.0/yaml/stringify.ts": "f0ed4e419cb40c807cf79ae4039d6cdf492be9a947121fff4d4b7cd1d4738bae",
     "https://deno.land/std@0.224.0/yaml/type.ts": "708dde5f20b01cc1096489b7155b6af79a217d585afb841128e78c3c2391eb5c",
+    "https://esm.sh/marked@15.0.11": "a8ea18a5e0709a6251094001492d0d0ca7d08fa4811d2a46af768314fef15010",
+    "https://esm.sh/marked@15.0.11/denonext/marked.mjs": "3a2798b830c1a399e6629bb11b7f007b08e5e83cdba558d2d7901c921cee6058",
     "https://esm.sh/marked@15.0.7": "ef80f69d22751f86de68c04793a0755000b5a6db6297575c60d8bb7e5b1c9263",
     "https://esm.sh/marked@15.0.7/denonext/marked.mjs": "ea38f723598408458f5345bec4a87384dc57615f9f18fc1e12659144062cde91",
     "https://esm.sh/marked@5.0.2": "e9afc1ed2b97b021b2bebac2c2fb67d6619202681ec49ae69fdbcf3da348637c",

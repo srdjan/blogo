@@ -56,11 +56,10 @@ export const formatError = (error: AppError): string => {
   }
 
   if (error.cause) {
-    message += `\nCause: ${
-      error.cause instanceof Error
-        ? `${error.cause.name}: ${error.cause.message}`
-        : String(error.cause)
-    }`;
+    message += `\nCause: ${error.cause instanceof Error
+      ? `${error.cause.name}: ${error.cause.message}`
+      : String(error.cause)
+      }`;
   }
 
   return message;
@@ -80,20 +79,6 @@ export function match<T, E, U>(
     return handlers.ok(result.value);
   } else {
     return handlers.error(result.error);
-  }
-}
-
-/**
- * Map a Result's success value
- */
-export function map<T, E, U>(
-  result: Result<T, E>,
-  fn: (value: T) => U,
-): Result<U, E> {
-  if (result.ok) {
-    return { ok: true, value: fn(result.value) };
-  } else {
-    return result;
   }
 }
 
@@ -151,47 +136,4 @@ export function tryCatchSync<T, E = AppError>(
   }
 }
 
-/**
- * Handle Result objects with a logging wrapper
- */
-export function handleResult<T, E extends AppError>(
-  result: Result<T, E>,
-  {
-    onSuccess,
-    onError,
-    logError = true,
-  }: {
-    onSuccess: (value: T) => void;
-    onError: (error: E) => void;
-    logError?: boolean;
-  },
-): void {
-  if (result.ok) {
-    onSuccess(result.value);
-  } else {
-    if (logError) {
-      // Use standard console.error here to avoid circular dependency
-      console.error(formatError(result.error));
-    }
-    onError(result.error);
-  }
-}
 
-/**
- * Convert a Result to a Response
- */
-export function resultToResponse<T, E>(
-  result: Result<T, E>,
-  {
-    onSuccess,
-    onError,
-  }: {
-    onSuccess: (value: T) => Response;
-    onError: (error: E) => Response;
-  },
-): Response {
-  return match(result, {
-    ok: onSuccess,
-    error: onError,
-  });
-}

@@ -1,27 +1,27 @@
 import { CONFIG } from "./config.ts";
 /**
  * Escape HTML/XML special characters to prevent XSS
+ * @param text The text to escape
+ * @param forXml Whether to use XML-compatible apostrophe escaping
  */
-export const escapeHtml = (text: string): string => {
+const escapeMarkup = (text: string, forXml = false): string => {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/'/g, forXml ? "&apos;" : "&#039;");
 };
 
 /**
- * Alias for escapeHtml with XML-compatible apostrophe escaping
+ * Escape HTML special characters to prevent XSS
  */
-export const escapeXml = (text: string): string => {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-};
+export const escapeHtml = (text: string): string => escapeMarkup(text, false);
+
+/**
+ * Escape XML special characters with XML-compatible apostrophe escaping
+ */
+export const escapeXml = (text: string): string => escapeMarkup(text, true);
 
 /**
  * Format a date string consistently
@@ -46,7 +46,7 @@ export const logger = {
       console.log(message, ...args);
     }
   },
-  
+
   error: (message: string, ...args: unknown[]): void => {
     // Always log errors, but conditionally include stack traces and details
     if (CONFIG.debug.verboseLogs) {
@@ -55,13 +55,13 @@ export const logger = {
       console.error(message);
     }
   },
-  
+
   warn: (message: string, ...args: unknown[]): void => {
     if (CONFIG.debug.enableLogs) {
       console.warn(message, ...args);
     }
   },
-  
+
   debug: (message: string, ...args: unknown[]): void => {
     if (CONFIG.debug.verboseLogs) {
       console.log(`[DEBUG] ${message}`, ...args);
