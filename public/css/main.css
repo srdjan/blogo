@@ -331,8 +331,8 @@ footer {
 }
 
 .post-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0 0 var(--color-border);
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 0 var(--color-border);
 }
 
 .post-card h2 {
@@ -394,6 +394,7 @@ footer {
 .content-section {
   margin-top: 0;
   padding-top: 1rem;
+  padding-left: 0.2rem;
   width: 100%;
   max-width: var(--max-width);
   overflow-x: hidden;
@@ -430,19 +431,19 @@ footer {
 .post-meta-subtle .tag {
   font-size: 0.8rem;
   padding: var(--space-3xs) var(--space-2xs);
-  background: transparent;
+  /* background: transparent; */
   border: none;
-  /* border-left: 2px solid var(--color-primary); */
+  /* border-left: 1px solid var(--color-primary); */
   color: var(--color-secondary);
   font-weight: normal;
   font-style: normal;
 }
 
 .post-meta-subtle .tag:hover {
-  color: var(--color-accent);
+  color: var(--color-primary);
   transform: none;
   box-shadow: none;
-  background-color: transparent;
+  background-color: var(--color-bg);
 }
 
 .post-content {
@@ -483,7 +484,7 @@ footer {
 .tag {
   font-size: 0.85rem;
   padding: var(--space-2xs) var(--space-xs);
-  /* border-left: 2px solid var(--color-primary); */
+  /* border-left: 1px solid var(--color-primary); */
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;

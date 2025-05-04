@@ -195,6 +195,83 @@ export const debugMiddleware = async (ctx: any, next: () => Promise<void>) => {
     return;
   }
 
+  // Handle tag detail pages
+  if (path.startsWith("/tags/") && path !== "/tags") {
+    logger.info("Tag detail page request detected");
+    const tag = path.substring("/tags/".length);
+
+    // Load posts
+    const { loadPosts } = await import("./parser.ts");
+    const { paginatePosts } = await import("./pagination.ts");
+
+    const postsResult = await loadPosts();
+
+    if (!postsResult.ok) {
+      logger.error("Failed to load posts for tag page");
+      ctx.response = new Response(
+        render.renderDocument(
+          {
+            title: config.blog.title,
+            path
+          },
+          "<div>Error loading posts</div>",
+          {
+            baseUrl: config.server.publicUrl,
+            description: config.blog.description,
+          }
+        ),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "text/html"
+          }
+        }
+      );
+      return;
+    }
+
+    const posts = postsResult.value;
+    const url = new URL(ctx.request.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const { postsPerPage } = config.blog;
+
+    // Filter posts by tag and paginate
+    const paginatedPosts = paginatePosts(posts, {
+      page,
+      itemsPerPage: postsPerPage,
+      tag,
+    });
+
+    // Manually handle tag detail page
+    ctx.response = new Response(
+      render.renderDocument(
+        {
+          title: `${config.blog.title} - Posts tagged "${tag}"`,
+          posts: paginatedPosts.items,
+          activeTag: tag,
+          path
+        },
+        render.renderPostList(
+          paginatedPosts.items,
+          tag,
+          paginatedPosts.pagination
+        ),
+        {
+          baseUrl: config.server.publicUrl,
+          description: config.blog.description,
+        }
+      ),
+      {
+        headers: {
+          "Content-Type": "text/html"
+        }
+      }
+    );
+
+    logger.info(`Tag detail page response set manually for tag: ${tag} with ${paginatedPosts.items.length} posts`);
+    return;
+  }
+
   // Handle about page
   if (path === "/about") {
     logger.info("About page request detected");
