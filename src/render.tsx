@@ -57,52 +57,85 @@ export const renderDocument = (
     pageDescription,
   );
 
-  // Use our Document component to render the full HTML document
-  // The Document component returns a string, not a Response
-  const result = Document({
-    title: pageTitle,
-    description: pageDescription,
-    path: context.path,
-    content,
-    structuredData,
-    ogTags,
-    twitterTags,
-  });
-  
-  // Make sure we're returning a string, not a Response object
-  if (typeof result === "object" && result !== null) {
-    console.error("Document component returned an object, not a string", result);
-    // Fall back to a basic HTML document
-    return `<!DOCTYPE html><html><head><title>${pageTitle}</title></head><body>${content}</body></html>`;
-  }
-  
-  return result;
+  // Instead of using the Document component, directly create the HTML
+  // This ensures we're returning a string and avoids mono-jsx issues
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${pageTitle}</title>
+    <meta name="description" content="${pageDescription}">
+    ${structuredData ? `<script type="application/ld+json">${structuredData}</script>` : ''}
+    ${ogTags || ''}
+    ${twitterTags || ''}
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/color-override.css">
+    <link rel="alternate" href="/feed.xml" title="${pageTitle} RSS Feed">
+    <script src="/js/htmx.min.js"></script>
+    <script src="/js/site.js"></script>
+  </head>
+  <body>
+    <div id="app-layout">
+      <header id="site-header">
+        <nav>
+          <a href="/" class="site-title">Home</a>
+          <a href="/about">About</a>
+          <div class="search-trigger" hx-get="/search" hx-target="#search-modal" hx-swap="innerHTML">
+            <span>Search</span>
+          </div>
+        </nav>
+        <div id="search-modal"></div>
+      </header>
+
+      <main id="content-main" class="content-main">
+        <div id="content-area" class="htmx-swappable">
+          ${content}
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
+            <span class="avatar">⊣˚∆˚⊢</span>
+          </a> & Claude
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>`;
 };
 
 export const renderPost = (post: Post): string => {
   try {
-    // Use our PostContent component to render the post
-    const element = PostContent({ post });
-    
-    // Check if element is a Response object
-    if (element instanceof Response) {
-      return `<div class="post-content">Error: Component returned a Response object</div>`;
-    }
-    
-    // Ensure we return a string
-    if (element && typeof element === "object") {
-      const result = String(element);
-      
-      // Check for unhelpful conversion
-      if (result === "[object Object]" || result.includes("[object Response]")) {
-        // Fall back to content string
-        return `<div class="post-content">${post.content}</div>`;
-      }
-      
-      return result;
-    }
-    
-    return element as string;
+    // Fall back to direct HTML content instead of using JSX
+    // This bypasses mono-jsx completely for post content
+    return `
+      <article class="post content-section">
+        <div class="post-meta-subtle">
+          <time datetime="${post.date}">${post.formattedDate || post.date}</time>
+          ${post.tags && post.tags.length > 0 ? `
+            <div class="tags">
+              ${post.tags.map(tag => `
+                <a 
+                  href="/tags/${tag}" 
+                  class="tag link" 
+                  hx-get="/tags/${tag}" 
+                  hx-target="#content-area" 
+                  hx-swap="innerHTML" 
+                  hx-push-url="true"
+                >
+                  ${tag}
+                </a>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+        <div class="post-content">
+          ${post.content}
+        </div>
+      </article>
+    `;
   } catch (error) {
     console.error("Error rendering post:", error);
     // Fallback content
