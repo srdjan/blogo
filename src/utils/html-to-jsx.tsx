@@ -15,9 +15,18 @@ export const htmlToJsx = (htmlContent: string | undefined): JSX.Element => {
   }
   
   try {
-    // Use mono-jsx's built-in html tag function
-    // This is equivalent to html`${htmlContent}` in JSX
-    return <div>{html`${htmlContent}`}</div>;
+    // Use mono-jsx's built-in html tag function directly
+    // Important: We need to ensure html`` is returning JSX elements, not Response objects
+    const jsxContent = html`${htmlContent}`;
+    
+    // Check if jsxContent is a Response object or JSX Element
+    if (jsxContent && typeof jsxContent === "object" && "status" in jsxContent) {
+      console.warn("html tag returned a Response object instead of JSX elements");
+      // Create a simple div with the string content as fallback
+      return <div class="parsed-html-fallback">{htmlContent}</div>;
+    }
+    
+    return <div class="parsed-html">{jsxContent}</div>;
   } catch (error) {
     console.error("Error parsing HTML:", error);
     // Return a minimal container if parsing fails

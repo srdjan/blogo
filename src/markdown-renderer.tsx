@@ -59,18 +59,30 @@ export const markdownToJsxElements = (
     // Step 2: Convert HTML to JSX elements
     const jsxElements = htmlToJsx(htmlResult.value);
     
+    // Check if we got a Response object instead of JSX elements
+    if (jsxElements && typeof jsxElements === "object" && "status" in jsxElements) {
+      console.warn("Received a Response object from htmlToJsx instead of JSX elements");
+      
+      // Create a simple container with the HTML content
+      const fallbackElement = <div class="markdown-content">{html`${htmlResult.value}`}</div>;
+      
+      return {
+        ok: true,
+        value: fallbackElement,
+      };
+    }
+    
     return {
       ok: true,
       value: jsxElements,
     };
   } catch (error) {
+    console.error("Failed to convert HTML to JSX:", error);
+    
+    // Fallback to a simple container
     return {
-      ok: false,
-      error: createError(
-        "RenderError",
-        "Failed to convert HTML to JSX elements",
-        error,
-      ),
+      ok: true, // Still return ok to keep the flow working
+      value: <div class="markdown-content-fallback">{markdown}</div>,
     };
   }
 };

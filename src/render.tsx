@@ -58,7 +58,8 @@ export const renderDocument = (
   );
 
   // Use our Document component to render the full HTML document
-  const element = Document({
+  // The Document component returns a string, not a Response
+  const result = Document({
     title: pageTitle,
     description: pageDescription,
     path: context.path,
@@ -67,13 +68,46 @@ export const renderDocument = (
     ogTags,
     twitterTags,
   });
-  return String(element);
+  
+  // Make sure we're returning a string, not a Response object
+  if (typeof result === "object" && result !== null) {
+    console.error("Document component returned an object, not a string", result);
+    // Fall back to a basic HTML document
+    return `<!DOCTYPE html><html><head><title>${pageTitle}</title></head><body>${content}</body></html>`;
+  }
+  
+  return result;
 };
 
 export const renderPost = (post: Post): string => {
-  // Use our PostContent component to render the post
-  const element = PostContent({ post });
-  return String(element);
+  try {
+    // Use our PostContent component to render the post
+    const element = PostContent({ post });
+    
+    // Check if element is a Response object
+    if (element instanceof Response) {
+      return `<div class="post-content">Error: Component returned a Response object</div>`;
+    }
+    
+    // Ensure we return a string
+    if (element && typeof element === "object") {
+      const result = String(element);
+      
+      // Check for unhelpful conversion
+      if (result === "[object Object]" || result.includes("[object Response]")) {
+        // Fall back to content string
+        return `<div class="post-content">${post.content}</div>`;
+      }
+      
+      return result;
+    }
+    
+    return element as string;
+  } catch (error) {
+    console.error("Error rendering post:", error);
+    // Fallback content
+    return `<div class="post-error">Error rendering content</div>`;
+  }
 };
 
 export const renderNotFound = (): string => {

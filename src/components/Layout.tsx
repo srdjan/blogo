@@ -5,6 +5,7 @@
 
 import { Navigation } from "./Navigation.tsx";
 import { SearchModal } from "./SearchModal.tsx";
+import { htmlToJsx } from "../utils/html-to-jsx.tsx";
 
 type LayoutProps = {
   title: string;
@@ -14,6 +15,9 @@ type LayoutProps = {
 };
 
 export const Layout = ({ title: _title, description: _description, path, content }: LayoutProps) => {
+  // Return the layout JSX 
+  // The conversion to string happens in the Document component
+  // This is a regular JSX component
   return (
     <div id="app-layout">
       <header id="site-header">
@@ -23,7 +27,8 @@ export const Layout = ({ title: _title, description: _description, path, content
 
       <main id="content-main" class="content-main">
         <div id="content-area" class="htmx-swappable">
-          {html`${content}`}
+          {/* Use our htmlToJsx utility to safely handle HTML content */}
+          {htmlToJsx(content)}
         </div>
       </main>
 
