@@ -71,6 +71,7 @@ export const renderDocument = (
     ${twitterTags || ''}
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/color-override.css">
+    <link rel="stylesheet" href="/css/fonts.css">
     <link rel="alternate" href="/feed.xml" title="${pageTitle} RSS Feed">
     <script src="/js/htmx.min.js"></script>
     <script src="/js/site.js"></script>
@@ -79,13 +80,50 @@ export const renderDocument = (
     <div id="app-layout">
       <header id="site-header">
         <nav>
-          <a href="/" class="site-title">Home</a>
-          <a href="/about">About</a>
-          <div class="search-trigger" hx-get="/search" hx-target="#search-modal" hx-swap="innerHTML">
-            <span>Search</span>
+          <div class="nav-links">
+            <a 
+              href="/" 
+              class="link${context.path === '/' ? ' active' : ''}" 
+              hx-get="/" 
+              hx-target="#content-area" 
+              hx-swap="innerHTML" 
+              hx-push-url="true"
+            >
+              Home
+            </a>
+            <a 
+              href="/tags" 
+              class="link${context.path === '/tags' ? ' active' : ''}" 
+              hx-get="/tags" 
+              hx-target="#content-area" 
+              hx-swap="innerHTML" 
+              hx-push-url="true"
+            >
+              Tags
+            </a>
+            <a 
+              href="/about" 
+              class="link${context.path === '/about' ? ' active' : ''}" 
+              hx-get="/about" 
+              hx-target="#content-area" 
+              hx-swap="innerHTML" 
+              hx-push-url="true"
+            >
+              About
+            </a>
+            <button
+              type="button"
+              class="search-toggle link"
+              aria-label="Search"
+              aria-expanded="false"
+              onClick="document.getElementById('search-modal').style.display='flex'"
+            >
+              Search
+            </button>
+            <a href="/feed.xml" class="link">RSS</a>
           </div>
         </nav>
-        <div id="search-modal"></div>
+        <div id="search-modal" class="search-modal"></div>
       </header>
 
       <main id="content-main" class="content-main">
