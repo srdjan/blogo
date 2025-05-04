@@ -56,32 +56,32 @@ export const renderDocument = (
   const navHTML = `
     <nav>
       <div class="nav-links">
-        <a 
-          href="/" 
-          class="link${context.path === '/' ? ' active' : ''}" 
-          hx-get="/" 
-          hx-target="#content-area" 
-          hx-swap="innerHTML" 
+        <a
+          href="/"
+          class="link${context.path === '/' ? ' active' : ''}"
+          hx-get="/"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
           hx-push-url="true"
         >
           Home
         </a>
-        <a 
-          href="/tags" 
-          class="link${context.path === '/tags' ? ' active' : ''}" 
-          hx-get="/tags" 
-          hx-target="#content-area" 
-          hx-swap="innerHTML" 
+        <a
+          href="/tags"
+          class="link${context.path === '/tags' ? ' active' : ''}"
+          hx-get="/tags"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
           hx-push-url="true"
         >
           Tags
         </a>
-        <a 
-          href="/about" 
-          class="link${context.path === '/about' ? ' active' : ''}" 
-          hx-get="/about" 
-          hx-target="#content-area" 
-          hx-swap="innerHTML" 
+        <a
+          href="/about"
+          class="link${context.path === '/about' ? ' active' : ''}"
+          hx-get="/about"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
           hx-push-url="true"
         >
           About
@@ -105,7 +105,39 @@ export const renderDocument = (
     <div id="app-layout">
       <header id="site-header">
         ${navHTML}
-        <div id="search-modal" class="search-modal"></div>
+        <div id="search-modal" class="search-modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="search-heading">
+          <div class="search-modal-content">
+            <div class="search-header">
+              <h2 id="search-heading">Search</h2>
+              <button
+                type="button"
+                class="search-close"
+                aria-label="Close search"
+                onClick="document.getElementById('search-modal').style.display='none'"
+              >
+                ✕ Close
+              </button>
+            </div>
+            <form class="search-form" id="search-form" role="search" action="/search">
+              <input
+                type="search"
+                name="q"
+                placeholder="Search posts..."
+                required
+                id="search-input"
+                aria-labelledby="search-heading"
+              />
+              <button type="submit" aria-label="Submit search">Search</button>
+            </form>
+            <div
+              id="search-results"
+              class="search-results"
+              aria-live="polite"
+              role="region"
+              aria-label="Search results"
+            ></div>
+          </div>
+        </div>
       </header>
 
       <main id="content-main" class="content-main">
@@ -158,12 +190,12 @@ export const renderPost = (post: Post): string => {
           ${post.tags && post.tags.length > 0 ? `
             <div class="tags">
               ${post.tags.map(tag => `
-                <a 
-                  href="/tags/${tag}" 
-                  class="tag link" 
-                  hx-get="/tags/${tag}" 
-                  hx-target="#content-area" 
-                  hx-swap="innerHTML" 
+                <a
+                  href="/tags/${tag}"
+                  class="tag link"
+                  hx-get="/tags/${tag}"
+                  hx-target="#content-area"
+                  hx-swap="innerHTML"
                   hx-push-url="true"
                 >
                   ${tag}
