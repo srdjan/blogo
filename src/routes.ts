@@ -14,6 +14,7 @@ import { searchPosts } from "./search.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
 import { logger } from "./utils.ts";
+import { type Context as MixonContext } from "jsr:@srdjan/mixon";
 
 /**
  * Simple cache with TTL
@@ -52,34 +53,13 @@ const CACHES = {
   posts: createCache<Post[]>(60 * 1000), // 1 minute TTL
   static: new Map<string, { data: Uint8Array; contentType: string }>(),
 };
-
-// Define a type for the Mixon app context
-interface MixonContext {
-  request: Request;
-  response: Response;
-  validated: {
-    params: { ok: boolean; value: Record<string, string>; error?: unknown };
-    query: { ok: boolean; value: Record<string, string>; error?: unknown };
-    body: { ok: boolean; value: unknown; error?: unknown };
-  };
-  status?: number;
-  headers: Headers;
-}
-
 /**
  * Setup all blog routes using Mixon app instance
  */
-export const setupBlogRoutes = (app: unknown, config: Config) => {
-  const mixonApp = app as {
-    get: (path: string | RegExp, handler: (ctx: MixonContext) => Promise<void>) => void;
-    post: (path: string | RegExp, handler: (ctx: MixonContext) => Promise<void>) => void;
-    utils: {
-      handleError: (ctx: MixonContext, status: number, message: string, details?: unknown) => void;
-    };
-  };
-
+export const setupBlogRoutes = (mixonApp: any, config: Config) => {
+  // Extract Mixon utils for standardized response handling
   const { utils } = mixonApp;
-  const { handleError } = utils;
+  const { handleError, createResponse } = utils;
 
   // Define route handlers
   mixonApp.get("/", handleHome);
@@ -131,41 +111,46 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": "/",
-          "HX-Trigger": JSON.stringify({
-            scrollToTop: {
-              scroll: "top",
-              offset: 120,
-            },
-          }),
-        },
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": "/",
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top",
+            offset: 120,
+          },
+        }),
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
+        status: 200,
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: config.blog.title,
-          posts,
-          path: "/"
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
+    const htmlContent = renderDocument(
       {
-        headers: {
-          "Content-Type": "text/html",
-          "Cache-Control": "max-age=60" // 1 minute cache
-        }
+        title: config.blog.title,
+        posts,
+        path: "/"
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
       }
     );
+    
+    const headers = {
+      "Content-Type": "text/html",
+      "Cache-Control": "max-age=60" // 1 minute cache
+    };
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 200,
+      headers 
+    });
   }
 
   /**
@@ -176,6 +161,11 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
 
     if (!postsResult.ok) {
       handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      return;
+    }
+
+    if (!ctx.validated.params.ok) {
+      handleError(ctx, 400, "Invalid post slug", ctx.validated.params.error);
       return;
     }
 
@@ -192,36 +182,41 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": path,
-          "HX-Trigger": JSON.stringify({
-            scrollToTop: {
-              scroll: "top",
-              offset: 120,
-            },
-          }),
-        },
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top",
+            offset: 120,
+          },
+        }),
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
+        status: 200,
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: `${config.blog.title} - ${post.title}`,
-          post,
-          path
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
-      { headers: { "Content-Type": "text/html" } }
+    const htmlContent = renderDocument(
+      {
+        title: `${config.blog.title} - ${post.title}`,
+        post,
+        path
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
+      }
     );
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 200,
+      headers: { "Content-Type": "text/html" } 
+    });
   }
 
   /**
@@ -256,36 +251,41 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": path,
-          "HX-Trigger": JSON.stringify({
-            scrollToTop: {
-              scroll: "top",
-              offset: 120,
-            },
-          }),
-        },
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top",
+            offset: 120,
+          },
+        }),
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
+        status: 200,
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: `${config.blog.title} - Tags`,
-          tags,
-          path
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
-      { headers: { "Content-Type": "text/html" } }
+    const htmlContent = renderDocument(
+      {
+        title: `${config.blog.title} - Tags`,
+        tags,
+        path
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
+      }
     );
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 200,
+      headers: { "Content-Type": "text/html" } 
+    });
   }
 
   /**
@@ -296,6 +296,11 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
 
     if (!postsResult.ok) {
       handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      return;
+    }
+
+    if (!ctx.validated.params.ok) {
+      handleError(ctx, 400, "Invalid tag parameter", ctx.validated.params.error);
       return;
     }
 
@@ -321,37 +326,42 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": path,
-          "HX-Trigger": JSON.stringify({
-            scrollToTop: {
-              scroll: "top",
-              offset: 120,
-            },
-          }),
-        },
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top",
+            offset: 120,
+          },
+        }),
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
+        status: 200,
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: `${config.blog.title} - Posts tagged "${tag}"`,
-          posts: paginatedPosts.items,
-          activeTag: tag,
-          path
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
-      { headers: { "Content-Type": "text/html" } }
+    const htmlContent = renderDocument(
+      {
+        title: `${config.blog.title} - Posts tagged "${tag}"`,
+        posts: paginatedPosts.items,
+        activeTag: tag,
+        path
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
+      }
     );
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 200,
+      headers: { "Content-Type": "text/html" } 
+    });
   }
 
   /**
@@ -366,35 +376,40 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": path,
-          "HX-Trigger": JSON.stringify({
-            scrollToTop: {
-              scroll: "top",
-              offset: 120,
-            },
-          }),
-        },
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+        "HX-Trigger": JSON.stringify({
+          scrollToTop: {
+            scroll: "top",
+            offset: 120,
+          },
+        }),
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
+        status: 200,
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: config.blog.title,
-          path
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
-      { headers: { "Content-Type": "text/html" } }
+    const htmlContent = renderDocument(
+      {
+        title: config.blog.title,
+        path
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
+      }
     );
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 200,
+      headers: { "Content-Type": "text/html" } 
+    });
   }
 
   /**
@@ -408,14 +423,20 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
       return;
     }
 
+    if (!ctx.validated.query.ok) {
+      handleError(ctx, 400, "Invalid search query", ctx.validated.query.error);
+      return;
+    }
+
     const posts = postsResult.value;
     const url = new URL(ctx.request.url);
     const query = url.searchParams.get("q") || "";
     const results = searchPosts(posts, query);
     const content = renderSearchResults(results, query);
 
-    ctx.response = new Response(content, {
-      headers: { "Content-Type": "text/html" },
+    ctx.response = createResponse(ctx, content, {
+      status: 200,
+      headers: { "Content-Type": "text/html" }
     });
   }
 
@@ -433,11 +454,12 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const posts = postsResult.value;
     const rssContent = generateRSS(posts, config.blog.title, config.server.publicUrl);
 
-    ctx.response = new Response(rssContent, {
+    ctx.response = createResponse(ctx, rssContent, {
+      status: 200,
       headers: {
         "Content-Type": "application/xml",
         "Cache-Control": "max-age=300", // 5 minutes cache
-      },
+      }
     });
   }
 
@@ -447,49 +469,29 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
   async function handleCreatePost(ctx: MixonContext): Promise<void> {
     logger.info("Handling create post request");
 
-    // Validation: Check content type
-    const contentType = ctx.request.headers.get("Content-Type");
-    logger.info(`Content-Type: ${contentType}`);
-
-    if (!contentType?.includes("application/json")) {
-      logger.info("Invalid content type, expected application/json");
-      ctx.response = new Response(
-        JSON.stringify({ error: "Content-Type must be application/json" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-      return;
-    }
-
-    // Parse request body
-    let postData;
-    try {
-      const text = await ctx.request.text();
-      logger.info(`Request body: ${text}`);
-      postData = JSON.parse(text);
-    } catch (error) {
-      logger.error("Failed to parse JSON:", error);
-      ctx.response = new Response(
-        JSON.stringify({ error: "Invalid JSON payload" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    // Validation: Check content type and body validation
+    if (!ctx.validated.body.ok) {
+      logger.error("Invalid request body");
+      handleError(ctx, 400, "Invalid request body", ctx.validated.body.error);
       return;
     }
 
     // Validate required fields
+    const postData = ctx.validated.body.value as Record<string, unknown>;
     const { title, content, tags } = postData;
-    logger.info(`Title: ${title}, Content length: ${content?.length || 0}, Tags: ${JSON.stringify(tags)}`);
+    logger.info(`Title: ${title}, Content length: ${(content as string)?.length || 0}, Tags: ${JSON.stringify(tags)}`);
 
     if (!title || !content) {
       logger.info("Missing required fields");
-      ctx.response = new Response(
-        JSON.stringify({ error: "Title and content are required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+      ctx.response = createResponse(ctx, 
+        { error: "Title and content are required" },
+        { status: 400 }
       );
       return;
     }
 
     // Generate slug from title
-    const slug = title.toLowerCase()
+    const slug = (title as string).toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-');
 
@@ -530,23 +532,16 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
 
       logger.info(`Returning response: ${JSON.stringify(response)}`);
 
-      ctx.response = new Response(
-        JSON.stringify(response),
-        {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"  // Allow CORS for testing
-          }
+      ctx.response = createResponse(ctx, response, {
+        status: 201,
+        headers: {
+          "Access-Control-Allow-Origin": "*"  // Allow CORS for testing
         }
-      );
+      });
     } catch (error) {
       logger.error("Failed to create post:", error);
-
-      ctx.response = new Response(
-        JSON.stringify({ error: "Failed to create post", details: String(error) }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+      
+      handleError(ctx, 500, "Failed to create post", String(error));
     }
   }
 
@@ -554,6 +549,11 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
    * Handler for static files
    */
   async function handleStaticFile(ctx: MixonContext): Promise<void> {
+    if (!ctx.validated.params.ok) {
+      handleError(ctx, 400, "Invalid static file path", ctx.validated.params.error);
+      return;
+    }
+    
     const url = new URL(ctx.request.url);
     const path = url.pathname;
     const filePath = `./public${path}`;
@@ -581,7 +581,7 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
       logger.info(`Served static file: ${filePath}`);
     } catch (error) {
       logger.error(`Error serving static file ${filePath}:`, error);
-      ctx.response = new Response("Not Found", { status: 404 });
+      handleError(ctx, 404, "Static file not found", { path, filePath });
     }
   }
 
@@ -598,33 +598,34 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     const isHtmxRequest = ctx.request.headers.get("HX-Request") === "true";
 
     if (isHtmxRequest) {
-      ctx.response = new Response(content, {
+      const headers = {
+        "Content-Type": "text/html",
+        "HX-Push-Url": path,
+      };
+      
+      ctx.response = createResponse(ctx, content, { 
         status: 404,
-        headers: {
-          "Content-Type": "text/html",
-          "HX-Push-Url": path,
-        },
+        headers 
       });
       return;
     }
 
-    ctx.response = new Response(
-      renderDocument(
-        {
-          title: config.blog.title,
-          path
-        },
-        content,
-        {
-          baseUrl: config.server.publicUrl,
-          description: config.blog.description,
-        }
-      ),
+    const htmlContent = renderDocument(
       {
-        status: 404,
-        headers: { "Content-Type": "text/html" }
+        title: config.blog.title,
+        path
+      },
+      content,
+      {
+        baseUrl: config.server.publicUrl,
+        description: config.blog.description,
       }
     );
+    
+    ctx.response = createResponse(ctx, htmlContent, { 
+      status: 404,
+      headers: { "Content-Type": "text/html" } 
+    });
   }
 
   /**
@@ -635,25 +636,28 @@ export const setupBlogRoutes = (app: unknown, config: Config) => {
     contentType: string,
     filePath: string,
   ): Response => {
-    const headers = new Headers({ "Content-Type": contentType });
+    const headers: Record<string, string> = { "Content-Type": contentType };
 
     // Set caching headers based on file type
     if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
-      headers.set("Cache-Control", "public, max-age=604800"); // 1 week
+      headers["Cache-Control"] = "public, max-age=604800"; // 1 week
     } else if (filePath.includes("/fonts/")) {
-      headers.set("Cache-Control", "public, max-age=2592000, immutable"); // 1 month
+      headers["Cache-Control"] = "public, max-age=2592000, immutable"; // 1 month
     } else if (
       filePath.endsWith(".svg") || filePath.endsWith(".png") ||
       filePath.endsWith(".jpg") || filePath.endsWith(".gif")
     ) {
-      headers.set("Cache-Control", "public, max-age=1209600"); // 2 weeks
+      headers["Cache-Control"] = "public, max-age=1209600"; // 2 weeks
     } else {
-      headers.set("Cache-Control", "public, max-age=86400"); // 1 day
+      headers["Cache-Control"] = "public, max-age=86400"; // 1 day
     }
 
-    headers.set("Vary", "Accept-Encoding");
+    headers["Vary"] = "Accept-Encoding";
 
-    return new Response(file, { headers });
+    return createResponse({ data: file }, { 
+      status: 200,
+      headers 
+    }) as Response;
   };
 
   /**
