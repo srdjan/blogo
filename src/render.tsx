@@ -6,19 +6,20 @@ import {
   generateTwitterCardTags,
   generateWebsiteSchema,
 } from "./metadata.ts";
-import { formatDate } from "./utils.ts";
+import { Document } from "./components/Document.tsx";
+import { PostContent } from "./components/Post.tsx";
+import { renderPostListHtml } from "./components/PostListHtml.tsx";
+import { renderAboutHtml } from "./components/AboutHtml.tsx";
+import { renderNotFoundHtml } from "./components/NotFoundHtml.tsx";
+import { renderTagIndexHtml } from "./components/TagIndexHtml.tsx";
+import { renderSearchResultsHtml } from "./components/SearchResultsHtml.tsx";
+import { renderErrorPageHtml } from "./components/ErrorPageHtml.tsx";
 
-/**
- * Helper function to get formatted date from a post
- * Uses pre-formatted date if available, otherwise formats it
- */
-const getFormattedDate = (post: Post): string => {
-  return post.formattedDate || formatDate(post.date);
-};
+// These helper functions are no longer needed as they've been replaced by JSX components
 
 /**
  * Render the HTML document shell
- * Uses a pure functional approach with explicit type signatures
+ * Uses JSX for declarative UI composition
  */
 export const renderDocument = (
   context: RenderContext,
@@ -56,171 +57,38 @@ export const renderDocument = (
     pageDescription,
   );
 
-  // Use string template to compose the document
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${pageTitle}</title>
-  <meta name="description" content="${pageDescription}">
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">${structuredData}</script>
-
-  <!-- Open Graph tags -->
-  ${ogTags}
-
-  <!-- Twitter Card tags -->
-  ${twitterTags}
-
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/color-override.css">
-  <link rel="alternate" type="application/rss+xml" title="${context.title} RSS Feed" href="/feed.xml">
-  <script src="/js/htmx.min.js"></script>
-  <script src="/js/site.js"></script>
-</head>
-<body>
-  <div id="app-layout">
-    <header id="site-header">
-      <nav>
-        <div class="nav-links">
-          <a href="/" class="link${context.path === '/' ? ' active' : ''}" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Home</a>
-          <a href="/tags" class="link${context.path === '/tags' ? ' active' : ''}" hx-get="/tags" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Tags</a>
-          <a href="/about" class="link${context.path === '/about' ? ' active' : ''}" hx-get="/about" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">About</a>
-          <button
-            class="search-toggle link"
-            aria-label="Search"
-            aria-expanded="false"
-            onclick="document.getElementById('search-modal').style.display='flex'"
-          >
-            Search
-          </button>
-          <a href="/feed.xml" class="link">RSS</a>
-        </div>
-      </nav>
-      <div
-        id="search-modal"
-        class="search-modal-overlay"
-        style="display:none"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="search-heading"
-      >
-        <div class="search-modal-content">
-          <div class="search-header">
-            <h2 id="search-heading">Search</h2>
-            <button
-              class="search-close"
-              aria-label="Close search"
-              onclick="document.getElementById('search-modal').style.display='none'"
-            >
-              ✕ Close
-            </button>
-          </div>
-          <form class="search-form" id="search-form" role="search">
-            <input
-              type="search"
-              name="q"
-              placeholder="Search posts..."
-              required
-              id="search-input"
-              autofocus
-              aria-labelledby="search-heading"
-            />
-            <button type="submit" aria-label="Submit search">Search</button>
-          </form>
-          <div
-            id="search-results"
-            class="search-results"
-            aria-live="polite"
-            role="region"
-            aria-label="Search results"
-          ></div>
-        </div>
-      </div>
-    </header>
-
-    <main id="content-main" class="content-main">
-      <div id="content-area" class="htmx-swappable">${content}</div>
-    </main>
-
-    <footer>
-      <p>
-        Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
-          <span class="avatar">⊣˚∆˚⊢</span>
-        </a> & Claude
-      </p>
-    </footer>
-  </div>
-</body>
-</html>`;
+  // Use our Document component to render the full HTML document
+  const element = Document({
+    title: pageTitle,
+    description: pageDescription,
+    path: context.path,
+    content,
+    structuredData,
+    ogTags,
+    twitterTags,
+  });
+  return String(element);
 };
 
 export const renderPost = (post: Post): string => {
-  const tags = post.tags ? renderTags(post.tags) : "";
-  const formattedDate = getFormattedDate(post);
-
-  return `<article class="post content-section">
-  <div class="post-meta-subtle">
-    <time datetime="${post.date}">${formattedDate} ${tags}</time>
-  </div>
-  <div class="post-content">${post.content}</div>
-</article>`;
-};
-
-const renderTags = (tags: string[]): string => {
-  return `<div class="tags">
-    ${tags.map(tag => `<a href="/tags/${tag}" class="tag link" hx-get="/tags/${tag}" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">${tag}</a>`).join("")}
-  </div>`;
+  // Use our PostContent component to render the post
+  const element = PostContent({ post });
+  return String(element);
 };
 
 export const renderNotFound = (): string => {
-  return `<section class="not-found content-section">
-  <h1>404 - Page Not Found</h1>
-  <p>The page you're looking for doesn't exist.</p>
-  <p><a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Return Home</a></p>
-</section>`;
+  // Use the renderNotFoundHtml function from components/NotFoundHtml.tsx
+  return renderNotFoundHtml();
 };
 
 export const renderAbout = (): string => {
-  return `<section class="about content-section">
-  <h1>About This Blog</h1>
-  <p>This is a minimal blog built with Deno, HTMX, and Markdown.</p>
-  <p>The architecture follows functional programming principles with immutable data structures, pure functions, and strong type safety throughout.</p>
-  <p>The design uses a neobrutalist approach with bold colors, thick borders, and raw typography.</p>
-</section>`;
+  // Use the renderAboutHtml function from components/AboutHtml.tsx
+  return renderAboutHtml();
 };
 
 export const renderTagIndex = (tags: TagInfo[]): string => {
-  const sortedTags = [...tags].sort((a, b) => b.count - a.count);
-
-  return `<section class="tag-index content-section">
-  <h1>Tags</h1>
-  <div class="tag-cloud">
-    ${sortedTags.map(tag => {
-    const sizeClass = sizeClassForCount(tag.count);
-    return `<a
-        href="/tags/${tag.name}"
-        class="tag tag-${sizeClass} link"
-        hx-get="/tags/${tag.name}"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
-        hx-push-url="true"
-        title="${tag.count} posts"
-      >
-        ${tag.name}
-        <span class="tag-count">${tag.count}</span>
-      </a>`;
-  }).join("")}
-  </div>
-</section>`;
-};
-
-const sizeClassForCount = (count: number): string => {
-  if (count >= 10) return "lg";
-  if (count >= 5) return "md";
-  return "sm";
+  // Use the renderTagIndexHtml function from components/TagIndexHtml.tsx
+  return renderTagIndexHtml(tags);
 };
 
 export const renderPostList = (
@@ -228,219 +96,13 @@ export const renderPostList = (
   activeTag?: string,
   pagination?: Pagination,
 ): string => {
-  let tagHeader = "";
-  if (activeTag) {
-    tagHeader = `
-      <h1>Posts Tagged "${activeTag}"</h1>
-      <div class="tag-filter-header">
-        <p>
-          Showing ${posts.length} post${posts.length !== 1 ? "s" : ""} tagged with <strong>${activeTag}</strong>
-        </p>
-        <a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">
-          Show All Posts
-        </a>
-      </div>
-    `;
-  }
-
-  let postCards = "";
-  if (posts.length > 0) {
-    postCards = posts.map(post => {
-      const tags = post.tags ? renderTags(post.tags) : "";
-      const formattedDate = getFormattedDate(post);
-      const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
-
-      return `<article class="post-card">
-        <div class="post-card-inner">
-          <h2>
-            <a
-              href="/posts/${post.slug}"
-              class="link"
-              hx-get="/posts/${post.slug}"
-              hx-target="#content-area"
-              hx-swap="innerHTML"
-              hx-push-url="true"
-            >
-              ${post.title}
-            </a>
-          </h2>
-          <div class="post-meta">
-            <time datetime="${post.date}">${formattedDate}</time>
-            ${tags}
-          </div>
-          ${excerpt}
-        </div>
-      </article>`;
-    }).join("");
-  } else {
-    postCards = `<div class="empty-state">
-      <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ""}.</p>
-    </div>`;
-  }
-
-  let paginationHtml = "";
-  if (pagination) {
-    paginationHtml = renderPagination(pagination);
-  }
-
-  return `<section class="post-list content-section">
-    <div class="content-wrapper">
-      ${tagHeader}
-      <div class="post-cards-container">
-        ${postCards}
-      </div>
-      ${paginationHtml}
-    </div>
-  </section>`;
-};
-
-const renderPagination = (pagination: Pagination): string => {
-  const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
-
-  // Don't render pagination if there's only one page
-  if (totalPages <= 1) {
-    return "";
-  }
-
-  // Generate page numbers to show
-  const pageNumbers: Array<number | null> = [];
-
-  // Always show first page
-  pageNumbers.push(1);
-
-  // Add ellipsis if needed
-  if (currentPage > 3) {
-    pageNumbers.push(null); // represents ellipsis
-  }
-
-  // Show nearby pages
-  for (
-    let i = Math.max(2, currentPage - 1);
-    i <= Math.min(totalPages - 1, currentPage + 1);
-    i++
-  ) {
-    pageNumbers.push(i);
-  }
-
-  // Add ellipsis if needed
-  if (currentPage < totalPages - 2) {
-    pageNumbers.push(null); // represents ellipsis
-  }
-
-  // Always show last page if it's not the only page
-  if (totalPages > 1) {
-    pageNumbers.push(totalPages);
-  }
-
-  // Render previous button
-  const prevButton = hasPrevPage
-    ? `<a
-        href="?page=${currentPage - 1}"
-        class="pagination-prev link"
-        hx-get="?page=${currentPage - 1}"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
-        hx-push-url="true"
-        aria-label="Previous page"
-      >
-        Previous
-      </a>`
-    : `<span class="pagination-prev pagination-disabled" aria-disabled="true">
-        Previous
-      </span>`;
-
-  // Render page numbers
-  const pageLinks = pageNumbers.map(page => {
-    if (page === null) {
-      return `<span class="pagination-ellipsis">&hellip;</span>`;
-    }
-
-    if (page === currentPage) {
-      return `<span class="pagination-current" aria-current="page">${page}</span>`;
-    }
-
-    return `<a
-      href="?page=${page}"
-      class="link"
-      hx-get="?page=${page}"
-      hx-target="#content-area"
-      hx-swap="innerHTML"
-      hx-push-url="true"
-    >
-      ${page}
-    </a>`;
-  }).join("");
-
-  // Render next button
-  const nextButton = hasNextPage
-    ? `<a
-        href="?page=${currentPage + 1}"
-        class="pagination-next link"
-        hx-get="?page=${currentPage + 1}"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
-        hx-push-url="true"
-        aria-label="Next page"
-      >
-        Next
-      </a>`
-    : `<span class="pagination-next pagination-disabled" aria-disabled="true">
-        Next
-      </span>`;
-
-  return `<nav class="pagination content-section" aria-label="Pagination Navigation">
-    ${prevButton}
-    <div class="pagination-pages">
-      ${pageLinks}
-    </div>
-    ${nextButton}
-    <div class="pagination-info">
-      <p>Page ${currentPage} of ${totalPages}</p>
-    </div>
-  </nav>`;
+  // Use the renderPostListHtml function from components/PostListHtml.tsx
+  return renderPostListHtml(posts, activeTag, pagination);
 };
 
 export const renderSearchResults = (posts: Post[], query: string): string => {
-  if (!query || query.trim().length === 0) {
-    return "";
-  }
-
-  if (posts.length === 0) {
-    return `<div class="search-results-summary content-section">
-      No posts found matching "${query}"
-    </div>`;
-  }
-
-  const resultsHtml = posts.map(post => {
-    const tags = post.tags ? renderTags(post.tags) : "";
-    const formattedDate = getFormattedDate(post);
-    const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
-
-    return `<article class="search-result">
-      <h3>
-        <a
-          href="/posts/${post.slug}"
-          class="link"
-          hx-get="/posts/${post.slug}"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-        >
-          ${post.title}
-        </a>
-      </h3>
-      <div class="post-meta">
-        <time datetime="${post.date}">${formattedDate}</time>
-        ${tags}
-      </div>
-      ${excerpt}
-    </article>`;
-  }).join("");
-
-  return `<div class="search-results-summary content-section">
-    Found ${posts.length} post${posts.length !== 1 ? "s" : ""} matching "${query}"
-  </div>
-  ${resultsHtml}`;
+  // Use the renderSearchResultsHtml function from components/SearchResultsHtml.tsx
+  return renderSearchResultsHtml(posts, query);
 };
 
 export const renderErrorPage = (error: {
@@ -448,19 +110,6 @@ export const renderErrorPage = (error: {
   message: string;
   stackTrace?: string;
 }): string => {
-  const stackTraceHtml = error.stackTrace
-    ? `<details class="error-details">
-        <summary>Technical Details</summary>
-        <pre class="error-stack">${error.stackTrace}</pre>
-      </details>`
-    : "";
-
-  return `<section class="error-page content-section">
-    <h1>${error.title}</h1>
-    <div class="error-message">
-      <p>${error.message}</p>
-    </div>
-    ${stackTraceHtml}
-    <p><a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Return Home</a></p>
-  </section>`;
+  // Use the renderErrorPageHtml function from components/ErrorPageHtml.tsx
+  return renderErrorPageHtml(error);
 };
