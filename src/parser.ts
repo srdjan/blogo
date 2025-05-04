@@ -1,9 +1,9 @@
 import { Post, PostMeta, Result } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
-import { marked } from "https://esm.sh/marked@15.0.11";
 import { chain, createError, tryCatch } from "./error.ts";
 import { CONFIG } from "./config.ts";
 import { logger, formatDate } from "./utils.ts";
+import { markdownToHtml, markdownToJsxElements } from "./markdown-renderer.tsx";
 
 /**
  * Extract frontmatter and content from markdown text
@@ -80,39 +80,8 @@ const parseFrontmatter = (
 };
 
 /**
- * Convert markdown to HTML with minimal configuration
- * Implementation uses in-memory cache for performance
- */
-const markdownCache = new Map<string, string>();
-
-const markdownToHtml = (markdown: string): Result<string, AppError> => {
-  try {
-    // Check cache first
-    if (markdownCache.has(markdown)) {
-      return { ok: true, value: markdownCache.get(markdown)! };
-    }
-
-    // Parse markdown if not in cache
-    const html = marked.parse(markdown) as string;
-
-    // Cache the result
-    markdownCache.set(markdown, html);
-
-    return { ok: true, value: html };
-  } catch (error) {
-    return {
-      ok: false,
-      error: createError(
-        "ParseError",
-        "Failed to parse markdown",
-        error,
-      ),
-    };
-  }
-};
-
-/**
  * Parse a markdown file into a Post object
+ * This version supports both HTML string and JSX element rendering
  */
 export const parseMarkdown = async (
   filePath: string,
@@ -133,9 +102,16 @@ export const parseMarkdown = async (
     const meta = parseFrontmatter(extracted.value.frontmatter, slug);
     if (!meta.ok) return meta;
 
-    // Parse markdown to HTML
+    // Parse markdown to HTML for backward compatibility
     const html = markdownToHtml(extracted.value.content);
     if (!html.ok) return html;
+
+    // Parse markdown to JSX elements for mono-jsx rendering
+    const jsxContent = markdownToJsxElements(extracted.value.content);
+    if (!jsxContent.ok) {
+      logger.warn(`Failed to convert markdown to JSX for post: ${slug}`);
+      // We'll continue with HTML content if JSX conversion fails
+    }
 
     // Combine metadata and content into a Post
     const formattedDate = formatDate(meta.value.date);
@@ -144,7 +120,8 @@ export const parseMarkdown = async (
       ok: true,
       value: {
         ...meta.value,
-        content: html.value,
+        content: html.value, // Keep HTML string for backward compatibility
+        contentJsx: jsxContent.ok ? jsxContent.value : undefined, // Add JSX content if available
         formattedDate,
       },
     };

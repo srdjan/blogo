@@ -1,9 +1,11 @@
 /**
  * Post component for rendering a blog post
+ * Uses mono-jsx exclusively for rendering, including markdown content
  */
 
 import { Post as PostType } from "../types.ts";
 import { formatDate } from "../utils.ts";
+import { htmlToJsx } from "../utils/html-to-jsx.tsx";
 
 // Helper function to get formatted date from a post
 const getFormattedDate = (post: PostType): string => {
@@ -33,6 +35,17 @@ export const Tags = ({ tags }: { tags: string[] }) => {
   );
 };
 
+// Component for rendering post content
+const PostContentBody = ({ post }: { post: PostType }) => {
+  // Use JSX content if available, otherwise convert HTML to JSX
+  if (post.contentJsx) {
+    return <div class="post-content">{post.contentJsx}</div>;
+  }
+  
+  // Fallback to converting HTML to JSX
+  return <div class="post-content">{htmlToJsx(post.content)}</div>;
+};
+
 // Component for rendering a single post
 export const PostContent = ({ post }: { post: PostType }) => {
   const formattedDate = getFormattedDate(post);
@@ -44,9 +57,7 @@ export const PostContent = ({ post }: { post: PostType }) => {
           {formattedDate} {post.tags && <Tags tags={post.tags} />}
         </time>
       </div>
-      <div class="post-content">
-        {html`${post.content}`}
-      </div>
+      <PostContentBody post={post} />
     </article>
   );
 };

@@ -12,7 +12,8 @@ export interface PostMeta {
 }
 
 export interface Post extends PostMeta {
-  content: string;
+  content: string; // HTML content as string (for backward compatibility)
+  contentJsx?: JSX.Element; // JSX element content for mono-jsx rendering
   formattedDate?: string; // Pre-formatted date string
 }
 
