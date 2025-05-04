@@ -1,4 +1,3 @@
-// src/metadata.ts - Structured metadata generation for SEO and discovery
 import type { Post } from "./types.ts";
 import { escapeHtml, stripHtml } from "./utils.ts";
 

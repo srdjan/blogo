@@ -1,4 +1,3 @@
-// src/utils.ts - Shared utility functions
 import { CONFIG } from "./config.ts";
 /**
  * Escape HTML/XML special characters to prevent XSS

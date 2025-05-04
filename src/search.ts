@@ -1,4 +1,3 @@
-// src/search.ts - Search functionality with improved accuracy and performance
 import { Post } from "./types.ts";
 
 // Pre-defined weights for scoring results

@@ -1,4 +1,3 @@
-// src/pagination.ts - Type-safe pagination utilities with optimized filtering
 import type { Post } from "./types.ts";
 import { tryCatchSync } from "./error.ts";
 import { logger } from "./utils.ts";

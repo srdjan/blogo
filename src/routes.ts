@@ -11,7 +11,6 @@ import {
 } from "./render.ts";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
-import { createError, tryCatch } from "./error.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
 import { logger } from "./utils.ts";

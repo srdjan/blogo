@@ -1,6 +1,6 @@
 import { Post, PostMeta, Result } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
-import { marked } from "https://esm.sh/marked@15.0.7";
+import { marked } from "https://esm.sh/marked@15.0.11";
 import { chain, createError, tryCatch } from "./error.ts";
 import { CONFIG } from "./config.ts";
 import { logger, formatDate } from "./utils.ts";

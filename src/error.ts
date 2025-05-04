@@ -1,4 +1,3 @@
-// src/error.ts - Advanced error handling with pattern matching and enhanced tracing
 import type { Result } from "./types.ts";
 
 /**

@@ -1,4 +1,3 @@
-// src/rss.ts - RSS feed generation
 import { Post } from "./types.ts";
 import { escapeXml } from "./utils.ts";
 
