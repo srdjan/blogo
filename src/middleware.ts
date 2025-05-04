@@ -32,7 +32,7 @@ export const debugMiddleware = async (ctx: any, next: () => Promise<void>) => {
   logger.info(`Request headers: ${JSON.stringify(Object.fromEntries(ctx.request.headers.entries()))}`);
 
   // Import common modules
-  const render = await import("./render.ts");
+  const render = await import("./render.tsx");
   const config = (await import("./config.ts")).CONFIG;
 
   if (path === "/") {

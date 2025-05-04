@@ -8,7 +8,7 @@ import {
   renderPostList,
   renderSearchResults,
   renderTagIndex,
-} from "./render.ts";
+} from "./render.tsx";
 import { generateRSS } from "./rss.ts";
 import { searchPosts } from "./search.ts";
 import type { Config } from "./config.ts";
