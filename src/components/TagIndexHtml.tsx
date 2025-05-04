@@ -1,7 +1,3 @@
-/**
- * TagIndex component using the html tag function
- */
-
 import { TagInfo } from "../types.ts";
 
 export const renderTagIndexHtml = (tags: TagInfo[]): string => {

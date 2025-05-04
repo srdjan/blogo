@@ -1,8 +1,5 @@
 import { logger } from "./utils.ts";
 
-/**
- * Middleware for logging requests
- */
 export const loggerMiddleware = async (ctx: any, next: () => Promise<void>) => {
   const start = performance.now();
   const url = new URL(ctx.request.url);
@@ -21,9 +18,6 @@ export const loggerMiddleware = async (ctx: any, next: () => Promise<void>) => {
   }
 };
 
-/**
- * Middleware for debugging requests
- */
 export const debugMiddleware = async (ctx: any, next: () => Promise<void>) => {
   const url = new URL(ctx.request.url);
   const path = url.pathname;

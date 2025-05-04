@@ -1,7 +1,3 @@
-/**
- * ErrorPage component using the html tag function
- */
-
 export const renderErrorPageHtml = (error: {
   title: string;
   message: string;

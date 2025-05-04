@@ -1,7 +1,3 @@
-/**
- * NotFound component using the html tag function
- */
-
 export const renderNotFoundHtml = (): string => {
   return `<section class="not-found content-section">
     <h1>404 - Page Not Found</h1>

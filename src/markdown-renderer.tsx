@@ -1,7 +1,3 @@
-/**
- * Simple markdown renderer
- */
-
 import { marked } from "https://esm.sh/marked@15.0.11";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
@@ -9,10 +5,6 @@ import { createError } from "./error.ts";
 // In-memory cache for better performance
 const markdownCache = new Map<string, string>();
 
-/**
- * Convert markdown to HTML
- * This uses the marked library and caches results
- */
 export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   try {
     // Check cache first

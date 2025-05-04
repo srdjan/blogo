@@ -1,7 +1,3 @@
-/**
- * About component using the html tag function
- */
-
 export const renderAboutHtml = (): string => {
   return `<section class="about content-section">
     <h1>About This Blog</h1>

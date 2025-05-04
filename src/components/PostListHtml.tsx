@@ -1,7 +1,3 @@
-/**
- * PostList component using the html tag function
- */
-
 import { Post } from "../types.ts";
 import type { Pagination } from "../pagination.ts";
 import { formatDate } from "../utils.ts";
