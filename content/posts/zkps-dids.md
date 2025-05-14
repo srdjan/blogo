@@ -5,19 +5,19 @@ tags: [Verifiable Credentials, DIDs, ZKPs]
 excerpt: A design for a multi-key zero-knowledge verification system that leverages verifiable credentials stored on decentralized storage without any references to blockchain.
 ---
 
-# Musings on Zero-Knowledge Proofs
+## Musings on Zero-Knowledge Proofs
 
 Below is a mussing about the design for a multi-key zero-knowledge (zk) verification system that leverages decentralized verifiable credentials stored on decentralized storage (such as an AT Protocol Personal Data Store, PDS) without any references to blockchain. This design focuses on proving, for example, employment by requiring both a decentralized identifier (DID)-based private key and an independent verifier key, while storing verifiable credentials (VCs) in a decentralized storage network.
 
 ---
 
-## 1. Overview
+## Overview
 
 The system enables a user (claimant) to demonstrate possession of employment credentials without revealing underlying sensitive details. The proof generation demands that both the claimant's DID-associated private key and an independent verifier's key (used to attest employment) are used to create a combined zero-knowledge proof. Verifiable credentials are stored within a decentralized data store (like an AT Protocol PDS), giving users full control over their data while ensuring a privacy-preserving verification process.
 
 ---
 
-## 2. Architectural Components
+### Architectural Components
 
 - **User (Claimant):**
   - Possesses a DID and its corresponding private key in a secure digital wallet.
@@ -49,7 +49,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 
 ---
 
-## 3. Data Flow and Processes
+## Data Flow and Processes
 
 ### A. Credential Issuance and PDS Storage
 
@@ -86,7 +86,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 
 ---
 
-## 4. Security and Privacy Considerations
+### Security and Privacy Considerations
 
 - **Privacy by Design:**
   - The system ensures that actual sensitive data (employment details) remains confidential and is only referenced via secure pointers/hashes in the zk proofs.
@@ -104,7 +104,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 
 ---
 
-## 5. Technologies and Protocols
+### Technologies and Protocols
 
 - **Decentralized Identifiers (DIDs) and Verifiable Credentials:**
   - Standards such as those defined by W3C to ensure interoperability and secure management of credentials.
@@ -120,7 +120,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 
 ---
 
-## 6. High-Level Block Diagram
+### High-Level Block Diagram
 
 ```mermaid
 flowchart TD
@@ -132,7 +132,7 @@ flowchart TD
     F -->|Validates zk Proof using:\n- Claimant's DID public key\n- Credential reference from the PDS\n- Independent verifier's attestation signature| G[Employment Verified]
 ```
 
-## 7. Summary
+## Summary
 
 This design describes a multi-key verification system where employment credentials—secured through decentralized storage (e.g., an AT Protocol PDS)—are proven valid without exposing sensitive data. The key features include:
 

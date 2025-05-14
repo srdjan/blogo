@@ -1,7 +1,7 @@
 ---
 title: Modern ARB Process
 date: 2025-04-06
-tags: [Architecture, Enterprise, SDLC, Product]
+tags: [Architecture, Enterprise, Product, Agile]
 excerpt: A post about the modern ARB process in agile Enterprise organizations.
 ---
 
