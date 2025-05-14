@@ -1,3 +1,4 @@
+import { App, type Context as MixonContext } from "@srdjan/mixon";
 import type { Post, TagInfo } from "./types.ts";
 import { loadPosts } from "./parser.ts";
 import {
@@ -14,7 +15,6 @@ import { searchPosts } from "./search.ts";
 import type { Config } from "./config.ts";
 import { paginatePosts } from "./pagination.ts";
 import { logger } from "./utils.ts";
-import { type Context as MixonContext } from "jsr:@srdjan/mixon";
 
 /**
  * Simple cache with TTL
@@ -56,13 +56,17 @@ const CACHES = {
 /**
  * Setup all blog routes using Mixon app instance
  */
-export const setupBlogRoutes = (mixonApp: any, config: Config) => {
+export const setupBlogRoutes = (mixonApp: App, config: Config) => {
   // Extract Mixon utils for standardized response handling
   const { utils } = mixonApp;
   const { handleError, createResponse } = utils;
 
   // Define route handlers
-  mixonApp.get("/", handleHome);
+  mixonApp.get("/", (ctx): void => {
+    handleHome(ctx);
+  });
+
+
   mixonApp.get("/posts/{slug}", handlePostDetail);
   mixonApp.get("/tags", handleTagIndex);
   mixonApp.get("/tags/{tag}", handleTagPage);
@@ -556,7 +560,7 @@ export const setupBlogRoutes = (mixonApp: any, config: Config) => {
     
     const url = new URL(ctx.request.url);
     const path = url.pathname;
-    const filePath = `./public${path}`;
+    const filePath = `${Deno.cwd()}/public${path}`;
 
     logger.info(`Handling static file: ${filePath}`);
 
@@ -571,14 +575,26 @@ export const setupBlogRoutes = (mixonApp: any, config: Config) => {
       // Read file
       const file = await Deno.readFile(filePath);
       const contentType = getContentType(filePath);
+      
+      // Add debug logging for JS files
+      if (filePath.endsWith('.js')) {
+        logger.info(`Serving JS file with content type: ${contentType}`);
+        
+        // Print first few bytes for debugging
+        const textDecoder = new TextDecoder();
+        const fileStart = textDecoder.decode(file.slice(0, 50));
+        logger.info(`JS file start: ${fileStart}`);
+      }
 
       // Cache smaller files (< 1MB)
       if (file.length < 1024 * 1024) {
         CACHES.static.set(filePath, { data: file, contentType });
       }
 
-      ctx.response = createStaticResponse(file, contentType, filePath);
-      logger.info(`Served static file: ${filePath}`);
+      const response = createStaticResponse(file, contentType, filePath);
+      ctx.response = response;
+      
+      logger.info(`Served static file: ${filePath} with content type: ${contentType}`);
     } catch (error) {
       logger.error(`Error serving static file ${filePath}:`, error);
       handleError(ctx, 404, "Static file not found", { path, filePath });
@@ -636,11 +652,14 @@ export const setupBlogRoutes = (mixonApp: any, config: Config) => {
     contentType: string,
     filePath: string,
   ): Response => {
-    const headers: Record<string, string> = { "Content-Type": contentType };
+    const headers: Record<string, string> = { 
+      "Content-Type": contentType,
+      "X-Content-Type-Options": "nosniff" // Prevent MIME type sniffing
+    };
 
     // Set caching headers based on file type
     if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
-      headers["Cache-Control"] = "public, max-age=604800"; // 1 week
+      headers["Cache-Control"] = "no-cache"; // Disable caching for debugging
     } else if (filePath.includes("/fonts/")) {
       headers["Cache-Control"] = "public, max-age=2592000, immutable"; // 1 month
     } else if (
@@ -654,10 +673,14 @@ export const setupBlogRoutes = (mixonApp: any, config: Config) => {
 
     headers["Vary"] = "Accept-Encoding";
 
-    return createResponse({ data: file }, { 
+    if (filePath.endsWith(".js")) {
+      logger.info(`Creating response for JS file: ${filePath} with headers:`, headers);
+    }
+
+    return new Response(file, { 
       status: 200,
-      headers 
-    }) as Response;
+      headers: new Headers(headers)
+    });
   };
 
   /**
@@ -665,7 +688,7 @@ export const setupBlogRoutes = (mixonApp: any, config: Config) => {
    */
   const getContentType = (filePath: string): string => {
     if (filePath.endsWith(".css")) return "text/css";
-    if (filePath.endsWith(".js")) return "text/javascript";
+    if (filePath.endsWith(".js")) return "application/javascript";
     if (filePath.endsWith(".json")) return "application/json";
     if (filePath.endsWith(".svg")) return "image/svg+xml";
     if (filePath.endsWith(".png")) return "image/png";

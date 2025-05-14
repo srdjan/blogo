@@ -1,7 +1,7 @@
 ---
 title: Musings on Zero-Knowledge Proofs
-date: 2025-04-06
-tags: [VCs, DIDs, ZKPs]
+date: 2025-05-06
+tags: [Verifiable Credentials, DIDs, ZKPs]
 excerpt: A design for a multi-key zero-knowledge verification system that leverages verifiable credentials stored on decentralized storage without any references to blockchain.
 ---
 

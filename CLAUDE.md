@@ -5,11 +5,33 @@ code in this repository.
 
 ## Build & Development Commands
 
-- `deno task start` - Run blog (--allow-net --allow-read --allow-env)
+- `deno task start` - Run blog (--allow-net --allow-read --allow-env --allow-write)
 - `deno task dev` - Run with file watching
 - `deno task setup` - Create directories and download dependencies
 - `deno lint` - Run linter on src/ and main.ts
 - `deno fmt` - Format code according to rules in deno.json
+
+## Architecture Overview
+
+This is a functional, minimal blog built with Deno, TypeScript, HTMX, and Markdown.
+
+### Core Components
+
+- **Server**: Deno HTTP server using Mixon library for HTTP routing and middleware
+- **Rendering**: Server-side rendering using mono-jsx for components
+- **Data Flow**: Markdown files with YAML frontmatter → Parser → Render → HTML
+- **Interactions**: HTMX for progressive enhancement without full page reloads
+- **Error Handling**: Result monad pattern (Ok/Err) for explicit error handling
+
+### Key Files
+
+- `main.ts` - Application entry point that sets up the server and middleware
+- `src/config.ts` - Application configuration
+- `src/routes.ts` - Route handlers and request processing
+- `src/parser.ts` - Markdown and frontmatter processing
+- `src/render.tsx` - HTML rendering functions and components
+- `src/error.ts` - Error handling utilities and Result type pattern
+- `src/types.ts` - Core type definitions and interfaces
 
 ## Code Style Guidelines
 
@@ -130,7 +152,7 @@ As a 10× software engineer specializing in light functional TypeScript v2 on De
 
 3. **Pattern Matching & ADTs**  
    - Model data with discriminated unions.  
-   - Use `ts-pattern`’s `match()` for exhaustive case handling.
+   - Use `ts-pattern`'s `match()` for exhaustive case handling.
 
 4. **Result-Based Errors**  
    - No `throw` or `try/catch`.  
@@ -149,7 +171,40 @@ As a 10× software engineer specializing in light functional TypeScript v2 on De
 
 Keep everything functional, declarative, and self-documenting with short inline comments.
 
-- **Testing**: TBD - No test commands found in current configuration
+## Common Issues and Solutions
+
+### Mixon Context Parameter
+
+The `setupBlogRoutes` function in `src/routes.ts` currently expects a `mixonContext` parameter that isn't properly passed in `main.ts`. When modifying `main.ts`, ensure route setup is called correctly:
+
+```typescript
+// From
+setupBlogRoutes(app, mixonContext, CONFIG);
+
+// To
+setupBlogRoutes(app, CONFIG);
+```
+
+### Error Handling
+
+Always use the Result type pattern from `src/error.ts` for error handling. Never use throw/catch in business logic. Pattern match on results using the `match` function:
+
+```typescript
+// Example of proper error handling
+const result = await someOperation();
+return match(result, {
+  ok: (value) => handleSuccess(value),
+  error: (error) => handleError(error)
+});
+```
+
+### Working with Posts
+
+Content is stored as Markdown files in `content/posts/` with YAML frontmatter. The parser converts these to Post objects with both HTML content and JSX content for mono-jsx rendering.
+
+## Testing
+
+TBD - No test commands found in current configuration
 
 When making changes, follow existing patterns and maintain the functional
 programming style with explicit error handling using the Result type pattern.
