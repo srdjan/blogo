@@ -1,7 +1,7 @@
 ---
 title: Introduction to HTMX
 date: 2025-04-05
-tags: [WebDev]
+tags: [WebDev, HTMX]
 excerpt: Exploring HTMX, a lightweight library for building interactive web applications by embracing HTML’s full potential.
 ---
 

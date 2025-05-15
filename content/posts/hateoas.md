@@ -1,7 +1,7 @@
 ---
 title: Introduction to HATEOAS
 date: 2025-04-05
-tags: [WebDev]
+tags: [WebDev, HATEOAS, HTMX, HAL]
 excerpt: Exploring HTMX and HAL for building interactive web applications by embracing HATEOAS.
 ---
 

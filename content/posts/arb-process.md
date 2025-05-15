@@ -5,13 +5,13 @@ tags: [Architecture, Enterprise, Product, Agile]
 excerpt: A post about the modern ARB process in agile Enterprise organizations.
 ---
 
-# Modern ARB Process
+## Modern ARB Process
 
 Here's your enhanced ARB summary, integrating the ability to leverage an AI Chatbot for historical ADR insights:
 
 ---
 
-## Lightweight ARB Process From the First Principles
+### Lightweight ARB Process From the First Principles
 
 **Principles**  
 
@@ -41,7 +41,7 @@ Here's your enhanced ARB summary, integrating the ability to leverage an AI Chat
 
 ---
 
-## Actionable Steps for ARB Integration
+### Actionable Steps for ARB Integration
 
 | Action | Description | Example |
 |--------|-------------|---------|
@@ -58,7 +58,7 @@ Here's your enhanced ARB summary, integrating the ability to leverage an AI Chat
 
 ---
 
-## Key Takeaways
+### Key Takeaways
 
 - ARB strategically enhances **product quality, consistency, and business value**.
 - Provides **just-in-time, actionable architectural guidance** without impeding product velocity.
