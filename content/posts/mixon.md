@@ -470,7 +470,7 @@ Mixon represents a fresh approach to web development in the Deno ecosystem, offe
 
 Whether you're building a simple API or a complex stateful application, Mixon provides the tools you need while staying true to Deno's philosophy of simplicity and security.
 
-Ready to get started? Check out the [full documentation](https://Mixframework.org/docs) or explore the [examples on GitHub](https://github.com/srdjan/mixon).
+Ready to get started? Check out the [full documentation](https://srdjan.github.io/mixon/) or explore the [examples on GitHub](https://github.com/srdjan/mixon).
 
 ---
 
