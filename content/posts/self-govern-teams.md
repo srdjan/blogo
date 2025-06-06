@@ -2,12 +2,10 @@
 title: Self-govern Product Teams
 date: 2025-05-12
 tags: [Architecture, Product, Agile]
-excerpt: Gatekeeping as a means of control in Legacy
+excerpt: Overview of the modern agile development process, now including a focus on self-governed teams
 ---
 
-## Overview of the modern agile development process, now including a focus on self-governed teams:
-
-### Lean Principles and Continuous Learning
+## Lean Principles and Continuous Learning
 
 - **Build-Measure-Learn Loops:** Instead of waiting for a production release to gauge user response, modern agile teams deploy frequently (or to select segments of users) to gather data continuously, learning and iterating quickly.
 - **Feedback Loops:** Quick cycles of feedback from customers, data analytics, and team retrospectives help teams adapt to changing requirements and environments.
