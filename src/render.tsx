@@ -141,6 +141,7 @@ export const renderDocument = (
       </header>
 
       <main id="content-main" class="content-main">
+        <h4 x>${config.description}</h4>
         <div id="content-area" class="htmx-swappable">
           ${content}
         </div>
