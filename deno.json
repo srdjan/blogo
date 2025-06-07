@@ -26,7 +26,6 @@
     "jsxImportSource": "mono-jsx"
   },
   "deploy": {
-    "project": "3adad4ef-2bcc-444a-9d73-40d58db36418",
     "exclude": [
       "**/node_modules"
     ],
