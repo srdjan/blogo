@@ -18,16 +18,19 @@ const Core = {
     document.addEventListener("htmx:beforeSwap", (event) => {
       if (event.detail.target.id === "content-area") {
         // Create a temporary div to parse the response
-        const tempDiv = document.createElement('div');
+        const tempDiv = document.createElement("div");
         tempDiv.innerHTML = event.detail.serverResponse;
 
         // Check if the response contains a full page (has #content-area)
-        const contentAreaInResponse = tempDiv.querySelector('#content-area');
+        const contentAreaInResponse = tempDiv.querySelector("#content-area");
         if (contentAreaInResponse) {
           // Extract only the content from within #content-area
           event.detail.serverResponse = contentAreaInResponse.innerHTML;
 
-          if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          if (
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+          ) {
             console.log("Filtered full page response to content-area only");
           }
         }
@@ -54,10 +57,13 @@ const Core = {
         this.updateActiveNavLink();
 
         // Log successful content swap (for debugging)
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
           console.log("HTMX content swap successful:", {
             path: event.detail.pathInfo.path,
-            target: event.detail.target.id
+            target: event.detail.target.id,
           });
         }
       }
@@ -79,32 +85,32 @@ const Core = {
     const currentPath = window.location.pathname;
 
     // Remove active class from all nav links
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.classList.remove('active');
+    document.querySelectorAll(".nav-links a").forEach((link) => {
+      link.classList.remove("active");
     });
 
     // Add active class to current nav link
     let activeLink;
 
-    if (currentPath === '/') {
+    if (currentPath === "/") {
       // Home page
       activeLink = document.querySelector('.nav-links a[href="/"]');
-    } else if (currentPath.startsWith('/tags')) {
+    } else if (currentPath.startsWith("/tags")) {
       // Tags page
       activeLink = document.querySelector('.nav-links a[href="/tags"]');
-    } else if (currentPath === '/about') {
+    } else if (currentPath === "/about") {
       // About page
       activeLink = document.querySelector('.nav-links a[href="/about"]');
-    } else if (currentPath.startsWith('/posts')) {
+    } else if (currentPath.startsWith("/posts")) {
       // Individual post - highlight Home
       activeLink = document.querySelector('.nav-links a[href="/"]');
     }
 
     // Add active class if we found a matching link
     if (activeLink) {
-      activeLink.classList.add('active');
+      activeLink.classList.add("active");
     }
-  }
+  },
 };
 
 // Search module for search functionality
@@ -174,11 +180,14 @@ const Search = {
       .catch((err) => {
         this.searchResults.innerHTML = "Error: Could not perform search.";
         // Only log errors in development
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
           console.error("Search error:", err);
         }
       });
-  }
+  },
 };
 
 // Initialize all modules when DOM is loaded

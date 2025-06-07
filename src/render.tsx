@@ -58,7 +58,7 @@ export const renderDocument = (
       <div class="nav-links">
         <a
           href="/"
-          class="link${context.path === '/' ? ' active' : ''}"
+          class="link${context.path === "/" ? " active" : ""}"
           hx-get="/"
           hx-target="#content-area"
           hx-swap="innerHTML"
@@ -68,7 +68,7 @@ export const renderDocument = (
         </a>
         <a
           href="/tags"
-          class="link${context.path === '/tags' ? ' active' : ''}"
+          class="link${context.path === "/tags" ? " active" : ""}"
           hx-get="/tags"
           hx-target="#content-area"
           hx-swap="innerHTML"
@@ -78,7 +78,7 @@ export const renderDocument = (
         </a>
         <a
           href="/about"
-          class="link${context.path === '/about' ? ' active' : ''}"
+          class="link${context.path === "/about" ? " active" : ""}"
           hx-get="/about"
           hx-target="#content-area"
           hx-swap="innerHTML"
@@ -164,9 +164,13 @@ export const renderDocument = (
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pageTitle}</title>
     <meta name="description" content="${pageDescription}">
-    ${structuredData ? `<script type="application/ld+json">${structuredData}</script>` : ''}
-    ${ogTags || ''}
-    ${twitterTags || ''}
+    ${
+    structuredData
+      ? `<script type="application/ld+json">${structuredData}</script>`
+      : ""
+  }
+    ${ogTags || ""}
+    ${twitterTags || ""}
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/color-override.css">
     <link rel="alternate" href="/feed.xml" title="${pageTitle} RSS Feed">
@@ -185,10 +189,15 @@ export const renderPost = (post: Post): string => {
     return `
       <article class="post content-section">
         <div class="post-meta-subtle">
-          <time datetime="${post.date}">${post.formattedDate || post.date}</time>
-          ${post.tags && post.tags.length > 0 ? `
+          <time datetime="${post.date}">${
+      post.formattedDate || post.date
+    }</time>
+          ${
+      post.tags && post.tags.length > 0
+        ? `
             <div class="tags">
-              ${post.tags.map(tag => `
+              ${
+          post.tags.map((tag) => `
                 <a
                   href="/tags/${tag}"
                   class="tag link"
@@ -199,9 +208,12 @@ export const renderPost = (post: Post): string => {
                 >
                   ${tag}
                 </a>
-              `).join('')}
+              `).join("")
+        }
             </div>
-          ` : ''}
+          `
+        : ""
+    }
         </div>
         <div class="post-content">
           ${post.content}

@@ -1,7 +1,8 @@
 # Functional Minimal Blog
 
 A lightweight, type-safe, functional blog implementation built with Deno,
-TypeScript, HTMX, and Markdown, using the Mixon library for HTTP server functionality.
+TypeScript, HTMX, and Markdown, using the Mixon library for HTTP server
+functionality.
 
 ## Core Principles
 
@@ -16,7 +17,9 @@ This blog system is built around several key architectural principles:
 4. **Type Safety**: Comprehensive type system for robust error handling
 5. **Semantic HTML**: Clean, accessible markup following modern best practices
 6. **Pure CSS**: Minimal, responsive styling without frameworks
-7. **Mixon Integration**: Using the [Mixon library](https://github.com/srdjan/mixon) for HTTP server functionality
+7. **Mixon Integration**: Using the
+   [Mixon library](https://github.com/srdjan/mixon) for HTTP server
+   functionality
 
 ## Features
 

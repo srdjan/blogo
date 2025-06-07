@@ -29,12 +29,12 @@ export interface Config {
 const getEnvironment = (): Environment => {
   const env = Deno.env.get("DENO_ENV") || "development";
   const validEnvs: Environment[] = ["development", "production", "test"];
-  
+
   if (!validEnvs.includes(env as Environment)) {
     console.warn(`Invalid environment "${env}", defaulting to "development"`);
     return "development";
   }
-  
+
   return env as Environment;
 };
 
@@ -90,7 +90,8 @@ export const CONFIG: Config = {
   },
   blog: {
     title: Deno.env.get("BLOG_TITLE") || "Minimal Blog",
-    description: Deno.env.get("BLOG_DESCRIPTION") || "A minimal blog built with Deno, HTMX, and Markdown",
+    description: Deno.env.get("BLOG_DESCRIPTION") ||
+      "A minimal blog built with Deno, HTMX, and Markdown",
     postsDir: Deno.env.get("POSTS_DIR") || "content/posts",
     postsPerPage: parseInt(Deno.env.get("POSTS_PER_PAGE") || "10", 10),
   },

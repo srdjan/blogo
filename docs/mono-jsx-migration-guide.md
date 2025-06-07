@@ -2,7 +2,8 @@
 
 ## Current Status
 
-We've attempted to refactor the rendering functions in `src/render.tsx` to use mono-jsx components, but encountered several challenges:
+We've attempted to refactor the rendering functions in `src/render.tsx` to use
+mono-jsx components, but encountered several challenges:
 
 1. Mono-jsx doesn't support `dangerouslySetInnerHTML` for injecting raw HTML
 2. Fragment components (`<>...</>`) don't convert properly to strings
@@ -10,7 +11,8 @@ We've attempted to refactor the rendering functions in `src/render.tsx` to use m
 
 ## Temporary Solution
 
-To keep the blog functioning, we've temporarily reverted to using template strings for most rendering functions:
+To keep the blog functioning, we've temporarily reverted to using template
+strings for most rendering functions:
 
 1. `renderPostList`: Reverted to template strings
 2. `renderTagIndex`: Reverted to template strings
@@ -19,7 +21,8 @@ To keep the blog functioning, we've temporarily reverted to using template strin
 5. `renderErrorPage`: Reverted to template strings
 6. `renderSearchResults`: Reverted to template strings
 
-We've kept the JSX components in the `src/components` directory for future use, but they're currently commented out in the imports.
+We've kept the JSX components in the `src/components` directory for future use,
+but they're currently commented out in the imports.
 
 ## Recommended Approach for Future Migration
 
@@ -63,7 +66,8 @@ Start with simpler components that don't require raw HTML injection:
 
 ### 5. Test Thoroughly
 
-After each refactoring step, test thoroughly to ensure everything works as expected.
+After each refactoring step, test thoroughly to ensure everything works as
+expected.
 
 ## Benefits of Migration
 

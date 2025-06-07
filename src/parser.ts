@@ -2,7 +2,7 @@ import { Post, PostMeta, Result } from "./types.ts";
 import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
 import { chain, createError, tryCatch } from "./error.ts";
 import { CONFIG } from "./config.ts";
-import { logger, formatDate } from "./utils.ts";
+import { formatDate, logger } from "./utils.ts";
 import { markdownToHtml } from "./markdown-renderer.tsx";
 
 /**
@@ -122,7 +122,6 @@ export const parseMarkdown = async (
   });
 };
 
-
 /**
  * Load all posts from the content directory
  */
@@ -139,7 +138,12 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
       }
       return entries;
     },
-    (error) => createError("IOError", `Failed to read posts directory: ${postsDir}`, error),
+    (error) =>
+      createError(
+        "IOError",
+        `Failed to read posts directory: ${postsDir}`,
+        error,
+      ),
   );
 
   if (!readDir.ok) return readDir;

@@ -1,7 +1,11 @@
 :root {
   /* Typography */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-mono: "IBM Plex Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-mono:
+    "IBM Plex Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+    monospace;
   --font-display: "Space Grotesk", system-ui, sans-serif;
 
   /* Colors - based on srdjan.github.io */
@@ -219,89 +223,123 @@ pre[class*="language-"]::before {
   font-family: var(--font-sans);
 }
 
-pre[class*="language-javascript"]::before { content: "JS"; }
-pre[class*="language-typescript"]::before { content: "TS"; }
-pre[class*="language-python"]::before { content: "PY"; }
-pre[class*="language-rust"]::before { content: "RS"; }
-pre[class*="language-go"]::before { content: "GO"; }
-pre[class*="language-java"]::before { content: "JAVA"; }
-pre[class*="language-css"]::before { content: "CSS"; }
-pre[class*="language-html"]::before { content: "HTML"; }
-pre[class*="language-json"]::before { content: "JSON"; }
-pre[class*="language-yaml"]::before { content: "YAML"; }
-pre[class*="language-bash"]::before { content: "BASH"; }
-pre[class*="language-sh"]::before { content: "SH"; }
-pre[class*="language-sql"]::before { content: "SQL"; }
-pre[class*="language-markdown"]::before { content: "MD"; }
+pre[class*="language-javascript"]::before {
+  content: "JS";
+}
+pre[class*="language-typescript"]::before {
+  content: "TS";
+}
+pre[class*="language-python"]::before {
+  content: "PY";
+}
+pre[class*="language-rust"]::before {
+  content: "RS";
+}
+pre[class*="language-go"]::before {
+  content: "GO";
+}
+pre[class*="language-java"]::before {
+  content: "JAVA";
+}
+pre[class*="language-css"]::before {
+  content: "CSS";
+}
+pre[class*="language-html"]::before {
+  content: "HTML";
+}
+pre[class*="language-json"]::before {
+  content: "JSON";
+}
+pre[class*="language-yaml"]::before {
+  content: "YAML";
+}
+pre[class*="language-bash"]::before {
+  content: "BASH";
+}
+pre[class*="language-sh"]::before {
+  content: "SH";
+}
+pre[class*="language-sql"]::before {
+  content: "SQL";
+}
+pre[class*="language-markdown"]::before {
+  content: "MD";
+}
 
-/* Basic syntax highlighting for common tokens */
-pre code .token.comment,
-pre code .token.prolog,
-pre code .token.doctype,
-pre code .token.cdata {
+/* Highlight.js syntax highlighting - One Dark theme */
+.hljs {
+  color: var(--color-code-text);
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
   color: #5c6370;
   font-style: italic;
 }
 
-pre code .token.punctuation {
-  color: #abb2bf;
-}
-
-pre code .token.property,
-pre code .token.tag,
-pre code .token.boolean,
-pre code .token.number,
-pre code .token.constant,
-pre code .token.symbol,
-pre code .token.deleted {
-  color: #e06c75;
-}
-
-pre code .token.selector,
-pre code .token.attr-name,
-pre code .token.string,
-pre code .token.char,
-pre code .token.builtin,
-pre code .token.inserted {
-  color: #98c379;
-}
-
-pre code .token.operator,
-pre code .token.entity,
-pre code .token.url,
-pre code .language-css .token.string,
-pre code .style .token.string {
-  color: #56b6c2;
-}
-
-pre code .token.atrule,
-pre code .token.attr-value,
-pre code .token.keyword {
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
   color: #c678dd;
 }
 
-pre code .token.function,
-pre code .token.class-name {
-  color: #61afef;
-}
-
-pre code .token.regex,
-pre code .token.important,
-pre code .token.variable {
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
   color: #e06c75;
 }
 
-pre code .token.important,
-pre code .token.bold {
-  font-weight: bold;
+.hljs-literal {
+  color: #56b6c2;
 }
 
-pre code .token.italic {
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61afef;
+}
+
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+.hljs-emphasis {
   font-style: italic;
 }
 
-pre code .token.entity {
-  cursor: help;
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
 }
 
 blockquote {

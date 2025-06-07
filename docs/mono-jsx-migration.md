@@ -2,10 +2,12 @@
 
 ## Current Status
 
-We've attempted to refactor `src/render.tsx` to use mono-jsx, but encountered several challenges:
+We've attempted to refactor `src/render.tsx` to use mono-jsx, but encountered
+several challenges:
 
 1. Mono-jsx doesn't support `dangerouslySetInnerHTML` for injecting raw HTML
-2. Attribute naming conventions differ from standard HTML (e.g., `charset` vs `charSet`)
+2. Attribute naming conventions differ from standard HTML (e.g., `charset` vs
+   `charSet`)
 3. The blog heavily relies on injecting HTML content from various sources
 
 ## Recommended Approach
@@ -54,7 +56,7 @@ Here's an example of a simple component using mono-jsx:
 // src/components/TagLink.tsx
 export const TagLink = ({ tag, count }: { tag: string; count: number }) => {
   const sizeClass = count >= 10 ? "lg" : count >= 5 ? "md" : "sm";
-  
+
   return (
     <a
       href={`/tags/${tag}`}

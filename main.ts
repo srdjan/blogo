@@ -2,7 +2,11 @@ import { App } from "@srdjan/mixon";
 import { CONFIG } from "./src/config.ts";
 import { logger } from "./src/utils.ts";
 import { setupBlogRoutes } from "./src/routes.ts";
-import { loggerMiddleware, corsMiddleware, debugMiddleware } from "./src/middleware.ts";
+import {
+  corsMiddleware,
+  debugMiddleware,
+  loggerMiddleware,
+} from "./src/middleware.ts";
 
 logger.info(`Starting ${CONFIG.blog.title} in ${CONFIG.env} mode...`);
 logger.info(`Server will run at ${CONFIG.server.publicUrl}`);

@@ -1,10 +1,12 @@
 # Mono-JSX Implementation Guide
 
-This document provides a comprehensive guide to how we've implemented mono-jsx in our blog, especially for rendering markdown content.
+This document provides a comprehensive guide to how we've implemented mono-jsx
+in our blog, especially for rendering markdown content.
 
 ## Overview
 
-We've successfully integrated mono-jsx for HTML rendering throughout the blog, including:
+We've successfully integrated mono-jsx for HTML rendering throughout the blog,
+including:
 
 1. Converting HTML strings to JSX elements
 2. Rendering markdown content with mono-jsx
@@ -14,7 +16,8 @@ We've successfully integrated mono-jsx for HTML rendering throughout the blog, i
 
 ### 1. HTML-to-JSX Conversion
 
-We've created a utility module (`src/utils/html-to-jsx.tsx`) that provides functions for converting HTML strings to mono-jsx elements:
+We've created a utility module (`src/utils/html-to-jsx.tsx`) that provides
+functions for converting HTML strings to mono-jsx elements:
 
 ```typescript
 // Converts HTML string to JSX elements
@@ -22,10 +25,16 @@ export const htmlToJsx = (htmlContent: string | undefined): JSX.Element => {
   if (!htmlContent) {
     return <div class="empty-content"></div>;
   }
-  
+
   try {
     // Use mono-jsx's built-in html tag function
-    return <div>{html`${htmlContent}`}</div>;
+    return (
+      <div>
+        {html`
+          ${htmlContent}
+        `}
+      </div>
+    );
   } catch (error) {
     console.error("Error parsing HTML:", error);
     return <div class="parse-error">Error parsing HTML content</div>;
@@ -40,12 +49,14 @@ export const markdownToJsx = (htmlContent: string): JSX.Element => {
 
 ### 2. Markdown Rendering
 
-Our custom markdown renderer (`src/markdown-renderer.tsx`) provides two primary functions:
+Our custom markdown renderer (`src/markdown-renderer.tsx`) provides two primary
+functions:
 
 1. `markdownToHtml`: Converts markdown to HTML (string)
 2. `markdownToJsxElements`: Converts markdown to JSX elements (for mono-jsx)
 
 This approach allows us to:
+
 - Maintain backward compatibility with HTML string rendering
 - Add new JSX-based rendering for mono-jsx
 
@@ -65,8 +76,10 @@ export interface Post extends PostMeta {
 
 Our component structure follows these patterns:
 
-1. **Helper Components**: Small, reusable components that handle specific rendering tasks
-2. **Content Components**: Components that render specific types of content (posts, tags, etc.)
+1. **Helper Components**: Small, reusable components that handle specific
+   rendering tasks
+2. **Content Components**: Components that render specific types of content
+   (posts, tags, etc.)
 3. **Layout Components**: Components that handle overall page structure
 
 ## Migration Strategy
@@ -91,7 +104,7 @@ import { htmlToJsx } from "../utils/html-to-jsx.tsx";
 // Then render:
 <div class="content">
   {htmlToJsx(htmlContent)}
-</div>
+</div>;
 ```
 
 ### For New Components
@@ -123,21 +136,27 @@ const Head = ({ title, description }) => {
 
 ## Important Notes
 
-1. **No dangerouslySetInnerHTML**: mono-jsx doesn't support this attribute. Use our `htmlToJsx` utility instead.
+1. **No dangerouslySetInnerHTML**: mono-jsx doesn't support this attribute. Use
+   our `htmlToJsx` utility instead.
 
-2. **HTML Attribute Names**: Use standard HTML attribute names (e.g., `class` instead of `className`).
+2. **HTML Attribute Names**: Use standard HTML attribute names (e.g., `class`
+   instead of `className`).
 
-3. **Fragment Limitations**: Be cautious with fragment components (`<>...</>`), as they may not convert properly to strings.
+3. **Fragment Limitations**: Be cautious with fragment components (`<>...</>`),
+   as they may not convert properly to strings.
 
-4. **Debugging**: If you encounter rendering issues, check both the HTML string and JSX elements.
+4. **Debugging**: If you encounter rendering issues, check both the HTML string
+   and JSX elements.
 
 ## Future Improvements
 
 1. **Component Library**: Build a comprehensive library of reusable components.
 
-2. **Custom Markdown Processor**: Consider a custom markdown processor that generates JSX directly.
+2. **Custom Markdown Processor**: Consider a custom markdown processor that
+   generates JSX directly.
 
-3. **Streaming Rendering**: Explore mono-jsx's streaming rendering capabilities for large pages.
+3. **Streaming Rendering**: Explore mono-jsx's streaming rendering capabilities
+   for large pages.
 
 4. **Hydration**: Investigate client-side hydration for interactive components.
 

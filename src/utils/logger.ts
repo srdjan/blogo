@@ -73,7 +73,9 @@ export const safeStringify = (obj: unknown): string => {
       return value;
     }, 2);
   } catch (error) {
-    return `[Cannot stringify: ${error instanceof Error ? error.message : String(error)}]`;
+    return `[Cannot stringify: ${
+      error instanceof Error ? error.message : String(error)
+    }]`;
   }
 };
 
@@ -83,18 +85,18 @@ export const safeStringify = (obj: unknown): string => {
 export const getObjectType = (obj: unknown): string => {
   if (obj === null) return "null";
   if (obj === undefined) return "undefined";
-  
+
   if (typeof obj === "string") return "string";
   if (typeof obj === "number") return "number";
   if (typeof obj === "boolean") return "boolean";
   if (typeof obj === "function") return "function";
-  
+
   if (Array.isArray(obj)) return "array";
-  
+
   if (obj instanceof Response) return "Response";
   if (obj instanceof Request) return "Request";
   if (obj instanceof Element) return "DOMElement";
   if (obj instanceof Error) return "Error";
-  
+
   return obj.constructor?.name || "object";
 };

@@ -56,10 +56,11 @@ export const formatError = (error: AppError): string => {
   }
 
   if (error.cause) {
-    message += `\nCause: ${error.cause instanceof Error
-      ? `${error.cause.name}: ${error.cause.message}`
-      : String(error.cause)
-      }`;
+    message += `\nCause: ${
+      error.cause instanceof Error
+        ? `${error.cause.name}: ${error.cause.message}`
+        : String(error.cause)
+    }`;
   }
 
   return message;
@@ -135,5 +136,3 @@ export function tryCatchSync<T, E = AppError>(
     return { ok: false, error: errorFn(error) };
   }
 }
-
-

@@ -7,13 +7,21 @@ excerpt: Exploring HTMX and HAL for building interactive web applications by emb
 
 ## HATEOAS & RESTful APIs: The Power of Discoverable Hypermedia
 
-In the world of APIs, **HATEOAS** (Hypermedia as the Engine of Application State) is often misunderstood—and underutilized. As the final constraint of true REST architecture, it transforms APIs from static endpoints into self-describing, navigable systems. Let’s explore how HATEOAS works, when to embrace it, and how it shines in both frontend (e.g., HTMX) and server-to-server (e.g., HAL JSON) scenarios.
+In the world of APIs, **HATEOAS** (Hypermedia as the Engine of Application
+State) is often misunderstood—and underutilized. As the final constraint of true
+REST architecture, it transforms APIs from static endpoints into
+self-describing, navigable systems. Let’s explore how HATEOAS works, when to
+embrace it, and how it shines in both frontend (e.g., HTMX) and server-to-server
+(e.g., HAL JSON) scenarios.
 
 ---
 
 ### What Is HATEOAS?
 
-HATEOAS is a design principle where APIs return **hypermedia controls** (links, forms, or actions) alongside data. Instead of clients hardcoding URLs, they “discover” next steps dynamically. Think of it like a website: you don’t predefine every page’s URL—you click links to navigate.
+HATEOAS is a design principle where APIs return **hypermedia controls** (links,
+forms, or actions) alongside data. Instead of clients hardcoding URLs, they
+“discover” next steps dynamically. Think of it like a website: you don’t
+predefine every page’s URL—you click links to navigate.
 
 **Example HAL JSON Response:**
 
@@ -29,25 +37,28 @@ HATEOAS is a design principle where APIs return **hypermedia controls** (links, 
 }
 ```
 
-Here, the client learns what actions are possible (`cancel`) and where to find related resources (`payment`) through embedded links.
+Here, the client learns what actions are possible (`cancel`) and where to find
+related resources (`payment`) through embedded links.
 
 ---
 
 ### Why HATEOAS Matters
 
-#### 1. **Decouples Clients from Servers**  
+#### 1. **Decouples Clients from Servers**
 
-Servers can evolve URLs and workflows without breaking clients. New actions (e.g., a `refund` link) appear automatically when available.
+Servers can evolve URLs and workflows without breaking clients. New actions
+(e.g., a `refund` link) appear automatically when available.
 
-#### 2. **Self-Documenting APIs**  
+#### 2. **Self-Documenting APIs**
 
 No more outdated API docs—clients learn capabilities at runtime.
 
-#### 3. **Stateful Navigation**  
+#### 3. **Stateful Navigation**
 
-Clients follow links to transition between states (e.g., `cart` → `checkout` → `payment`), mirroring web browsing.
+Clients follow links to transition between states (e.g., `cart` → `checkout` →
+`payment`), mirroring web browsing.
 
-#### 4. **Reduces Client Complexity**  
+#### 4. **Reduces Client Complexity**
 
 No URL construction logic needed. Clients just follow links.
 
@@ -67,7 +78,9 @@ While not every API needs HATEOAS, it excels in:
 
 ### Frontend Use Case: HTMX + HATEOAS
 
-HTMX’s HTML-centric approach pairs perfectly with HATEOAS. Instead of returning JSON, servers return **HTML fragments with embedded actions**, letting the UI evolve dynamically.
+HTMX’s HTML-centric approach pairs perfectly with HATEOAS. Instead of returning
+JSON, servers return **HTML fragments with embedded actions**, letting the UI
+evolve dynamically.
 
 **Example: A Task List with HTMX**
 
@@ -84,17 +97,21 @@ HTMX’s HTML-centric approach pairs perfectly with HATEOAS. Instead of returnin
 </div>
 ```
 
-- The server drives the UI: Clients receive HTML with pre-defined `hx-*` attributes.
-- Actions like loading details or adding tasks are **discoverable**—no client-side routing.
+- The server drives the UI: Clients receive HTML with pre-defined `hx-*`
+  attributes.
+- Actions like loading details or adding tasks are **discoverable**—no
+  client-side routing.
 - Perfect for server-rendered apps needing lightweight interactivity.
 
 ---
 
 ### Server-to-Server Use Case: HAL JSON
 
-For machine-to-machine communication, **HAL (Hypertext Application Language)** standardizes HATEOAS in JSON APIs. Clients navigate via embedded links, reducing coupling.
+For machine-to-machine communication, **HAL (Hypertext Application Language)**
+standardizes HATEOAS in JSON APIs. Clients navigate via embedded links, reducing
+coupling.
 
-**Scenario: Order Management System**  
+**Scenario: Order Management System**
 
 1. **Service A** fetches an order from **Service B**:
 
@@ -110,12 +127,14 @@ For machine-to-machine communication, **HAL (Hypertext Application Language)** s
    ```
 
 2. **Service A** follows the `invoice` link to retrieve payment details.
-3. **Service B** can change the `invoice` URL structure without impacting Service A.
+3. **Service B** can change the `invoice` URL structure without impacting
+   Service A.
 
 **Benefits:**
 
 - Services never construct URLs manually.
-- New relationships (e.g., adding a `shipment` link) are automatically discoverable.
+- New relationships (e.g., adding a `shipment` link) are automatically
+  discoverable.
 - Aligns with microservices’ distributed nature.
 
 ---
@@ -150,7 +169,7 @@ For machine-to-machine communication, **HAL (Hypertext Application Language)** s
 
 ---
 
-### When *Not* to Use HATEOAS
+### When _Not_ to Use HATEOAS
 
 - **Simple CRUD APIs**: If your API has no complex workflows, YAGNI.
 - **Performance-Critical Systems**: Parsing links adds overhead.
@@ -160,14 +179,17 @@ For machine-to-machine communication, **HAL (Hypertext Application Language)** s
 
 ### The Future of Hypermedia-Driven Development
 
-With tools like HTMX making HATEOAS accessible for web UIs, and standards like HAL streamlining server-to-server communication, hypermedia is experiencing a renaissance. While it requires a mindset shift, the payoff—flexible, resilient, and self-adapting systems—is worth it.
+With tools like HTMX making HATEOAS accessible for web UIs, and standards like
+HAL streamlining server-to-server communication, hypermedia is experiencing a
+renaissance. While it requires a mindset shift, the payoff—flexible, resilient,
+and self-adapting systems—is worth it.
 
-**HATEOAS isn’t just academic—it’s practical magic for building APIs that stand the test of time.** 🌐
+**HATEOAS isn’t just academic—it’s practical magic for building APIs that stand
+the test of time.** 🌐
 
 ---
 
-*Learn more:  
+*Learn more:
 
-- [HAL Specification](https://stateless.group/hal_specification.html)  
+- [HAL Specification](https://stateless.group/hal_specification.html)
 - [HTMX Documentation](https://htmx.org/docs/)*
-

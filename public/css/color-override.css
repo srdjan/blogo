@@ -13,15 +13,15 @@
   --color-card: #ffffff;
   --color-border: #1a1a1a;
   --color-muted: #6c757d;
-  
+
   /* Link colors (derived from primary) */
   --color-link: var(--color-primary);
   --color-link-hover: #004c99;
-  
+
   /* Code colors */
   --color-code-bg: #f8f9fa;
   --color-code-text: var(--color-text);
-  
+
   /* Selection color */
   --color-selection: #b3d4fc;
 }

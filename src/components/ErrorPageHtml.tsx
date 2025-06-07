@@ -11,7 +11,7 @@ export const renderErrorPageHtml = (error: {
         <pre class="error-stack">${error.stackTrace}</pre>
       </details>`
     : "";
-  
+
   return `<section class="error-page content-section">
     <h1>${error.title}</h1>
     <div class="error-message">
