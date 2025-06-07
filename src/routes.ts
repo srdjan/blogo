@@ -76,7 +76,6 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
   // Add specific routes for static files
   mixonApp.get("/css/{*}", handleStaticFile);
   mixonApp.get("/js/{*}", handleStaticFile);
-  mixonApp.get("/fonts/{*}", handleStaticFile);
   mixonApp.post("/api/posts", handleCreatePost);
 
   // Add a catch-all route for 404s
@@ -660,8 +659,6 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
     // Set caching headers based on file type
     if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
       headers["Cache-Control"] = "no-cache"; // Disable caching for debugging
-    } else if (filePath.includes("/fonts/")) {
-      headers["Cache-Control"] = "public, max-age=2592000, immutable"; // 1 month
     } else if (
       filePath.endsWith(".svg") || filePath.endsWith(".png") ||
       filePath.endsWith(".jpg") || filePath.endsWith(".gif")
