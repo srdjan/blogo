@@ -150,7 +150,7 @@ a {
 
 a:hover {
   background-color: var(--color-primary);
-  color: var(--color-bg);
+  color: var(--color-card);
   text-decoration: none;
 }
 
@@ -371,7 +371,7 @@ nav {
   max-width: var(--max-width);
   padding: 0.5rem 1rem;
   margin: 0 auto;
-  border: var(--border-thin);
+  /* border: var(--border-thin); */
   background-color: var(--color-card);
 }
 
@@ -1156,11 +1156,6 @@ form[role="search"] button:hover,
   border: var(--border-thin);
 }
 
-/* Avatar styling for footer */
-.avatar {
-  color: var(--color-primary);
-}
-
 /* Media queries */
 @media (max-width: 768px) {
   :root {
@@ -1206,6 +1201,18 @@ form[role="search"] button:hover,
   .rss-link {
     font-size: 0.9rem;
     padding: var(--space-2xs) var(--space-xs);
+  }
+
+  .nav-subtitle {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: -0.1rem;
+    margin-bottom: var(--space-lg);
+    font-size: 0.85rem;
+    color: var(--color-secondary);
+    font-style: italic;
   }
 
   .post-card {

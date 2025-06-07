@@ -150,8 +150,9 @@ export const renderDocument = (
         </div>
       </header>
 
+      <h4 class="nav-subtitle">${config.description}</h4>
+
       <main id="content-main" class="content-main">
-        <h4 x>${config.description}</h4>
         <div id="content-area" class="htmx-swappable">
           ${content}
         </div>
@@ -159,9 +160,9 @@ export const renderDocument = (
 
       <footer>
         <p>
-          Cooked with ❤️ by <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
-            <span class="avatar">⊣˚∆˚⊢</span>
-          </a> & Claude
+          Claude &
+          <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer"><span>⊣˚∆˚⊢</span></a>
+          vibe coded together...
         </p>
       </footer>
     </div>

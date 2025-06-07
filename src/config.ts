@@ -91,7 +91,7 @@ export const CONFIG: Config = {
   blog: {
     title: Deno.env.get("BLOG_TITLE") || "Minimal Blog",
     description: Deno.env.get("BLOG_DESCRIPTION") ||
-      "A minimal blog built together with Claude Code",
+      "A minimal blog vibe coded with Claude",
     postsDir: Deno.env.get("POSTS_DIR") || "content/posts",
     postsPerPage: parseInt(Deno.env.get("POSTS_PER_PAGE") || "10", 10),
   },
