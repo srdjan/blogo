@@ -87,7 +87,7 @@ development:
 - **Feature Flags and Canary Releases:** These techniques allow incremental
   rollouts and the ability to quickly roll back when issues are detected.
 
-## **Holistic Focus on Outcomes**
+### **Holistic Focus on Outcomes**
 
 - **Beyond Velocity Metrics:** Rather than focusing purely on story points or
   sprint velocity, modern agile measures success in terms of customer
