@@ -598,7 +598,7 @@ article header h1,
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  margin-bottom: var(--space-lg);
+  /* margin-bottom: var(--space-lg); */
   font-size: 0.85rem;
   color: var(--color-secondary);
   font-style: italic;
