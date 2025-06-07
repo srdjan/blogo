@@ -5,17 +5,11 @@ tags: [VCs, DIDs, ZKPs]
 excerpt: A design for a multi-key zero-knowledge verification system that leverages verifiable credentials stored on decentralized storage without any references to blockchain.
 ---
 
-## Musings on Zero-Knowledge Proofs
+## Overview
 
 Below is a mussing about the design for a multi-key zero-knowledge (zk) verification system that leverages decentralized verifiable credentials stored on decentralized storage (such as an AT Protocol Personal Data Store, PDS) without any references to blockchain. This design focuses on proving, for example, employment by requiring both a decentralized identifier (DID)-based private key and an independent verifier key, while storing verifiable credentials (VCs) in a decentralized storage network.
 
----
-
-## Overview
-
-The system enables a user (claimant) to demonstrate possession of employment credentials without revealing underlying sensitive details. The proof generation demands that both the claimant's DID-associated private key and an independent verifier's key (used to attest employment) are used to create a combined zero-knowledge proof. Verifiable credentials are stored within a decentralized data store (like an AT Protocol PDS), giving users full control over their data while ensuring a privacy-preserving verification process.
-
----
+This system enables a user (claimant) to demonstrate possession of employment credentials without revealing underlying sensitive details. The proof generation demands that both the claimant's DID-associated private key and an independent verifier's key (used to attest employment) are used to create a combined zero-knowledge proof. Verifiable credentials are stored within a decentralized data store (like an AT Protocol PDS), giving users full control over their data while ensuring a privacy-preserving verification process.
 
 ### Architectural Components
 
@@ -49,9 +43,9 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 
 ---
 
-## Data Flow and Processes
+### Data Flow and Processes
 
-### A. Credential Issuance and PDS Storage
+#### A. Credential Issuance and PDS Storage
 
 1. The credential issuer creates a verifiable credential encapsulating employment details and signs it with its issuance key.
 2. The user receives the credential and subsequently encrypts it.
@@ -59,7 +53,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
 4. Independently, the employer or attestor generates an attestation of employment using its verifier key.
 5. The employment attestation is provided to the user—either stored directly in the PDS or kept as a separate signed artifact.
 
-### B. Aggregation of Proof Material
+#### B. Aggregation of Proof Material
 
 1. The user retrieves the secure pointers and metadata (such as cryptographic hashes) from the PDS that reference the encrypted VC.
 2. The user locally aggregates:
@@ -67,7 +61,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
    - The independent employment attestation (signed using the verifier key).
 3. The aggregated data establishes a link between the VC stored on decentralized storage and the required multi-key presence required for verification.
 
-### C. Zero-Knowledge Proof Generation
+#### C. Zero-Knowledge Proof Generation
 
 1. The user employs the ZKP Module to construct a proof that secretly verifies:
    - Ownership of the private key corresponding to their DID by proving knowledge of it (without revealing the key itself).
@@ -75,7 +69,7 @@ The system enables a user (claimant) to demonstrate possession of employment cre
    - A valid employment attestation exists as provided by the independent verifier, whose signature is also verified within the circuit.
 2. The resulting zk proof encapsulates all the above evidence, proving compliance with the verification conditions without exposing sensitive data.
 
-### D. Proof Verification
+#### D. Proof Verification
 
 1. The user submits the generated zk proof along with a minimal set of public parameters (e.g., the claimant's DID public key, the verifier's public key, and the credential reference commitment) to the Verification Engine.
 2. The Verification Engine validates that:
@@ -132,7 +126,7 @@ flowchart TD
     F -->|Validates zk Proof using:\n- Claimant's DID public key\n- Credential reference from the PDS\n- Independent verifier's attestation signature| G[Employment Verified]
 ```
 
-## Summary
+### Summary
 
 This design describes a multi-key verification system where employment credentials—secured through decentralized storage (e.g., an AT Protocol PDS)—are proven valid without exposing sensitive data. The key features include:
 
