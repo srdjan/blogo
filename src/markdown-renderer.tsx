@@ -1,4 +1,4 @@
-import { marked } from "https://esm.sh/marked@15.0.11";
+import { marked } from "https://esm.sh/marked@15.0.12";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
 
