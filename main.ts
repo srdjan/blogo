@@ -1,4 +1,4 @@
-import { App, type Context as MixonContext } from "@srdjan/mixon";
+import { App } from "@srdjan/mixon";
 import { CONFIG } from "./src/config.ts";
 import { logger } from "./src/utils.ts";
 import { setupBlogRoutes } from "./src/routes.ts";

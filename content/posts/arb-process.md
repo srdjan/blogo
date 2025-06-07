@@ -5,13 +5,7 @@ tags: [Architecture, Enterprise, Product, Agile]
 excerpt: A post about the modern ARB process in agile Enterprise organizations.
 ---
 
-## Modern ARB Process
-
-Here's your enhanced ARB summary, integrating the ability to leverage an AI Chatbot for historical ADR insights:
-
----
-
-### Lightweight ARB Process From the First Principles
+## Lightweight ARB Process From the First Principles
 
 **Principles**  
 
@@ -21,23 +15,20 @@ Here's your enhanced ARB summary, integrating the ability to leverage an AI Chat
 2. **Agility Through Asynchronous Reviews:**  
    Reviews are conducted asynchronously (design docs, PRs, ADRs), enabling teams to move swiftly without formal meetings.
 
-3. **Non-Functional First:**  
+3. **Address Non-Functional Early:**  
    Proactively addresses security, scalability, compliance, and tech debt throughout development, rather than as post-development audits.
 
-4. **Continuous Evolution:**  
-   Architecture is dynamic; ARB supports incremental improvements and continuous adjustments.
+4. **Continuous Evolution and history of Decisions:**  
+   Architecture is dynamic; ARB supports incremental improvements and continuous adjustments. These decisions are captured in Architecture Decision Records (ADRs) for future reference.
 
 5. **Collaboration Over Control:**  
    ARB fosters cross-functional collaboration, offering insights from security, operations, compliance, and more, while decisions remain with product teams.
 
 6. **Contributing to Product Features:**  
-   ARB actively contributes insights and architectural recommendations directly enhancing product features and customer value.
+   ARB actively contributes insights to functional requirements, as well as architectural recommendations, directly enhancing product features and customer value.
 
 7. **Maximize Reuse and Shared Services:**  
    ARB proactively encourages teams to leverage shared and common business services, reducing redundancy and promoting enterprise-wide consistency.
-
-8. **AI-Assisted Historical Knowledge:** *(new)*  
-   Teams have on-demand access to historical architecture decisions through an AI chatbot, making past insights easily discoverable and reusable.
 
 ---
 
@@ -48,11 +39,10 @@ Here's your enhanced ARB summary, integrating the ability to leverage an AI Chat
 | **Automated Compliance Checks** | Embed automated architecture checks into CI/CD for instant feedback on security, scalability, and standards adherence. | Static analysis during build checks for insecure dependencies and standards compliance. |
 | **Asynchronous Design Reviews** | Teams submit standardized design documents asynchronously; ARB provides feedback within a defined timeframe. | PR-based design reviews with ARB feedback asynchronously via Git comments. |
 | **Self-Service Templates and Checklists** | Equip teams with templates and compliance checklists, enabling autonomous baseline quality verification. | A standardized "Production Readiness" checklist covering security, scalability, logging, and compliance. |
-| **Cross-Functional Liaisons** | ARB assigns architecture champions or domain experts who proactively engage with product teams. | A security architect advises a team implementing critical authentication services. |
+| **Cross-Functional Liaisons** | ARB assigns architecture champions or domain experts who proactively engage with product teams. | A Data architect advises a team implementing critical database design choices. |
 | **Continuous Learning & Iteration** | Maintain Architecture Decision Records (ADRs) and tech debt registers to continuously track, revisit, and evolve architecture decisions. | Team revisits its database choice documented in an ADR after scaling issues in production. |
-| **Incremental Releases via Feature Flags** | Enable safe incremental deployments and validation through feature flags. | Incremental rollout of new services in production behind feature flags. |
-| **Collaboration Forums & Knowledge Sharing** | Facilitate open forums (architecture guild meetings, Slack channels) for sharing architectural knowledge and product ideas. | Monthly forums where teams present solutions and promote reuse. |
-| **Product Feature Alignment & Shared Services** | ARB proactively identifies opportunities for alignment and reuse of common business services across teams. | Central authentication services reused by multiple teams rather than separate implementations. |
+| **Collaboration Forums & Knowledge Sharing** | Facilitate open forums (architecture NorthStar meetings, chat channels, reference implementation showcases, hackathons, etc...) for sharing architectural knowledge and product ideas. | Monthly forums where teams present solutions and promote reuse. |
+| **Product Feature Alignment & Shared Services** | ARB proactively identifies opportunities for alignment and reuse of common core & business services across teams. | Central authentication services reused by multiple teams rather than separate implementations. |
 | **ARB Contribution to Product Roadmap** | ARB collaborates with product teams to translate architectural improvements into customer-facing product features. | Recommendations for enhanced observability tools for better analytics. |
 | **AI Chatbot for Historical ADR Insights** *(new)* | Integrate an AI-powered chatbot to facilitate instant Q&A and insights from historical ADRs, enabling quick access to past architecture decisions. | Developers ask chatbot, "Have we previously decided on Redis vs. Memcached for caching?" and receive immediate context from past ADRs. |
 
