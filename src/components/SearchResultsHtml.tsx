@@ -1,5 +1,10 @@
 import { Post } from "../types.ts";
-import { formatDate } from "../utils.ts";
+import { 
+  renderPostMeta, 
+  renderPostExcerpt, 
+  createPostLink,
+  pluralize 
+} from "../utils/html-helpers.ts";
 
 export const renderSearchResultsHtml = (posts: Post[], query: string): string => {
   if (!query || query.trim().length === 0) {
@@ -12,55 +17,22 @@ export const renderSearchResultsHtml = (posts: Post[], query: string): string =>
     </div>`;
   }
   
-  // Helper function to render tags
-  const renderTags = (tags: string[]): string => {
-    if (!tags || tags.length === 0) return "";
-    
-    const tagLinks = tags.map(tag => 
-      `<a 
-        href="/tags/${tag}" 
-        class="tag link" 
-        hx-get="/tags/${tag}" 
-        hx-target="#content-area" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
-      >
-        ${tag}
-      </a>`
-    ).join("");
-    
-    return `<div class="tags">${tagLinks}</div>`;
-  };
-  
   const resultsHtml = posts.map(post => {
-    const tags = post.tags ? renderTags(post.tags) : "";
-    const formattedDate = post.formattedDate || formatDate(post.date);
-    const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
+    const postMeta = renderPostMeta(post);
+    const excerpt = renderPostExcerpt(post);
     
     return `<article class="search-result">
       <h3>
-        <a
-          href="/posts/${post.slug}"
-          class="link"
-          hx-get="/posts/${post.slug}"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-        >
-          ${post.title}
-        </a>
+        ${createPostLink(post.slug, post.title)}
       </h3>
-      <div class="post-meta">
-        <time datetime="${post.date}">${formattedDate}</time>
-        ${tags}
-      </div>
+      ${postMeta}
       ${excerpt}
     </article>`;
   }).join("");
   
   return `<div class="search-results-container">
     <div class="search-results-summary content-section">
-      Found ${posts.length} post${posts.length !== 1 ? "s" : ""} matching "${query}"
+      Found ${posts.length} ${pluralize(posts.length, "post")} matching "${query}"
     </div>
     ${resultsHtml}
   </div>`;

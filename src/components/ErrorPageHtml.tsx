@@ -1,3 +1,5 @@
+import { createHomeLink } from "../utils/html-helpers.ts";
+
 export const renderErrorPageHtml = (error: {
   title: string;
   message: string;
@@ -16,6 +18,6 @@ export const renderErrorPageHtml = (error: {
       <p>${error.message}</p>
     </div>
     ${stackTraceHtml}
-    <p><a href="/" class="button link" hx-get="/" hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true">Return Home</a></p>
+    <p>${createHomeLink()}</p>
   </section>`;
 };

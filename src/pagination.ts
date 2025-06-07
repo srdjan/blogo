@@ -1,5 +1,4 @@
 import type { Post } from "./types.ts";
-import { tryCatchSync } from "./error.ts";
 import { logger } from "./utils.ts";
 
 /**
@@ -123,8 +122,7 @@ export const filterPosts = (
   const { tag, search, dateFrom, dateTo, sortBy = "date", sortDir = "desc" } =
     options;
 
-  // Create a safe wrapper to handle potential errors in filtering
-  return tryCatchSync(() => {
+  try {
     let filteredPosts = [...posts]; // Create a copy to avoid mutating original
 
     // Filter by tag if specified
@@ -184,11 +182,11 @@ export const filterPosts = (
     });
 
     return filteredPosts;
-  }, () => {
+  } catch (error) {
     // Fallback to original posts if any error occurs
-    logger.error("Error filtering posts, returning unfiltered");
+    logger.error("Error filtering posts, returning unfiltered", error);
     return posts;
-  }).value;
+  }
 };
 
 /**

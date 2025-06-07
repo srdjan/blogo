@@ -1,32 +1,18 @@
 import { Post } from "../types.ts";
 import type { Pagination } from "../pagination.ts";
-import { formatDate } from "../utils.ts";
+import { 
+  renderPostMeta, 
+  renderPostExcerpt, 
+  createPostLink, 
+  createHtmxLink,
+  pluralize 
+} from "../utils/html-helpers.ts";
 
 export const renderPostListHtml = (
   posts: Post[],
   activeTag?: string,
   pagination?: Pagination,
 ): string => {
-  // Helper function to render tags
-  const renderTags = (tags: string[]): string => {
-    if (!tags || tags.length === 0) return "";
-    
-    const tagLinks = tags.map(tag => 
-      `<a 
-        href="/tags/${tag}" 
-        class="tag link" 
-        hx-get="/tags/${tag}" 
-        hx-target="#content-area" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
-      >
-        ${tag}
-      </a>`
-    ).join("");
-    
-    return `<div class="tags">${tagLinks}</div>`;
-  };
-  
   // Helper function to render pagination
   const renderPagination = (pagination: Pagination): string => {
     const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
@@ -68,20 +54,8 @@ export const renderPostListHtml = (
     
     // Render previous button
     const prevButton = hasPrevPage
-      ? `<a
-          href="?page=${currentPage - 1}"
-          class="pagination-prev link"
-          hx-get="?page=${currentPage - 1}"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-          aria-label="Previous page"
-        >
-          Previous
-        </a>`
-      : `<span class="pagination-prev pagination-disabled" aria-disabled="true">
-          Previous
-        </span>`;
+      ? createHtmxLink(`?page=${currentPage - 1}`, "Previous", "pagination-prev link", `aria-label="Previous page"`)
+      : `<span class="pagination-prev pagination-disabled" aria-disabled="true">Previous</span>`;
     
     // Render page numbers
     const pageLinks = pageNumbers.map(page => {
@@ -93,34 +67,13 @@ export const renderPostListHtml = (
         return `<span class="pagination-current" aria-current="page">${page}</span>`;
       }
       
-      return `<a
-        href="?page=${page}"
-        class="link"
-        hx-get="?page=${page}"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
-        hx-push-url="true"
-      >
-        ${page}
-      </a>`;
+      return createHtmxLink(`?page=${page}`, page.toString());
     }).join("");
     
     // Render next button
     const nextButton = hasNextPage
-      ? `<a
-          href="?page=${currentPage + 1}"
-          class="pagination-next link"
-          hx-get="?page=${currentPage + 1}"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-          aria-label="Next page"
-        >
-          Next
-        </a>`
-      : `<span class="pagination-next pagination-disabled" aria-disabled="true">
-          Next
-        </span>`;
+      ? createHtmxLink(`?page=${currentPage + 1}`, "Next", "pagination-next link", `aria-label="Next page"`)
+      : `<span class="pagination-next pagination-disabled" aria-disabled="true">Next</span>`;
     
     return `<nav class="pagination content-section" aria-label="Pagination Navigation">
       ${prevButton}
@@ -142,18 +95,9 @@ export const renderPostListHtml = (
         <h1>Posts Tagged "${activeTag}"</h1>
         <div class="tag-filter-header">
           <p>
-            Showing ${posts.length} post${posts.length !== 1 ? "s" : ""} tagged with <strong>${activeTag}</strong>
+            Showing ${posts.length} ${pluralize(posts.length, "post")} tagged with <strong>${activeTag}</strong>
           </p>
-          <a 
-            href="/" 
-            class="button link" 
-            hx-get="/" 
-            hx-target="#content-area" 
-            hx-swap="innerHTML" 
-            hx-push-url="true"
-          >
-            Show All Posts
-          </a>
+          ${createHtmxLink("/", "Show All Posts", "button link")}
         </div>
       </div>
     `;
@@ -163,28 +107,15 @@ export const renderPostListHtml = (
   let postCards = "";
   if (posts.length > 0) {
     postCards = posts.map(post => {
-      const formattedDate = post.formattedDate || formatDate(post.date);
-      const tags = post.tags ? renderTags(post.tags) : "";
-      const excerpt = post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
+      const postMeta = renderPostMeta(post);
+      const excerpt = renderPostExcerpt(post);
       
       return `<article class="post-card">
         <div class="post-card-inner">
           <h2>
-            <a
-              href="/posts/${post.slug}"
-              class="link"
-              hx-get="/posts/${post.slug}"
-              hx-target="#content-area"
-              hx-swap="innerHTML"
-              hx-push-url="true"
-            >
-              ${post.title}
-            </a>
+            ${createPostLink(post.slug, post.title)}
           </h2>
-          <div class="post-meta">
-            <time datetime="${post.date}">${formattedDate}</time>
-            ${tags}
-          </div>
+          ${postMeta}
           ${excerpt}
         </div>
       </article>`;

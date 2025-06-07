@@ -3,7 +3,7 @@ import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
 import { chain, createError, tryCatch } from "./error.ts";
 import { CONFIG } from "./config.ts";
 import { logger, formatDate } from "./utils.ts";
-import { markdownToHtml, markdownToJsxElements } from "./markdown-renderer.tsx";
+import { markdownToHtml } from "./markdown-renderer.tsx";
 
 /**
  * Extract frontmatter and content from markdown text
@@ -106,12 +106,7 @@ export const parseMarkdown = async (
     const html = markdownToHtml(extracted.value.content);
     if (!html.ok) return html;
 
-    // Parse markdown to JSX elements for mono-jsx rendering
-    const jsxContent = markdownToJsxElements(extracted.value.content);
-    if (!jsxContent.ok) {
-      logger.warn(`Failed to convert markdown to JSX for post: ${slug}`);
-      // We'll continue with HTML content if JSX conversion fails
-    }
+    // JSX content is no longer used - only HTML content is supported
 
     // Combine metadata and content into a Post
     const formattedDate = formatDate(meta.value.date);
@@ -120,26 +115,13 @@ export const parseMarkdown = async (
       ok: true,
       value: {
         ...meta.value,
-        content: html.value, // Keep HTML string for backward compatibility
-        contentJsx: jsxContent.ok ? jsxContent.value : undefined, // Add JSX content if available
+        content: html.value,
         formattedDate,
       },
     };
   });
 };
 
-/**
- * Type guard for Post objects
- * Currently not used but kept for potential future use
- */
-const _isPost = (obj: unknown): obj is Post => {
-  return obj !== null &&
-    typeof obj === "object" &&
-    "title" in obj &&
-    "date" in obj &&
-    "slug" in obj &&
-    "content" in obj;
-};
 
 /**
  * Load all posts from the content directory
@@ -196,7 +178,7 @@ export const loadPosts = async (): Promise<Result<Post[], AppError>> => {
       return {
         ok: false,
         error: createError(
-          "DataError",
+          "IOError",
           `Failed to load any posts. ${errors.length} post files had errors.`,
           errors[0], // Include the first error as the cause
         ),

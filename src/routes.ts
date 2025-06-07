@@ -56,14 +56,10 @@ const CACHES = {
 /**
  * Setup all blog routes using Mixon app instance
  */
-export const setupBlogRoutes = (mixonApp: App, config: Config) => {
-  // Extract Mixon utils for standardized response handling
-  const { utils } = mixonApp;
-  const { handleError, createResponse } = utils;
-
+export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config) => {
   // Define route handlers
-  mixonApp.get("/", (ctx): void => {
-    handleHome(ctx);
+  mixonApp.get("/", async (ctx) => {
+    await handleHome(ctx);
   });
 
 
@@ -91,7 +87,10 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
 
     if (!postsResult.ok) {
       logger.error("Failed to load posts");
-      handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      ctx.response = new Response("Error loading posts", { 
+      status: 500,
+      headers: { "Content-Type": "text/plain" }
+    });
       return;
     }
 
@@ -125,7 +124,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
         }),
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 200,
         headers 
       });
@@ -150,9 +149,12 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       "Cache-Control": "max-age=60" // 1 minute cache
     };
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 200,
-      headers 
+      headers: { 
+        "Content-Type": "text/html",
+        "Cache-Control": "max-age=60"
+      }
     });
   }
 
@@ -163,7 +165,10 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
     const postsResult = await getPostsWithCache();
 
     if (!postsResult.ok) {
-      handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      ctx.response = new Response("Error loading posts", { 
+      status: 500,
+      headers: { "Content-Type": "text/plain" }
+    });
       return;
     }
 
@@ -196,7 +201,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
         }),
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 200,
         headers 
       });
@@ -216,7 +221,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       }
     );
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 200,
       headers: { "Content-Type": "text/html" } 
     });
@@ -229,7 +234,10 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
     const postsResult = await getPostsWithCache();
 
     if (!postsResult.ok) {
-      handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      ctx.response = new Response("Error loading posts", { 
+      status: 500,
+      headers: { "Content-Type": "text/plain" }
+    });
       return;
     }
 
@@ -265,7 +273,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
         }),
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 200,
         headers 
       });
@@ -285,7 +293,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       }
     );
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 200,
       headers: { "Content-Type": "text/html" } 
     });
@@ -298,7 +306,10 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
     const postsResult = await getPostsWithCache();
 
     if (!postsResult.ok) {
-      handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      ctx.response = new Response("Error loading posts", { 
+      status: 500,
+      headers: { "Content-Type": "text/plain" }
+    });
       return;
     }
 
@@ -340,7 +351,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
         }),
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 200,
         headers 
       });
@@ -361,7 +372,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       }
     );
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 200,
       headers: { "Content-Type": "text/html" } 
     });
@@ -390,7 +401,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
         }),
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 200,
         headers 
       });
@@ -409,7 +420,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       }
     );
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 200,
       headers: { "Content-Type": "text/html" } 
     });
@@ -422,7 +433,10 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
     const postsResult = await getPostsWithCache();
 
     if (!postsResult.ok) {
-      handleError(ctx, 500, "Failed to load posts", "Error loading posts");
+      ctx.response = new Response("Error loading posts", { 
+      status: 500,
+      headers: { "Content-Type": "text/plain" }
+    });
       return;
     }
 
@@ -637,7 +651,7 @@ export const setupBlogRoutes = (mixonApp: App, config: Config) => {
       }
     );
     
-    ctx.response = createResponse(ctx, htmlContent, { 
+    ctx.response = new Response(htmlContent, { 
       status: 404,
       headers: { "Content-Type": "text/html" } 
     });

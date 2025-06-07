@@ -31,16 +31,6 @@ export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   }
 };
 
-/**
- * Stub function to maintain compatibility with existing code
- * This function is no longer used for JSX rendering
- */
-export const markdownToJsxElements = (
-  markdown: string,
-): Result<any, AppError> => {
-  // Just return the HTML as a string
-  return markdownToHtml(markdown);
-};
 
 // Application-specific error type
 type AppError = import("./error.ts").AppError;
