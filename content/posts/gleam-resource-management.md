@@ -2,8 +2,9 @@
 title: Gleam's Resource Management Revolution
 date: 2025-06-06
 tags: [Functional Programming, Typescript, Gleam]
-excerpt: Gleam's `use` syntax represents a breakthrough in functional programming ergonomics, providing a **general-purpose solution to callback hell** that maintains type safety while dramatically improving code readability. Unlike traditional monadic approaches that require deep functional programming knowledge, Gleam's design philosophy prioritizes simplicity and the "happy path," making sophisticated resource management accessible to all developers.
---- 
+excerpt: Gleam's `use` syntax represents a breakthrough in functional programming ergonomics, providing a **general-purpose solution to callback hell** that maintains type safety while dramatically improving code readability
+---
+
 ## How Gleam's use syntax transforms code structure
 
 Gleam's `use` expression is **syntactic sugar that converts callback-style code into linear, readable sequences**. The pattern `use user <- result.try(authenticate(credentials))` follows a precise structure where the left side declares variables receiving callback arguments, while the right side must be a function taking a callback as its final parameter.
