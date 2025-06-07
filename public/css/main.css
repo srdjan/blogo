@@ -6,6 +6,7 @@
 
   /* Colors - based on srdjan.github.io */
   --color-bg: #f5f5f5;
+  --color-body-bg: #f8f9fa;
   --color-text: #1a1a1a;
   --color-primary: #0066cc;
   --color-secondary: #6c757d;
@@ -15,8 +16,11 @@
   --color-muted: #6c757d;
   --color-link: #0066cc;
   --color-link-hover: #004c99;
-  --color-code-bg: #f8f9fa;
-  --color-code-text: #212529;
+  --color-code-bg: #282c34;
+  --color-code-text: #abb2bf;
+  --color-code-border: #3e4451;
+  --color-code-line-numbers: #5c6370;
+  --color-code-selection: #3e4451;
   --color-selection: #b3d4fc;
 
   /* Borders */
@@ -72,7 +76,7 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   color: var(--color-text);
-  background: var(--color-bg);
+  background: var(--color-card);
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--content-padding);
@@ -154,22 +158,150 @@ code {
   padding: var(--space-2xs) var(--space-xs);
   border: var(--border-thin);
   color: var(--color-text);
+  border-radius: 3px;
 }
 
 pre {
-  background: var(--color-card);
+  background: var(--color-code-bg);
   padding: var(--space-md);
-  border: var(--border-medium);
+  border: 2px solid var(--color-code-border);
   box-shadow: var(--shadow-brutal);
   overflow-x: auto;
   margin: var(--space-lg) 0;
+  border-radius: 6px;
+  position: relative;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-code-text);
 }
 
 pre code {
   background: none;
   padding: 0;
   border: none;
-  color: var(--color-text);
+  color: var(--color-code-text);
+  font-size: inherit;
+  border-radius: 0;
+  display: block;
+  width: 100%;
+  white-space: pre;
+  overflow: visible;
+}
+
+/* Code block improvements */
+pre::-webkit-scrollbar {
+  height: 8px;
+  background: var(--color-code-border);
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: var(--color-code-line-numbers);
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: var(--color-code-text);
+}
+
+/* Language label for code blocks */
+pre[class*="language-"]::before {
+  content: attr(class);
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--color-code-border);
+  color: var(--color-code-line-numbers);
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom-left-radius: 4px;
+  font-family: var(--font-sans);
+}
+
+pre[class*="language-javascript"]::before { content: "JS"; }
+pre[class*="language-typescript"]::before { content: "TS"; }
+pre[class*="language-python"]::before { content: "PY"; }
+pre[class*="language-rust"]::before { content: "RS"; }
+pre[class*="language-go"]::before { content: "GO"; }
+pre[class*="language-java"]::before { content: "JAVA"; }
+pre[class*="language-css"]::before { content: "CSS"; }
+pre[class*="language-html"]::before { content: "HTML"; }
+pre[class*="language-json"]::before { content: "JSON"; }
+pre[class*="language-yaml"]::before { content: "YAML"; }
+pre[class*="language-bash"]::before { content: "BASH"; }
+pre[class*="language-sh"]::before { content: "SH"; }
+pre[class*="language-sql"]::before { content: "SQL"; }
+pre[class*="language-markdown"]::before { content: "MD"; }
+
+/* Basic syntax highlighting for common tokens */
+pre code .token.comment,
+pre code .token.prolog,
+pre code .token.doctype,
+pre code .token.cdata {
+  color: #5c6370;
+  font-style: italic;
+}
+
+pre code .token.punctuation {
+  color: #abb2bf;
+}
+
+pre code .token.property,
+pre code .token.tag,
+pre code .token.boolean,
+pre code .token.number,
+pre code .token.constant,
+pre code .token.symbol,
+pre code .token.deleted {
+  color: #e06c75;
+}
+
+pre code .token.selector,
+pre code .token.attr-name,
+pre code .token.string,
+pre code .token.char,
+pre code .token.builtin,
+pre code .token.inserted {
+  color: #98c379;
+}
+
+pre code .token.operator,
+pre code .token.entity,
+pre code .token.url,
+pre code .language-css .token.string,
+pre code .style .token.string {
+  color: #56b6c2;
+}
+
+pre code .token.atrule,
+pre code .token.attr-value,
+pre code .token.keyword {
+  color: #c678dd;
+}
+
+pre code .token.function,
+pre code .token.class-name {
+  color: #61afef;
+}
+
+pre code .token.regex,
+pre code .token.important,
+pre code .token.variable {
+  color: #e06c75;
+}
+
+pre code .token.important,
+pre code .token.bold {
+  font-weight: bold;
+}
+
+pre code .token.italic {
+  font-style: italic;
+}
+
+pre code .token.entity {
+  cursor: help;
 }
 
 blockquote {
