@@ -10,7 +10,6 @@
 
   /* Colors - based on srdjan.github.io */
   --color-bg: #f5f5f5;
-  --color-body-bg: #f8f9fa;
   --color-text: #1a1a1a;
   --color-primary: #0066cc;
   --color-secondary: #6c757d;
@@ -24,8 +23,6 @@
   --color-code-text: #abb2bf;
   --color-code-border: #3e4451;
   --color-code-line-numbers: #5c6370;
-  --color-code-selection: #3e4451;
-  --color-selection: #b3d4fc;
 
   /* Borders */
   --border-thin: 1px solid var(--color-border);
@@ -34,7 +31,6 @@
 
   /* Shadows */
   --shadow-brutal: 4px 4px 0 0 var(--color-border);
-  --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   /* Spacing */
   --space-3xs: 0.25rem;
@@ -50,9 +46,6 @@
   --max-width: 60rem;
   --content-padding: clamp(1rem, 5vw, 2.5rem);
   --header-height: 60px;
-
-  /* Radius */
-  --radius-none: 0;
 
   /* Transitions */
   --transition-fast: 100ms ease;
@@ -126,7 +119,6 @@ h1::after {
 
 h2 {
   font-size: 1.75rem;
-  margin-top: var(--space-lg);
   color: var(--color-primary);
 }
 
@@ -232,38 +224,17 @@ pre[class*="language-typescript"]::before {
 pre[class*="language-python"]::before {
   content: "PY";
 }
-pre[class*="language-rust"]::before {
-  content: "RS";
+pre[class*="language-bash"]::before {
+  content: "BASH";
 }
-pre[class*="language-go"]::before {
-  content: "GO";
-}
-pre[class*="language-java"]::before {
-  content: "JAVA";
+pre[class*="language-json"]::before {
+  content: "JSON";
 }
 pre[class*="language-css"]::before {
   content: "CSS";
 }
 pre[class*="language-html"]::before {
   content: "HTML";
-}
-pre[class*="language-json"]::before {
-  content: "JSON";
-}
-pre[class*="language-yaml"]::before {
-  content: "YAML";
-}
-pre[class*="language-bash"]::before {
-  content: "BASH";
-}
-pre[class*="language-sh"]::before {
-  content: "SH";
-}
-pre[class*="language-sql"]::before {
-  content: "SQL";
-}
-pre[class*="language-markdown"]::before {
-  content: "MD";
 }
 
 /* Highlight.js syntax highlighting - One Dark theme */
@@ -344,7 +315,6 @@ pre[class*="language-markdown"]::before {
 
 blockquote {
   border-left: 8px solid var(--color-accent);
-  padding-left: var(--space-md);
   font-style: italic;
   margin: var(--space-lg) 0;
   background-color: var(--color-card);
@@ -371,12 +341,10 @@ nav {
   max-width: var(--max-width);
   padding: 0.5rem 1rem;
   margin: 0 auto;
-  /* border: var(--border-thin); */
   background-color: var(--color-card);
 }
 
-nav ul,
-nav .nav-links {
+nav ul {
   display: flex;
   justify-content: center;
   gap: var(--space-md);
@@ -391,9 +359,7 @@ nav ul li {
 }
 
 nav ul a,
-nav .nav-links a,
-nav ul button,
-nav .nav-links button {
+nav ul button {
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
@@ -403,15 +369,12 @@ nav .nav-links button {
 }
 
 nav ul a:hover,
-nav .nav-links a:hover,
-nav ul button:hover,
-nav .nav-links button:hover {
+nav ul button:hover {
   transform: translate(-2px, -2px);
   box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
-nav ul a.active,
-nav .nav-links a.active {
+nav ul a.active {
   background-color: var(--color-accent);
   color: var(--color-primary);
   transform: translate(-2px, -2px);
@@ -439,7 +402,6 @@ main {
   align-items: center;
   align-self: center;
   margin: 0 auto;
-  /* padding-top: 3rem; */
 }
 
 #content-area {
@@ -525,9 +487,6 @@ main,
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
 }
 
 .post-card h2 a {
@@ -542,46 +501,6 @@ main,
   text-decoration: underline;
   background: transparent;
   color: var(--color-primary);
-}
-
-.post-card h2 .post-meta {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: normal;
-  text-transform: none;
-  color: var(--color-secondary);
-  font-style: italic;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.post-card h2 .post-meta time {
-  display: inline-flex;
-  align-items: center;
-}
-
-.post-card h2 .post-meta .tags {
-  display: inline-flex;
-  margin: 0;
-}
-
-.post-card h2 .post-meta .tag {
-  font-size: 0.8rem;
-  padding: var(--space-3xs) var(--space-2xs);
-  border: none;
-  color: var(--color-secondary);
-  font-weight: normal;
-  font-style: normal;
-}
-
-.post-card h2 .post-meta .tag:hover {
-  color: var(--color-primary);
-  transform: none;
-  box-shadow: none;
-  background-color: var(--color-bg);
 }
 
 .post-meta {
@@ -611,16 +530,8 @@ main,
 
 /* Common content sections */
 article,
-section,
-.post,
-.about,
-.tag-index,
-.not-found,
-.error-page,
-.search-results-section,
-.content-section {
+section {
   margin-top: 0;
-  padding-top: 1rem;
   padding-left: 0.2rem;
   width: 100%;
   max-width: var(--max-width);
@@ -636,7 +547,6 @@ article header h1,
   margin-bottom: var(--space-sm);
 }
 
-article header,
 .post-meta-subtle {
   display: flex;
   align-items: center;
@@ -648,31 +558,25 @@ article header,
   font-style: italic;
 }
 
-article header time,
 .post-meta-subtle time {
   display: inline-flex;
   align-items: center;
 }
 
-article header .tags,
 .post-meta-subtle .tags {
   display: inline-flex;
   margin: 0;
 }
 
-article header .tag,
 .post-meta-subtle .tag {
   font-size: 0.8rem;
   padding: var(--space-3xs) var(--space-2xs);
-  /* background: transparent; */
   border: none;
-  /* border-left: 1px solid var(--color-primary); */
   color: var(--color-secondary);
   font-weight: normal;
   font-style: normal;
 }
 
-article header .tag:hover,
 .post-meta-subtle .tag:hover {
   color: var(--color-primary);
   transform: none;
@@ -680,17 +584,12 @@ article header .tag:hover,
   background-color: var(--color-bg);
 }
 
-article section,
-article .post-content,
-.post-content {
+article section {
   line-height: 1.7;
   font-size: 1.05rem;
-  margin-top: var(--space-md);
 }
 
-article section h2,
-article .post-content h2,
-.post-content h2 {
+article section h2 {
   display: inline-block;
   padding: var(--space-2xs) var(--space-xs);
   background-color: var(--color-card);
@@ -698,15 +597,11 @@ article .post-content h2,
   box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
-article section p,
-article .post-content p,
-.post-content p {
+article section p {
   margin-bottom: var(--space-md);
 }
 
-article section img,
-article .post-content img,
-.post-content img {
+article section img {
   max-width: 100%;
   height: auto;
   border: var(--border-medium);
@@ -726,7 +621,6 @@ article .post-content img,
 .tag {
   font-size: 0.85rem;
   padding: var(--space-2xs) var(--space-xs);
-  /* border-left: 1px solid var(--color-primary); */
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
@@ -1235,8 +1129,7 @@ form[role="search"] button:hover,
     padding: var(--space-sm);
   }
 
-  nav ul,
-  nav .nav-links {
+  nav ul {
     width: 100%;
     flex-wrap: wrap;
     justify-content: center;
@@ -1244,7 +1137,6 @@ form[role="search"] button:hover,
   }
 
   nav ul a,
-  nav .nav-links a,
   .search-toggle,
   .rss-link {
     font-size: 0.9rem;
@@ -1279,13 +1171,11 @@ form[role="search"] button:hover,
     font-size: 14px;
   }
 
-  nav ul,
-  nav .nav-links {
+  nav ul {
     gap: var(--space-2xs);
   }
 
   nav ul a,
-  nav .nav-links a,
   .search-toggle,
   .rss-link {
     font-size: 0.8rem;
