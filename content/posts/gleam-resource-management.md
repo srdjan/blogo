@@ -7,7 +7,21 @@ excerpt: Gleam's `use` syntax represents a breakthrough in functional programmin
 
 ## How Gleam's use syntax transforms code structure
 
-Gleam's `use` expression is **syntactic sugar that converts callback-style code into linear, readable sequences**. The pattern `use user <- result.try(authenticate(credentials))` follows a precise structure where the left side declares variables receiving callback arguments, while the right side must be a function taking a callback as its final parameter.
+Gleam's `use` expression is **syntactic sugar that converts callback-style code into linear, readable sequences**. 
+
+The pattern:
+
+```gleam
+use <variables> <- <function taking a callback>
+```
+
+as in:
+
+```gleam
+use user <- result.try(authenticate(credentials))` 
+```
+
+follows a precise structure where the left side declares variables receiving callback arguments, while the right side must be a function taking a callback as its final parameter.
 
 **Traditional nested approach:**
 
