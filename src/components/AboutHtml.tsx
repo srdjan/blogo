@@ -1,5 +1,5 @@
 export const renderAboutHtml = (): string => {
-  return `<section class="about content-section">
+  return `<section>
     <h1>About This Blog</h1>
     <p>This is a minimal blog creayted with Claude's helping hand. It's built with Deno, HTMX, and Markdown.</p>
     <p>The architecture follows functional programming principles with immutable data structures, pure functions, and strong type safety throughout.</p>

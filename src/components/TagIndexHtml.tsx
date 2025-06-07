@@ -15,7 +15,7 @@ export const renderTagIndexHtml = (tags: TagInfo[]): string => {
     );
   }).join("");
 
-  return `<section class="tag-index content-section">
+  return `<section>
     <h1>Tags</h1>
     <div class="tag-cloud">
       ${tagLinks}

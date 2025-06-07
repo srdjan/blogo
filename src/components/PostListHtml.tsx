@@ -145,13 +145,13 @@ export const renderPostListHtml = (
   }
 
   // Render the complete post list
-  return `<section class="post-list content-section">
-    <div class="content-wrapper">
+  return `<section class="post-list">
+    <main>
       ${tagHeader}
       <div class="post-cards-container">
         ${postCards}
       </div>
       ${paginationHtml}
-    </div>
+    </main>
   </section>`;
 };

@@ -55,48 +55,58 @@ export const renderDocument = (
   // Create the navbar HTML with active state handling
   const navHTML = `
     <nav>
-      <div class="nav-links">
-        <a
-          href="/"
-          class="link${context.path === "/" ? " active" : ""}"
-          hx-get="/"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-        >
-          Home
-        </a>
-        <a
-          href="/tags"
-          class="link${context.path === "/tags" ? " active" : ""}"
-          hx-get="/tags"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-        >
-          Tags
-        </a>
-        <a
-          href="/about"
-          class="link${context.path === "/about" ? " active" : ""}"
-          hx-get="/about"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-        >
-          About
-        </a>
-        <button
-          type="button"
-          class="search-toggle link"
-          aria-label="Search"
-          aria-expanded="false"
-          onClick="document.getElementById('search-modal').style.display='flex'"
-        >
-          Search
-        </button>
-        <a href="/feed.xml" class="link">RSS</a>
-      </div>
+      <ul>
+        <li>
+          <a
+            href="/"
+            class="link${context.path === "/" ? " active" : ""}"
+            hx-get="/"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+          >
+            Home
+          </a>
+        </li>
+        <li>
+          <a
+            href="/tags"
+            class="link${context.path === "/tags" ? " active" : ""}"
+            hx-get="/tags"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+          >
+            Tags
+          </a>
+        </li>
+        <li>
+          <a
+            href="/about"
+            class="link${context.path === "/about" ? " active" : ""}"
+            hx-get="/about"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+          >
+            About
+          </a>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="search-toggle link"
+            aria-label="Search"
+            aria-expanded="false"
+            onClick="document.getElementById('search-modal').style.display='flex'"
+          >
+            Search
+          </button>
+        </li>
+        <li>
+          <a href="/feed.xml" class="link">RSS</a>
+        </li>
+      </ul>
     </nav>
   `;
 
@@ -118,7 +128,7 @@ export const renderDocument = (
                 ✕ Close
               </button>
             </div>
-            <form class="search-form" id="search-form" role="search" action="/search">
+            <form id="search-form" role="search" action="/search">
               <input
                 type="search"
                 name="q"
@@ -188,8 +198,8 @@ export const renderPost = (post: Post): string => {
   try {
     // Use plain HTML rendering rather than JSX component
     return `
-      <article class="post content-section">
-        <div class="post-meta-subtle">
+      <article>
+        <header class="post-meta-subtle">
           <time datetime="${post.date}">${
       post.formattedDate || post.date
     }</time>
@@ -215,10 +225,10 @@ export const renderPost = (post: Post): string => {
           `
         : ""
     }
-        </div>
-        <div class="post-content">
+        </header>
+        <section>
           ${post.content}
-        </div>
+        </section>
       </article>
     `;
   } catch (error) {

@@ -15,9 +15,9 @@ export const renderSearchResultsHtml = (
   }
 
   if (posts.length === 0) {
-    return `<div class="search-results-summary content-section">
+    return `<section class="search-results-summary">
       No posts found matching "${query}"
-    </div>`;
+    </section>`;
   }
 
   const resultsHtml = posts.map((post) => {
@@ -33,12 +33,12 @@ export const renderSearchResultsHtml = (
     </article>`;
   }).join("");
 
-  return `<div class="search-results-container">
-    <div class="search-results-summary content-section">
+  return `<section>
+    <div class="search-results-summary">
       Found ${posts.length} ${
     pluralize(posts.length, "post")
   } matching "${query}"
     </div>
     ${resultsHtml}
-  </div>`;
+  </section>`;
 };

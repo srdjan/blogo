@@ -12,7 +12,7 @@ export const renderErrorPageHtml = (error: {
       </details>`
     : "";
 
-  return `<section class="error-page content-section">
+  return `<section class="error-page">
     <h1>${error.title}</h1>
     <div class="error-message">
       <p>${error.message}</p>
