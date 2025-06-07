@@ -63,9 +63,9 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
   });
 
 
-  mixonApp.get("/posts/{slug}", handlePostDetail);
+  mixonApp.get("/posts/:slug", handlePostDetail);
   mixonApp.get("/tags", handleTagIndex);
-  mixonApp.get("/tags/{tag}", handleTagPage);
+  mixonApp.get("/tags/:tag", handleTagPage);
   mixonApp.get("/about", handleAbout);
   mixonApp.get("/search", handleSearch);
   mixonApp.get("/feed.xml", handleRssFeed);
@@ -172,13 +172,24 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
       return;
     }
 
-    if (!ctx.validated.params.ok) {
-      handleError(ctx, 400, "Invalid post slug", ctx.validated.params.error);
+    // Try to get slug from Mixon params first, then fallback to URL parsing
+    let slug = ctx.params?.slug;
+    
+    if (!slug) {
+      const url = new URL(ctx.request.url);
+      const pathParts = url.pathname.split('/');
+      slug = pathParts[pathParts.length - 1];
+    }
+    
+    if (!slug) {
+      ctx.response = new Response("Invalid post slug", { 
+        status: 400,
+        headers: { "Content-Type": "text/plain" }
+      });
       return;
     }
 
     const posts = postsResult.value;
-    const slug = ctx.validated.params.value.slug;
     const post = posts.find((p) => p.slug === slug);
 
     if (!post) {
@@ -313,13 +324,24 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
       return;
     }
 
-    if (!ctx.validated.params.ok) {
-      handleError(ctx, 400, "Invalid tag parameter", ctx.validated.params.error);
+    // Get tag from params
+    let tag = ctx.params?.tag;
+    
+    if (!tag) {
+      const url = new URL(ctx.request.url);
+      const pathParts = url.pathname.split('/');
+      tag = pathParts[pathParts.length - 1];
+    }
+    
+    if (!tag) {
+      ctx.response = new Response("Invalid tag parameter", { 
+        status: 400,
+        headers: { "Content-Type": "text/plain" }
+      });
       return;
     }
 
     const posts = postsResult.value;
-    const tag = ctx.validated.params.value.tag;
     const url = new URL(ctx.request.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const { postsPerPage } = config.blog;
@@ -451,7 +473,7 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
     const results = searchPosts(posts, query);
     const content = renderSearchResults(results, query);
 
-    ctx.response = createResponse(ctx, content, {
+    ctx.response = new Response(content, {
       status: 200,
       headers: { "Content-Type": "text/html" }
     });
@@ -471,7 +493,7 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
     const posts = postsResult.value;
     const rssContent = generateRSS(posts, config.blog.title, config.server.publicUrl);
 
-    ctx.response = createResponse(ctx, rssContent, {
+    ctx.response = new Response(rssContent, {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
@@ -500,9 +522,12 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
 
     if (!title || !content) {
       logger.info("Missing required fields");
-      ctx.response = createResponse(ctx, 
-        { error: "Title and content are required" },
-        { status: 400 }
+      ctx.response = new Response(
+        JSON.stringify({ error: "Title and content are required" }),
+        { 
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        }
       );
       return;
     }
@@ -549,9 +574,10 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
 
       logger.info(`Returning response: ${JSON.stringify(response)}`);
 
-      ctx.response = createResponse(ctx, response, {
+      ctx.response = new Response(JSON.stringify(response), {
         status: 201,
         headers: {
+          "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*"  // Allow CORS for testing
         }
       });
@@ -632,7 +658,7 @@ export const setupBlogRoutes = (mixonApp: ReturnType<typeof App>, config: Config
         "HX-Push-Url": path,
       };
       
-      ctx.response = createResponse(ctx, content, { 
+      ctx.response = new Response(content, { 
         status: 404,
         headers 
       });
