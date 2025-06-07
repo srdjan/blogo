@@ -7,9 +7,8 @@ excerpt: Gleam's `use` syntax represents a breakthrough in functional programmin
 
 ## How Gleam's use syntax transforms code structure
 
-Gleam's **use** expression is **syntactic sugar that converts callback-style code
-into linear, readable sequences**.
-
+Gleam's **use** expression is **syntactic sugar that converts callback-style
+code into linear, readable sequences**.
 
 ```gleam
 // The pattern:
@@ -51,14 +50,14 @@ pub fn login(credentials) {
 
 The transformation is profound: **deeply nested error handling becomes linear,
 top-to-bottom code flow** while preserving functional programming principles.
-Under the hood, the compiler transforms ***use*** expressions into regular function
-calls with anonymous functions, ensuring zero performance overhead.
+Under the hood, the compiler transforms _**use**_ expressions into regular
+function calls with anonymous functions, ensuring zero performance overhead.
 
 ### Gleam's design philosophy and unique benefits
 
 What sets Gleam's approach apart is its **generality and simplicity**. Unlike
 language-specific constructs (async/await for concurrency, try/catch for
-errors), ***use*** works with any function accepting a callback as the final
+errors), _**use**_ works with any function accepting a callback as the final
 argument. This creates a unified syntax for multiple programming patterns:
 
 **Resource management:**
@@ -113,7 +112,7 @@ async function processData() {
 ```
 
 This approach offers **zero overhead and perfect TypeScript integration** while
-maintaining the automatic cleanup benefits of Gleam's ***use***.
+maintaining the automatic cleanup benefits of Gleam's _**use**_.
 
 #### Effect-TS: The comprehensive functional solution
 
@@ -135,8 +134,8 @@ const processUser = (id: string) =>
 ```
 
 Effect-TS provides **dependency injection, structured concurrency, and
-observability** while maintaining the linear code flow that makes Gleam's ***use***
-so appealing.
+observability** while maintaining the linear code flow that makes Gleam's
+_**use**_ so appealing.
 
 #### Lightweight monad implementations
 
@@ -196,16 +195,16 @@ propagation but only works with Result/Option types, while **Haskell's
 do-notation** requires deep understanding of monadic abstractions. **F#'s
 computation expressions** offer more flexibility but at the cost of complexity.
 
-Gleam strikes an **optimal balance between power and simplicity**. The ***use***
+Gleam strikes an **optimal balance between power and simplicity**. The _**use**_
 syntax works with any callback-taking function, making it more general than
 Rust's approach while being more accessible than Haskell's mathematical
 foundations.
 
 ### Recommendations for TypeScript teams
 
-**For simple resource management**: Use TypeScript 5.2's native ***using*** syntax,
-which provides automatic cleanup with zero learning curve and perfect tooling
-integration.
+**For simple resource management**: Use TypeScript 5.2's native _**using**_
+syntax, which provides automatic cleanup with zero learning curve and perfect
+tooling integration.
 
 **For comprehensive functional programming**: Effect-TS offers the most complete
 solution, providing Gleam-like ergonomics plus advanced features like structured
@@ -220,7 +219,7 @@ familiar syntax while introducing functional concepts gradually.
 
 ### Conclusion
 
-Gleam's ***use*** syntax represents a **paradigm shift in functional programming
+Gleam's _**use**_ syntax represents a **paradigm shift in functional programming
 ergonomics**. By focusing on the "happy path" and providing a general solution
 to callback hell, it makes sophisticated resource management and error handling
 accessible without sacrificing the benefits of functional programming.
