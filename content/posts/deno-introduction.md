@@ -35,7 +35,7 @@ malicious scripts from wreaking havoc unnoticed.
 #### 2. **TypeScript Support Out of the Box**
 
 No more convoluted setup! Deno natively compiles TypeScript, eliminating the
-need for external tools like `ts-node` or complex build configurations. Just
+need for external tools like **ts-node** or complex build configurations. Just
 write your code, and Deno handles the rest.
 
 #### 3. **Built-In Tools for Modern Development**
@@ -46,7 +46,7 @@ sprawl and ensures consistency across projects.
 
 #### 4. **ES Modules & URL Imports**
 
-Gone are the days of `require()` and `node_modules`. Deno uses ES modules
+Gone are the days of **require()** and **node_modules**. Deno uses ES modules
 exclusively and allows importing scripts directly from URLs, simplifying
 dependency management and embracing the decentralized web.
 
@@ -61,10 +61,10 @@ effortless. It works seamlessly across Windows, macOS, and Linux.
 
 While Node.js remains a powerhouse, Deno offers compelling advantages:
 
-- **No `package.json` or `node_modules`**: Dependencies are cached locally from
+- **No **package.json** or **node_modules****: Dependencies are cached locally from
   URLs, decluttering projects.
 - **Top-Level Await**: Write asynchronous code without wrapping everything in
-  `async` functions.
+  **async** functions.
 - **Browser Compatibility**: Deno APIs align closely with web standards, making
   code reuse between server and browser easier.
 - **Improved Performance**: Built on modern Tokio (Rust) for async I/O, Deno

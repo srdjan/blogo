@@ -7,7 +7,7 @@ excerpt: A post about the modern ARB process in agile Enterprise organizations.
 
 ## Lightweight ARB Process From the First Principles
 
-**Principles**
+### Principles
 
 1. **Enablement Over Gatekeeping:**\
    ARB acts as a supportive advisor rather than an approval bottleneck,

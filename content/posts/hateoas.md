@@ -37,8 +37,8 @@ predefine every page’s URL—you click links to navigate.
 }
 ```
 
-Here, the client learns what actions are possible (`cancel`) and where to find
-related resources (`payment`) through embedded links.
+Here, the client learns what actions are possible (**cancel**) and where to find
+related resources (**payment**) through embedded links.
 
 ---
 
@@ -47,7 +47,7 @@ related resources (`payment`) through embedded links.
 #### 1. **Decouples Clients from Servers**
 
 Servers can evolve URLs and workflows without breaking clients. New actions
-(e.g., a `refund` link) appear automatically when available.
+(e.g., a **refund** link) appear automatically when available.
 
 #### 2. **Self-Documenting APIs**
 
@@ -55,8 +55,8 @@ No more outdated API docs—clients learn capabilities at runtime.
 
 #### 3. **Stateful Navigation**
 
-Clients follow links to transition between states (e.g., `cart` → `checkout` →
-`payment`), mirroring web browsing.
+Clients follow links to transition between states (e.g., **cart** → **checkout** →
+**payment**), mirroring web browsing.
 
 #### 4. **Reduces Client Complexity**
 
@@ -82,7 +82,7 @@ HTMX’s HTML-centric approach pairs perfectly with HATEOAS. Instead of returnin
 JSON, servers return **HTML fragments with embedded actions**, letting the UI
 evolve dynamically.
 
-**Example: A Task List with HTMX**
+### Example: A Task List with HTMX
 
 ```html
 <!-- Server response after adding a task -->
@@ -97,7 +97,7 @@ evolve dynamically.
 </div>
 ```
 
-- The server drives the UI: Clients receive HTML with pre-defined `hx-*`
+- The server drives the UI: Clients receive HTML with pre-defined **hx-* **
   attributes.
 - Actions like loading details or adding tasks are **discoverable**—no
   client-side routing.
@@ -111,7 +111,7 @@ For machine-to-machine communication, **HAL (Hypertext Application Language)**
 standardizes HATEOAS in JSON APIs. Clients navigate via embedded links, reducing
 coupling.
 
-**Scenario: Order Management System**
+#### Scenario: Order Management System**
 
 1. **Service A** fetches an order from **Service B**:
 
@@ -126,14 +126,14 @@ coupling.
    }
    ```
 
-2. **Service A** follows the `invoice` link to retrieve payment details.
-3. **Service B** can change the `invoice` URL structure without impacting
+2. **Service A** follows the **invoice** link to retrieve payment details.
+3. **Service B** can change the **invoice** URL structure without impacting
    Service A.
 
 **Benefits:**
 
 - Services never construct URLs manually.
-- New relationships (e.g., adding a `shipment` link) are automatically
+- New relationships (e.g., adding a **shipment** link) are automatically
   discoverable.
 - Aligns with microservices’ distributed nature.
 
@@ -143,7 +143,7 @@ coupling.
 
 #### For HTMX (HTML Hypermedia)
 
-- Return HTML fragments with embedded links/forms using `hx-*` attributes.
+- Return HTML fragments with embedded links/forms using **hx-* ** attributes.
 - Use server-side templating (e.g., Django, Rails) to inject actions.
 - Example workflow:
 
@@ -157,8 +157,8 @@ coupling.
 
 #### For HAL JSON (Machine Clients)
 
-- Structure responses with `_links` and `_embedded` sections.
-- Use libraries like `Spring HATEOAS` (Java) or `django-hal` (Python).
+- Structure responses with **_links** and **_embedded** sections.
+- Use libraries like ****Spring HATEOAS** (Java) or **django-hal** (Python).
 - Example request flow:
 
   ```

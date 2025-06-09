@@ -30,8 +30,8 @@ frontend frameworks.
 
 #### 1. **Zero JavaScript, Maximum Power**
 
-HTMX lets you create dynamic web apps by adding attributes like `hx-get`,
-`hx-post`, or `hx-trigger` to HTML elements. Want to fetch content from an API
+HTMX lets you create dynamic web apps by adding attributes like **hx-get**,
+**hx-post**, or **hx-trigger** to HTML elements. Want to fetch content from an API
 on button click? Just write:
 
 ```html
@@ -62,7 +62,7 @@ letting your backend handle logic.
 #### 5. **Seamless Integration**
 
 HTMX plays nicely with Alpine.js, Hyperscript, or vanilla JavaScript. Need
-animations? Add CSS transitions with `hx-swap="transition:true"` for smooth
+animations? Add CSS transitions with **hx-swap="transition:true"** for smooth
 updates.
 
 ---
@@ -113,7 +113,7 @@ HTMX isn’t just for toy projects—it scales beautifully:
    ```
 
 3. **Let Your Server Respond**:\
-   Return an HTML fragment (e.g., `<p>Hello, HTMX!</p>`) from `/hello`.
+   Return an HTML fragment (e.g., **<p>Hello, HTMX!</p>**) from **/hello**.
 
 ---
 

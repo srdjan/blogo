@@ -10,20 +10,13 @@ excerpt: Exploring Mixon, a lightweight library for building full stack applicat
 In the ever-evolving landscape of web development, finding the right balance
 between simplicity and power can be challenging. Today, I'm excited to introduce
 **Mixon** - a lightweight, type-safe microframework for building modern web
-applications and APIs in Deno.
-
-### What is Mixon?
-
-Mixon is a minimalist yet powerful framework designed specifically for Deno,
-combining the simplicity of minimal frameworks with advanced features like
-runtime type validation, elegant pattern matching, content negotiation, and
-HATEOAS support. At less than 5KB for its core functionality and with zero
-dependencies, Mixon provides a robust foundation for building everything from
-simple REST APIs to complex stateful applications.
+applications and APIs in Deno, combining the simplicity of minimal frameworks
+with advanced features like runtime type validation, elegant pattern matching,
+ content negotiation, andHATEOAS support. At less than 5KB for its core functionality
+and with zero dependencies, Mixon provides a robust foundation for building everything
+from simple REST APIs to complex stateful applications.
 
 ### Why Choose Mixon?
-
-In a world of heavyweight frameworks, Mixon stands out by offering:
 
 #### 1. Type-Safety Throughout Your Application
 
@@ -93,7 +86,7 @@ Mixon includes a powerful state machine implementation for modeling complex
 business processes. The workflow engine is one of Mixon's standout features,
 providing a type-safe way to manage state transitions in your application.
 
-##### Core Workflow Concepts
+##### 4.1 Core Workflow Concepts
 
 The workflow engine is built on finite state machine principles:
 
@@ -168,7 +161,7 @@ orderWorkflow.load({
 });
 ```
 
-##### Creating Workflow Handlers
+##### 4.2 Creating Workflow Handlers
 
 The workflow engine makes it easy to create API endpoints that handle state
 transitions:
@@ -207,7 +200,7 @@ orderWorkflow.createHandler("/orders/:id/transitions", (ctx) => {
 });
 ```
 
-##### Workflow History and Audit Trails
+##### 4.3 Workflow History and Audit Trails
 
 The workflow engine automatically maintains a history of state transitions,
 providing a complete audit trail:
@@ -234,7 +227,7 @@ providing a complete audit trail:
 }
 ```
 
-##### Multiple Workflows
+##### 4.4 Multiple Workflows
 
 You can define multiple workflows for different domains in your application:
 
@@ -435,7 +428,7 @@ app.listen(3000);
 
 #### Project Configuration
 
-Create a `deno.json` file in your project root:
+Create a **deno.json** file in your project root:
 
 ```json
 {
@@ -521,5 +514,3 @@ Ready to get started? Check out the
 [examples on GitHub](https://github.com/srdjan/mixon).
 
 ---
-
-_Crafted with ❤️ by [⊣˚∆˚⊢](https://srdjan.github.io) & DeepSeek_
