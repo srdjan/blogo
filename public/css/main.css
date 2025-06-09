@@ -323,6 +323,44 @@ blockquote {
   box-shadow: var(--shadow-brutal);
 }
 
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  background-color: var(--color-card);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-brutal);
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  border-bottom: var(--border-thin);
+  vertical-align: top;
+}
+
+th {
+  background-color: var(--color-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  border-bottom: var(--border-medium);
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--color-bg);
+}
+
+tbody tr:hover {
+  background-color: var(--color-accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 0 var(--color-border);
+  transition: all var(--transition-fast);
+}
+
 /* Layout */
 
 #site-header {

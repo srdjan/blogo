@@ -12,9 +12,9 @@ between simplicity and power can be challenging. Today, I'm excited to introduce
 **Mixon** - a lightweight, type-safe microframework for building modern web
 applications and APIs in Deno, combining the simplicity of minimal frameworks
 with advanced features like runtime type validation, elegant pattern matching,
- content negotiation, andHATEOAS support. At less than 5KB for its core functionality
-and with zero dependencies, Mixon provides a robust foundation for building everything
-from simple REST APIs to complex stateful applications.
+content negotiation, andHATEOAS support. At less than 5KB for its core
+functionality and with zero dependencies, Mixon provides a robust foundation for
+building everything from simple REST APIs to complex stateful applications.
 
 ### Why Choose Mixon?
 

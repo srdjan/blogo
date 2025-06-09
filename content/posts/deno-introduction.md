@@ -61,8 +61,8 @@ effortless. It works seamlessly across Windows, macOS, and Linux.
 
 While Node.js remains a powerhouse, Deno offers compelling advantages:
 
-- **No **package.json** or **node_modules****: Dependencies are cached locally from
-  URLs, decluttering projects.
+- **No **package.json** or **node_modules****: Dependencies are cached locally
+  from URLs, decluttering projects.
 - **Top-Level Await**: Write asynchronous code without wrapping everything in
   **async** functions.
 - **Browser Compatibility**: Deno APIs align closely with web standards, making

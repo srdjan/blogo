@@ -55,8 +55,8 @@ No more outdated API docs—clients learn capabilities at runtime.
 
 #### 3. **Stateful Navigation**
 
-Clients follow links to transition between states (e.g., **cart** → **checkout** →
-**payment**), mirroring web browsing.
+Clients follow links to transition between states (e.g., **cart** → **checkout**
+→ **payment**), mirroring web browsing.
 
 #### 4. **Reduces Client Complexity**
 
@@ -97,7 +97,7 @@ evolve dynamically.
 </div>
 ```
 
-- The server drives the UI: Clients receive HTML with pre-defined **hx-* **
+- The server drives the UI: Clients receive HTML with pre-defined *_hx-_ **
   attributes.
 - Actions like loading details or adding tasks are **discoverable**—no
   client-side routing.
@@ -143,7 +143,7 @@ coupling.
 
 #### For HTMX (HTML Hypermedia)
 
-- Return HTML fragments with embedded links/forms using **hx-* ** attributes.
+- Return HTML fragments with embedded links/forms using *_hx-_ ** attributes.
 - Use server-side templating (e.g., Django, Rails) to inject actions.
 - Example workflow:
 

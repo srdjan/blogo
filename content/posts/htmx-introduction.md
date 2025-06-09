@@ -31,8 +31,8 @@ frontend frameworks.
 #### 1. **Zero JavaScript, Maximum Power**
 
 HTMX lets you create dynamic web apps by adding attributes like **hx-get**,
-**hx-post**, or **hx-trigger** to HTML elements. Want to fetch content from an API
-on button click? Just write:
+**hx-post**, or **hx-trigger** to HTML elements. Want to fetch content from an
+API on button click? Just write:
 
 ```html
 <button hx-get="/api/data" hx-target="#result">Load Data</button>
