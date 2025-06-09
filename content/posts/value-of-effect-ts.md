@@ -5,7 +5,6 @@ tags: [Functional Programming, Typescript]
 excerpt: How Effect-TS helps maximize signal (business requirements) while minimizing noise (technical implementation) through functional abstractions
 ---
 
-
 ## Demonstrating Signal/Noise Ratio with Effect-TS: Business Logic vs. Technical Implementation  
 
 ### Scenario: Loading a User Profile
