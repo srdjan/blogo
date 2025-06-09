@@ -1,15 +1,15 @@
 ---
-title: EffeictTS: The Value of Functional Abstractions
+title: EffectTS - The Value of Functional Abstractions
 date: 2025-06-09
 tags: [Functional Programming, Typescript]
 excerpt: How Effect-TS helps maximize signal (business requirements) while minimizing noise (technical implementation) through functional abstractions
 ---
 
-## Demonstrating Signal/Noise Ratio with Effect-TS: Business Logic vs. Technical Implementation  
+## Demonstrating values of functional programming with Effect-TS
 
 ### Scenario: Loading a User Profile
 
-#### Low SNR Approach (Manual Implementation)
+#### Standard Approach (Manual Implementation)
 
 ```typescript
 // =============== NOISE (Technical Concerns) ===============
@@ -48,7 +48,7 @@ const loadUserProfile = async (userId: number) => {
 }
 ```
 
-#### High SNR Approach (Effect-TS)
+#### Effect-TS Approach
 
 ```typescript
 // =============== SIGNAL (Business Requirements) ===============
@@ -76,7 +76,7 @@ const loadUserProfile = (userId: number) =>
   )
 ```
 
-### Key SNR Improvements
+### Key Improvements
 
 | **Concern**          | **Low SNR Approach**               | **High SNR (Effect)**              |
 |----------------------|-----------------------------------|-----------------------------------|
@@ -86,7 +86,7 @@ const loadUserProfile = (userId: number) =>
 | **Side Effects**     | Direct console.log calls          | Controlled via Effect.sync        |
 | **Business Logic**   | Buried in tech concerns           | Primary focus of composition      |
 
-### Effect-TS Features That Boost SNR
+### Effect-TS Features That Boost productivity and code clarity
 
 1. **Effect Type as Abstraction**
 
@@ -150,7 +150,7 @@ pipe(
 )
 ```
 
-### Why This Improves SNR
+### Why This Improves Signal/Noise Ratio
 
 1. **Business Logic Isolation**  
    Core requirements exist at the top level of composition
@@ -179,11 +179,6 @@ const onboardingWorkflow = (userId: number) =>
   )
 ```
 
-> **Signal/Noise Ratio Achieved**:  
->
-> - Business requirements occupy 90% of visual space  
-> - Technical details exist only at implementation boundaries  
-> - Error handling becomes type-checked business logic  
-> - Async operations disappear from cognitive load  
+### Conclusion
 
 This demonstrates how Effect-TS transforms TypeScript into a "business requirements DSL" where technical concerns become implementation details rather than cognitive obstacles.
