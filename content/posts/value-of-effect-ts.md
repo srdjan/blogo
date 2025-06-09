@@ -11,6 +11,8 @@ excerpt: How Effect-TS helps maximize signal (business requirements) while minim
 
 #### Standard Approach (Manual Implementation)
 
+This example shows how a standard approach to loading a user profile can result in a lot of noise, making it difficult to focus on the business requirements.
+
 ```typescript
 // =============== NOISE (Technical Concerns) ===============
 type User = { id: number; name: string }
