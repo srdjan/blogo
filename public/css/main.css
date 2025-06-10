@@ -25,11 +25,11 @@
 
   /* Borders */
   --border-thin: 1px solid var(--color-border);
-  --border-medium: 2px solid var(--color-border);
-  --border-thick: 4px solid var(--color-border);
+  --border-medium: 1px solid var(--color-border);
+  --border-thick: 2px solid var(--color-border);
 
   /* Shadows */
-  --shadow-brutal: 4px 4px 0 0 var(--color-border);
+  --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   /* Spacing */
   --space-3xs: 0.25rem;
@@ -95,8 +95,7 @@ h6 {
   font-family: var(--font-display);
   margin: var(--space-lg) 0 var(--space-md);
   line-height: 1.1;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-weight: 600;
 }
 
 h1 {
@@ -109,10 +108,10 @@ h1 {
 h1::after {
   content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: -2px;
   left: 0;
   width: 100%;
-  height: 5px;
+  height: 2px;
   background-color: var(--color-primary);
 }
 
@@ -165,7 +164,7 @@ pre {
   background: var(--color-code-bg);
   padding: var(--space-md);
   border: 2px solid var(--color-code-border);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   overflow-x: auto;
   margin: var(--space-lg) 0;
   border-radius: 6px;
@@ -318,13 +317,12 @@ pre[class*="language-html"]::before {
 }
 
 blockquote {
-  border-left: 8px solid var(--color-accent);
+  border-left: 3px solid var(--color-accent);
   font-style: italic;
   margin: var(--space-lg) 0;
   background-color: var(--color-card);
   padding: var(--space-md);
   border: var(--border-thin);
-  box-shadow: var(--shadow-brutal);
 }
 
 /* Table styling */
@@ -334,7 +332,7 @@ table {
   margin: var(--space-lg) 0;
   background-color: var(--color-card);
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   font-size: 0.95rem;
 }
 
@@ -348,8 +346,7 @@ td {
 
 th {
   background-color: var(--color-accent);
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
   font-family: var(--font-display);
   border-bottom: var(--border-medium);
 }
@@ -360,9 +357,6 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background-color: var(--color-accent);
-  transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
-  transition: all var(--transition-fast);
 }
 
 /* Enhanced blockquote with attribution support */
@@ -380,30 +374,15 @@ blockquote cite {
 
 blockquote cite::before {
   content: "— ";
-  color: var(--color-primary);
-  font-weight: bold;
+  color: var(--color-secondary);
 }
 
 /* Horizontal rule styling */
 article section hr {
   border: none;
-  height: 3px;
-  background: var(--color-primary);
+  height: 1px;
+  background: var(--color-accent);
   margin: var(--space-xl) 0;
-  position: relative;
-  box-shadow: var(--shadow-brutal);
-}
-
-article section hr::after {
-  content: "✦";
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-card);
-  color: var(--color-primary);
-  padding: 0 var(--space-sm);
-  font-size: 1.2em;
 }
 
 /* Definition lists */
@@ -415,11 +394,9 @@ article section dl {
 }
 
 article section dt {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary);
   margin-bottom: var(--space-xs);
-  text-transform: uppercase;
-  font-family: var(--font-display);
 }
 
 article section dd {
@@ -454,14 +431,14 @@ article section .math {
 
 /* About page specific styling */
 .intro-tagline {
-  font-size: 1.2em;
+  font-size: 1.1em;
   color: var(--color-secondary);
   font-style: italic;
   text-align: center;
   margin: var(--space-sm) 0 var(--space-xl);
   padding: var(--space-sm);
   background: var(--color-bg);
-  border-left: 4px solid var(--color-primary);
+  border-left: 2px solid var(--color-primary);
 }
 
 .author {
@@ -472,20 +449,17 @@ article section .math {
 
 .author-intro {
   margin: var(--space-xl) 0;
-  padding: var(--space-lg);
+  padding: var(--space-md);
   background: var(--color-card);
-  border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
-  position: relative;
+  border: var(--border-thin);
 }
 
 .author-signature {
   text-align: center;
   margin-top: var(--space-xl);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   background: var(--color-accent);
-  border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  border: var(--border-thin);
 }
 
 .author-signature p:first-child {
@@ -536,8 +510,7 @@ nav ul li {
 nav ul a,
 nav ul button {
   font-family: var(--font-display);
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
   border: var(--border-thin);
   padding: var(--space-2xs) var(--space-xs);
   transition: all var(--transition-fast);
@@ -545,15 +518,12 @@ nav ul button {
 
 nav ul a:hover,
 nav ul button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
+  background-color: var(--color-accent);
 }
 
 nav ul a.active {
   background-color: var(--color-accent);
   color: var(--color-primary);
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
 }
 
 /* App layout */
@@ -629,7 +599,7 @@ main,
   padding: var(--space-lg);
   background-color: var(--color-card);
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   transition: transform var(--transition-standard);
   position: relative;
   overflow: hidden;
@@ -650,8 +620,7 @@ main,
 }
 
 .post-card:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 0 var(--color-border);
+  box-shadow: var(--shadow-subtle);
 }
 
 .post-card h2 {
@@ -786,12 +755,11 @@ article section ol li {
 
 /* Custom bullet points */
 article section ul li::before {
-  content: "▪";
-  color: var(--color-primary);
-  font-weight: bold;
+  content: "•";
+  color: var(--color-secondary);
   position: absolute;
-  left: -1.5rem;
-  font-size: 1.2em;
+  left: -1.2rem;
+  font-size: 1em;
 }
 
 /* Enhanced numbered lists */
@@ -803,15 +771,6 @@ article section ol li {
   counter-increment: list-counter;
 }
 
-article section ol li::before {
-  content: counter(list-counter) ".";
-  color: var(--color-secondary);
-  font-weight: 600;
-  position: absolute;
-  left: -1.5rem;
-  font-size: 0.9em;
-}
-
 /* Enhanced emphasis styling */
 article section strong {
   font-weight: 600;
@@ -819,55 +778,29 @@ article section strong {
 }
 
 article section em {
-  background: linear-gradient(
-    120deg,
-    var(--color-accent) 0%,
-    var(--color-accent) 100%
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 40%;
-  background-position: 0 80%;
-  font-style: normal;
-  font-weight: 600;
-  padding: 1px 2px;
+  font-style: italic;
+  font-weight: 500;
 }
 
 /* Enhanced heading hierarchy */
 article section h2 {
-  display: inline-block;
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--color-card);
-  border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
   margin: var(--space-xl) 0 var(--space-lg);
-  position: relative;
+  color: var(--color-primary);
 }
 
 article section h3 {
   color: var(--color-primary);
-  border-left: 4px solid var(--color-primary);
+  border-left: 2px solid var(--color-primary);
   padding-left: var(--space-md);
   margin: var(--space-lg) 0 var(--space-md);
-  position: relative;
-  background: var(--color-bg);
-  padding: var(--space-sm) var(--space-md);
 }
 
 article section h4 {
   color: var(--color-secondary);
-  text-transform: uppercase;
   font-size: 1rem;
   margin: var(--space-md) 0 var(--space-sm);
   padding: var(--space-xs) 0;
-  border-bottom: 2px solid var(--color-accent);
-  position: relative;
-}
-
-article section h4::before {
-  content: "▶";
-  color: var(--color-primary);
-  margin-right: var(--space-xs);
-  font-size: 0.8em;
+  border-bottom: 1px solid var(--color-accent);
 }
 
 article section p {
@@ -902,7 +835,7 @@ article section img {
   max-width: 100%;
   height: auto;
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
 }
 
 /* Tags */
@@ -958,8 +891,6 @@ article section img {
 }
 
 .tag-cloud .tag:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
   text-decoration: none;
@@ -985,7 +916,7 @@ article section img {
   padding: var(--space-md);
   background: var(--color-card);
   border: var(--border-thin);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
 }
 
 /* Buttons */
@@ -995,17 +926,14 @@ article section img {
   padding: var(--space-xs) var(--space-md);
   background: var(--color-bg);
   color: var(--color-text);
-  font-weight: 700;
+  font-weight: 600;
   border: var(--border-thin);
   border-color: var(--color-primary);
-  text-transform: uppercase;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   text-decoration: none;
   background-color: var(--color-accent);
 }
@@ -1014,7 +942,7 @@ article section img {
   padding: var(--space-lg);
   background: var(--color-card);
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   text-align: center;
   margin: var(--space-lg) 0;
 }
@@ -1025,8 +953,7 @@ article section img {
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
   border: var(--border-thin);
   border-color: var(--color-primary);
   padding: var(--space-2xs) var(--space-xs);
@@ -1036,8 +963,6 @@ article section img {
 }
 
 .search-toggle:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
 }
 
@@ -1064,7 +989,7 @@ article section img {
   max-width: 600px;
   background-color: var(--color-bg);
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   padding: var(--space-lg);
   animation: modalEnter 300ms cubic-bezier(0.22, 1, 0.36, 1);
   max-height: 80vh;
@@ -1104,8 +1029,6 @@ article section img {
 }
 
 .search-close:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
 }
 
@@ -1187,12 +1110,11 @@ form[role="search"] button:hover,
   border: var(--border-medium);
   background-color: var(--color-card);
   transition: all var(--transition-standard);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
 }
 
 .search-result:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0 0 var(--color-border);
+  background-color: var(--color-accent);
 }
 
 .search-result h3 {
@@ -1232,13 +1154,10 @@ form[role="search"] button:hover,
   border: var(--border-thin);
   border-color: var(--color-primary);
   font-family: var(--font-display);
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .rss-link:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -1271,7 +1190,7 @@ form[role="search"] button:hover,
   padding: var(--space-md);
   border: var(--border-medium);
   background-color: var(--color-card);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
 }
 
 .pagination-pages {
@@ -1302,8 +1221,6 @@ form[role="search"] button:hover,
 }
 
 .pagination-pages a:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -1331,8 +1248,6 @@ form[role="search"] button:hover,
 
 .pagination-prev:not(.pagination-disabled):hover,
 .pagination-next:not(.pagination-disabled):hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 2px 2px 0 0 var(--color-border);
   background-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -1354,7 +1269,7 @@ form[role="search"] button:hover,
   padding: var(--space-lg);
   background: var(--color-card);
   border: var(--border-medium);
-  box-shadow: var(--shadow-brutal);
+  box-shadow: var(--shadow-subtle);
   margin: var(--space-lg) 0;
 }
 
