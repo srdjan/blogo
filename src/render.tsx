@@ -184,7 +184,6 @@ export const renderDocument = (
     ${ogTags || ""}
     ${twitterTags || ""}
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/color-override.css">
     <link rel="alternate" href="/feed.xml" title="${pageTitle} RSS Feed">
     <script src="/js/htmx.min.js"></script>
     <script src="/js/site.js"></script>

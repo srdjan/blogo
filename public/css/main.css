@@ -8,8 +8,7 @@
     monospace;
   --font-display: "Space Grotesk", system-ui, sans-serif;
 
-  /* Colors - based on srdjan.github.io */
-  --color-bg: #f5f5f5;
+  --color-bg: #f5f5f573;
   --color-text: #1a1a1a;
   --color-primary: #0066cc;
   --color-secondary: #6c757d;
@@ -471,6 +470,52 @@ article section .math {
   text-align: center;
 }
 
+/* About page specific styling */
+.intro-tagline {
+  font-size: 1.2em;
+  color: var(--color-secondary);
+  font-style: italic;
+  text-align: center;
+  margin: var(--space-sm) 0 var(--space-xl);
+  padding: var(--space-sm);
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-primary);
+}
+
+.author {
+  display: block;
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.author-intro {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: var(--color-card);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+}
+
+.author-signature {
+  text-align: center;
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--color-accent);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-brutal);
+}
+
+.author-signature p:first-child {
+  font-size: 1.3em;
+  margin-bottom: var(--space-xs);
+}
+
+.author-signature small {
+  color: var(--color-secondary);
+  font-style: italic;
+}
+
 /* Layout */
 
 #site-header {
@@ -791,10 +836,7 @@ article section ol li::before {
 
 /* Enhanced emphasis styling */
 article section strong {
-  background: var(--color-accent);
-  padding: 2px 4px;
-  border: 1px solid var(--color-primary);
-  font-weight: 800;
+  font-weight: 600;
   color: var(--color-primary);
 }
 
@@ -839,14 +881,6 @@ article section h3 {
   position: relative;
   background: var(--color-bg);
   padding: var(--space-sm) var(--space-md);
-}
-
-article section h3::before {
-  content: "###";
-  color: var(--color-secondary);
-  font-size: 0.8em;
-  margin-right: var(--space-xs);
-  opacity: 0.6;
 }
 
 article section h4 {
