@@ -9,22 +9,25 @@ export const generateRSS = (
   blogTitle: string,
   blogURL: string,
 ): string => {
-  const items = posts.map((post) => {
+  const items = posts.slice(0, 20).map((post) => { // Limit to 20 most recent posts
     const postURL = `${blogURL}/posts/${post.slug}`;
-    return `
-    <item>
+    const pubDate = new Date(post.date).toUTCString();
+    
+    return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${postURL}</link>
-      <guid>${postURL}</guid>
-      <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      ${
-      post.excerpt
-        ? `<description>${escapeXml(post.excerpt)}</description>`
-        : ""
-    }
+      <guid isPermaLink="true">${postURL}</guid>
+      <pubDate>${pubDate}</pubDate>
+      ${post.excerpt ? `<description>${escapeXml(post.excerpt)}</description>` : ""}
+      ${post.tags && post.tags.length > 0 ? post.tags.map(tag => `<category>${escapeXml(tag)}</category>`).join("\n      ") : ""}
       <content:encoded><![CDATA[${post.content}]]></content:encoded>
     </item>`;
-  }).join("");
+  }).join("\n");
+
+  const mostRecentPost = posts[0];
+  const lastBuildDate = mostRecentPost 
+    ? new Date(mostRecentPost.date).toUTCString()
+    : new Date().toUTCString();
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" 
@@ -35,9 +38,15 @@ export const generateRSS = (
     <link>${blogURL}</link>
     <description>Articles from ${escapeXml(blogTitle)}</description>
     <language>en-us</language>
-    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <copyright>© ${new Date().getFullYear()} ${escapeXml(blogTitle)}</copyright>
+    <managingEditor>noreply@example.com (${escapeXml(blogTitle)})</managingEditor>
+    <webMaster>noreply@example.com (${escapeXml(blogTitle)})</webMaster>
+    <lastBuildDate>${lastBuildDate}</lastBuildDate>
+    <pubDate>${lastBuildDate}</pubDate>
+    <ttl>60</ttl>
+    <generator>Deno Blog with Mixon</generator>
     <atom:link href="${blogURL}/feed.xml" rel="self" type="application/rss+xml" />
-    ${items}
+${items}
   </channel>
 </rss>`;
 };
