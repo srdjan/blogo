@@ -109,7 +109,7 @@ export const renderPostListHtml = (
       pluralize(posts.length, "post")
     } tagged with <strong>${activeTag}</strong>
           </p>
-          ${createHtmxLink("/", "Show All Posts", "button link")}
+          ${createHtmxLink("/", "Show All Posts", "link")}
         </div>
       </div>
     `;

@@ -37,7 +37,7 @@ export const createTagLink = (tag: string): string => {
  * Create a home navigation link
  */
 export const createHomeLink = (text = "Return Home"): string => {
-  return createHtmxLink("/", text, "button link");
+  return createHtmxLink("/", text, "link");
 };
 
 /**

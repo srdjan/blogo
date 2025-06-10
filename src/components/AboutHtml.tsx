@@ -18,7 +18,8 @@ export const renderAboutHtml = (): string => {
           This space is where I unpack the <strong>intersections of tech, culture, and creativity</strong>.
           I'll share lessons from my <strong>20+ years in tech</strong>, but also the stories behind the code—the late-night
           debugging sessions, the messy collaborations, and the occasional typo that sparked a breakthrough.
-          My friend, Claude will help me not loose my train of thought.
+          
+          My friend, Claude, will help me not loose my train of thought.
         </p>
 
         <p>
