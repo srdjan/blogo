@@ -150,7 +150,7 @@ export const renderDocument = (
         </div>
       </header>
 
-      <h4 class="nav-subtitle">${config.description}</h4>
+      <p class="nav-subtitle">${config.description}</p>
 
       <main id="content-main" class="content-main">
         <div id="content-area" class="htmx-swappable">

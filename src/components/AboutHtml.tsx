@@ -1,9 +1,5 @@
 export const renderAboutHtml = (): string => {
   return `<section>
-    <header>
-      <p class="intro-tagline">Where tech, creativity, and human-centric thinking collide</p>
-    </header>
-
     <article>
       <section>
         <p>

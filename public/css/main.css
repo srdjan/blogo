@@ -149,28 +149,10 @@ a:hover {
 code {
   font-family: var(--font-mono);
   font-size: 0.9em;
-  background: var(--color-accent);
-  padding: var(--space-2xs) var(--space-xs);
-  border: var(--border-thin);
-  color: var(--color-text);
-  border-radius: 3px;
-  position: relative;
-}
-
-code::before {
-  content: "`";
-  color: var(--color-primary);
-  font-weight: bold;
-  margin-right: 2px;
-  opacity: 0.6;
-}
-
-code::after {
-  content: "`";
-  color: var(--color-primary);
-  font-weight: bold;
-  margin-left: 2px;
-  opacity: 0.6;
+  background: var(--color-bg);
+  padding: 1px 3px;
+  color: var(--color-secondary);
+  border-radius: 2px;
 }
 
 /* Remove backticks from code blocks */
@@ -823,15 +805,11 @@ article section ol li {
 
 article section ol li::before {
   content: counter(list-counter) ".";
-  color: var(--color-primary);
-  font-weight: 700;
-  font-family: var(--font-display);
+  color: var(--color-secondary);
+  font-weight: 600;
   position: absolute;
-  left: -2rem;
-  background: var(--color-accent);
-  padding: 2px 6px;
-  border: var(--border-thin);
-  font-size: 0.85em;
+  left: -1.5rem;
+  font-size: 0.9em;
 }
 
 /* Enhanced emphasis styling */
@@ -863,14 +841,6 @@ article section h2 {
   box-shadow: var(--shadow-brutal);
   margin: var(--space-xl) 0 var(--space-lg);
   position: relative;
-}
-
-article section h2::before {
-  content: "##";
-  color: var(--color-primary);
-  font-weight: 900;
-  margin-right: var(--space-xs);
-  opacity: 0.7;
 }
 
 article section h3 {
@@ -1425,6 +1395,17 @@ form[role="search"] button:hover,
   border: var(--border-thin);
 }
 
+/* Nav subtitle */
+.nav-subtitle {
+  text-align: center;
+  margin-top: -1rem;
+  margin-bottom: 5rem;
+  font-size: 0.9rem;
+  color: var(--color-secondary);
+  font-style: italic;
+  font-weight: 400;
+}
+
 /* Media queries */
 @media (max-width: 768px) {
   :root {
@@ -1473,13 +1454,13 @@ form[role="search"] button:hover,
   .nav-subtitle {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
     gap: var(--space-xs);
-    margin-top: -0.1rem;
-    margin-bottom: var(--space-lg);
-    font-size: 0.85rem;
+    font-size: 0.65rem;
     color: var(--color-secondary);
     font-style: italic;
+    font-weight: 400;
   }
 
   .post-card {
