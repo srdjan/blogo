@@ -1,45 +1,7 @@
-/* Tacit-inspired semantic CSS for blog */
-/* Pure element selectors, minimal classes, maximum readability */
+/* Mobile-first Tacit-inspired semantic CSS */
+/* Designed for mobile devices first, enhanced for larger screens */
 
-/* Basic reset and font */
-:root {
-  /* Typography */
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-  --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-
-  /* Colors - Minimal black and white palette */
-  --color-bg: #ffffff;
-  --color-text: #000000;
-  --color-text-light: #666666;
-  --color-border: #e1e5e9;
-  --color-link: #0969da;
-  --color-code-bg: #f6f8fa;
-
-  /* Spacing */
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 1.5rem;
-  --space-lg: 2rem;
-  --space-xl: 3rem;
-  --space-2xl: 4rem;
-
-  /* Layout */
-  --max-width: 680px;
-  --content-padding: 2rem;
-
-  /* Typography scale */
-  --text-xsm: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-}
-
+/* Basic reset and mobile-optimized foundation */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -52,132 +14,153 @@ html {
   line-height: 1.6;
   color: #333;
   background: white;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Typography - pure semantic approach */
+/* Mobile-first body layout */
 body {
-  max-width: 42rem;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.75rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* Mobile-first typography */
 h1, h2, h3 {
   font-weight: normal;
   line-height: 1.2;
-  margin: 2rem 0 1rem;
+  margin: 1.5rem 0 0.75rem;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   margin-top: 0;
   font-weight: bold;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.375rem;
 }
 
 h3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
 }
 
 p, ul, ol, blockquote {
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
 }
 
-/* Links - minimal styling */
+/* Links - mobile-optimized */
 a {
   color: #0366d6;
   text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 a:hover {
   text-decoration: underline;
 }
 
-/* Lists */
+/* Lists - mobile-friendly spacing */
 ul, ol {
-  padding-left: 2rem;
+  padding-left: 1.5rem;
 }
 
 li {
   margin-bottom: 0.25rem;
 }
 
-/* Special list styling for tags and navigation */
+/* Tag lists - mobile-optimized */
 ul[role="list"] {
   list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  justify-content: center;
 }
 
 ul[role="list"] li {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #f6f8fa;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  color: #586069;
+  font-size: 0.875rem;
+  min-height: 44px;
 }
 
 ul[role="list"] li a {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: #f6f8fa;
-  border: 1px solid #d1d5da;
-  border-radius: 3px;
-  color: #586069;
-  font-size: 0.875rem;
-}
-
-ul[role="list"] li a:hover {
-  background: #e1e4e8;
+  color: inherit;
   text-decoration: none;
+  min-height: auto;
+  display: inline;
+  padding: 0;
 }
 
-/* Code */
+ul[role="list"] li:hover {
+  background: #e1e4e8;
+}
+
+/* Code - mobile-readable */
 code {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   background: #f6f8fa;
-  padding: 0.125rem 0.25rem;
+  padding: 0.125rem 0.375rem;
   border-radius: 3px;
+  word-wrap: break-word;
 }
 
 pre {
   background: #f6f8fa;
-  padding: 1rem;
+  padding: 0.875rem;
   border-radius: 6px;
   overflow-x: auto;
-  margin: 1rem 0;
+  margin: 0.875rem 0;
+  font-size: 0.8rem;
 }
 
 pre code {
   background: none;
   padding: 0;
+  font-size: inherit;
 }
 
 /* Blockquotes */
 blockquote {
   border-left: 4px solid #ddd;
-  padding-left: 1rem;
-  margin: 1rem 0;
+  padding-left: 0.875rem;
+  margin: 0.875rem 0;
   color: #666;
   font-style: italic;
 }
 
-/* Tables */
+/* Tables - mobile-responsive */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1rem 0;
+  margin: 0.875rem 0;
+  font-size: 0.875rem;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 th, td {
   text-align: left;
-  padding: 0.5rem;
+  padding: 0.5rem 0.375rem;
   border-bottom: 1px solid #eee;
 }
 
@@ -186,68 +169,67 @@ th {
   background: #f6f8fa;
 }
 
-/* Navigation - minimal text-based */
+/* Navigation - mobile-first */
 nav {
-  padding: 1rem 0;
-  margin-bottom: 2rem;
+  padding: 0.75rem 0;
+  margin-bottom: 1.5rem;
   border-bottom: 1px solid #eee;
 }
 
 nav ul {
   display: flex;
-  justify-content: center;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 0.75rem;
   list-style: none;
   padding: 0;
   margin: 0;
+  text-align: center;
 }
 
-nav a {
+nav a, nav button {
   color: #333;
   font-weight: 500;
-}
-
-nav a:hover {
-  color: #0366d6;
-}
-
-/* Search button styling */
-nav button {
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  padding: 0;
-  font-weight: 500;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  width: 100%;
 }
 
-nav button:hover {
+nav a:hover, nav button:hover {
   color: #0366d6;
+  background: #f6f8fa;
+  text-decoration: none;
 }
 
-nav button svg {
+/* Search button - mobile-optimized */
+nav button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+nav button svg, nav a svg {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
-nav a svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Main content layout */
+/* Main content - mobile layout */
 main {
   flex: 1;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Article styling - pure semantic */
+/* Article styling - mobile-first */
 article {
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
   border-bottom: 1px solid #eee;
 }
 
@@ -256,30 +238,31 @@ article:last-child {
 }
 
 article header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
 }
 
 article header h2 {
   margin: 0 0 0.5rem;
   border: none;
   padding: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
 }
 
 article header h2 a {
   color: #333;
+  min-height: auto;
+  display: inline;
 }
 
 article header h2 a:hover {
   color: #0366d6;
 }
 
-/* Semantic metadata elements */
+/* Semantic metadata - mobile-optimized */
 time, small {
   color: #666;
-  font-size: 0.875rem;
-}
-
-time {
+  font-size: 0.8rem;
   display: block;
   margin-bottom: 0.5rem;
 }
@@ -287,30 +270,33 @@ time {
 summary {
   color: #666;
   line-height: 1.5;
+  font-size: 0.9rem;
 }
 
-/* Aside elements for banners and notes */
+/* Aside elements - mobile-friendly */
 aside {
   background: #f6f8fa;
   border: 1px solid #d1d5da;
   border-radius: 6px;
-  padding: 1rem;
-  margin: 1rem 0;
+  padding: 0.875rem;
+  margin: 0.875rem 0;
 }
 
 aside[role="banner"] {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
 }
 
 aside p {
   margin: 0;
+  font-size: 0.875rem;
 }
 
-/* Forms - minimal semantic styling */
+/* Forms - mobile-optimized */
 form {
-  margin: 1rem 0;
+  margin: 0.875rem 0;
 }
 
 input, textarea, select, button {
@@ -321,10 +307,12 @@ input, textarea, select, button {
 
 input[type="search"], input[type="text"], textarea {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #d1d5da;
   border-radius: 6px;
   background: white;
+  font-size: 16px; /* Prevents zoom on iOS */
+  min-height: 44px;
 }
 
 input:focus, textarea:focus {
@@ -338,8 +326,11 @@ button, input[type="submit"] {
   color: white;
   border: 1px solid #0366d6;
   border-radius: 6px;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
+  min-height: 44px;
+  font-weight: 500;
+  touch-action: manipulation;
 }
 
 button:hover, input[type="submit"]:hover {
@@ -347,7 +338,7 @@ button:hover, input[type="submit"]:hover {
   border-color: #0256cc;
 }
 
-/* Dialog styling for search modal - minimal and clean */
+/* Dialog - mobile-first modal */
 dialog {
   position: fixed;
   top: 50%;
@@ -356,9 +347,9 @@ dialog {
   border: 1px solid #d1d5da;
   border-radius: 6px;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
-  max-width: 36rem;
-  width: 90%;
-  max-height: 80vh;
+  width: 95%;
+  max-width: 28rem;
+  max-height: 85vh;
   padding: 0;
   background: white;
   display: none;
@@ -375,21 +366,21 @@ dialog::backdrop {
 dialog > section {
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
+  max-height: 85vh;
 }
 
 dialog header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
 }
 
 dialog header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   border: none;
   padding: 0;
@@ -401,9 +392,11 @@ dialog header button {
   color: #666;
   cursor: pointer;
   font-size: 1.25rem;
-  padding: 0.25rem;
-  border-radius: 3px;
+  padding: 0.5rem;
+  border-radius: 6px;
   line-height: 1;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 dialog header button:hover {
@@ -412,69 +405,54 @@ dialog header button:hover {
 }
 
 dialog form {
-  padding: 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid #eee;
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   flex-shrink: 0;
 }
 
 dialog form input[type="search"] {
   flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #d1d5da;
-  border-radius: 6px;
-  font-size: 1rem;
-  background: white;
-}
-
-dialog form input[type="search"]:focus {
-  outline: none;
-  border-color: #0366d6;
-  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
 }
 
 dialog form button {
-  padding: 0.75rem 1.5rem;
-  background: #0366d6;
-  color: white;
-  border: 1px solid #0366d6;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-dialog form button:hover {
-  background: #0256cc;
-  border-color: #0256cc;
+  width: 100%;
 }
 
 dialog section[role="region"] {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 dialog section[role="region"]:empty {
   display: none;
 }
 
-/* Pagination - minimal semantic navigation */
+/* Pagination - mobile navigation */
 nav[aria-label="pagination"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  margin: 2rem 0;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 1.5rem 0;
   border: none;
   padding: 0;
 }
 
 nav[aria-label="pagination"] a,
 nav[aria-label="pagination"] span {
-  padding: 0.25rem 0.5rem;
-  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
 }
 
 nav[aria-label="pagination"] span[aria-current="page"] {
@@ -486,69 +464,138 @@ nav[aria-label="pagination"] span[aria-disabled="true"] {
   color: #ccc;
 }
 
-/* Footer */
+nav[aria-label="pagination"] small {
+  width: 100%;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Footer - mobile-optimized */
 footer {
   border-top: 1px solid #eee;
   padding: 1rem 0;
   text-align: center;
   color: #666;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   margin-top: auto;
 }
 
-/* Tag size variants - minimal classes only where needed */
-.tag-lg { font-size: 1rem; font-weight: bold; }
-.tag-md { font-size: 0.9rem; font-weight: 500; }
+/* Tag size variants */
+.tag-lg { font-size: 0.95rem; font-weight: bold; }
+.tag-md { font-size: 0.875rem; font-weight: 500; }
 .tag-sm { font-size: 0.8rem; }
 
-/* Responsive design - mobile first */
-@media (max-width: 48rem) {
+/* Tablet and larger screens (768px+) */
+@media (min-width: 48rem) {
   body {
-    padding: 0.5rem;
+    max-width: 42rem;
+    padding: 1.5rem;
   }
   
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
   nav ul {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  
+  nav a, nav button {
+    padding: 0.5rem 1rem;
+    width: auto;
   }
   
   aside[role="banner"] {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
   }
   
   dialog {
-    width: 95%;
-    max-height: 90vh;
+    max-width: 36rem;
+    width: 90%;
   }
   
   dialog form {
-    flex-direction: column;
-    padding: 1rem;
+    flex-direction: row;
+    padding: 1.5rem;
+  }
+  
+  dialog form button {
+    width: auto;
+    white-space: nowrap;
   }
   
   dialog header {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
   }
   
   dialog section[role="region"] {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
+  }
+  
+  article {
+    margin-bottom: 2.5rem;
+  }
+  
+  article header h2 {
+    font-size: 1.5rem;
   }
   
   ul[role="list"] {
-    justify-content: center;
+    justify-content: flex-start;
+  }
+  
+  table {
+    display: table;
+    font-size: 0.9rem;
+  }
+  
+  pre {
+    font-size: 0.875rem;
   }
 }
 
-/* High contrast support */
+/* Desktop screens (1024px+) */
+@media (min-width: 64rem) {
+  body {
+    max-width: 48rem;
+    padding: 2rem;
+  }
+  
+  nav ul {
+    gap: 2rem;
+  }
+  
+  article {
+    margin-bottom: 3rem;
+  }
+  
+  dialog {
+    max-width: 42rem;
+  }
+}
+
+/* Large desktop screens (1200px+) */
+@media (min-width: 75rem) {
+  body {
+    max-width: 52rem;
+    padding: 2.5rem;
+  }
+}
+
+/* High contrast mode support */
 @media (prefers-contrast: high) {
   a { color: #0000ee; }
   a:visited { color: #551a8b; }
   
   ul[role="list"] li a {
     border-color: #000;
+    border-width: 2px;
   }
 }
 
@@ -560,9 +607,92 @@ footer {
   }
 }
 
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  html {
+    background: #0d1117;
+    color: #f0f6fc;
+  }
+  
+  a {
+    color: #58a6ff;
+  }
+  
+  h2 {
+    border-bottom-color: #30363d;
+  }
+  
+  article {
+    border-bottom-color: #30363d;
+  }
+  
+  nav {
+    border-bottom-color: #30363d;
+  }
+  
+  nav a:hover, nav button:hover {
+    background: #21262d;
+  }
+  
+  ul[role="list"] li {
+    background: #21262d;
+    border-color: #30363d;
+    color: #8b949e;
+  }
+  
+  ul[role="list"] li:hover {
+    background: #30363d;
+  }
+  
+  code, pre {
+    background: #161b22;
+  }
+  
+  aside {
+    background: #161b22;
+    border-color: #30363d;
+  }
+  
+  input[type="search"], input[type="text"], textarea {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #f0f6fc;
+  }
+  
+  input:focus, textarea:focus {
+    border-color: #58a6ff;
+  }
+  
+  dialog {
+    background: #0d1117;
+    border-color: #30363d;
+  }
+  
+  dialog header {
+    border-bottom-color: #30363d;
+  }
+  
+  dialog form {
+    border-bottom-color: #30363d;
+  }
+  
+  footer {
+    border-top-color: #30363d;
+  }
+  
+  th {
+    background: #161b22;
+  }
+  
+  th, td {
+    border-bottom-color: #30363d;
+  }
+}
+
 /* Print styles */
 @media print {
   nav, aside, dialog { display: none; }
-  body { max-width: none; margin: 0; padding: 0; }
+  body { max-width: none; margin: 0; padding: 1rem; }
   a { color: inherit; text-decoration: underline; }
+  article { page-break-inside: avoid; }
 }

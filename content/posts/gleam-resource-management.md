@@ -1,7 +1,7 @@
 ---
 title: Gleam's Resource Management Revolution
 date: 2025-06-06
-tags: [Functional Programming, Typescript, Gleam]
+tags: [Functional, Typescript, Gleam]
 excerpt: Gleam's `use` syntax represents a breakthrough in functional programming ergonomics, providing a **general-purpose solution to callback hell** that maintains type safety while dramatically improving code readability
 ---
 

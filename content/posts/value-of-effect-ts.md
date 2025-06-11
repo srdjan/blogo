@@ -1,7 +1,7 @@
 ---
 title: EffectTS - The Value of Functional Abstractions
 date: 2025-06-09
-tags: [Functional Programming, Typescript]
+tags: [Functional, Typescript]
 excerpt: How Effect-TS helps maximize signal (business requirements) while minimizing noise (technical implementation) through functional abstractions
 ---
 
