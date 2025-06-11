@@ -66,7 +66,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            ◊ Home
+            Home
           </a>
         </li>
         <li>
@@ -78,7 +78,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            ◈ Tags
+            Tags
           </a>
         </li>
         <li>
@@ -90,7 +90,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            ◆ About
+            About
           </a>
         </li>
         <li>
@@ -185,6 +185,7 @@ export const renderDocument = (
     <link rel="stylesheet" href="/css/main.css">
     <link rel="alternate" href="/feed.xml" title="${pageTitle} RSS Feed">
     <script src="/js/htmx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <script src="/js/site.js"></script>
   </head>
   <body>

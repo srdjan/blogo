@@ -4,46 +4,51 @@ import hljs from "https://esm.sh/highlight.js@11.10.0";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
 
-// Configure marked with syntax highlighting
-marked.use(markedHighlight({
-  langPrefix: "hljs language-",
-  highlight(code: string, lang: string): string {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(code, { language: lang }).value;
-      } catch (err) {
-        console.warn(
-          `Failed to highlight code block with language "${lang}":`,
-          err,
-        );
-      }
-    }
+// Custom renderer for mermaid blocks  
+const renderer = new marked.Renderer();
+const originalCode = renderer.code;
 
-    // Fallback to auto-detection
+renderer.code = function(token) {
+  // Handle the new marked API where token is an object
+  const code = token.text;
+  const lang = token.lang;
+  
+  if (lang === 'mermaid') {
+    const mermaidId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+    return `<div class="mermaid" id="${mermaidId}">${code}</div>`;
+  }
+  
+  // For other code blocks, use highlighting
+  if (lang && hljs.getLanguage(lang)) {
     try {
-      return hljs.highlightAuto(code).value;
+      const highlighted = hljs.highlight(code, { language: lang }).value;
+      return `<pre><code class="hljs language-${lang}">${highlighted}</code></pre>`;
     } catch (err) {
-      console.warn("Failed to auto-highlight code block:", err);
-      return code; // Return original code if highlighting fails
+      console.warn(`Failed to highlight code block with language "${lang}":`, err);
+      return `<pre><code class="language-${lang}">${code}</code></pre>`;
     }
-  },
-}));
+  }
+  
+  // Fallback for code without language - try auto-detection
+  try {
+    const highlighted = hljs.highlightAuto(code).value;
+    return `<pre><code class="hljs">${highlighted}</code></pre>`;
+  } catch (err) {
+    // Final fallback - plain code
+    return `<pre><code>${code}</code></pre>`;
+  }
+};
+
+// Configure marked with custom renderer
+marked.use({ renderer });
 
 // In-memory cache for better performance
 const markdownCache = new Map<string, string>();
 
 export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   try {
-    // Check cache first
-    if (markdownCache.has(markdown)) {
-      return { ok: true, value: markdownCache.get(markdown)! };
-    }
-
-    // Parse markdown if not in cache
+    // Parse markdown (cache disabled to ensure Mermaid changes take effect)
     const html = marked.parse(markdown) as string;
-
-    // Cache the result
-    markdownCache.set(markdown, html);
 
     return { ok: true, value: html };
   } catch (error) {

@@ -11,6 +11,9 @@ const Core = {
 
     // Set active nav link on initial page load
     this.updateActiveNavLink();
+    
+    // Initialize Mermaid if available
+    this.initMermaid();
   },
 
   setupEventListeners() {
@@ -55,6 +58,9 @@ const Core = {
 
         // Update active navigation link
         this.updateActiveNavLink();
+        
+        // Re-initialize Mermaid for new content
+        this.initMermaid();
 
         // Log successful content swap (for debugging)
         if (
@@ -109,6 +115,58 @@ const Core = {
     // Add active class if we found a matching link
     if (activeLink) {
       activeLink.classList.add("active");
+    }
+  },
+
+  initMermaid() {
+    // Wait for mermaid to be available
+    if (typeof mermaid === 'undefined') {
+      console.log('Mermaid not yet loaded, retrying...');
+      setTimeout(() => this.initMermaid(), 100);
+      return;
+    }
+
+    try {
+      console.log('Mermaid found, initializing...');
+      
+      // Configure Mermaid with blog theme colors
+      mermaid.initialize({
+        startOnLoad: false, // We'll manually trigger rendering
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#6B8E6B',
+          primaryTextColor: '#333',
+          primaryBorderColor: '#d1d5da',
+          lineColor: '#666',
+          sectionBkgColor: '#f6f8fa',
+          altSectionBkgColor: '#ffffff',
+          gridColor: '#e1e4e8',
+          tertiaryColor: '#f6f8fa'
+        }
+      });
+
+      // Find all mermaid elements and render them
+      const mermaidElements = document.querySelectorAll('.mermaid');
+      console.log(`Found ${mermaidElements.length} mermaid elements`);
+      
+      if (mermaidElements.length > 0) {
+        // Use the run method for newer mermaid versions
+        mermaid.run({
+          nodes: mermaidElements
+        });
+        console.log('Mermaid rendering completed');
+      }
+      
+    } catch (error) {
+      console.error('Mermaid initialization failed:', error);
+      
+      // Fallback: try the older init method
+      try {
+        console.log('Trying fallback mermaid.init()...');
+        mermaid.init();
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+      }
     }
   },
 };

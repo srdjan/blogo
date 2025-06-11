@@ -8,16 +8,16 @@ excerpt: A design for a multi-key zero-knowledge verification system that levera
 ## Overview
 
 Below is a mussing about the design for a multi-key zero-knowledge (zk)
-verification system that leverages decentralized verifiable credentials stored
+verification system that leverages the use of verifiable credentials stored
 on decentralized storage (such as an AT Protocol Personal Data Store, PDS)
 without any references to blockchain. This design focuses on proving, for
 example, employment by requiring both a decentralized identifier (DID)-based
-private key and an independent verifier key, while storing verifiable
-credentials (VCs) in a decentralized storage network.
+private key and an Employer key, while storing verifiable
+credentials (VCs) in user profiles on a decentralized storage network.
 
-This system enables a user (claimant) to demonstrate possession of employment
+This system enables a user to demonstrate possession of employment
 credentials without revealing underlying sensitive details. The proof generation
-demands that both the claimant's DID-associated private key and an independent
+demands that both the user's DID-associated private key and an independent
 verifier's key (used to attest employment) are used to create a combined
 zero-knowledge proof. Verifiable credentials are stored within a decentralized
 data store (like an AT Protocol PDS), giving users full control over their data
@@ -25,31 +25,30 @@ while ensuring a privacy-preserving verification process.
 
 ### Architectural Components
 
-- **User (Claimant):**
-  - Possesses a DID and its corresponding private key in a secure digital
-    wallet.
+- **User (User's application):**
+  - Possesses a DID and its corresponding private key in a secure digital wallet.
   - Receives verifiable credentials (VCs) that contain employment-related data,
     issued by a credential issuer.
   - Stores the encrypted VCs or references (e.g., secure pointers, hashes) to
-    these credentials in a Personal Data Store (PDS) on a decentralized storage
+    these credentials in a Personal Data Store on a decentralized storage
     platform.
   - Initiates the process to generate a zk proof using locally stored
     pointers/references and the necessary keys.
 
-- **Credential Issuer:**
+- **Credential Issuer (Employment Verification Service):**
   - Issues employment verifiable credentials (VCs) in a privacy-preserving
     format by signing them using its trusted issuance key.
   - The credentials encode employment status, position, dates, and other
     relevant metadata, then are provided to the claimant in an encrypted format.
 
-- **Independent Verifier (Employer/Attestor):**
-  - Uses an independent verifier key to attest the employment relationship.
+- **Verifier (Employer):**
+  - Uses an its own key to attest the employment relationship.
   - Issues a signed attestation or confirmation that the claimant's employment
     is valid.
   - Provides this attestation either directly or in a format that can be stored
     alongside the VC reference.
 
-- **Decentralized Storage (AT Protocol PDS):**
+- **Decentralized Storage:**
   - Hosts encrypted verifiable credentials and related metadata, controlled and
     maintained by the user.
   - Provides interfaces (e.g., RESTful APIs) for data retrieval, update, and
@@ -70,11 +69,106 @@ while ensuring a privacy-preserving verification process.
     retrieving sensitive data stored in the PDS.
   - Checks that the zk proof includes valid cryptographic evidence (such as
     commitments and signatures) that both the DID-based credential and the
-    independent verifier attestation are linked to the claimant.
+    Employer attestation are linked to the claimant.
 
 ---
 
 ### Data Flow and Processes
+
+```mermaid
+flowchart TD
+    %% Styling
+    classDef userClass fill:#6B8E6B,stroke:#333,stroke-width:2px,color:#fff
+    classDef issuerClass fill:#D4A574,stroke:#333,stroke-width:2px,color:#fff
+    classDef verifierClass fill:#E8A5A5,stroke:#333,stroke-width:2px,color:#fff
+    classDef storageClass fill:#0366d6,stroke:#333,stroke-width:2px,color:#fff
+    classDef processClass fill:#f6f8fa,stroke:#333,stroke-width:2px,color:#333
+
+    %% A. Credential Issuance and PDS Storage
+    A1[User/Claimant]:::userClass
+    A2[Credential Issuer]:::issuerClass
+    A3[Personal Data Store PDS]:::storageClass
+    A4[Employer]:::verifierClass
+    
+    A1 -->|1. Request VC| A2
+    A2 -->|2. Issue signed VC| A1
+    A1 -->|3. Encrypt & store VC| A3
+    A4 -->|4. Generate attestation| A1
+    A1 -->|5. Store attestation| A3
+    
+    %% B. Aggregation of Proof Material
+    B1[Retrieve Pointers]:::processClass
+    B2[Local Aggregation]:::processClass
+    B3[Link Evidence]:::processClass
+    
+    A3 -->|Secure pointers & hashes| B1
+    B1 --> B2
+    B2 -->|DID signature + VC pointer| B3
+    B2 -->|Independent attestation| B3
+    
+    %% C. Zero-Knowledge Proof Generation
+    C1[ZKP Module]:::processClass
+    C2[Prove DID Ownership]:::processClass
+    C3[Prove VC Validity]:::processClass
+    C4[Prove Attestation]:::processClass
+    C5[Generate Combined Proof]:::processClass
+    
+    B3 --> C1
+    C1 --> C2
+    C1 --> C3
+    C1 --> C4
+    C2 --> C5
+    C3 --> C5
+    C4 --> C5
+    
+    %% D. Proof Verification
+    D1[Submit ZK Proof]:::processClass
+    D2[Verification Engine]:::storageClass
+    D3[Validate DID Key]:::processClass
+    D4[Validate VC Hash]:::processClass
+    D5[Validate Attestation]:::processClass
+    D6[Employment Verified ✓]:::userClass
+    
+    C5 --> D1
+    D1 --> D2
+    D2 --> D3
+    D2 --> D4
+    D2 --> D5
+    D3 --> D6
+    D4 --> D6
+    D5 --> D6
+    
+    %% Section labels
+    subgraph " A. Credential Issuance & PDS Storage"
+        A1
+        A2
+        A3
+        A4
+    end
+    
+    subgraph " B. Aggregation of Proof Material"
+        B1
+        B2
+        B3
+    end
+    
+    subgraph " C. Zero-Knowledge Proof Generation"
+        C1
+        C2
+        C3
+        C4
+        C5
+    end
+    
+    subgraph " D. Proof Verification"
+        D1
+        D2
+        D3
+        D4
+        D5
+        D6
+    end
+```
 
 #### A. Credential Issuance and PDS Storage
 
@@ -173,7 +267,7 @@ while ensuring a privacy-preserving verification process.
 
 - **Cryptographic Signature Schemes:**
   - Standard digital signature algorithms (e.g., EdDSA, RSA, or ECDSA variants)
-    that are used both by the credential issuer and the independent verifier for
+    that are used both by the credential issuer and the for
     signing attestations.
 
 ---
