@@ -129,19 +129,42 @@ const Core = {
     try {
       console.log('Mermaid found, initializing...');
       
-      // Configure Mermaid with blog theme colors
+      // Configure Mermaid with bright pastel colors
       mermaid.initialize({
         startOnLoad: false, // We'll manually trigger rendering
         theme: 'base',
         themeVariables: {
-          primaryColor: '#6B8E6B',
-          primaryTextColor: '#333',
-          primaryBorderColor: '#d1d5da',
-          lineColor: '#666',
-          sectionBkgColor: '#f6f8fa',
-          altSectionBkgColor: '#ffffff',
-          gridColor: '#e1e4e8',
-          tertiaryColor: '#f6f8fa'
+          // Brighter, more pastel primary colors
+          primaryColor: '#B8E6B8',        // Light sage green
+          secondaryColor: '#F5E6A3',       // Light amber
+          tertiaryColor: '#F0C5C5',        // Light coral
+          quaternaryColor: '#C5D7F0',      // Light blue
+          
+          // Text and borders
+          primaryTextColor: '#2c3e50',     // Darker text for better contrast
+          primaryBorderColor: '#95a5a6',   // Lighter border
+          lineColor: '#7f8c8d',           // Medium gray for lines
+          
+          // Background colors
+          background: '#ffffff',
+          secondaryBackground: '#f8f9fa',
+          tertiaryBackground: '#e9ecef',
+          
+          // Node-specific colors (these override the defaults)
+          cScale0: '#B8E6B8',             // Light sage
+          cScale1: '#F5E6A3',             // Light amber  
+          cScale2: '#F0C5C5',             // Light coral
+          cScale3: '#C5D7F0',             // Light blue
+          cScale4: '#E6D7F0',             // Light purple
+          cScale5: '#D7F0E6',             // Light mint
+          
+          // Subgraph colors
+          clusterBkg: '#f8f9fa',
+          clusterBorder: '#bdc3c7',
+          
+          // Special elements
+          activationBorderColor: '#34495e',
+          activationBkgColor: '#ecf0f1'
         }
       });
 
