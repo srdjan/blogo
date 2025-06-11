@@ -275,4 +275,43 @@ const Search = {
 document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
+  
+  // Setup search modal functionality
+  const searchToggle = document.querySelector('.search-toggle');
+  const searchModal = document.getElementById('search-modal');
+  const searchInput = document.getElementById('search-input');
+  
+  // Open search modal
+  if (searchToggle && searchModal) {
+    searchToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchModal.style.display = 'block';
+      setTimeout(() => searchInput?.focus(), 100);
+    });
+  }
+  
+  // Close search modal
+  const searchCloseBtn = searchModal?.querySelector('button[aria-label="Close search"]');
+  if (searchCloseBtn) {
+    searchCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchModal.style.display = 'none';
+    });
+  }
+  
+  // Close modal when clicking outside
+  if (searchModal) {
+    searchModal.addEventListener('click', (e) => {
+      if (e.target === searchModal) {
+        searchModal.style.display = 'none';
+      }
+    });
+  }
+  
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchModal?.style.display === 'block') {
+      searchModal.style.display = 'none';
+    }
+  });
 });
