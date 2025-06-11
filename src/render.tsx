@@ -98,13 +98,15 @@ export const renderDocument = (
             class="search-toggle link"
             aria-label="Search"
             aria-expanded="false"
-            onClick="document.getElementById('search-modal').style.display='flex'"
+            onClick="document.getElementById('search-modal').style.display='block'"
           >
-            Search
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
           </button>
         </li>
         <li>
-          <a href="/feed.xml" class="link">RSS</a>
+          <a href="/feed.xml" class="link" aria-label="RSS Feed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rss-icon lucide-rss"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          </a>
         </li>
       </ul>
     </nav>
@@ -115,19 +117,18 @@ export const renderDocument = (
     <div id="app-layout">
       <header id="site-header">
         ${navHTML}
-        <div id="search-modal" class="search-modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="search-heading">
-          <div class="search-modal-content">
-            <div class="search-header">
+        <dialog id="search-modal" aria-labelledby="search-heading">
+          <section>
+            <header>
               <h2 id="search-heading">Search</h2>
               <button
                 type="button"
-                class="search-close"
                 aria-label="Close search"
                 onClick="document.getElementById('search-modal').style.display='none'"
               >
-                ✕ Close
+                ✕
               </button>
-            </div>
+            </header>
             <form id="search-form" role="search" action="/search">
               <input
                 type="search"
@@ -139,18 +140,15 @@ export const renderDocument = (
               />
               <button type="submit" aria-label="Submit search">Search</button>
             </form>
-            <div
+            <section
               id="search-results"
-              class="search-results"
-              aria-live="polite"
               role="region"
+              aria-live="polite"
               aria-label="Search results"
-            ></div>
-          </div>
-        </div>
+            ></section>
+          </section>
+        </dialog>
       </header>
-
-      <p class="nav-subtitle">${config.description}</p>
 
       <main id="content-main" class="content-main">
         <div id="content-area" class="htmx-swappable">
