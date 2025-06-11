@@ -12,20 +12,30 @@ export const generateRSS = (
   const items = posts.slice(0, 20).map((post) => { // Limit to 20 most recent posts
     const postURL = `${blogURL}/posts/${post.slug}`;
     const pubDate = new Date(post.date).toUTCString();
-    
+
     return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${postURL}</link>
       <guid isPermaLink="true">${postURL}</guid>
       <pubDate>${pubDate}</pubDate>
-      ${post.excerpt ? `<description>${escapeXml(post.excerpt)}</description>` : ""}
-      ${post.tags && post.tags.length > 0 ? post.tags.map(tag => `<category>${escapeXml(tag)}</category>`).join("\n      ") : ""}
+      ${
+      post.excerpt
+        ? `<description>${escapeXml(post.excerpt)}</description>`
+        : ""
+    }
+      ${
+      post.tags && post.tags.length > 0
+        ? post.tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join(
+          "\n      ",
+        )
+        : ""
+    }
       <content:encoded><![CDATA[${post.content}]]></content:encoded>
     </item>`;
   }).join("\n");
 
   const mostRecentPost = posts[0];
-  const lastBuildDate = mostRecentPost 
+  const lastBuildDate = mostRecentPost
     ? new Date(mostRecentPost.date).toUTCString()
     : new Date().toUTCString();
 
@@ -39,7 +49,9 @@ export const generateRSS = (
     <description>Articles from ${escapeXml(blogTitle)}</description>
     <language>en-us</language>
     <copyright>© ${new Date().getFullYear()} ${escapeXml(blogTitle)}</copyright>
-    <managingEditor>noreply@example.com (${escapeXml(blogTitle)})</managingEditor>
+    <managingEditor>noreply@example.com (${
+    escapeXml(blogTitle)
+  })</managingEditor>
     <webMaster>noreply@example.com (${escapeXml(blogTitle)})</webMaster>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <pubDate>${lastBuildDate}</pubDate>

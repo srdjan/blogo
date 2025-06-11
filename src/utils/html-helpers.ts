@@ -8,15 +8,16 @@ const HTMX_NAV_ATTRS =
   `hx-target="#content-area" hx-swap="innerHTML" hx-push-url="true"`;
 
 /**
- * Create an HTMX navigation link
+ * Create an HTMX navigation link with minimal classes
  */
 export const createHtmxLink = (
   href: string,
   content: string,
-  className = "link",
+  className = "",
   additionalAttrs = "",
 ): string => {
-  return `<a href="${href}" class="${className}" hx-get="${href}" ${HTMX_NAV_ATTRS} ${additionalAttrs}>${content}</a>`;
+  const classAttr = className ? ` class="${className}"` : "";
+  return `<a href="${href}"${classAttr} hx-get="${href}" ${HTMX_NAV_ATTRS} ${additionalAttrs}>${content}</a>`;
 };
 
 /**
@@ -27,50 +28,51 @@ export const createPostLink = (slug: string, title: string): string => {
 };
 
 /**
- * Create a tag link
+ * Create a tag link using semantic markup
  */
 export const createTagLink = (tag: string): string => {
-  return createHtmxLink(`/tags/${tag}`, tag, "tag link");
+  return createHtmxLink(`/tags/${tag}`, tag);
 };
 
 /**
  * Create a home navigation link
  */
 export const createHomeLink = (text = "Return Home"): string => {
-  return createHtmxLink("/", text, "link");
+  return createHtmxLink("/", text);
 };
 
 /**
- * Render tags as HTML links
+ * Render tags as semantic list with role attribute
  */
 export const renderTags = (tags: string[]): string => {
   if (!tags || tags.length === 0) return "";
 
-  const tagLinks = tags.map((tag) => createTagLink(tag)).join("");
-  return `<div class="tags">${tagLinks}</div>`;
+  const tagLinks = tags.map((tag) => `<li>${createTagLink(tag)}</li>`).join("");
+  return `<ul role="list">${tagLinks}</ul>`;
 };
 
 /**
- * Render post metadata (date and tags)
+ * Render post metadata using semantic elements
  */
 export const renderPostMeta = (post: Post): string => {
   const formattedDate = post.formattedDate || formatDate(post.date);
   const tags = renderTags(post.tags || []);
 
-  return `<div class="post-meta">
+  return `<small>
     <time datetime="${post.date}">${formattedDate}</time>
     ${tags}
-  </div>`;
+  </small>`;
 };
 
 /**
- * Wrap content in a content section
+ * Wrap content in a semantic section
  */
 export const wrapContentSection = (
   content: string,
-  className: string,
+  ariaLabel?: string,
 ): string => {
-  return `<section class="${className} content-section">${content}</section>`;
+  const labelAttr = ariaLabel ? ` aria-label="${ariaLabel}"` : "";
+  return `<section${labelAttr}>${content}</section>`;
 };
 
 /**
@@ -86,8 +88,8 @@ export const pluralize = (
 };
 
 /**
- * Render post excerpt if available
+ * Render post excerpt using semantic summary element
  */
 export const renderPostExcerpt = (post: Post): string => {
-  return post.excerpt ? `<p class="post-excerpt">${post.excerpt}</p>` : "";
+  return post.excerpt ? `<summary>${post.excerpt}</summary>` : "";
 };

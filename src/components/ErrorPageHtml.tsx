@@ -6,17 +6,15 @@ export const renderErrorPageHtml = (error: {
   stackTrace?: string;
 }): string => {
   const stackTraceHtml = error.stackTrace
-    ? `<details class="error-details">
+    ? `<details>
         <summary>Technical Details</summary>
-        <pre class="error-stack">${error.stackTrace}</pre>
+        <pre>${error.stackTrace}</pre>
       </details>`
     : "";
 
-  return `<section class="error-page">
+  return `<section>
     <h1>${error.title}</h1>
-    <div class="error-message">
-      <p>${error.message}</p>
-    </div>
+    <p><strong>${error.message}</strong></p>
     ${stackTraceHtml}
     <p>${createHomeLink()}</p>
   </section>`;

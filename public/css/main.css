@@ -1,6 +1,8 @@
 :root {
   /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
   --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 
   /* Colors - Minimal black and white palette */
@@ -291,7 +293,7 @@ nav a.active {
   color: var(--color-text-light);
   font-size: var(--text-sm);
   margin-top: -4.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 5rem;
   font-style: italic;
 }
 
@@ -301,26 +303,43 @@ main {
   margin-bottom: var(--space-2xl);
 }
 
-/* Post cards */
-.post-card {
+/* Post cards - using semantic section elements */
+main section article {
   margin-bottom: var(--space-2xl);
   padding-bottom: var(--space-lg);
   border-bottom: 1px solid var(--color-border);
 }
 
-.post-card:last-child {
+main section article:last-child {
   border-bottom: none;
 }
 
-.post-card h2 {
+main section article header h2 {
   margin: 0 0 var(--space-sm);
   font-size: var(--text-2xl);
 }
 
-.post-card h2 a {
+main section article header h2 a {
   color: var(--color-text);
 }
 
+/* Post metadata using semantic time and small elements */
+main section article header time,
+main section article header small {
+  color: var(--color-text-light);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+/* Post excerpts using semantic summary or paragraph fallback */
+main section article summary,
+main section article > p:first-of-type {
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+
+/* Legacy class support for backwards compatibility */
 .post-meta {
   color: var(--color-text-light);
   font-size: var(--text-sm);
@@ -332,7 +351,48 @@ main {
   line-height: 1.6;
 }
 
-/* Tags */
+/* Tags using semantic ul and li elements */
+ul[role="list"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  list-style: none;
+  padding: 0;
+}
+
+ul[role="list"] li a {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  text-decoration: none;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.15s ease;
+  display: inline-block;
+}
+
+ul[role="list"] li a:hover {
+  background-color: var(--color-code-bg);
+  text-decoration: none;
+}
+
+/* Tag cloud size variants */
+.tag-lg {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.tag-md {
+  font-size: var(--text-base);
+  font-weight: 500;
+}
+
+.tag-sm {
+  font-size: var(--text-sm);
+}
+
+/* Legacy class support for backwards compatibility */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -588,7 +648,37 @@ input[type="search"]::-webkit-search-results-decoration {
   color: var(--color-text-light);
 }
 
-/* Pagination */
+/* Pagination using semantic nav */
+nav[aria-label="pagination"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xl);
+}
+
+nav[aria-label="pagination"] a,
+nav[aria-label="pagination"] span[aria-current="page"] {
+  padding: var(--space-xs) var(--space-sm);
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+nav[aria-label="pagination"] a {
+  color: var(--color-link);
+}
+
+nav[aria-label="pagination"] a:hover {
+  background-color: var(--color-code-bg);
+  text-decoration: none;
+}
+
+nav[aria-label="pagination"] span[aria-current="page"] {
+  background-color: var(--color-link);
+  color: white;
+}
+
+/* Legacy class support for backwards compatibility */
 .pagination {
   display: flex;
   justify-content: center;
@@ -684,7 +774,7 @@ article section h2 {
     gap: var(--space-sm);
     justify-content: center;
   }
-  
+
   nav a, nav .search-toggle {
     padding: var(--space-sm) var(--space-md);
     font-size: var(--text-sm);
@@ -700,7 +790,7 @@ article section h2 {
     font-size: var(--text-2xl);
     margin-top: var(--space-xl);
   }
-  
+
   h3 {
     font-size: var(--text-xl);
   }
@@ -710,7 +800,7 @@ article section h2 {
     margin-bottom: var(--space-xl);
     padding-bottom: var(--space-md);
   }
-  
+
   .post-card h2 {
     font-size: var(--text-xl);
     line-height: 1.3;
@@ -720,7 +810,7 @@ article section h2 {
   .tags {
     gap: 0.375rem;
   }
-  
+
   .tag {
     font-size: 0.8125rem;
     padding: 0.125rem 0.375rem;
@@ -730,16 +820,16 @@ article section h2 {
   .search-modal-overlay {
     padding: var(--space-md);
   }
-  
+
   .search-modal-content {
     margin-top: var(--space-md);
   }
-  
+
   .search-form {
     flex-direction: column;
     gap: var(--space-sm);
   }
-  
+
   .search-form button {
     width: 100%;
   }
@@ -756,16 +846,16 @@ article section h2 {
   article section {
     font-size: var(--text-base);
   }
-  
+
   /* Tables */
   table {
     font-size: 0.8125rem;
   }
-  
+
   th, td {
     padding: 0.375rem 0.5rem;
   }
-  
+
   /* Code blocks */
   pre {
     padding: var(--space-sm);
@@ -786,11 +876,11 @@ article section h2 {
   nav {
     padding: var(--space-md) 0;
   }
-  
+
   nav ul {
     gap: 0.375rem;
   }
-  
+
   nav a, nav .search-toggle {
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
@@ -800,7 +890,7 @@ article section h2 {
   .nav-subtitle {
     font-size: 0.8125rem;
     margin-top: -3.5rem;
-    margin-bottom: var(--space-sm);
+    margin-bottom: 5rem;
     padding: 0 var(--space-sm);
   }
 
@@ -809,11 +899,11 @@ article section h2 {
     font-size: var(--text-2xl);
     margin-bottom: var(--space-sm);
   }
-  
+
   h2 {
     font-size: var(--text-xl);
   }
-  
+
   h3 {
     font-size: var(--text-lg);
   }
@@ -822,17 +912,17 @@ article section h2 {
   .post-card {
     margin-bottom: var(--space-lg);
   }
-  
+
   .post-card h2 {
     font-size: var(--text-lg);
     margin-bottom: 0.375rem;
   }
-  
+
   .post-meta {
     font-size: 0.8125rem;
     margin-bottom: 0.375rem;
   }
-  
+
   .post-excerpt {
     font-size: var(--text-sm);
   }
@@ -842,26 +932,26 @@ article section h2 {
     padding: var(--space-sm);
     align-items: stretch;
   }
-  
+
   .search-modal-content {
     margin-top: 0;
     max-height: 100vh;
     border-radius: 0;
   }
-  
+
   .search-header {
     padding: var(--space-md);
   }
-  
+
   .search-form {
     padding: var(--space-md);
   }
-  
+
   .search-form input[type="search"] {
     height: 48px;
     font-size: var(--text-base);
   }
-  
+
   .search-form button {
     height: 48px;
   }
@@ -871,7 +961,7 @@ article section h2 {
     flex-wrap: wrap;
     gap: 0.375rem;
   }
-  
+
   .pagination a,
   .pagination-current {
     padding: 0.5rem 0.75rem;
@@ -891,14 +981,14 @@ article section h2 {
     overflow-x: auto;
     white-space: nowrap;
   }
-  
+
   /* Code blocks */
   pre {
     padding: var(--space-sm);
     font-size: 0.75rem;
     border-radius: 4px;
   }
-  
+
   pre code {
     font-size: 0.75rem;
   }
@@ -910,11 +1000,11 @@ article section h2 {
     --max-width: 720px;
     --content-padding: 2.5rem;
   }
-  
+
   nav ul {
     gap: var(--space-xl);
   }
-  
+
   .post-card {
     margin-bottom: 3rem;
   }
@@ -938,27 +1028,27 @@ article section h2 {
     align-items: center;
     justify-content: center;
   }
-  
+
   .tag {
     min-height: 32px;
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.5rem;
   }
-  
+
   .button, button {
     min-height: 44px;
     touch-action: manipulation;
   }
-  
+
   .search-form input[type="search"] {
     min-height: 48px;
   }
-  
+
   .search-form button {
     min-height: 48px;
   }
-  
+
   /* Improve touch scrolling */
   .search-results,
   .search-modal-content {
@@ -981,7 +1071,7 @@ article section h2 {
     --color-border: #000000;
     --color-text-light: #333333;
   }
-  
+
   .tag {
     border-width: 2px;
   }

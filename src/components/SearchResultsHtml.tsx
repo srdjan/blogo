@@ -15,8 +15,10 @@ export const renderSearchResultsHtml = (
   }
 
   if (posts.length === 0) {
-    return `<section class="search-results-summary">
-      No posts found matching "${query}"
+    return `<section role="region">
+      <summary>
+        No posts found matching "${query}"
+      </summary>
     </section>`;
   }
 
@@ -24,7 +26,7 @@ export const renderSearchResultsHtml = (
     const postMeta = renderPostMeta(post);
     const excerpt = renderPostExcerpt(post);
 
-    return `<article class="search-result">
+    return `<article>
       <h3>
         ${createPostLink(post.slug, post.title)}
       </h3>
@@ -33,12 +35,12 @@ export const renderSearchResultsHtml = (
     </article>`;
   }).join("");
 
-  return `<section>
-    <div class="search-results-summary">
+  return `<section role="region">
+    <summary>
       Found ${posts.length} ${
     pluralize(posts.length, "post")
   } matching "${query}"
-    </div>
+    </summary>
     ${resultsHtml}
   </section>`;
 };

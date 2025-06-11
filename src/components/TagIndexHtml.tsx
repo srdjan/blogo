@@ -6,19 +6,21 @@ export const renderTagIndexHtml = (tags: TagInfo[]): string => {
 
   const tagLinks = sortedTags.map((tag) => {
     const sizeClass = tag.count >= 10 ? "lg" : tag.count >= 5 ? "md" : "sm";
-
-    return createHtmxLink(
+    const tagLink = createHtmxLink(
       `/tags/${tag.name}`,
-      `${tag.name} <span class="tag-count">${tag.count}</span>`,
-      `tag tag-${sizeClass} link`,
+      tag.name,
+      `tag-${sizeClass}`,
       `title="${tag.count} posts"`,
     );
+    const count = `<small>${tag.count}</small>`;
+
+    return `<li>${tagLink} ${count}</li>`;
   }).join("");
 
   return `<section>
     <h1>Tags</h1>
-    <div class="tag-cloud">
+    <ul role="list">
       ${tagLinks}
-    </div>
+    </ul>
   </section>`;
 };

@@ -57,19 +57,19 @@ export const renderPostListHtml = (
       ? createHtmxLink(
         `?page=${currentPage - 1}`,
         "Previous",
-        "pagination-prev link",
+        "",
         `aria-label="Previous page"`,
       )
-      : `<span class="pagination-prev pagination-disabled" aria-disabled="true">Previous</span>`;
+      : `<span aria-disabled="true">Previous</span>`;
 
     // Render page numbers
     const pageLinks = pageNumbers.map((page) => {
       if (page === null) {
-        return `<span class="pagination-ellipsis">&hellip;</span>`;
+        return `<span>&hellip;</span>`;
       }
 
       if (page === currentPage) {
-        return `<span class="pagination-current" aria-current="page">${page}</span>`;
+        return `<span aria-current="page">${page}</span>`;
       }
 
       return createHtmxLink(`?page=${page}`, page.toString());
@@ -80,20 +80,16 @@ export const renderPostListHtml = (
       ? createHtmxLink(
         `?page=${currentPage + 1}`,
         "Next",
-        "pagination-next link",
+        "",
         `aria-label="Next page"`,
       )
-      : `<span class="pagination-next pagination-disabled" aria-disabled="true">Next</span>`;
+      : `<span aria-disabled="true">Next</span>`;
 
-    return `<nav class="pagination content-section" aria-label="Pagination Navigation">
+    return `<nav aria-label="pagination">
       ${prevButton}
-      <div class="pagination-pages">
-        ${pageLinks}
-      </div>
+      ${pageLinks}
       ${nextButton}
-      <div class="pagination-info">
-        <p>Page ${currentPage} of ${totalPages}</p>
-      </div>
+      <small>Page ${currentPage} of ${totalPages}</small>
     </nav>`;
   };
 
@@ -101,17 +97,17 @@ export const renderPostListHtml = (
   let tagHeader = "";
   if (activeTag) {
     tagHeader = `
-      <div class="tag-header-container">
+      <header>
         <h1>Posts Tagged "${activeTag}"</h1>
-        <div class="tag-filter-header">
+        <aside role="banner">
           <p>
             Showing ${posts.length} ${
       pluralize(posts.length, "post")
     } tagged with <strong>${activeTag}</strong>
           </p>
-          ${createHtmxLink("/", "Show All Posts", "link")}
-        </div>
-      </div>
+          ${createHtmxLink("/", "Show All Posts")}
+        </aside>
+      </header>
     `;
   }
 
@@ -122,20 +118,20 @@ export const renderPostListHtml = (
       const postMeta = renderPostMeta(post);
       const excerpt = renderPostExcerpt(post);
 
-      return `<article class="post-card">
-        <div class="post-card-inner">
+      return `<article>
+        <header>
           <h2>
             ${createPostLink(post.slug, post.title)}
           </h2>
           ${postMeta}
-          ${excerpt}
-        </div>
+        </header>
+        ${excerpt}
       </article>`;
     }).join("");
   } else {
-    postCards = `<div class="empty-state">
+    postCards = `<aside>
       <p>No posts found${activeTag ? ` tagged with "${activeTag}"` : ""}.</p>
-    </div>`;
+    </aside>`;
   }
 
   // Render pagination
@@ -145,13 +141,11 @@ export const renderPostListHtml = (
   }
 
   // Render the complete post list
-  return `<section class="post-list">
-    <main>
-      ${tagHeader}
-      <div class="post-cards-container">
-        ${postCards}
-      </div>
-      ${paginationHtml}
-    </main>
-  </section>`;
+  return `<main>
+    ${tagHeader}
+    <section>
+      ${postCards}
+    </section>
+    ${paginationHtml}
+  </main>`;
 };
