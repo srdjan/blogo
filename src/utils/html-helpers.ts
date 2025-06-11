@@ -31,7 +31,7 @@ export const createPostLink = (slug: string, title: string): string => {
  * Create a tag link using semantic markup
  */
 export const createTagLink = (tag: string): string => {
-  return createHtmxLink(`/tags/${tag}`, tag);
+  return createHtmxLink(`/tags/${tag}`, `# ${tag}`);
 };
 
 /**
@@ -59,8 +59,8 @@ export const renderPostMeta = (post: Post): string => {
   const tags = renderTags(post.tags || []);
 
   return `<small>
-    <time datetime="${post.date}">${formattedDate}</time>
-    ${tags}
+    <time datetime="${post.date}">◐ ${formattedDate}</time>
+    ${tags ? ` • ${tags}` : ''}
   </small>`;
 };
 

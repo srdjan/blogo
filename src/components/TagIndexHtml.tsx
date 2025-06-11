@@ -8,7 +8,7 @@ export const renderTagIndexHtml = (tags: TagInfo[]): string => {
     const sizeClass = tag.count >= 10 ? "lg" : tag.count >= 5 ? "md" : "sm";
     const tagLink = createHtmxLink(
       `/tags/${tag.name}`,
-      tag.name,
+      `# ${tag.name}`,
       `tag-${sizeClass}`,
       `title="${tag.count} posts"`,
     );

@@ -65,7 +65,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            Home
+            ◊ Home
           </a>
         </li>
         <li>
@@ -77,7 +77,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            Tags
+            ◈ Tags
           </a>
         </li>
         <li>
@@ -89,7 +89,7 @@ export const renderDocument = (
             hx-swap="innerHTML"
             hx-push-url="true"
           >
-            About
+            ◆ About
           </a>
         </li>
         <li>
@@ -198,7 +198,7 @@ export const renderPost = (post: Post): string => {
     return `
       <article>
         <header class="post-meta-subtle">
-          <time datetime="${post.date}">${
+          <time datetime="${post.date}">◐ ${
       post.formattedDate || post.date
     }</time>
           ${
@@ -215,9 +215,9 @@ export const renderPost = (post: Post): string => {
                   hx-swap="innerHTML"
                   hx-push-url="true"
                 >
-                  ${tag}
+                  # ${tag}
                 </a>
-              `).join("")
+              `).join(" • ")
         }
             </div>
           `
