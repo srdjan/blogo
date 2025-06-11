@@ -60,7 +60,7 @@ export const renderPostMeta = (post: Post): string => {
 
   return `<small>
     <time datetime="${post.date}">◐ ${formattedDate}</time>
-    ${tags ? ` • ${tags}` : ''}
+    ${tags ? ` ${tags}` : ''}
   </small>`;
 };
 

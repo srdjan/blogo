@@ -12,6 +12,7 @@ import { renderNotFoundHtml } from "./components/NotFoundHtml.tsx";
 import { renderTagIndexHtml } from "./components/TagIndexHtml.tsx";
 import { renderSearchResultsHtml } from "./components/SearchResultsHtml.tsx";
 import { renderErrorPageHtml } from "./components/ErrorPageHtml.tsx";
+import { renderPostMeta } from "./utils/html-helpers.ts";
 
 /**
  * Render the HTML document shell
@@ -198,31 +199,7 @@ export const renderPost = (post: Post): string => {
     return `
       <article>
         <header class="post-meta-subtle">
-          <time datetime="${post.date}">◐ ${
-      post.formattedDate || post.date
-    }</time>
-          ${
-      post.tags && post.tags.length > 0
-        ? `
-            <div class="tags">
-              ${
-          post.tags.map((tag) => `
-                <a
-                  href="/tags/${tag}"
-                  class="tag link"
-                  hx-get="/tags/${tag}"
-                  hx-target="#content-area"
-                  hx-swap="innerHTML"
-                  hx-push-url="true"
-                >
-                  # ${tag}
-                </a>
-              `).join(" • ")
-        }
-            </div>
-          `
-        : ""
-    }
+          ${renderPostMeta(post)}
         </header>
         <section>
           ${post.content}
