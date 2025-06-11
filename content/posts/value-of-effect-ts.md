@@ -12,10 +12,10 @@ excerpt: How Effect-TS helps maximize signal (business requirements) while minim
 #### Standard Approach (Manual Implementation)
 
 This example shows how a standard approach to loading a user profile can result
-in a lot of noise, making it difficult to focus on the business requirements.
+in a lot of code noise, making it difficult to focus on the business requirements.
 
 ```typescript
-// =============== NOISE (Technical Concerns) ===============
+// =============== HIGH NOISE (Mixed Technical Concerns) ===============
 type User = { id: number; name: string };
 
 // Manual error handling
@@ -54,7 +54,7 @@ const loadUserProfile = async (userId: number) => {
 #### Effect-TS Approach
 
 ```typescript
-// =============== SIGNAL (Business Requirements) ===============
+// =============== HIGH SIGNAL (Pure Business Requirements) ===============
 import { Effect, pipe } from "effect";
 
 // 1. Declare business requirements as types
@@ -185,8 +185,77 @@ const onboardingWorkflow = (userId: number) =>
   );
 ```
 
+#### Dreamland
+
+Almost there.
+
+So, the question is, if we would to dream a bit, would we be able to hide even the last two 'technical' concerns still appearing in the code? Yes, absolutely! For example, a 'use' instead a 'flatMap' and 'do' instead 'tap'are much better - they're natural, intuitive, and express intent clearly. We wil also remove 'Effect.' from the beginning of each line, just because...
+
+With 'use' and 'do', we would have:
+
+```typescript
+  const onboardingWorkflow = (userId: number) =>
+    pipe(
+      loadUserProfile(userId),
+      use(createSubscription),        // use the profile to create subscription
+      use(generateWelcomeKit),        // use the subscription to generate kit
+      do(sendConfirmationEmail),      // do this action (side effect)
+      provideService(EmailService, EmailServiceLive),
+    );
+```
+
+Here Is Why This Works So Well:
+
+  **use() = Transform/Chain**
+
+- Natural language: "use the profile to create subscription"
+- Clear intent: The result flows forward and gets transformed
+- Intuitive: Everyone understands "use X to do Y"
+
+  **do() = Side Effect**
+
+- Natural language: "do send confirmation email"
+- Clear intent: Perform action without changing the main flow
+- Imperative feel: Matches how we think about actions
+
+Comparison:
+
+```typescript
+  // Technical (current)
+  Effect.flatMap(createSubscription)    // What's flatMap? 🤔
+  Effect.tap(sendConfirmationEmail)     // What's tap? 🤔
+```
+
+```typescript
+  // Business-friendly
+  use(createSubscription)               // Clear! ✅
+  do(sendConfirmationEmail)            // Obvious! ✅
+```
+
+Even Better:
+
+```typescript
+  // Combined with Verbs
+  const onboardingWorkflow = (userId: number) =>
+    pipe(
+      loadUserProfile(userId),
+      use(toCreateSubscription),        // use profile to create subscription  
+      use(toGenerateWelcomeKit),        // use subscription to generate kit
+      do(sendConfirmationEmail),        // do send email
+      with(EmailServiceLive),           // with email service
+    );
+```
+
+So, 'use' and 'do' perfectly capture the two fundamental operations in any workflow:
+
+- Transform data (use)
+- Perform actions (do)
+
+  This would make functional programming much more accessible to business stakeholders and new developers!
+
 ### Conclusion
 
-This demonstrates how Effect-TS transforms TypeScript into a "business
+Effect-TS is a powerful tool for maximizing signal-to-noise ratio in
+software development with TypeScript. This post demonstrates how Effect-TS transforms TypeScript into a "business
 requirements DSL" where technical concerns become implementation details rather
 than cognitive obstacles.
