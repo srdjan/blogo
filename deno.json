@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env --allow-write main.ts",
-    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch main.ts",
-    "mono": "deno serve --allow-net --allow-read --allow-env --allow-write --port 8001 app.tsx",
-    "mono-dev": "deno serve --allow-net --allow-read --allow-env --allow-write --watch --port 8001 app.tsx",
+    "start": "deno serve --allow-net --allow-read --allow-env --allow-write --port 8000 app.tsx",
+    "dev": "deno serve --allow-net --allow-read --allow-env --allow-write --watch --port 8000 app.tsx",
+    "mixon": "deno run --allow-net --allow-read --allow-env --allow-write main.ts",
+    "mixon-dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch main.ts",
     "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
   },
   "fmt": {
@@ -32,6 +32,6 @@
       "**/node_modules"
     ],
     "include": [],
-    "entrypoint": "main.ts"
+    "entrypoint": "app.tsx"
   }
 }
