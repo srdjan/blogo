@@ -6,7 +6,10 @@ interface LayoutOptions {
   path?: string;
 }
 
-export function createBlogLayout(options: LayoutOptions, children: JSX.Element) {
+export function createBlogLayout(
+  options: LayoutOptions,
+  children: JSX.Element,
+) {
   const { title, description, path = "/" } = options;
 
   return (

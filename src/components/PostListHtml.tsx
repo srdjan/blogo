@@ -29,9 +29,13 @@ function renderPostMeta(post: Post) {
       <time dateTime={post.date}>{formattedDate}</time>
       {post.tags && post.tags.length > 0
         ? (
-          <div>
-            {post.tags.map((tag) => <a key={tag} href={`/tags/${tag}`}>#{tag}</a>)}
-          </div>
+          <ul role="list">
+            {post.tags.map((tag) => (
+              <li key={tag}>
+                <a href={`/tags/${tag}`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
         )
         : null}
     </div>
