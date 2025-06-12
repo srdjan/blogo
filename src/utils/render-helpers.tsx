@@ -1,6 +1,15 @@
 // Render helper functions for mono-jsx compatibility (replacing string-based components)
 import { Post, TagInfo } from "../types.ts";
-import type { Pagination } from "../pagination.ts";
+import { AboutHtml } from "../components/AboutHtml.tsx";
+import { TagIndexHtml } from "../components/TagIndexHtml.tsx";
+
+// Define Pagination type locally since we deleted the pagination.ts file
+type Pagination = {
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};
 
 // Helper to create post excerpt
 function renderPostExcerpt(post: Post) {
@@ -20,13 +29,13 @@ function renderPostMeta(post: Post) {
   return (
     <div class="post-meta">
       <time dateTime={post.date}>{formattedDate}</time>
-      {post.tags && post.tags.length > 0 && (
+{post.tags && post.tags.length > 0 ? (
         <div class="post-tags">
           {post.tags.map(tag => (
             <a href={`/tags/${tag}`} class="tag-link">#{tag}</a>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -81,7 +90,7 @@ function renderPagination(pagination: Pagination, activeTag?: string) {
 export function createPostList(posts: Post[], activeTag?: string, pagination?: Pagination) {
   return (
     <main>
-      {activeTag && (
+{activeTag ? (
         <header>
           <h1>Posts Tagged "{activeTag}"</h1>
           <aside role="banner">
@@ -99,7 +108,7 @@ export function createPostList(posts: Post[], activeTag?: string, pagination?: P
             </a>
           </aside>
         </header>
-      )}
+      ) : null}
       
       <section>
         {posts.length > 0 ? (
@@ -129,88 +138,20 @@ export function createPostList(posts: Post[], activeTag?: string, pagination?: P
         )}
       </section>
       
-      {pagination && renderPagination(pagination, activeTag)}
+{pagination ? renderPagination(pagination, activeTag) : null}
     </main>
   );
 }
 
 // Create tag index content
 export function createTagIndex(tags: TagInfo[]) {
-  return (
-    <main>
-      <header>
-        <h1>Tags</h1>
-        <p>Browse posts by topic</p>
-      </header>
-      
-      <section class="tag-cloud">
-        {tags.length > 0 ? (
-          tags.map(tag => (
-            <div class="tag-item">
-              <a 
-                href={`/tags/${tag.name}`}
-                hx-get={`/tags/${tag.name}`}
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                hx-push-url="true"
-                class="tag-link"
-              >
-                #{tag.name}
-              </a>
-              <span class="tag-count">({tag.count})</span>
-            </div>
-          ))
-        ) : (
-          <p>No tags found.</p>
-        )}
-      </section>
-    </main>
-  );
+  return <TagIndexHtml tags={tags} />;
 }
 
-// Create individual post content
-export function createPost(post: Post) {
-  return (
-    <main>
-      <article>
-        <header class="post-meta-subtle">
-          <h1>{post.title}</h1>
-          {renderPostMeta(post)}
-        </header>
-        <section>
-          <div innerHTML={post.content}></div>
-        </section>
-      </article>
-    </main>
-  );
-}
 
 // Create about page content
 export function createAbout() {
-  return (
-    <main>
-      <article>
-        <header>
-          <h1>About</h1>
-        </header>
-        <section>
-          <p>This is a minimal, functional blog built with Deno, TypeScript, and mono-jsx.</p>
-          <p>It demonstrates server-side rendering with HTMX for dynamic interactions.</p>
-          
-          <h2>Features</h2>
-          <ul>
-            <li>✅ Server-side rendering with mono-jsx</li>
-            <li>✅ HTMX for progressive enhancement</li>
-            <li>✅ Markdown content with YAML frontmatter</li>
-            <li>✅ Full-text search</li>
-            <li>✅ Tag-based browsing</li>
-            <li>✅ RSS feed</li>
-            <li>✅ Mermaid diagram support</li>
-          </ul>
-        </section>
-      </article>
-    </main>
-  );
+  return <AboutHtml />;
 }
 
 // Create search results content  

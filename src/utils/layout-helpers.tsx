@@ -12,10 +12,10 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
   return (
     <html lang="en">
       <head>
-        <meta charset="UTF-8" />
+        <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title}</title>
-        {description && <meta name="description" content={description} />}
+        {description ? <meta name="description" content={description} /> : null}
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} />
         <script src="/js/htmx.min.js"></script>
@@ -36,7 +36,7 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                     hx-swap="innerHTML"
                     hx-push-url="true"
                   >
-                    ◊ Home
+                    Home
                   </a>
                 </li>
                 <li>
@@ -48,7 +48,7 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                     hx-swap="innerHTML"
                     hx-push-url="true"
                   >
-                    ◈ Tags
+                    Tags
                   </a>
                 </li>
                 <li>
@@ -60,7 +60,7 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                     hx-swap="innerHTML"
                     hx-push-url="true"
                   >
-                    ◆ About
+                    About
                   </a>
                 </li>
                 <li>

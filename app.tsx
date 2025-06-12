@@ -1,10 +1,6 @@
 // New mono-jsx entry point
-import { Layout } from "./src/components/Layout.tsx";
-import { SimpleLayout } from "./src/components/SimpleLayout.tsx";
-import { MonoLayout } from "./src/components/MonoLayout.tsx";
-import { MinimalLayout } from "./src/components/MinimalLayout.tsx";
 import { createBlogLayout } from "./src/utils/layout-helpers.tsx";
-import { createAbout, createPostList, createTagIndex, createPost, createSearchResults } from "./src/utils/render-helpers.tsx";
+import { createAbout, createPostList, createTagIndex, createSearchResults } from "./src/utils/render-helpers.tsx";
 import { getCachedPosts, getCachedTags, getPostBySlug, getPostsByTag, searchPostsByQuery } from "./src/utils/content-loader.ts";
 
 export default {
@@ -32,7 +28,7 @@ export default {
           headers: { 'Content-Type': contentType }
         });
       } catch (error) {
-        console.log(`Static file not found: ${url.pathname}, error:`, error.message);
+        console.log(`Static file not found: ${url.pathname}, error:`, error instanceof Error ? error.message : String(error));
         return new Response('File not found', { status: 404 });
       }
     }

@@ -433,11 +433,11 @@ article {
   background: var(--color-bg);
 }
 
-article:hover {
-  transform: translateY(-2px);
+/* article:hover {
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(107, 142, 107, 0.08);
   background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-subtle) 100%);
-}
+} */
 
 article:last-child {
   border-bottom: none;

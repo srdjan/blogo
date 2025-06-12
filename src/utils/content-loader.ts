@@ -1,5 +1,5 @@
 // Content loading utilities for mono-jsx
-import { Post, TagInfo, Result } from "../types.ts";
+import { Post, TagInfo } from "../types.ts";
 import { loadPosts } from "../parser.ts";
 import { logger } from "../utils.ts";
 

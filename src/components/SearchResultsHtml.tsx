@@ -1,46 +1,78 @@
 import { Post } from "../types.ts";
-import {
-  createPostLink,
-  pluralize,
-  renderPostExcerpt,
-  renderPostMeta,
-} from "../utils/html-helpers.ts";
 
-export const renderSearchResultsHtml = (
-  posts: Post[],
-  query: string,
-): string => {
-  if (!query || query.trim().length === 0) {
-    return "";
-  }
+// Helper to create post excerpt
+function renderPostExcerpt(post: Post) {
+  if (!post.excerpt) return null;
+  
+  return (
+    <p class="post-excerpt">
+      {post.excerpt}
+    </p>
+  );
+}
 
-  if (posts.length === 0) {
-    return `<section role="region">
-      <summary>
-        No posts found matching "${query}"
-      </summary>
-    </section>`;
-  }
+// Helper to create post meta information  
+function renderPostMeta(post: Post) {
+  const formattedDate = post.formattedDate || new Date(post.date).toLocaleDateString();
+  
+  return (
+    <div class="post-meta">
+      <time dateTime={post.date}>{formattedDate}</time>
+      {post.tags && post.tags.length > 0 ? (
+        <div class="post-tags">
+          {post.tags.map(tag => (
+            <a href={`/tags/${tag}`} class="tag-link">#{tag}</a>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
-  const resultsHtml = posts.map((post) => {
-    const postMeta = renderPostMeta(post);
-    const excerpt = renderPostExcerpt(post);
-
-    return `<article>
-      <h3>
-        ${createPostLink(post.slug, post.title)}
-      </h3>
-      ${postMeta}
-      ${excerpt}
-    </article>`;
-  }).join("");
-
-  return `<section role="region">
-    <summary>
-      Found ${posts.length} ${
-    pluralize(posts.length, "post")
-  } matching "${query}"
-    </summary>
-    ${resultsHtml}
-  </section>`;
-};
+export function SearchResultsHtml({ posts, query }: { posts: Post[], query: string }) {
+  return (
+    <main>
+      <header>
+        <h1>Search Results</h1>
+        <p>Results for: <strong>"{query}"</strong></p>
+      </header>
+      
+      <section>
+        {posts.length > 0 ? (
+          posts.map(post => (
+            <article>
+              <header>
+                <h2>
+                  <a 
+                    href={`/posts/${post.slug}`}
+                    hx-get={`/posts/${post.slug}`}
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                  >
+                    {post.title}
+                  </a>
+                </h2>
+                {renderPostMeta(post)}
+              </header>
+              {renderPostExcerpt(post)}
+            </article>
+          ))
+        ) : (
+          <aside>
+            <p>No posts found for "{query}".</p>
+            <a 
+              href="/"
+              hx-get="/"
+              hx-target="#content-area"
+              hx-swap="innerHTML"
+              hx-push-url="true"
+            >
+              ← Back to all posts
+            </a>
+          </aside>
+        )}
+      </section>
+    </main>
+  );
+}
