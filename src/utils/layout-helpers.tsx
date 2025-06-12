@@ -19,7 +19,7 @@ export function createBlogLayout(
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title}</title>
         {description ? <meta name="description" content={description} /> : null}
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/main-modern.css" />
         <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} />
         <script src="/js/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">

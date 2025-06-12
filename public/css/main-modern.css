@@ -1,0 +1,833 @@
+/* Modern CSS with Nesting, @scope, Container Queries, and latest features */
+
+/* Color palette with modern CSS custom properties */
+:root {
+  --color-text: #333;
+  --color-text-muted: #666;
+  --color-text-subtle: #8b949e;
+  --color-bg: white;
+  --color-bg-subtle: #f6f8fa;
+  --color-border: #d1d5da;
+  --color-border-subtle: #eee;
+  --color-primary: #0366d6;
+  --color-primary-hover: #0256cc;
+  --color-accent-sage: #6b8e6b;
+  --color-accent-amber: #d4a574;
+  --color-accent-coral: #e8a5a5;
+  --color-syntax-keyword: #d73a49;
+  --color-syntax-string: #032f62;
+  --color-syntax-number: #005cc5;
+  --color-syntax-function: #6f42c1;
+  --color-syntax-comment: #6a737d;
+  --color-syntax-variable: #e36209;
+  --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 12px rgba(107, 142, 107, 0.08);
+  
+  /* View Transitions */
+  view-transition-name: root;
+}
+
+/* Basic reset with modern CSS */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body and layout with CSS Nesting and Container Queries */
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-text-size-adjust: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0.75rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+
+  /* Responsive with media queries like original */
+  @media (min-width: 48rem) {
+    max-width: 42rem;
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    max-width: 48rem;
+    padding: 2rem;
+  }
+
+  @media (min-width: 75rem) {
+    max-width: 52rem;
+    padding: 2.5rem;
+  }
+}
+
+/* Typography with CSS Nesting */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+  line-height: 1.2;
+  margin-block: 1.5rem 0.75rem;
+
+  &:first-child {
+    margin-block-start: 0;
+  }
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: bold;
+
+  @container (min-width: 48rem) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  font-size: 1.375rem;
+  border-block-end: 1px solid var(--color-border-subtle);
+  padding-block-end: 0.375rem;
+
+  @container (min-width: 48rem) {
+    font-size: 1.5rem;
+  }
+}
+
+h3 {
+  font-size: 1.125rem;
+
+  @container (min-width: 48rem) {
+    font-size: 1.25rem;
+  }
+}
+
+/* Links with modern properties */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  min-block-size: 44px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--color-accent-sage);
+  }
+}
+
+/* Lists with CSS Nesting */
+ul, ol {
+  padding-inline-start: 1.5rem;
+  margin-block-end: 0.875rem;
+
+  & li {
+    margin-block-end: 0.25rem;
+  }
+}
+
+/* Tag lists using @scope */
+@scope (ul[role="list"]) {
+  :scope {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    justify-content: flex-start;
+    margin-block: 0.5rem 0;
+
+    & li {
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 0.1rem 0.35rem;
+      background: var(--color-bg-subtle);
+      border-radius: 3px;
+      border: 1px solid var(--color-border-subtle);
+      color: var(--color-text-muted);
+      font-size: 0.7rem;
+      line-height: 1;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      block-size: auto;
+      min-block-size: auto;
+
+      &:hover {
+        background: var(--color-bg);
+        border-color: var(--color-accent-sage);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-subtle);
+      }
+
+      & a {
+        color: inherit;
+        text-decoration: none;
+        display: inline-block;
+        padding: 0;
+        width: 100%;
+        text-align: center;
+        min-block-size: auto;
+      }
+    }
+  }
+}
+
+/* Tag index page using @scope */
+@scope (section) {
+  ul[role="list"] {
+    list-style: none;
+    padding: 0;
+    margin-block: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+    gap: 0.75rem;
+    justify-content: start;
+
+    & li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: fit-content;
+      min-width: 150px;
+      padding: 0.25rem 0.5rem;
+      background: var(--color-bg-subtle);
+      border-radius: 4px;
+      border: 1px solid var(--color-border-subtle);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      block-size: auto;
+      min-block-size: auto;
+
+      &:hover {
+        background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--color-accent-sage);
+
+        & small {
+          opacity: 1;
+        }
+      }
+
+      & a {
+        min-block-size: auto;
+        block-size: auto;
+      }
+
+      & small {
+        color: var(--color-text-muted);
+        font-weight: 500;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+      }
+    }
+
+    @container (min-width: 48rem) {
+      grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
+      gap: 1rem;
+
+      & li {
+        padding: 0.4rem 0.75rem;
+        min-width: 180px;
+      }
+    }
+  }
+}
+
+/* Code highlighting with CSS Nesting */
+code {
+  font-family: ui-monospace, 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+  font-size: 0.85rem;
+  background: #f1f5f9;
+  color: var(--color-syntax-keyword);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  word-wrap: break-word;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+}
+
+pre {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-block: 1.5rem;
+  font-size: 0.85rem;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  line-height: 1.5;
+
+  &:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    border-color: #cbd5e0;
+  }
+
+  &[class*="language-"]::before {
+    content: attr(class);
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    background: linear-gradient(135deg, var(--color-syntax-keyword), var(--color-syntax-function));
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  & code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    border: none;
+  }
+
+  @container (min-width: 48rem) {
+    font-size: 0.875rem;
+    padding: 1.25rem;
+
+    &[class*="language-"]::before {
+      inset-block-start: 0.75rem;
+      inset-inline-end: 0.75rem;
+    }
+  }
+}
+
+/* Syntax highlighting - using traditional selectors for compatibility */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0;
+  color: var(--color-text);
+  background: transparent;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-syntax-comment);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Keywords, types, and language constructs */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-type,
+.hljs-built_in {
+  color: var(--color-syntax-keyword);
+  font-weight: 600;
+}
+
+/* Strings and literals */
+.hljs-string,
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--color-syntax-string);
+  font-weight: 500;
+}
+
+/* Numbers and constants */
+.hljs-number,
+.hljs-regexp {
+  color: var(--color-syntax-number);
+  font-weight: 500;
+}
+
+/* Variables, attributes, and identifiers */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr,
+.hljs-attribute {
+  color: var(--color-syntax-variable);
+  font-weight: 500;
+}
+
+/* Functions and methods */
+.hljs-function,
+.hljs-title,
+.hljs-section {
+  color: var(--color-syntax-function);
+  font-weight: 700;
+}
+
+/* Class names */
+.hljs-class .hljs-title {
+  color: var(--color-syntax-function);
+  font-weight: 700;
+}
+
+/* Tags and markup */
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: var(--color-syntax-keyword);
+  font-weight: 600;
+}
+
+/* Operators and punctuation */
+.hljs-operator,
+.hljs-punctuation {
+  color: var(--color-text-subtle);
+}
+
+/* Deletions and errors */
+.hljs-deletion {
+  background: rgba(232, 165, 165, 0.2);
+}
+
+/* Additions and success */
+.hljs-addition {
+  background: rgba(107, 142, 107, 0.2);
+}
+
+/* Meta and processing instructions */
+.hljs-meta,
+.hljs-meta-keyword,
+.hljs-meta-string {
+  color: var(--color-text-muted);
+}
+
+/* Language-specific styling */
+.hljs-doctag,
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+/* Additional common selectors */
+.hljs-params,
+.hljs-property {
+  color: var(--color-syntax-variable);
+}
+
+.hljs-subst {
+  color: var(--color-text);
+}
+
+.hljs-formula {
+  background: var(--color-bg-subtle);
+  font-style: italic;
+}
+
+/* Navigation with CSS Nesting */
+nav {
+  padding-block: 0.75rem;
+  margin-block-end: 1.5rem;
+  border-block-end: 1px solid var(--color-border-subtle);
+
+  & ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+
+    @container (min-width: 30rem) {
+      gap: 0.625rem;
+    }
+
+    @container (min-width: 48rem) {
+      gap: 0.875rem;
+    }
+
+    @container (min-width: 64rem) {
+      gap: 1.5rem;
+    }
+
+    @container (min-width: 90rem) {
+      gap: 2rem;
+    }
+  }
+
+  & a,
+  & button {
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: clamp(0.875rem, 3vw, 1.125rem);
+    min-block-size: 44px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    width: auto;
+    min-width: 44px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: -100%;
+      width: 100%;
+      block-size: 100%;
+      background: linear-gradient(90deg, transparent, rgba(107, 142, 107, 0.1), transparent);
+      transition: inset-inline-start 0.3s ease;
+    }
+
+    &:hover {
+      color: var(--color-accent-sage);
+      background: var(--color-bg-subtle);
+      text-decoration: none;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(107, 142, 107, 0.15);
+
+      &::before {
+        inset-inline-start: 100%;
+      }
+    }
+
+    @container (min-width: 30rem) {
+      padding: 0.625rem 1rem;
+    }
+
+    @container (min-width: 37.5rem) {
+      padding: 0.5rem 0.875rem;
+    }
+
+    @container (min-width: 48rem) {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+
+    @container (min-width: 64rem) {
+      padding: 0.625rem 1.25rem;
+      font-size: 1.125rem;
+    }
+
+    @container (min-width: 90rem) {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+  }
+
+  & button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+
+    & svg {
+      width: 20px;
+      block-size: 20px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+/* Articles with CSS Nesting */
+article {
+  margin-block-end: 2rem;
+  padding-block-end: 1.5rem;
+  border-block-end: 1px solid var(--color-border-subtle);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: var(--color-bg);
+
+  &:last-child {
+    border-block-end: none;
+  }
+
+  & header {
+    margin-block-end: 0.875rem;
+
+    & h2 {
+      margin: 0 0 0.5rem;
+      border: none;
+      padding: 0;
+      font-size: 1.25rem;
+      line-height: 1.3;
+
+      & a {
+        color: var(--color-text);
+        min-block-size: auto;
+        display: inline;
+
+        &:hover {
+          color: var(--color-primary);
+        }
+      }
+
+      @container (min-width: 48rem) {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  @container (min-width: 48rem) {
+    margin-block-end: 2.5rem;
+  }
+
+  @container (min-width: 64rem) {
+    margin-block-end: 3rem;
+  }
+}
+
+/* Time and semantic elements */
+time, small {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  display: block;
+  margin-block-end: 0.5rem;
+}
+
+time {
+  font-weight: 500;
+  color: var(--color-accent-sage);
+}
+
+summary {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  font-size: 0.9rem;
+  font-style: italic;
+  border-inline-start: 3px solid var(--color-accent-amber);
+  padding-inline-start: 0.75rem;
+  margin-block: 0.75rem;
+}
+
+/* About page styling */
+@scope (section) {
+  article {
+    & p {
+      margin-block-end: 1.5rem;
+      line-height: 1.7;
+      
+      &:last-child {
+        margin-block-end: 0;
+      }
+
+      &:first-of-type {
+        font-size: 1.1rem;
+        color: var(--color-text);
+        font-weight: 500;
+      }
+    }
+
+    & aside {
+      background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+      border-inline-start: 4px solid var(--color-accent-amber);
+      padding: 1rem 1.25rem;
+      margin: 2rem 0;
+      border-radius: 0 8px 8px 0;
+      position: relative;
+      box-shadow: var(--shadow-subtle);
+
+      & p {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--color-accent-sage);
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset-inline-start: -2px;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        block-size: 8px;
+        background: var(--color-accent-amber);
+        border-radius: 50%;
+      }
+    }
+
+    & hr {
+      border: none;
+      block-size: 1px;
+      background: linear-gradient(to right, transparent, var(--color-border), transparent);
+      margin: 2.5rem 0;
+      opacity: 0.6;
+    }
+
+    & em {
+      color: var(--color-text-muted);
+      font-style: italic;
+      opacity: 0.9;
+    }
+
+    & strong {
+      color: var(--color-accent-sage);
+      font-weight: 600;
+    }
+  }
+}
+
+/* Footer */
+footer {
+  border-block-start: 1px solid var(--color-border-subtle);
+  padding-block: 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin-block-start: auto;
+}
+
+/* Modern dark mode with @media */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-syntax-keyword: #ff7b72;
+    --color-syntax-string: #a5d6ff;
+    --color-syntax-number: #79c0ff;
+    --color-syntax-function: #d2a8ff;
+    --color-syntax-comment: #8b949e;
+    --color-syntax-variable: #ffa657;
+  }
+
+  html {
+    background: #0d1117;
+    color: #f0f6fc;
+  }
+
+  a {
+    color: #58a6ff;
+  }
+
+  h2 {
+    border-block-end-color: #30363d;
+  }
+
+  article {
+    border-block-end-color: #30363d;
+  }
+
+  nav {
+    border-block-end-color: #30363d;
+
+    & a:hover,
+    & button:hover {
+      background: #21262d;
+    }
+  }
+
+  footer {
+    border-block-start-color: #30363d;
+  }
+
+  @scope (ul[role="list"]) {
+    :scope li {
+      background: #21262d;
+      color: #8b949e;
+
+      &:hover {
+        background: #30363d;
+      }
+    }
+  }
+
+  @scope (section) {
+    article aside {
+      background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+      border-inline-start-color: var(--color-accent-amber);
+    }
+  }
+
+  code {
+    background: #21262d;
+    border-color: #30363d;
+    color: var(--color-syntax-keyword);
+  }
+
+  pre {
+    background: #161b22;
+    border-color: #30363d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      border-color: #484f58;
+    }
+  }
+
+  .hljs {
+    color: #f0f6fc;
+  }
+}
+
+/* Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  a {
+    color: #0000ee;
+
+    &:visited {
+      color: #551a8b;
+    }
+  }
+
+  @scope (ul[role="list"]) {
+    :scope li a {
+      border-color: #000;
+      border-width: 2px;
+    }
+  }
+}
+
+/* View Transitions API */
+@view-transition {
+  navigation: auto;
+}
+
+/* Print styles */
+@media print {
+  nav, aside, dialog {
+    display: none;
+  }
+
+  body {
+    max-width: none;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  article {
+    page-break-inside: avoid;
+  }
+}
