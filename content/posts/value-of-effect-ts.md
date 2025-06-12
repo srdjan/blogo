@@ -15,7 +15,8 @@ This example shows how a standard approach to loading a user profile can result
 in a lot of code noise, making it difficult to focus on the business requirements.
 
 ```typescript
-// =============== HIGH NOISE (Mixed Technical Concerns) ===============
+// -------------------- HIGH NOISE (Mixed Technical Concerns) --------------------
+
 type User = { id: number; name: string };
 
 // Manual error handling
@@ -54,7 +55,8 @@ const loadUserProfile = async (userId: number) => {
 #### Effect-TS Approach
 
 ```typescript
-// =============== HIGH SIGNAL (Pure Business Requirements) ===============
+// -------------------- HIGH SIGNAL (Pure Business Requirements) --------------------
+
 import { Effect, pipe } from "effect";
 
 // 1. Declare business requirements as types
