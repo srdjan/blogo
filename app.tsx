@@ -2,6 +2,7 @@
 import { createBlogLayout } from "./src/utils/layout-helpers.tsx";
 import { createAbout, createPostList, createTagIndex, createSearchResults } from "./src/utils/render-helpers.tsx";
 import { getCachedPosts, getCachedTags, getPostBySlug, getPostsByTag, searchPostsByQuery } from "./src/utils/content-loader.ts";
+import { generateRSS } from "./src/rss.ts";
 
 export default {
   async fetch(req: Request) {
@@ -257,6 +258,25 @@ export default {
         },
         createSearchResults(posts, query)
       );
+    }
+
+    // Handle RSS feed
+    if (url.pathname === '/feed.xml') {
+      const posts = await getCachedPosts();
+      const baseUrl = url.origin;
+      const rssContent = generateRSS(
+        posts,
+        "Blog",
+        baseUrl,
+        "A minimal blog built with mono-jsx"
+      );
+
+      return new Response(rssContent, {
+        headers: { 
+          'Content-Type': 'application/rss+xml; charset=utf-8',
+          'Cache-Control': 'max-age=3600' // Cache for 1 hour
+        }
+      });
     }
     
     // For all other routes, return 404 with more info

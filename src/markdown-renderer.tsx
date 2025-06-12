@@ -1,12 +1,10 @@
 import { marked } from "https://esm.sh/marked@15.0.12";
-import { markedHighlight } from "https://esm.sh/marked-highlight@2.1.4";
 import hljs from "https://esm.sh/highlight.js@11.10.0";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
 
 // Custom renderer for mermaid blocks  
 const renderer = new marked.Renderer();
-const originalCode = renderer.code;
 
 renderer.code = function(token) {
   // Handle the new marked API where token is an object
@@ -42,12 +40,9 @@ renderer.code = function(token) {
 // Configure marked with custom renderer
 marked.use({ renderer });
 
-// In-memory cache for better performance
-const markdownCache = new Map<string, string>();
-
 export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   try {
-    // Parse markdown (cache disabled to ensure Mermaid changes take effect)
+    // Parse markdown to HTML
     const html = marked.parse(markdown) as string;
 
     return { ok: true, value: html };
