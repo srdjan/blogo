@@ -272,23 +272,22 @@ const app = App();
 // Product list route
 app.get("/products", (ctx) => {
   const html = renderSSR(
-    <div class="product-grid">
+    <section>
       {products.map((product) => (
-        <div class="product-card">
-          <h3 class="product-name">{product.name}</h3>
-          <div class="product-price">${product.price}</div>
-          <p class="product-description">{product.description}</p>
+        <article>
+          <h3>{product.name}</h3>
+          <div>${product.price}</div>
+          <p>{product.description}</p>
           <button
             type="button"
-            class="btn"
             hx-get={`/api/fragments/product-detail/${product.id}`}
             hx-target="#content"
           >
             View Details
           </button>
-        </div>
+        </article>
       ))}
-    </div>,
+    </section>,
   );
 
   ctx.response = new Response(html, {
@@ -343,27 +342,25 @@ app.get("/api/fragments/product-detail/:id", (ctx) => {
   }
 
   const html = renderSSR(
-    <div class="product-detail">
+    <article>
       <h2>{product.name}</h2>
-      <div class="price">${product.price}</div>
-      <p class="description">{product.description}</p>
-      <div class="actions">
+      <div>${product.price}</div>
+      <p>{product.description}</p>
+      <div>
         <button
-          class="btn add-to-cart"
           hx-post={`/api/cart/add/${product.id}`}
           hx-target="#cart-count"
         >
           Add to Cart
         </button>
         <button
-          class="btn back"
           hx-get="/products"
           hx-target="#content"
         >
           Back to Products
         </button>
       </div>
-    </div>,
+    </article>,
   );
 
   ctx.response = new Response(html, {

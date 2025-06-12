@@ -12,7 +12,8 @@ excerpt: How Effect-TS helps maximize signal (business requirements) while minim
 #### Standard Approach (Manual Implementation)
 
 This example shows how a standard approach to loading a user profile can result
-in a lot of code noise, making it difficult to focus on the business requirements.
+in a lot of code noise, making it difficult to focus on the business
+requirements.
 
 ```typescript
 // -------------------- HIGH NOISE (Mixed Technical Concerns) --------------------
@@ -191,7 +192,11 @@ const onboardingWorkflow = (userId: number) =>
 
 Almost there.
 
-So, the question is, if we would to dream a bit, would we be able to hide even the last two 'technical' concerns still appearing in the code? Yes, absolutely! For example, a 'use' instead a 'flatMap' and 'do' instead 'tap' are much better - they're natural, intuitive, and express intent clearly. We will also remove 'Effect.' from the beginning of each line, just because...
+So, the question is, if we would to dream a bit, would we be able to hide even
+the last two 'technical' concerns still appearing in the code? Yes, absolutely!
+For example, a 'use' instead a 'flatMap' and 'do' instead 'tap' are much
+better - they're natural, intuitive, and express intent clearly. We will also
+remove 'Effect.' from the beginning of each line, just because...
 
 With 'use' and 'do', we would have:
 
@@ -209,11 +214,13 @@ const onboardingWorkflow = (userId: number) =>
 Here is why this works so well:
 
 **use() = Transform/Chain**
+
 - Natural language: "use the profile to create subscription"
 - Clear intent: The result flows forward and gets transformed
 - Intuitive: Everyone understands "use X to do Y"
 
 **do() = Side Effect**
+
 - Natural language: "do send confirmation email"
 - Clear intent: Perform action without changing the main flow
 - Imperative feel: Matches how we think about actions
@@ -222,8 +229,8 @@ Here is why this works so well:
 
 ```typescript
 // Technical (current)
-Effect.flatMap(createSubscription)    // What's flatMap? 🤔
-Effect.tap(sendConfirmationEmail)     // What's tap? 🤔
+Effect.flatMap(createSubscription); // What's flatMap? 🤔
+Effect.tap(sendConfirmationEmail); // What's tap? 🤔
 ```
 
 ```typescript
@@ -246,13 +253,18 @@ const onboardingWorkflow = (userId: number) =>
   );
 ```
 
-So, 'use' and 'do' perfectly capture the two fundamental operations in any workflow:
+So, 'use' and 'do' perfectly capture the two fundamental operations in any
+workflow:
 
 - **Transform data** (use)
 - **Perform actions** (do)
 
-This would make functional programming much more accessible to business stakeholders and new developers!
+This would make functional programming much more accessible to business
+stakeholders and new developers!
 
 ### Conclusion
 
-Effect-TS is a powerful tool for maximizing signal-to-noise ratio in software development with TypeScript. This post demonstrates how Effect-TS transforms TypeScript into a "business requirements DSL" where technical concerns become implementation details rather than cognitive obstacles.
+Effect-TS is a powerful tool for maximizing signal-to-noise ratio in software
+development with TypeScript. This post demonstrates how Effect-TS transforms
+TypeScript into a "business requirements DSL" where technical concerns become
+implementation details rather than cognitive obstacles.

@@ -6,9 +6,9 @@ interface LayoutOptions {
   path?: string;
 }
 
-export function createBlogLayout(options: LayoutOptions, children: any) {
+export function createBlogLayout(options: LayoutOptions, children: JSX.Element) {
   const { title, description, path = "/" } = options;
-  
+
   return (
     <html lang="en">
       <head>
@@ -19,7 +19,8 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} />
         <script src="/js/htmx.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">
+        </script>
         <script src="/js/site.js"></script>
       </head>
       <body>
@@ -28,9 +29,9 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
             <nav>
               <ul>
                 <li>
-                  <a 
-                    href="/" 
-                    class={path === "/" ? "link active" : "link"}
+                  <a
+                    href="/"
+                    aria-current={path === "/" ? "page" : undefined}
                     hx-get="/"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
@@ -40,9 +41,9 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                   </a>
                 </li>
                 <li>
-                  <a 
-                    href="/tags" 
-                    class={path === "/tags" ? "link active" : "link"}
+                  <a
+                    href="/tags"
+                    aria-current={path === "/tags" ? "page" : undefined}
                     hx-get="/tags"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
@@ -52,9 +53,9 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                   </a>
                 </li>
                 <li>
-                  <a 
-                    href="/about" 
-                    class={path === "/about" ? "link active" : "link"}
+                  <a
+                    href="/about"
+                    aria-current={path === "/about" ? "page" : undefined}
                     hx-get="/about"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
@@ -66,28 +67,47 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                 <li>
                   <button
                     type="button"
-                    class="search-toggle link"
                     aria-label="Search"
                     aria-expanded="false"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
-                      <path d="m21 21-4.34-4.34"/>
-                      <circle cx="11" cy="11" r="8"/>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m21 21-4.34-4.34" />
+                      <circle cx="11" cy="11" r="8" />
                     </svg>
                   </button>
                 </li>
                 <li>
-                  <a href="/feed.xml" class="link" aria-label="RSS Feed">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rss-icon lucide-rss">
-                      <path d="M4 11a9 9 0 0 1 9 9"/>
-                      <path d="M4 4a16 16 0 0 1 16 16"/>
-                      <circle cx="5" cy="19" r="1"/>
+                  <a href="/feed.xml" aria-label="RSS Feed">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M4 11a9 9 0 0 1 9 9" />
+                      <path d="M4 4a16 16 0 0 1 16 16" />
+                      <circle cx="5" cy="19" r="1" />
                     </svg>
                   </a>
                 </li>
               </ul>
             </nav>
-            
+
             <dialog id="search-modal" aria-labelledby="search-heading">
               <section>
                 <header>
@@ -108,20 +128,23 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
                     id="search-input"
                     aria-labelledby="search-heading"
                   />
-                  <button type="submit" aria-label="Submit search">Search</button>
+                  <button type="submit" aria-label="Submit search">
+                    Search
+                  </button>
                 </form>
                 <section
                   id="search-results"
                   role="region"
                   aria-live="polite"
                   aria-label="Search results"
-                ></section>
+                >
+                </section>
               </section>
             </dialog>
           </header>
 
-          <main id="content-main" class="content-main">
-            <div id="content-area" class="htmx-swappable">
+          <main id="content-main">
+            <div id="content-area">
               {children}
             </div>
           </main>
@@ -129,7 +152,11 @@ export function createBlogLayout(options: LayoutOptions, children: any) {
           <footer>
             <p>
               Claude &
-              <a href="https://srdjan.github.io" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://srdjan.github.io"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <span>⊣˚∆˚⊢</span>
               </a>
               vibe coded together...

@@ -4,7 +4,7 @@ export function NotFoundHtml() {
       <h1>404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
       <p>
-        <a 
+        <a
           href="/"
           hx-get="/"
           hx-target="#content-area"

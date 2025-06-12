@@ -1,14 +1,18 @@
 # Functional Minimal Blog
 
-A lightweight, type-safe, functional blog implementation built with Deno, TypeScript, mono-jsx, HTMX, and Markdown.
+A lightweight, type-safe, functional blog implementation built with Deno,
+TypeScript, mono-jsx, HTMX, and Markdown.
 
 ## Core Principles
 
 This blog system is built around several key architectural principles:
 
-1. **Functional Programming**: Pure functions, immutability, and type-safe data transformations
-2. **Minimal Dependencies**: Leveraging Deno's standard library with minimal external dependencies
-3. **Progressive Enhancement**: Core functionality works without JavaScript, enhanced with HTMX
+1. **Functional Programming**: Pure functions, immutability, and type-safe data
+   transformations
+2. **Minimal Dependencies**: Leveraging Deno's standard library with minimal
+   external dependencies
+3. **Progressive Enhancement**: Core functionality works without JavaScript,
+   enhanced with HTMX
 4. **Type Safety**: Comprehensive type system for robust error handling
 5. **Semantic HTML**: Clean, accessible markup following modern best practices
 6. **Pure CSS**: Minimal, semantic, responsive styling without frameworks
@@ -17,17 +21,21 @@ This blog system is built around several key architectural principles:
 ## Features
 
 - **Markdown Content**: Posts written in markdown with YAML frontmatter
-- **Tag System**: Posts can be tagged and filtered by tag with elegant tag cloud display
+- **Tag System**: Posts can be tagged and filtered by tag with elegant tag cloud
+  display
 - **Full-text Search**: Client-side search implementation with modal interface
-- **Responsive Design**: Mobile-first styling that works seamlessly across all devices
-- **Semantic Components**: Clean JSX components following semantic HTML principles
+- **Responsive Design**: Mobile-first styling that works seamlessly across all
+  devices
+- **Semantic Components**: Clean JSX components following semantic HTML
+  principles
 - **Elegant Interactions**: Subtle hover effects and smooth animations
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
 
 ## Architecture
 
-The project follows a functional mono-jsx architecture with clean separation of concerns and semantic HTML/CSS.
+The project follows a functional mono-jsx architecture with clean separation of
+concerns and semantic HTML/CSS.
 
 ### Core Structure
 
@@ -103,7 +111,7 @@ The blog will be available at `http://localhost:8000`
 
 Create markdown files in `content/posts/` with YAML frontmatter:
 
-```markdown
+````markdown
 ---
 title: Your Post Title
 date: 2025-01-15
@@ -117,7 +125,7 @@ tags:
 
 Write your post content in markdown here. Supports:
 
-- **Bold** and *italic* text
+- **Bold** and _italic_ text
 - Code blocks with syntax highlighting
 - Mermaid diagrams
 - Links and images
@@ -128,10 +136,12 @@ graph TD
     A[Start] --> B[Process]
     B --> C[End]
 ```
+````
 
 ### Configuration
 
-The blog can be configured through environment variables or by modifying `src/config.ts`:
+The blog can be configured through environment variables or by modifying
+`src/config.ts`:
 
 - Blog title and description
 - Posts per page
@@ -168,7 +178,8 @@ CSS follows a mobile-first approach with:
 
 ### Deno Deploy
 
-The blog is optimized for deployment on [Deno Deploy](https://deno.com/deploy), Deno's edge computing platform.
+The blog is optimized for deployment on [Deno Deploy](https://deno.com/deploy),
+Deno's edge computing platform.
 
 #### Quick Deployment
 
@@ -237,10 +248,12 @@ To use a custom domain:
 
 #### Production Considerations
 
-- **Content Updates**: Add new posts by committing markdown files to your repository
+- **Content Updates**: Add new posts by committing markdown files to your
+  repository
 - **Caching**: The blog includes intelligent caching for optimal performance
 - **Static Assets**: CSS and JS are served efficiently from the edge
-- **Environment Variables**: Configure blog settings through Deno Deploy dashboard
+- **Environment Variables**: Configure blog settings through Deno Deploy
+  dashboard
 
 ## Technology Stack
 

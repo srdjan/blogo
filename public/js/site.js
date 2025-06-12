@@ -11,7 +11,7 @@ const Core = {
 
     // Set active nav link on initial page load
     this.updateActiveNavLink();
-    
+
     // Initialize Mermaid if available
     this.initMermaid();
   },
@@ -58,7 +58,7 @@ const Core = {
 
         // Update active navigation link
         this.updateActiveNavLink();
-        
+
         // Re-initialize Mermaid for new content
         this.initMermaid();
 
@@ -120,75 +120,74 @@ const Core = {
 
   initMermaid() {
     // Wait for mermaid to be available
-    if (typeof mermaid === 'undefined') {
-      console.log('Mermaid not yet loaded, retrying...');
+    if (typeof mermaid === "undefined") {
+      console.log("Mermaid not yet loaded, retrying...");
       setTimeout(() => this.initMermaid(), 100);
       return;
     }
 
     try {
-      console.log('Mermaid found, initializing...');
-      
+      console.log("Mermaid found, initializing...");
+
       // Configure Mermaid with bright pastel colors
       mermaid.initialize({
         startOnLoad: false, // We'll manually trigger rendering
-        theme: 'base',
+        theme: "base",
         themeVariables: {
           // Brighter, more pastel primary colors
-          primaryColor: '#B8E6B8',        // Light sage green
-          secondaryColor: '#F5E6A3',       // Light amber
-          tertiaryColor: '#F0C5C5',        // Light coral
-          quaternaryColor: '#C5D7F0',      // Light blue
-          
+          primaryColor: "#B8E6B8", // Light sage green
+          secondaryColor: "#F5E6A3", // Light amber
+          tertiaryColor: "#F0C5C5", // Light coral
+          quaternaryColor: "#C5D7F0", // Light blue
+
           // Text and borders
-          primaryTextColor: '#2c3e50',     // Darker text for better contrast
-          primaryBorderColor: '#95a5a6',   // Lighter border
-          lineColor: '#7f8c8d',           // Medium gray for lines
-          
+          primaryTextColor: "#2c3e50", // Darker text for better contrast
+          primaryBorderColor: "#95a5a6", // Lighter border
+          lineColor: "#7f8c8d", // Medium gray for lines
+
           // Background colors
-          background: '#ffffff',
-          secondaryBackground: '#f8f9fa',
-          tertiaryBackground: '#e9ecef',
-          
+          background: "#ffffff",
+          secondaryBackground: "#f8f9fa",
+          tertiaryBackground: "#e9ecef",
+
           // Node-specific colors (these override the defaults)
-          cScale0: '#B8E6B8',             // Light sage
-          cScale1: '#F5E6A3',             // Light amber  
-          cScale2: '#F0C5C5',             // Light coral
-          cScale3: '#C5D7F0',             // Light blue
-          cScale4: '#E6D7F0',             // Light purple
-          cScale5: '#D7F0E6',             // Light mint
-          
+          cScale0: "#B8E6B8", // Light sage
+          cScale1: "#F5E6A3", // Light amber
+          cScale2: "#F0C5C5", // Light coral
+          cScale3: "#C5D7F0", // Light blue
+          cScale4: "#E6D7F0", // Light purple
+          cScale5: "#D7F0E6", // Light mint
+
           // Subgraph colors
-          clusterBkg: '#f8f9fa',
-          clusterBorder: '#bdc3c7',
-          
+          clusterBkg: "#f8f9fa",
+          clusterBorder: "#bdc3c7",
+
           // Special elements
-          activationBorderColor: '#34495e',
-          activationBkgColor: '#ecf0f1'
-        }
+          activationBorderColor: "#34495e",
+          activationBkgColor: "#ecf0f1",
+        },
       });
 
       // Find all mermaid elements and render them
-      const mermaidElements = document.querySelectorAll('.mermaid');
+      const mermaidElements = document.querySelectorAll(".mermaid");
       console.log(`Found ${mermaidElements.length} mermaid elements`);
-      
+
       if (mermaidElements.length > 0) {
         // Use the run method for newer mermaid versions
         mermaid.run({
-          nodes: mermaidElements
+          nodes: mermaidElements,
         });
-        console.log('Mermaid rendering completed');
+        console.log("Mermaid rendering completed");
       }
-      
     } catch (error) {
-      console.error('Mermaid initialization failed:', error);
-      
+      console.error("Mermaid initialization failed:", error);
+
       // Fallback: try the older init method
       try {
-        console.log('Trying fallback mermaid.init()...');
+        console.log("Trying fallback mermaid.init()...");
         mermaid.init();
       } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
+        console.error("Fallback also failed:", fallbackError);
       }
     }
   },
@@ -275,43 +274,45 @@ const Search = {
 document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
-  
+
   // Setup search modal functionality
-  const searchToggle = document.querySelector('.search-toggle');
-  const searchModal = document.getElementById('search-modal');
-  const searchInput = document.getElementById('search-input');
-  
+  const searchToggle = document.querySelector(".search-toggle");
+  const searchModal = document.getElementById("search-modal");
+  const searchInput = document.getElementById("search-input");
+
   // Open search modal
   if (searchToggle && searchModal) {
-    searchToggle.addEventListener('click', (e) => {
+    searchToggle.addEventListener("click", (e) => {
       e.preventDefault();
-      searchModal.style.display = 'block';
+      searchModal.style.display = "block";
       setTimeout(() => searchInput?.focus(), 100);
     });
   }
-  
+
   // Close search modal
-  const searchCloseBtn = searchModal?.querySelector('button[aria-label="Close search"]');
+  const searchCloseBtn = searchModal?.querySelector(
+    'button[aria-label="Close search"]',
+  );
   if (searchCloseBtn) {
-    searchCloseBtn.addEventListener('click', (e) => {
+    searchCloseBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      searchModal.style.display = 'none';
+      searchModal.style.display = "none";
     });
   }
-  
+
   // Close modal when clicking outside
   if (searchModal) {
-    searchModal.addEventListener('click', (e) => {
+    searchModal.addEventListener("click", (e) => {
       if (e.target === searchModal) {
-        searchModal.style.display = 'none';
+        searchModal.style.display = "none";
       }
     });
   }
-  
+
   // Close modal with Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && searchModal?.style.display === 'block') {
-      searchModal.style.display = 'none';
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && searchModal?.style.display === "block") {
+      searchModal.style.display = "none";
     }
   });
 });

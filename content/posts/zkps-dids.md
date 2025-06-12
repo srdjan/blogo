@@ -8,25 +8,26 @@ excerpt: A design for a multi-key zero-knowledge verification system that levera
 ## Overview
 
 Below is a mussing about the design for a multi-key zero-knowledge (zk)
-verification system that leverages the use of verifiable credentials stored
-on decentralized storage (such as an AT Protocol Personal Data Store, PDS)
-without any references to blockchain. This design focuses on proving, for
-example, employment by requiring both a decentralized identifier (DID)-based
-private key and an Employer key, while storing verifiable
-credentials (VCs) in user profiles on a decentralized storage network.
+verification system that leverages the use of verifiable credentials stored on
+decentralized storage (such as an AT Protocol Personal Data Store, PDS) without
+any references to blockchain. This design focuses on proving, for example,
+employment by requiring both a decentralized identifier (DID)-based private key
+and an Employer key, while storing verifiable credentials (VCs) in user profiles
+on a decentralized storage network.
 
-This system enables a user to demonstrate possession of employment
-credentials without revealing underlying sensitive details. The proof generation
-demands that both the user's DID-associated private key and an independent
-verifier's key (used to attest employment) are used to create a combined
-zero-knowledge proof. Verifiable credentials are stored within a decentralized
-data store (like an AT Protocol PDS), giving users full control over their data
-while ensuring a privacy-preserving verification process.
+This system enables a user to demonstrate possession of employment credentials
+without revealing underlying sensitive details. The proof generation demands
+that both the user's DID-associated private key and an independent verifier's
+key (used to attest employment) are used to create a combined zero-knowledge
+proof. Verifiable credentials are stored within a decentralized data store (like
+an AT Protocol PDS), giving users full control over their data while ensuring a
+privacy-preserving verification process.
 
 ### Architectural Components
 
 - **User (User's application):**
-  - Possesses a DID and its corresponding private key in a secure digital wallet.
+  - Possesses a DID and its corresponding private key in a secure digital
+    wallet.
   - Receives verifiable credentials (VCs) that contain employment-related data,
     issued by a credential issuer.
   - Stores the encrypted VCs or references (e.g., secure pointers, hashes) to
@@ -267,8 +268,8 @@ flowchart TD
 
 - **Cryptographic Signature Schemes:**
   - Standard digital signature algorithms (e.g., EdDSA, RSA, or ECDSA variants)
-    that are used both by the credential issuer and the for
-    signing attestations.
+    that are used both by the credential issuer and the for signing
+    attestations.
 
 ---
 
