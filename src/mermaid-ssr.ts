@@ -258,7 +258,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "sans-serif",
+        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -278,7 +278,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "sans-serif",
+        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -296,7 +296,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "sans-serif",
+        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 11,
       })
     }${label}</text>`)
@@ -318,7 +318,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "sans-serif",
+        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -366,7 +366,7 @@ const renderEdge = (
           x: midX,
           y: midY - 5,
           "text-anchor": "middle",
-          "font-family": "sans-serif",
+          "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
           "font-size": 10,
           fill: "#444",
         })

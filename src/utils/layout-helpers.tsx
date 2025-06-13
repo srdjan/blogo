@@ -32,7 +32,7 @@ export function createBlogLayout(
           type="image/svg+xml"
           {...({} as any)}
         />
-        <link rel="stylesheet" href="/css/main-modern.css" {...({} as any)} />
+        <link rel="stylesheet" href="/css/main.css" {...({} as any)} />
         <link
           rel="alternate"
           href="/feed.xml"

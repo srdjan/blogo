@@ -97,31 +97,31 @@ const Core = {
     // Get current path
     const currentPath = window.location.pathname;
 
-    // Remove active class from all nav links
-    document.querySelectorAll(".nav-links a").forEach((link) => {
-      link.classList.remove("active");
+    // Remove aria-current from all nav links
+    document.querySelectorAll("nav a").forEach((link) => {
+      link.removeAttribute("aria-current");
     });
 
-    // Add active class to current nav link
+    // Add aria-current to current nav link
     let activeLink;
 
     if (currentPath === "/") {
       // Home page
-      activeLink = document.querySelector('.nav-links a[href="/"]');
+      activeLink = document.querySelector('nav a[href="/"]');
     } else if (currentPath.startsWith("/tags")) {
       // Tags page
-      activeLink = document.querySelector('.nav-links a[href="/tags"]');
+      activeLink = document.querySelector('nav a[href="/tags"]');
     } else if (currentPath === "/about") {
       // About page
-      activeLink = document.querySelector('.nav-links a[href="/about"]');
+      activeLink = document.querySelector('nav a[href="/about"]');
     } else if (currentPath.startsWith("/posts")) {
       // Individual post - highlight Home
-      activeLink = document.querySelector('.nav-links a[href="/"]');
+      activeLink = document.querySelector('nav a[href="/"]');
     }
 
-    // Add active class if we found a matching link
+    // Add aria-current if we found a matching link
     if (activeLink) {
-      activeLink.classList.add("active");
+      activeLink.setAttribute("aria-current", "page");
     }
   },
 };

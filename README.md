@@ -58,7 +58,7 @@ concerns and semantic HTML/CSS.
 │   └── markdown-renderer.tsx # Markdown to HTML rendering
 ├── content/posts/            # Markdown blog posts
 ├── public/
-│   ├── css/main-modern.css  # Modern CSS with nesting, @scope, container queries
+│   ├── css/main.css  # Modern CSS with nesting, @scope, container queries
 │   └── js/                  # HTMX and site JavaScript
 └── CLAUDE.md                # Development guidance and architecture notes
 ```
