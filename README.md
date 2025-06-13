@@ -23,7 +23,7 @@ This blog system is built around several key architectural principles:
 - **Markdown Content**: Posts written in markdown with YAML frontmatter
 - **Tag System**: Posts can be tagged and filtered by tag with elegant tag cloud
   display
-- **Full-text Search**: Client-side search implementation with modal interface
+- **Full-text Search**: Dual search experience with modal quick-search and full results page
 - **Responsive Design**: Mobile-first styling that works seamlessly across all
   devices
 - **Semantic Components**: Clean JSX components following semantic HTML
@@ -40,7 +40,7 @@ concerns and semantic HTML/CSS.
 ### Core Structure
 
 ```
-├── app.tsx                    # Main mono-jsx application entry point
+├── app.tsx                    # Main application with serve wrapper and fetch handler
 ├── src/
 │   ├── components/            # Semantic JSX components
 │   │   ├── AboutHtml.tsx     # About page component
@@ -61,7 +61,7 @@ concerns and semantic HTML/CSS.
 │   └── markdown-renderer.tsx # Markdown to HTML rendering
 ├── content/posts/            # Markdown blog posts
 ├── public/
-│   ├── css/main.css         # Semantic, responsive CSS
+│   ├── css/main-modern.css  # Modern CSS with nesting, @scope, container queries
 │   └── js/                  # HTMX and site JavaScript
 └── CLAUDE.md                # Development guidance and architecture notes
 ```
@@ -70,7 +70,9 @@ concerns and semantic HTML/CSS.
 
 ### Prerequisites
 
+- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.x or higher 
 - [Deno](https://deno.land/) v2.x or higher
+- [HTMX](https://htmx.org/) for dynamic interactions
 
 ### Installation
 
@@ -99,8 +101,8 @@ The blog will be available at `http://localhost:8000`
 
 ### Available Commands
 
-- `deno task start` - Start the production server
-- `deno task dev` - Start development server with watch mode
+- `deno task start` - Start the production server (`deno run` with required permissions)
+- `deno task dev` - Start development server with watch mode and hot reloading
 - `deno task setup` - Initialize project structure and download dependencies
 - `deno fmt` - Format TypeScript/JSX files
 - `deno lint` - Lint source files
@@ -219,6 +221,13 @@ The blog is configured for Deno Deploy in `deno.json`:
 
 ```json
 {
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env --allow-write app.tsx",
+    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch app.tsx"
+  },
+  "imports": {
+    "mono-jsx": "npm:mono-jsx@^0.6.6"
+  },
   "deploy": {
     "exclude": ["**/node_modules"],
     "include": [],
@@ -414,6 +423,13 @@ font-family: ui-monospace, "SF Mono", "Monaco", monospace;
 - Progressive disclosure patterns
 - Visual feedback for interactions
 
+#### **Enhanced Search Experience**
+
+- **Modal Search**: Quick access with title-only results for fast browsing
+- **Full Search Page**: Complete results with excerpts, dates, and metadata
+- **Event Delegation**: Robust JavaScript that persists through HTMX navigation
+- **Dialog API**: Native browser modal functionality with proper focus management
+
 ### 🛠 **Development Experience**
 
 #### **Type-Safe Architecture**
@@ -438,6 +454,24 @@ type Result<T, E> =
 - Advanced type inference
 - Discriminated unions
 - Utility types
+
+#### **Clean Server Architecture**
+
+```typescript
+// Custom serve wrapper for better control
+export const serve = (
+  fetchHandler: (request: Request) => Response | Promise<Response>,
+  options: ServeOptions = {}
+): Deno.HttpServer => {
+  const { port = 8000, hostname = "localhost", signal } = options;
+  return Deno.serve({ port, hostname, signal }, fetchHandler);
+};
+```
+
+- **Separation of Concerns**: App logic separate from server startup
+- **Testable Architecture**: Fetch handler can be tested independently  
+- **Environment Detection**: `import.meta.main` for conditional server start
+- **Flexible Configuration**: Configurable port, hostname, and abort signals
 
 ### 🎨 **Visual Design System**
 
@@ -537,10 +571,12 @@ the future of web development—clean, fast, accessible, and maintainable.
 
 - **Runtime**: Deno v2.x
 - **Language**: TypeScript
-- **Rendering**: mono-jsx (server-side JSX)
-- **Enhancement**: HTMX for dynamic interactions
+- **Rendering**: mono-jsx v0.6.6+ (server-side JSX without React)
+- **Server**: Custom serve wrapper with `deno run` for better control
+- **Enhancement**: HTMX for dynamic interactions and progressive enhancement
 - **Styling**: Modern CSS with nesting, @scope, container queries
 - **Layout**: CSS logical properties and modern selectors
 - **Content**: Markdown with YAML frontmatter
 - **Diagrams**: Mermaid.js integration
+- **Search**: Client-side modal search with minimal results display
 - **Hosting**: Deno Deploy (edge computing platform)
