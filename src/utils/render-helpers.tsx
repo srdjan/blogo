@@ -222,3 +222,4 @@ export function createSearchResults(posts: Post[], query: string) {
     </main>
   );
 }
+
