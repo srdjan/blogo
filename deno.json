@@ -18,7 +18,7 @@
     ]
   },
   "imports": {
-    "mono-jsx": "npm:mono-jsx@^0.3.2",
+    "mono-jsx": "npm:mono-jsx@^0.6.6",
     "@srdjan/mixon": "jsr:@srdjan/mixon@^1.0.2"
   },
   "compilerOptions": {

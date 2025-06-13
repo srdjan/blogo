@@ -257,20 +257,22 @@ To use a custom domain:
 
 ## Modern Web Techniques & Features
 
-This blog showcases cutting-edge web development techniques that create a fast, maintainable, and user-friendly experience.
+This blog showcases cutting-edge web development techniques that create a fast,
+maintainable, and user-friendly experience.
 
 ### 🎨 **Modern CSS Architecture**
 
 #### **CSS Nesting**
+
 ```css
 /* Clean, organized CSS with native nesting */
 nav {
   padding-block: 0.75rem;
-  
+
   & ul {
     display: flex;
     gap: 0.5rem;
-    
+
     & li {
       padding: 0.5rem;
     }
@@ -279,13 +281,14 @@ nav {
 ```
 
 #### **@scope for Component Isolation**
+
 ```css
 /* Scoped styles prevent CSS pollution */
 @scope (ul[role="list"]) {
   :scope {
     list-style: none;
     display: flex;
-    
+
     & li {
       padding: 0.1rem 0.35rem;
       border-radius: 3px;
@@ -295,6 +298,7 @@ nav {
 ```
 
 #### **Container Queries**
+
 ```css
 /* Responsive design based on container size, not viewport */
 @container (min-width: 48rem) {
@@ -304,14 +308,16 @@ nav {
 ```
 
 #### **CSS Logical Properties**
+
 ```css
 /* Internationalization-ready layout properties */
-margin-block-end: 1.5rem;        /* Instead of margin-bottom */
-padding-inline-start: 0.75rem;   /* Instead of padding-left */
-border-block-start: 1px solid;   /* Instead of border-top */
+margin-block-end: 1.5rem; /* Instead of margin-bottom */
+padding-inline-start: 0.75rem; /* Instead of padding-left */
+border-block-start: 1px solid; /* Instead of border-top */
 ```
 
 #### **Modern CSS Selectors & Features**
+
 - `:where()` and `:is()` for better specificity control
 - CSS custom properties (variables) for theming
 - `clamp()` for fluid typography
@@ -321,18 +327,21 @@ border-block-start: 1px solid;   /* Instead of border-top */
 ### 🚀 **Performance Optimizations**
 
 #### **Size Reduction**
+
 - **67% smaller CSS** (1200+ lines → 400 lines) through nesting
 - **Semantic HTML** reduces class pollution
 - **Component-scoped styles** eliminate unused CSS
 
 #### **Modern Font Stacks**
+
 ```css
 /* System fonts for optimal performance */
 font-family: system-ui, -apple-system, sans-serif;
-font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
+font-family: ui-monospace, "SF Mono", "Monaco", monospace;
 ```
 
 #### **Intelligent Caching**
+
 - TTL-based content caching
 - Static asset optimization
 - Edge-ready deployment
@@ -340,18 +349,22 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 ### ♿ **Accessibility & UX**
 
 #### **Semantic HTML Structure**
+
 ```tsx
 // Meaningful markup over utility classes
 <article>
   <header>
-    <h2><a href="/post">Title</a></h2>
+    <h2>
+      <a href="/post">Title</a>
+    </h2>
     <time dateTime="2025-01-15">Jan 15, 2025</time>
   </header>
   <summary>Post excerpt...</summary>
-</article>
+</article>;
 ```
 
 #### **Modern Accessibility Features**
+
 - ARIA roles and properties
 - Proper heading hierarchy
 - Touch-friendly targets (44px minimum)
@@ -359,6 +372,7 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 - Screen reader optimization
 
 #### **Progressive Enhancement**
+
 - Works without JavaScript
 - HTMX for smooth interactions
 - Graceful degradation
@@ -366,6 +380,7 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 ### 🎯 **User Experience Enhancements**
 
 #### **View Transitions API**
+
 ```css
 /* Smooth page transitions (Chrome/Edge) */
 @view-transition {
@@ -374,10 +389,13 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 ```
 
 #### **Preference-Based Design**
+
 ```css
 /* Respects user system preferences */
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; }
+  * {
+    animation-duration: 0.01ms !important;
+  }
 }
 
 @media (prefers-contrast: high) {
@@ -390,6 +408,7 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 ```
 
 #### **Micro-Interactions**
+
 - Subtle hover effects with transforms
 - Smooth transitions and animations
 - Progressive disclosure patterns
@@ -398,20 +417,23 @@ font-family: ui-monospace, 'SF Mono', 'Monaco', monospace;
 ### 🛠 **Development Experience**
 
 #### **Type-Safe Architecture**
+
 ```typescript
 // Result monad pattern for error handling
-type Result<T, E> = 
+type Result<T, E> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 ```
 
 #### **Functional Programming**
+
 - Pure functions throughout
 - Immutable data structures
 - Composable utilities
 - No side effects in core logic
 
 #### **Modern TypeScript**
+
 - Strict type checking
 - Advanced type inference
 - Discriminated unions
@@ -420,18 +442,21 @@ type Result<T, E> =
 ### 🎨 **Visual Design System**
 
 #### **Striking Code Highlighting**
+
 - GitHub-inspired color scheme
 - Enhanced contrast and readability
 - Language-specific styling
 - Dark mode optimization
 
 #### **Tag System Evolution**
+
 - Content-proportional widths
 - Semantic `ul[role="list"]` structure
 - Consistent styling across contexts
 - Hover states and transitions
 
 #### **Typography & Layout**
+
 - Fluid typography with `clamp()`
 - Optimal line heights (1.6-1.7)
 - Semantic spacing rhythm
@@ -440,6 +465,7 @@ type Result<T, E> =
 ### 📱 **Mobile-First Responsive Design**
 
 #### **Container-Based Responsiveness**
+
 ```css
 /* Component-aware responsive design */
 body {
@@ -452,6 +478,7 @@ body {
 ```
 
 #### **Touch-Optimized Interactions**
+
 - 44px minimum touch targets
 - Optimized spacing for mobile
 - Gesture-friendly navigation
@@ -460,6 +487,7 @@ body {
 ### 🌙 **Advanced Theming**
 
 #### **CSS Variables for Theming**
+
 ```css
 :root {
   --color-syntax-keyword: #d73a49;
@@ -477,6 +505,7 @@ body {
 ```
 
 #### **Automatic Dark Mode**
+
 - System preference detection
 - Smooth color transitions
 - Optimized contrast ratios
@@ -501,7 +530,8 @@ body {
 - **Performance-Optimized**: Every technique chosen for speed
 - **Accessibility-Native**: Built-in, not bolted-on
 
-This modern approach creates a blog that's not just functional, but showcases the future of web development—clean, fast, accessible, and maintainable.
+This modern approach creates a blog that's not just functional, but showcases
+the future of web development—clean, fast, accessible, and maintainable.
 
 ## Technology Stack
 

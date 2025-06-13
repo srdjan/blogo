@@ -62,6 +62,15 @@ const Core = {
         // Re-initialize Mermaid for new content
         this.initMermaid();
 
+        // Ensure search modal is properly reset after content swap
+        const searchModal = document.getElementById("search-modal");
+        if (searchModal && searchModal.open) {
+          searchModal.close();
+        }
+        
+        // Ensure search toggle still works after HTMX swap
+        ensureSearchToggleWorks();
+
         // Log successful content swap (for debugging)
         if (
           window.location.hostname === "localhost" ||
@@ -79,7 +88,7 @@ const Core = {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const searchModal = document.getElementById("search-modal");
-        if (searchModal && searchModal.style.display === "flex") {
+        if (searchModal && (searchModal.style.display === "flex" || searchModal.style.display === "block")) {
           searchModal.style.display = "none";
         }
       }
@@ -232,30 +241,27 @@ const Search = {
       }
     });
 
-    // Auto-focus search input when modal opens
-    if (this.searchToggle) {
-      this.searchToggle.addEventListener("click", () => {
-        setTimeout(() => this.searchInput.focus(), 10);
-      });
-    }
-
-    // Close search modal when clicking outside content
-    if (this.searchModal) {
-      this.searchModal.addEventListener("click", (e) => {
-        if (e.target === this.searchModal) {
-          this.searchModal.style.display = "none";
-        }
-      });
-    }
+    // Note: Search toggle and modal close are handled by event delegation in main script
   },
 
   performSearch(query) {
     this.searchResults.innerHTML = "Searching...";
 
-    fetch("/search?q=" + encodeURIComponent(query))
+    fetch("/search-modal?q=" + encodeURIComponent(query))
       .then((res) => res.text())
       .then((html) => {
         this.searchResults.innerHTML = html;
+        
+        // Add click handlers to close modal when a result is clicked
+        const resultLinks = this.searchResults.querySelectorAll('.search-result-link');
+        resultLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            const searchModal = document.getElementById("search-modal");
+            if (searchModal) {
+              searchModal.close();
+            }
+          });
+        });
       })
       .catch((err) => {
         this.searchResults.innerHTML = "Error: Could not perform search.";
@@ -270,49 +276,78 @@ const Search = {
   },
 };
 
+// Simple function to ensure search functionality works
+function ensureSearchToggleWorks() {
+  const searchToggle = document.querySelector(".search-toggle");
+  const searchCloseBtn = document.querySelector('button[aria-label="Close search"]');
+  const searchModal = document.getElementById("search-modal");
+  
+  console.log("Ensuring search functionality works", { 
+    toggle: !!searchToggle, 
+    closeBtn: !!searchCloseBtn, 
+    modal: !!searchModal 
+  });
+  
+  // Search toggle
+  if (searchToggle && !searchToggle.hasAttribute('data-listener-attached')) {
+    searchToggle.setAttribute('data-listener-attached', 'true');
+    
+    searchToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Search toggle clicked - direct listener");
+      const modal = document.getElementById("search-modal");
+      const input = document.getElementById("search-input");
+      if (modal) {
+        modal.showModal();
+        setTimeout(() => {
+          if (input) {
+            input.focus();
+          }
+        }, 100);
+      }
+    });
+  }
+  
+  // Close button  
+  if (searchCloseBtn && !searchCloseBtn.hasAttribute('data-listener-attached')) {
+    searchCloseBtn.setAttribute('data-listener-attached', 'true');
+    
+    searchCloseBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modal = document.getElementById("search-modal");
+      if (modal) {
+        modal.close();
+      }
+    });
+  }
+  
+  // Click outside modal
+  if (searchModal && !searchModal.hasAttribute('data-listener-attached')) {
+    searchModal.setAttribute('data-listener-attached', 'true');
+    
+    searchModal.addEventListener("click", (e) => {
+      if (e.target === searchModal) {
+        searchModal.close();
+      }
+    });
+  }
+}
+
 // Initialize all modules when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
+  
+  // Initial attachment of search listeners
+  ensureSearchToggleWorks();
 
-  // Setup search modal functionality
-  const searchToggle = document.querySelector(".search-toggle");
-  const searchModal = document.getElementById("search-modal");
-  const searchInput = document.getElementById("search-input");
-
-  // Open search modal
-  if (searchToggle && searchModal) {
-    searchToggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      searchModal.style.display = "block";
-      setTimeout(() => searchInput?.focus(), 100);
-    });
-  }
-
-  // Close search modal
-  const searchCloseBtn = searchModal?.querySelector(
-    'button[aria-label="Close search"]',
-  );
-  if (searchCloseBtn) {
-    searchCloseBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      searchModal.style.display = "none";
-    });
-  }
-
-  // Close modal when clicking outside
-  if (searchModal) {
-    searchModal.addEventListener("click", (e) => {
-      if (e.target === searchModal) {
-        searchModal.style.display = "none";
-      }
-    });
-  }
-
-  // Close modal with Escape key
+  // Close modal with Escape key (global listener)
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && searchModal?.style.display === "block") {
-      searchModal.style.display = "none";
+    if (e.key === "Escape") {
+      const searchModal = document.getElementById("search-modal");
+      if (searchModal && searchModal.open) {
+        searchModal.close();
+      }
     }
   });
 });

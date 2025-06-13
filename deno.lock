@@ -3,7 +3,7 @@
   "specifiers": {
     "jsr:@srdjan/mixon@^1.0.2": "1.0.6",
     "npm:arktype@2.1.19": "2.1.19",
-    "npm:mono-jsx@~0.3.2": "0.3.4"
+    "npm:mono-jsx@~0.6.6": "0.6.6"
   },
   "jsr": {
     "@srdjan/mixon@1.0.6": {
@@ -30,8 +30,8 @@
         "@ark/util"
       ]
     },
-    "mono-jsx@0.3.4": {
-      "integrity": "sha512-5acMea5rDflWm4max2/mPz64ij3pMuDc/bQRWMwtt6bpULTPrkldFV0MVQvn/yoaIppvhpn0668AxQmj6KH8gg==",
+    "mono-jsx@0.6.6": {
+      "integrity": "sha512-tYBB7k5Qr8uV4jwA8aHyKzjPDlEyB/uQl4ceevTBy27dqxTIpDQ1rpAX24zDbinT7hMgaVM8BtKnuF6hsfCWNQ==",
       "bin": true
     }
   },
@@ -281,7 +281,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@srdjan/mixon@^1.0.2",
-      "npm:mono-jsx@~0.3.2"
+      "npm:mono-jsx@~0.6.6"
     ]
   }
 }

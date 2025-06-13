@@ -1,4 +1,5 @@
 // Layout helper functions instead of components for mono-jsx compatibility
+// deno-lint-ignore-file no-explicit-any
 
 interface LayoutOptions {
   title: string;
@@ -16,11 +17,11 @@ export function createBlogLayout(
     <html lang="en">
       <head>
         <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" {...({} as any)} />
         <title>{title}</title>
-        {description ? <meta name="description" content={description} /> : null}
-        <link rel="stylesheet" href="/css/main-modern.css" />
-        <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} />
+        {description ? <meta name="description" content={description} {...({} as any)} /> : null}
+        <link rel="stylesheet" href="/css/main-modern.css" {...({} as any)} />
+        <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} {...({} as any)} />
         <script src="/js/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">
         </script>
@@ -70,6 +71,7 @@ export function createBlogLayout(
                 <li>
                   <button
                     type="button"
+                    class="search-toggle"
                     aria-label="Search"
                     aria-expanded="false"
                   >

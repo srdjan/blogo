@@ -284,6 +284,43 @@ export default {
       );
     }
 
+    // Handle minimal search for modal: /search-modal?q=query
+    if (url.pathname === "/search-modal") {
+      const query = url.searchParams.get("q");
+
+      if (!query) {
+        return new Response("Missing query parameter", { status: 400 });
+      }
+
+      const posts = await searchPostsByQuery(query);
+      
+      // Return just HTML fragment as string for the modal
+      if (posts.length === 0) {
+        return new Response(`<p>No posts found for "${query}".</p>`, {
+          headers: { "Content-Type": "text/html" },
+        });
+      }
+
+      const listItems = posts.map(post => 
+        `<li style="margin: 0.5rem 0;">
+          <a href="/posts/${post.slug}" 
+             hx-get="/posts/${post.slug}" 
+             hx-target="#content-area" 
+             hx-swap="innerHTML" 
+             hx-push-url="true" 
+             class="search-result-link">
+            ${post.title}
+          </a>
+        </li>`
+      ).join('');
+
+      const html = `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
+      
+      return new Response(html, {
+        headers: { "Content-Type": "text/html" },
+      });
+    }
+
     // Handle RSS feed
     if (url.pathname === "/feed.xml") {
       const posts = await getCachedPosts();
