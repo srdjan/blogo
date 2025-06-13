@@ -1,4 +1,3 @@
-// New mono-jsx entry point
 import { createBlogLayout } from "./src/utils/layout-helpers.tsx";
 import {
   createAbout,
@@ -51,30 +50,6 @@ const app = {
         );
         return new Response("File not found", { status: 404 });
       }
-    }
-
-    // Handle test route with full blog layout
-    if (url.pathname === "/mono-test") {
-      return createBlogLayout(
-        {
-          title: "Layout Test - Blog",
-          description: "Testing the full blog layout helper function",
-          path: url.pathname,
-        },
-        <main>
-          <h1>🎉 Full Blog Layout Working!</h1>
-          <p>This page uses the complete blog layout with all features:</p>
-          <ul>
-            <li>✅ Unicode symbols in navigation</li>
-            <li>✅ HTMX attributes</li>
-            <li>✅ Search modal</li>
-            <li>✅ SVG icons</li>
-            <li>✅ Active navigation states</li>
-            <li>✅ All CSS and JavaScript</li>
-          </ul>
-          <p>Try clicking the navigation links and search button!</p>
-        </main>,
-      );
     }
 
     // Handle root route with real blog posts
