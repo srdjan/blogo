@@ -1049,3 +1049,31 @@ footer {
     page-break-inside: avoid;
   }
 }
+
+/* Mermaid diagram styles */
+.mermaid-diagram {
+  display: block;
+  margin: 1.5rem auto;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-text) 10%, transparent);
+  padding: 1rem;
+  
+  @container (min-width: 48rem) {
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
+}
+
+.mermaid-error {
+  margin: 1.5rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  
+  @container (min-width: 48rem) {
+    margin: 2rem 0;
+  }
+}

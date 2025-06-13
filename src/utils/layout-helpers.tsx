@@ -17,15 +17,29 @@ export function createBlogLayout(
     <html lang="en">
       <head>
         <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" {...({} as any)} />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+          {...({} as any)}
+        />
         <title>{title}</title>
-        {description ? <meta name="description" content={description} {...({} as any)} /> : null}
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" {...({} as any)} />
+        {description
+          ? <meta name="description" content={description} {...({} as any)} />
+          : null}
+        <link
+          rel="icon"
+          href="/favicon.svg"
+          type="image/svg+xml"
+          {...({} as any)}
+        />
         <link rel="stylesheet" href="/css/main-modern.css" {...({} as any)} />
-        <link rel="alternate" href="/feed.xml" title={`${title} RSS Feed`} {...({} as any)} />
+        <link
+          rel="alternate"
+          href="/feed.xml"
+          title={`${title} RSS Feed`}
+          {...({} as any)}
+        />
         <script src="/js/htmx.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">
-        </script>
         <script src="/js/site.js"></script>
       </head>
       <body>

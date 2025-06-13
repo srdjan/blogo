@@ -1,12 +1,16 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:mono-jsx@~0.6.6": "0.6.6"
+    "npm:mono-jsx@~0.6.6": "0.6.6",
+    "npm:ts-pattern@5.0.5": "5.0.5"
   },
   "npm": {
     "mono-jsx@0.6.6": {
       "integrity": "sha512-tYBB7k5Qr8uV4jwA8aHyKzjPDlEyB/uQl4ceevTBy27dqxTIpDQ1rpAX24zDbinT7hMgaVM8BtKnuF6hsfCWNQ==",
       "bin": true
+    },
+    "ts-pattern@5.0.5": {
+      "integrity": "sha512-tL0w8U/pgaacOmkb9fRlYzWEUDCfVjjv9dD4wHTgZ61MjhuMt46VNWTG747NqW6vRzoWIKABVhFSOJ82FvXrfA=="
     }
   },
   "redirects": {

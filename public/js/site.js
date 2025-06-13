@@ -11,9 +11,6 @@ const Core = {
 
     // Set active nav link on initial page load
     this.updateActiveNavLink();
-
-    // Initialize Mermaid if available
-    this.initMermaid();
   },
 
   setupEventListeners() {
@@ -59,15 +56,12 @@ const Core = {
         // Update active navigation link
         this.updateActiveNavLink();
 
-        // Re-initialize Mermaid for new content
-        this.initMermaid();
-
         // Ensure search modal is properly reset after content swap
         const searchModal = document.getElementById("search-modal");
         if (searchModal && searchModal.open) {
           searchModal.close();
         }
-        
+
         // Ensure search toggle still works after HTMX swap
         ensureSearchToggleWorks();
 
@@ -88,7 +82,11 @@ const Core = {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const searchModal = document.getElementById("search-modal");
-        if (searchModal && (searchModal.style.display === "flex" || searchModal.style.display === "block")) {
+        if (
+          searchModal &&
+          (searchModal.style.display === "flex" ||
+            searchModal.style.display === "block")
+        ) {
           searchModal.style.display = "none";
         }
       }
@@ -124,80 +122,6 @@ const Core = {
     // Add active class if we found a matching link
     if (activeLink) {
       activeLink.classList.add("active");
-    }
-  },
-
-  initMermaid() {
-    // Wait for mermaid to be available
-    if (typeof mermaid === "undefined") {
-      console.log("Mermaid not yet loaded, retrying...");
-      setTimeout(() => this.initMermaid(), 100);
-      return;
-    }
-
-    try {
-      console.log("Mermaid found, initializing...");
-
-      // Configure Mermaid with bright pastel colors
-      mermaid.initialize({
-        startOnLoad: false, // We'll manually trigger rendering
-        theme: "base",
-        themeVariables: {
-          // Brighter, more pastel primary colors
-          primaryColor: "#B8E6B8", // Light sage green
-          secondaryColor: "#F5E6A3", // Light amber
-          tertiaryColor: "#F0C5C5", // Light coral
-          quaternaryColor: "#C5D7F0", // Light blue
-
-          // Text and borders
-          primaryTextColor: "#2c3e50", // Darker text for better contrast
-          primaryBorderColor: "#95a5a6", // Lighter border
-          lineColor: "#7f8c8d", // Medium gray for lines
-
-          // Background colors
-          background: "#ffffff",
-          secondaryBackground: "#f8f9fa",
-          tertiaryBackground: "#e9ecef",
-
-          // Node-specific colors (these override the defaults)
-          cScale0: "#B8E6B8", // Light sage
-          cScale1: "#F5E6A3", // Light amber
-          cScale2: "#F0C5C5", // Light coral
-          cScale3: "#C5D7F0", // Light blue
-          cScale4: "#E6D7F0", // Light purple
-          cScale5: "#D7F0E6", // Light mint
-
-          // Subgraph colors
-          clusterBkg: "#f8f9fa",
-          clusterBorder: "#bdc3c7",
-
-          // Special elements
-          activationBorderColor: "#34495e",
-          activationBkgColor: "#ecf0f1",
-        },
-      });
-
-      // Find all mermaid elements and render them
-      const mermaidElements = document.querySelectorAll(".mermaid");
-      console.log(`Found ${mermaidElements.length} mermaid elements`);
-
-      if (mermaidElements.length > 0) {
-        // Use the run method for newer mermaid versions
-        mermaid.run({
-          nodes: mermaidElements,
-        });
-        console.log("Mermaid rendering completed");
-      }
-    } catch (error) {
-      console.error("Mermaid initialization failed:", error);
-
-      // Fallback: try the older init method
-      try {
-        console.log("Trying fallback mermaid.init()...");
-        mermaid.init();
-      } catch (fallbackError) {
-        console.error("Fallback also failed:", fallbackError);
-      }
     }
   },
 };
@@ -251,11 +175,13 @@ const Search = {
       .then((res) => res.text())
       .then((html) => {
         this.searchResults.innerHTML = html;
-        
+
         // Add click handlers to close modal when a result is clicked
-        const resultLinks = this.searchResults.querySelectorAll('.search-result-link');
-        resultLinks.forEach(link => {
-          link.addEventListener('click', () => {
+        const resultLinks = this.searchResults.querySelectorAll(
+          ".search-result-link",
+        );
+        resultLinks.forEach((link) => {
+          link.addEventListener("click", () => {
             const searchModal = document.getElementById("search-modal");
             if (searchModal) {
               searchModal.close();
@@ -279,19 +205,21 @@ const Search = {
 // Simple function to ensure search functionality works
 function ensureSearchToggleWorks() {
   const searchToggle = document.querySelector(".search-toggle");
-  const searchCloseBtn = document.querySelector('button[aria-label="Close search"]');
+  const searchCloseBtn = document.querySelector(
+    'button[aria-label="Close search"]',
+  );
   const searchModal = document.getElementById("search-modal");
-  
-  console.log("Ensuring search functionality works", { 
-    toggle: !!searchToggle, 
-    closeBtn: !!searchCloseBtn, 
-    modal: !!searchModal 
+
+  console.log("Ensuring search functionality works", {
+    toggle: !!searchToggle,
+    closeBtn: !!searchCloseBtn,
+    modal: !!searchModal,
   });
-  
+
   // Search toggle
-  if (searchToggle && !searchToggle.hasAttribute('data-listener-attached')) {
-    searchToggle.setAttribute('data-listener-attached', 'true');
-    
+  if (searchToggle && !searchToggle.hasAttribute("data-listener-attached")) {
+    searchToggle.setAttribute("data-listener-attached", "true");
+
     searchToggle.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Search toggle clicked - direct listener");
@@ -307,11 +235,13 @@ function ensureSearchToggleWorks() {
       }
     });
   }
-  
-  // Close button  
-  if (searchCloseBtn && !searchCloseBtn.hasAttribute('data-listener-attached')) {
-    searchCloseBtn.setAttribute('data-listener-attached', 'true');
-    
+
+  // Close button
+  if (
+    searchCloseBtn && !searchCloseBtn.hasAttribute("data-listener-attached")
+  ) {
+    searchCloseBtn.setAttribute("data-listener-attached", "true");
+
     searchCloseBtn.addEventListener("click", (e) => {
       e.preventDefault();
       const modal = document.getElementById("search-modal");
@@ -320,11 +250,11 @@ function ensureSearchToggleWorks() {
       }
     });
   }
-  
+
   // Click outside modal
-  if (searchModal && !searchModal.hasAttribute('data-listener-attached')) {
-    searchModal.setAttribute('data-listener-attached', 'true');
-    
+  if (searchModal && !searchModal.hasAttribute("data-listener-attached")) {
+    searchModal.setAttribute("data-listener-attached", "true");
+
     searchModal.addEventListener("click", (e) => {
       if (e.target === searchModal) {
         searchModal.close();
@@ -337,7 +267,7 @@ function ensureSearchToggleWorks() {
 document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
-  
+
   // Initial attachment of search listeners
   ensureSearchToggleWorks();
 

@@ -22,7 +22,10 @@ const app = {
     console.log(`mono-jsx: ${req.method} ${url.pathname}`);
 
     // Handle static files
-    if (url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/") || url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico") {
+    if (
+      url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/") ||
+      url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico"
+    ) {
       try {
         // Files are in public/ directory, so map /css/main.css to public/css/main.css
         const filePath = `public${url.pathname}`;
@@ -134,7 +137,6 @@ const app = {
     <link rel="stylesheet" href="/css/main.css">
     <link rel="alternate" href="/feed.xml" title="Blog RSS Feed">
     <script src="/js/htmx.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <script src="/js/site.js"></script>
   </head>
   <body>
@@ -295,7 +297,7 @@ const app = {
       }
 
       const posts = await searchPostsByQuery(query);
-      
+
       // Return just HTML fragment as string for the modal
       if (posts.length === 0) {
         return new Response(`<p>No posts found for "${query}".</p>`, {
@@ -303,7 +305,7 @@ const app = {
         });
       }
 
-      const listItems = posts.map(post => 
+      const listItems = posts.map((post) =>
         `<li style="margin: 0.5rem 0;">
           <a href="/posts/${post.slug}" 
              hx-get="/posts/${post.slug}" 
@@ -314,10 +316,11 @@ const app = {
             ${post.title}
           </a>
         </li>`
-      ).join('');
+      ).join("");
 
-      const html = `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
-      
+      const html =
+        `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
+
       return new Response(html, {
         headers: { "Content-Type": "text/html" },
       });
@@ -358,13 +361,13 @@ interface ServeOptions {
 
 export const serve = (
   fetchHandler: (request: Request) => Response | Promise<Response>,
-  options: ServeOptions = {}
+  options: ServeOptions = {},
 ): Deno.HttpServer => {
   const { port = 8000, hostname = "localhost", signal } = options;
-  
+
   return Deno.serve(
     { port, hostname, signal },
-    fetchHandler
+    fetchHandler,
   );
 };
 

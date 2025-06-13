@@ -2,6 +2,7 @@ import { marked } from "https://esm.sh/marked@15.0.12";
 import hljs from "https://esm.sh/highlight.js@11.10.0";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
+import { renderMermaidToSVG } from "./mermaid-ssr.ts";
 
 // Custom renderer for mermaid blocks
 const renderer = new marked.Renderer();
@@ -12,8 +13,7 @@ renderer.code = function (token) {
   const lang = token.lang;
 
   if (lang === "mermaid") {
-    const mermaidId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-    return `<div id="${mermaidId}" class="mermaid">${code}</div>`;
+    return renderMermaidToSVG(code);
   }
 
   // For other code blocks, use highlighting

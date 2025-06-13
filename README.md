@@ -10,8 +10,8 @@ This blog system is built around several key architectural principles:
 1. **mono-jsx Architecture**: Server-side JSX rendering without React overhead
 2. **HTMX for Interactivity**: HTMX for dynamic interactions and progressive
    enhancement
-3. **Deno for Minimal Dependencies**: Leveraging Deno's standard library with minimal
-   external dependencies
+3. **Deno for Minimal Dependencies**: Leveraging Deno's standard library with
+   minimal external dependencies
 4. **Semantic HTML**: Clean, accessible markup following modern best practices
 5. **Pure CSS**: Minimal, semantic, responsive styling without frameworks
 
@@ -19,9 +19,12 @@ This blog system is built around several key architectural principles:
 
 - **Markdown Content**: Posts written in markdown
 - **Tag System**: Posts can be tagged and filtered by a tag
-- **Full-text Search**: Dual search experience with modal quick-search and full results page
-- **Responsive Design**: Mobile-first styling that works seamlessly across all devices
-- **Semantic Components**: Clean JSX components following semantic HTML and ARIA principles
+- **Full-text Search**: Dual search experience with modal quick-search and full
+  results page
+- **Responsive Design**: Mobile-first styling that works seamlessly across all
+  devices
+- **Semantic Components**: Clean JSX components following semantic HTML and ARIA
+  principles
 - **Elegant Interactions**: Subtle hover effects and smooth animations
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
@@ -64,7 +67,7 @@ concerns and semantic HTML/CSS.
 
 ### Prerequisites
 
-- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.x or higher 
+- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.x or higher
 - [Deno](https://deno.land/) v2.x or higher
 - [HTMX](https://htmx.org/) for dynamic interactions
 
@@ -95,7 +98,8 @@ The blog will be available at `http://localhost:8000`
 
 ### Available Commands
 
-- `deno task start` - Start the production server (`deno run` with required permissions)
+- `deno task start` - Start the production server (`deno run` with required
+  permissions)
 - `deno task dev` - Start development server with watch mode and hot reloading
 - `deno task setup` - Initialize project structure and download dependencies
 - `deno fmt` - Format TypeScript/JSX files
@@ -422,7 +426,8 @@ font-family: ui-monospace, "SF Mono", "Monaco", monospace;
 - **Modal Search**: Quick access with title-only results for fast browsing
 - **Full Search Page**: Complete results with excerpts, dates, and metadata
 - **Event Delegation**: Robust JavaScript that persists through HTMX navigation
-- **Dialog API**: Native browser modal functionality with proper focus management
+- **Dialog API**: Native browser modal functionality with proper focus
+  management
 
 ### **Clean Server Architecture**
 
@@ -430,7 +435,7 @@ font-family: ui-monospace, "SF Mono", "Monaco", monospace;
 // Custom serve wrapper for better control
 export const serve = (
   fetchHandler: (request: Request) => Response | Promise<Response>,
-  options: ServeOptions = {}
+  options: ServeOptions = {},
 ): Deno.HttpServer => {
   const { port = 8000, hostname = "localhost", signal } = options;
   return Deno.serve({ port, hostname, signal }, fetchHandler);
@@ -438,7 +443,7 @@ export const serve = (
 ```
 
 - **Separation of Concerns**: App logic separate from server startup
-- **Testable Architecture**: Fetch handler can be tested independently  
+- **Testable Architecture**: Fetch handler can be tested independently
 - **Environment Detection**: `import.meta.main` for conditional server start
 - **Flexible Configuration**: Configurable port, hostname, and abort signals
 
