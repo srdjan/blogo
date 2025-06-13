@@ -171,7 +171,7 @@ export function createBlogLayout(
 
           <footer>
             <p>
-              Claude &
+              Claude & {" "}
               <a
                 href="https://srdjan.github.io"
                 target="_blank"
@@ -179,7 +179,7 @@ export function createBlogLayout(
               >
                 <span>⊣˚∆˚⊢</span>
               </a>
-              vibe coded together...
+              {" "} vibe coded together...
             </p>
           </footer>
         </div>

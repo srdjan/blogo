@@ -1,10 +1,6 @@
 export function AboutHtml() {
   return (
     <section>
-      <header>
-        <h1>About</h1>
-      </header>
-
       <article>
         <p>
           Welcome to my corner of the internet. I'm a{" "}

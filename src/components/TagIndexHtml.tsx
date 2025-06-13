@@ -5,7 +5,6 @@ export function TagIndexHtml({ tags }: { tags: TagInfo[] }) {
 
   return (
     <section>
-      <h1>Tags</h1>
       <ul role="list">
         {sortedTags.map((tag) => {
           return (

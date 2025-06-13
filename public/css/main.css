@@ -6,23 +6,26 @@
   /* Monospace font stack following the monospace web approach */
   --font-mono: ui-monospace, "SF Mono", Monaco, "Inconsolata", "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-  --color-text: #333;
-  --color-text-muted: #666;
-  --color-text-subtle: #8b949e;
-  --color-bg: white;
-  --color-bg-subtle: #f8f9fd;
-  --color-border: #d1d5da;
-  --color-primary: #5b5b5b;
-  --color-primary-hover: #0256cc;
-  --color-accent-amber: #d4a574;
-  --color-accent-coral: #e8a5a5;
-  --color-syntax-keyword: #d73a49;
-  --color-syntax-string: #032f62;
-  --color-syntax-number: #005cc5;
-  --color-syntax-function: #6f42c1;
-  --color-syntax-comment: #6a737d;
-  --color-syntax-variable: #e36209;
-  --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Ultra high contrast color palette */
+  --color-text: #000000;
+  --color-text-muted: #333333;
+  --color-text-subtle: #555555;
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f0f0f0;
+  --color-border: #999999;
+  --color-border-strong: #666666;
+  --color-primary: #000000;
+  --color-primary-hover: #000000;
+  --color-accent-amber: #b8860b;
+  --color-accent-coral: #cd5c5c;
+  --color-syntax-keyword: #c41e3a;
+  --color-syntax-string: #1e3a8a;
+  --color-syntax-number: #1565c0;
+  --color-syntax-function: #5e35b1;
+  --color-syntax-comment: #546e7a;
+  --color-syntax-variable: #e65100;
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.16);
 
   /* View Transitions */
   view-transition-name: root;
@@ -99,8 +102,9 @@ h1 {
 h2 {
   font-size: 1.375rem;
   border-block-end: 1px solid var(--color-border);
-  padding-block-end: 0.375rem;
+  padding-block-end: 0.5rem;
   margin-block: 2.5rem 1rem;
+  color: var(--color-text);
 
   @container (min-width: 48rem) {
     font-size: 1.5rem;
@@ -134,30 +138,25 @@ table {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.5;
-  overflow-x: auto;
-  display: block;
-  white-space: nowrap;
-
-  @container (min-width: 48rem) {
-    display: table;
-    white-space: normal;
-  }
+  display: table;
+  table-layout: fixed;
+  word-wrap: break-word;
 }
 
 thead {
-  background: var(--color-bg-subtle);
+  background: var(--color-text);
+  color: var(--color-bg);
   
   & th {
     font-weight: bold;
     text-align: left;
-    border-bottom: 2px solid var(--color-border);
   }
 }
 
 th,
 td {
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   vertical-align: top;
 
   &:first-child {
@@ -177,9 +176,6 @@ tbody {
       background: var(--color-bg-subtle);
     }
 
-    &:hover {
-      background: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg));
-    }
   }
 
   & td {
@@ -204,15 +200,19 @@ tbody {
 /* Links with modern properties */
 a {
   color: var(--color-primary);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
   min-block-size: 44px;
   display: inline-flex;
   align-items: center;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  padding: 0.1rem 0.2rem;
+  border-radius: 2px;
+  cursor: pointer;
 
-  &:hover {
-    text-decoration:dashed ;
-    color: var(--color-border);
+  &:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
   }
 }
 
@@ -255,12 +255,6 @@ ol {
       block-size: auto;
       min-block-size: auto;
 
-      &:hover {
-        background: var(--color-bg);
-        border-color: var(--color-border);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-subtle);
-      }
 
       & a {
         color: inherit;
@@ -301,18 +295,6 @@ ol {
       block-size: auto;
       min-block-size: auto;
 
-      &:hover {
-        background: linear-gradient(135deg,
-            var(--color-bg-subtle) 0%,
-            var(--color-bg) 100%);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-subtle);
-        border-color: var(--color-border);
-
-        & small {
-          opacity: 1;
-        }
-      }
 
       & a {
         min-block-size: auto;
@@ -343,33 +325,25 @@ ol {
 code {
   font-family: var(--font-mono);
   font-size: 0.9rem;
-  background: #f1f5f9;
-  color: var(--color-syntax-keyword);
-  padding: 0.15rem 0.4rem;
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
   word-wrap: break-word;
-  border: 1px solid #e2e8f0;
-  font-weight: 500;
+  border: 2px solid var(--color-border);
+  font-weight: 700;
 }
 
 pre {
-  background: #f8fafc;
-  padding: 1.25rem;
+  background: var(--color-bg-subtle);
+  padding: 1.5rem;
   border-radius: 8px;
   overflow-x: auto;
   margin-block: 1.5rem;
   font-size: 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
   line-height: 1.5;
-
-  &:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-    border-color: #cbd5e0;
-  }
 
   &[class*="language-"]::before {
     content: attr(class);
@@ -532,9 +506,10 @@ pre {
 
 /* Navigation with CSS Nesting */
 nav {
-  padding-block: 0.75rem;
+  padding-block: 1rem;
   margin-block-end: 1.5rem;
-  border-block-end: 1px solid var(--color-border);
+  /* border-block-end: 2px solid var(--color-border-strong); */
+  /* background: var(--color-bg-subtle); */
 
   & ul {
     display: flex;
@@ -580,11 +555,15 @@ nav {
     min-width: 44px;
     text-decoration: none;
 
-    &:hover,
     &[aria-current="page"] {
-      color: var(--color-text);
-      background: var(--color-bg-subtle);
+      color: var(--color-bg);
+      background: var(--color-primary);
       text-decoration: none;
+      font-weight: bold;
+    }
+
+    &:focus {
+      outline: none;
     }
 
     @container (min-width: 30rem) {
@@ -631,10 +610,11 @@ article {
   margin-block-end: 2rem;
   padding-block-end: 1.5rem;
   border-block-end: 1px solid var(--color-border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 2rem;
   background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-medium);
 
   &:last-child {
     border-block-end: none;
@@ -655,8 +635,9 @@ article {
         min-block-size: auto;
         display: inline;
 
-        &:hover {
-          color: var(--color-primary);
+        &:focus {
+          outline: 2px solid var(--color-primary);
+          outline-offset: 2px;
         }
       }
 
@@ -780,17 +761,40 @@ footer {
   color: var(--color-text-muted);
   font-size: 0.8rem;
   margin-block-start: auto;
+
+  & a {
+    border: none;
+    padding: 0;
+    background: none;
+    display: inline;
+    min-block-size: auto;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 /* Modern dark mode with @media */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-syntax-keyword: #ff7b72;
-    --color-syntax-string: #a5d6ff;
-    --color-syntax-number: #79c0ff;
-    --color-syntax-function: #d2a8ff;
-    --color-syntax-comment: #8b949e;
-    --color-syntax-variable: #ffa657;
+    --color-text: #ffffff;
+    --color-text-muted: #cccccc;
+    --color-text-subtle: #999999;
+    --color-bg: #000000;
+    --color-bg-subtle: #111111;
+    --color-border: #666666;
+    --color-border-strong: #888888;
+    --color-primary: #ffffff;
+    --color-primary-hover: #ffffff;
+    --color-syntax-keyword: #ff6b6b;
+    --color-syntax-string: #74c0fc;
+    --color-syntax-number: #69db7c;
+    --color-syntax-function: #da77f2;
+    --color-syntax-comment: #868e96;
+    --color-syntax-variable: #ffd43b;
+    --shadow-subtle: 0 2px 8px rgba(255, 255, 255, 0.1);
+    --shadow-medium: 0 4px 16px rgba(255, 255, 255, 0.15);
   }
 
   html {
@@ -799,39 +803,37 @@ footer {
   }
 
   a {
-    color: #58a6ff;
+    color: #ffffff;
+    text-decoration-color: #ffffff;
   }
 
   h2 {
-    border-block-end-color: #30363d;
+    border-block-end-color: var(--color-border-strong);
   }
 
   article {
-    border-block-end-color: #30363d;
+    border-block-end-color: var(--color-border-strong);
+    border-color: var(--color-border-strong);
   }
 
   nav {
-    border-block-end-color: #30363d;
+    border-block-end-color: var(--color-border-strong);
+    background: var(--color-bg-subtle);
 
-    & a:hover,
-    & a[aria-current="page"],
-    & button:hover {
-      background: #21262d;
+    & a[aria-current="page"] {
+      background: var(--color-primary);
+      color: var(--color-bg);
     }
   }
 
   footer {
-    border-block-start-color: #30363d;
+    border-block-start-color: var(--color-border-strong);
   }
 
   @scope (ul[role="list"]) {
     :scope li {
       background: #21262d;
       color: #8b949e;
-
-      &:hover {
-        background: #30363d;
-      }
     }
   }
 
@@ -843,20 +845,15 @@ footer {
   }
 
   code {
-    background: #21262d;
-    border-color: #30363d;
-    color: var(--color-syntax-keyword);
+    background: var(--color-bg-subtle);
+    border-color: var(--color-border);
+    color: var(--color-text);
   }
 
   pre {
-    background: #161b22;
-    border-color: #30363d;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-
-    &:hover {
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-      border-color: #484f58;
-    }
+    background: var(--color-bg-subtle);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-medium);
   }
 
   .hljs {
@@ -864,7 +861,7 @@ footer {
   }
 
   table {
-    border-color: #30363d;
+    border-color: var(--color-border-strong);
   }
 
   thead {
@@ -873,7 +870,7 @@ footer {
 
   th,
   td {
-    border-color: #30363d;
+    border-color: var(--color-border);
   }
 
   tbody tr {
@@ -881,13 +878,10 @@ footer {
       background: #161b22;
     }
 
-    &:hover {
-      background: color-mix(in srgb, #58a6ff 12%, #0d1117);
-    }
   }
 
   .table-wrapper {
-    border-color: #30363d;
+    border-color: var(--color-border-strong);
   }
 }
 
