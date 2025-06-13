@@ -34,7 +34,7 @@ function renderPostMeta(post: Post) {
         ? (
           <ul role="list">
             {post.tags.map((tag) => (
-              <li key={tag}>
+              <li>
                 <a href={`/tags/${tag}`}>#{tag}</a>
               </li>
             ))}

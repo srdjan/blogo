@@ -15,7 +15,7 @@ import {
 } from "./src/utils/content-loader.ts";
 import { generateRSS } from "./src/rss.ts";
 
-export default {
+const app = {
   async fetch(req: Request) {
     const url = new URL(req.url);
 
@@ -346,3 +346,28 @@ export default {
     });
   },
 };
+
+// Serve wrapper function
+interface ServeOptions {
+  port?: number;
+  hostname?: string;
+  signal?: AbortSignal;
+}
+
+export const serve = (
+  fetchHandler: (request: Request) => Response | Promise<Response>,
+  options: ServeOptions = {}
+): Deno.HttpServer => {
+  const { port = 8000, hostname = "localhost", signal } = options;
+  
+  return Deno.serve(
+    { port, hostname, signal },
+    fetchHandler
+  );
+};
+
+// Start the server
+if (import.meta.main) {
+  console.log("Starting server on http://localhost:8000");
+  serve(app.fetch);
+}

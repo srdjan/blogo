@@ -9,7 +9,7 @@ export function TagIndexHtml({ tags }: { tags: TagInfo[] }) {
       <ul role="list">
         {sortedTags.map((tag) => {
           return (
-            <li key={tag.name}>
+            <li>
               <a
                 href={`/tags/${tag.name}`}
                 hx-get={`/tags/${tag.name}`}
