@@ -22,7 +22,7 @@ const app = {
     console.log(`mono-jsx: ${req.method} ${url.pathname}`);
 
     // Handle static files
-    if (url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/")) {
+    if (url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/") || url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico") {
       try {
         // Files are in public/ directory, so map /css/main.css to public/css/main.css
         const filePath = `public${url.pathname}`;
@@ -35,6 +35,8 @@ const app = {
         if (ext === "css") contentType = "text/css";
         else if (ext === "js") contentType = "application/javascript";
         else if (ext === "html") contentType = "text/html";
+        else if (ext === "svg") contentType = "image/svg+xml";
+        else if (ext === "ico") contentType = "image/x-icon";
 
         return new Response(file, {
           headers: { "Content-Type": contentType },
