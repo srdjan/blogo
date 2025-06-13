@@ -1,4 +1,5 @@
-import { createBlogLayout } from "./src/utils/layout-helpers.tsx";
+import { createBlogLayout } from "./src/components/BlogLayout.tsx";
+import { PostView } from "./src/components/PostView.tsx";
 import {
   createAbout,
   createPostList,
@@ -56,40 +57,34 @@ const app = {
     if (url.pathname === "/") {
       const posts = await getCachedPosts();
 
-      return createBlogLayout(
-        {
-          title: "Blog - Home",
-          description: "A minimal blog built with mono-jsx",
-          path: url.pathname,
-        },
-        createPostList(posts),
-      );
+      return createBlogLayout({
+        title: "Blog - Home",
+        description: "A minimal blog built with mono-jsx",
+        path: url.pathname,
+        children: createPostList(posts),
+      });
     }
 
     // Handle tags route with real tags
     if (url.pathname === "/tags") {
       const tags = await getCachedTags();
 
-      return createBlogLayout(
-        {
-          title: "Tags - Blog",
-          description: "Browse posts by tags",
-          path: url.pathname,
-        },
-        createTagIndex(tags),
-      );
+      return createBlogLayout({
+        title: "Tags - Blog",
+        description: "Browse posts by tags",
+        path: url.pathname,
+        children: createTagIndex(tags),
+      });
     }
 
     // Handle about route with blog layout
     if (url.pathname === "/about") {
-      return createBlogLayout(
-        {
-          title: "About - Blog",
-          description: "About this blog and its features",
-          path: url.pathname,
-        },
-        createAbout(),
-      );
+      return createBlogLayout({
+        title: "About - Blog",
+        description: "About this blog and its features",
+        path: url.pathname,
+        children: createAbout(),
+      });
     }
 
     // Handle individual post routes: /posts/slug
@@ -101,36 +96,12 @@ const app = {
         return new Response("Post not found", { status: 404 });
       }
 
-      return createBlogLayout(
-        {
-          title: `${post.title} - Blog`,
-          description: post.excerpt || `Read ${post.title}`,
-          path: url.pathname,
-        },
-        <main>
-          <article>
-            <header>
-              <div>
-                <time dateTime={post.date}>
-                  {post.formattedDate || new Date(post.date).toLocaleDateString()}
-                </time>
-                {post.tags && post.tags.length > 0 && (
-                  <div>
-                    {post.tags.map((tag) => (
-                      <a href={`/tags/${tag}`}>#{tag}</a>
-                    )).reduce((prev, curr, index) => (
-                      index === 0 ? [curr] : [...prev, " ", curr]
-                    ), [] as (JSX.Element | string)[])}
-                  </div>
-                )}
-              </div>
-            </header>
-            <section>
-              <div innerHTML={post.content}></div>
-            </section>
-          </article>
-        </main>,
-      );
+      return createBlogLayout({
+        title: `${post.title} - Blog`,
+        description: post.excerpt || `Read ${post.title}`,
+        path: url.pathname,
+        children: <PostView post={post} />,
+      });
     }
 
     // Handle tag routes: /tags/tagname
@@ -138,14 +109,12 @@ const app = {
       const tagName = decodeURIComponent(url.pathname.replace("/tags/", ""));
       const posts = await getPostsByTag(tagName);
 
-      return createBlogLayout(
-        {
-          title: `Posts tagged "${tagName}" - Blog`,
-          description: `All posts tagged with ${tagName}`,
-          path: url.pathname,
-        },
-        createPostList(posts, tagName),
-      );
+      return createBlogLayout({
+        title: `Posts tagged "${tagName}" - Blog`,
+        description: `All posts tagged with ${tagName}`,
+        path: url.pathname,
+        children: createPostList(posts, tagName),
+      });
     }
 
     // Handle search requests: /search?q=query
@@ -153,30 +122,28 @@ const app = {
       const query = url.searchParams.get("q");
 
       if (!query) {
-        return createBlogLayout(
-          {
-            title: "Search - Blog",
-            description: "Search blog posts",
-            path: url.pathname,
-          },
-          <main>
-            <h1>Search</h1>
-            <p>Please provide a search query.</p>
-            <a href="/">← Back to home</a>
-          </main>,
-        );
+        return createBlogLayout({
+          title: "Search - Blog",
+          description: "Search blog posts",
+          path: url.pathname,
+          children: (
+            <main>
+              <h1>Search</h1>
+              <p>Please provide a search query.</p>
+              <a href="/">← Back to home</a>
+            </main>
+          ),
+        });
       }
 
       const posts = await searchPostsByQuery(query);
 
-      return createBlogLayout(
-        {
-          title: `Search: "${query}" - Blog`,
-          description: `Search results for ${query}`,
-          path: url.pathname,
-        },
-        createSearchResults(posts, query),
-      );
+      return createBlogLayout({
+        title: `Search: "${query}" - Blog`,
+        description: `Search results for ${query}`,
+        path: url.pathname,
+        children: createSearchResults(posts, query),
+      });
     }
 
     // Handle minimal search for modal: /search-modal?q=query
