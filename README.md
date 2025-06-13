@@ -1,5 +1,7 @@
 # Functional Minimal Blog
 
+![Blogo Logo](blogo-logo.png)
+
 A lightweight, type-safe, functional blog implementation built with Deno,
 TypeScript, mono-jsx, HTMX, and Markdown.
 
