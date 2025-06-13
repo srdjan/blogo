@@ -1,6 +1,4 @@
-# Blogo <img src="public/blogo-logo.png" alt="Blogo Logo" width="60">
-
-*A lightweight, functional blog built with modern web technologies*
+# <img src="public/blogo-logo.png" alt="Blogo Logo" width="60"> *A lightweight blog built with modern web technologies*
 
 ## Core Principles
 
