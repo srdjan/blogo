@@ -7,27 +7,21 @@ TypeScript, mono-jsx, HTMX, and Markdown.
 
 This blog system is built around several key architectural principles:
 
-1. **Functional Programming**: Pure functions, immutability, and type-safe data
-   transformations
-2. **Minimal Dependencies**: Leveraging Deno's standard library with minimal
+1. **mono-jsx Architecture**: Server-side JSX rendering without React overhead
+2. **HTMX for Interactivity**: HTMX for dynamic interactions and progressive
+   enhancement
+3. **Deno for Minimal Dependencies**: Leveraging Deno's standard library with minimal
    external dependencies
-3. **Progressive Enhancement**: Core functionality works without JavaScript,
-   enhanced with HTMX
-4. **Type Safety**: Comprehensive type system for robust error handling
-5. **Semantic HTML**: Clean, accessible markup following modern best practices
-6. **Pure CSS**: Minimal, semantic, responsive styling without frameworks
-7. **mono-jsx Architecture**: Server-side JSX rendering without React overhead
+4. **Semantic HTML**: Clean, accessible markup following modern best practices
+5. **Pure CSS**: Minimal, semantic, responsive styling without frameworks
 
 ## Features
 
-- **Markdown Content**: Posts written in markdown with YAML frontmatter
-- **Tag System**: Posts can be tagged and filtered by tag with elegant tag cloud
-  display
+- **Markdown Content**: Posts written in markdown
+- **Tag System**: Posts can be tagged and filtered by a tag
 - **Full-text Search**: Dual search experience with modal quick-search and full results page
-- **Responsive Design**: Mobile-first styling that works seamlessly across all
-  devices
-- **Semantic Components**: Clean JSX components following semantic HTML
-  principles
+- **Responsive Design**: Mobile-first styling that works seamlessly across all devices
+- **Semantic Components**: Clean JSX components following semantic HTML and ARIA principles
 - **Elegant Interactions**: Subtle hover effects and smooth animations
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
@@ -430,32 +424,7 @@ font-family: ui-monospace, "SF Mono", "Monaco", monospace;
 - **Event Delegation**: Robust JavaScript that persists through HTMX navigation
 - **Dialog API**: Native browser modal functionality with proper focus management
 
-### 🛠 **Development Experience**
-
-#### **Type-Safe Architecture**
-
-```typescript
-// Result monad pattern for error handling
-type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
-```
-
-#### **Functional Programming**
-
-- Pure functions throughout
-- Immutable data structures
-- Composable utilities
-- No side effects in core logic
-
-#### **Modern TypeScript**
-
-- Strict type checking
-- Advanced type inference
-- Discriminated unions
-- Utility types
-
-#### **Clean Server Architecture**
+### **Clean Server Architecture**
 
 ```typescript
 // Custom serve wrapper for better control
@@ -555,7 +524,7 @@ body {
 6. **Developer Experience**: Better debugging and organization
 7. **User Experience**: Smooth interactions and responsive design
 
-### 🎯 **Key Innovations**
+### 🎯 **Key Principles**
 
 - **Zero-Class Components**: Most styling through element selectors
 - **Content-Aware Design**: Tags scale to content size
@@ -570,9 +539,7 @@ the future of web development—clean, fast, accessible, and maintainable.
 ## Technology Stack
 
 - **Runtime**: Deno v2.x
-- **Language**: TypeScript
 - **Rendering**: mono-jsx v0.6.6+ (server-side JSX without React)
-- **Server**: Custom serve wrapper with `deno run` for better control
 - **Enhancement**: HTMX for dynamic interactions and progressive enhancement
 - **Styling**: Modern CSS with nesting, @scope, container queries
 - **Layout**: CSS logical properties and modern selectors
@@ -580,3 +547,4 @@ the future of web development—clean, fast, accessible, and maintainable.
 - **Diagrams**: Mermaid.js integration
 - **Search**: Client-side modal search with minimal results display
 - **Hosting**: Deno Deploy (edge computing platform)
+- **Language**: TypeScript
