@@ -1,18 +1,15 @@
-# Functional Minimal Blog
+# Blogo <img src="public/blogo-logo.png" alt="Blogo Logo" width="60">
 
-![Blogo Logo](blogo-logo.png)
-
-A lightweight, type-safe, functional blog implementation built with Deno,
-TypeScript, mono-jsx, HTMX, and Markdown.
+*A lightweight, functional blog built with modern web technologies*
 
 ## Core Principles
 
 This blog system is built around several key architectural principles:
 
-1. **mono-jsx Architecture**: Server-side JSX rendering without React overhead
-2. **HTMX for Interactivity**: HTMX for dynamic interactions and progressive
+1. **mono-jsx architecture**: Server-side JSX rendering without React overhead
+2. **HTMX for interactivity**: HTMX for dynamic interactions and progressive
    enhancement
-3. **Deno for Minimal Dependencies**: Leveraging Deno's standard library with
+3. **Deno for minimal dependencies**: Leveraging Deno's standard library with
    minimal external dependencies
 4. **Semantic HTML**: Clean, accessible markup following modern best practices
 5. **Pure CSS**: Minimal, semantic, responsive styling without frameworks
