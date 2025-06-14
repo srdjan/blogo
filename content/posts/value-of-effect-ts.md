@@ -192,9 +192,9 @@ Almost there...
 
 So, the question is, if we would to dream a bit, would we be able to hide even
 the last two 'technical' concerns still appearing in the code? Yes, absolutely!
-We could, for example, replace 'flatMap' with 'use' and 'tap' with 'do', which seem
-more natural, intuitive, and express intent clearly. Lets also remove 'Effect.' and
-pretend 'use' and 'do' are langugage keywords.
+We could, for example, replace 'flatMap' with 'use' and 'tap' with 'do', which
+seem more natural, intuitive, and express intent clearly. Lets also remove
+'Effect.' and pretend 'use' and 'do' are langugage keywords.
 
 With 'use' and 'do', we would have:
 
@@ -208,7 +208,6 @@ const onboardingWorkflow = (userId: number) =>
     provideService(EmailService, EmailServiceLive),
   );
 ```
-
 
 Here is why this works so well:
 
