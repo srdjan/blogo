@@ -3,10 +3,10 @@ export function AboutHtml() {
     <section>
       <article>
         <p>
-          Welcome to my corner of the internet. I'm a{" "} <strong>NYC-area technologist</strong>{" "}
-          with a passion for turning big ideas into resilient, impactful products.{" "}
-          My background as a recovering startup founder and ex-<strong>ThoughtWorks principal</strong>{" "}
-          means I speak both the language of engineers and executives.
+          Welcome to my corner of the internet. I'm a{" "}
+          <strong>NYC-area technologist</strong>{" "}
+          with a passion for turning big ideas into resilient, impactful
+          products.
         </p>
 
         <p>
@@ -16,6 +16,13 @@ export function AboutHtml() {
           <strong>NFT ticketing systems</strong>, or rethinking{" "}
           <strong>decentralized hiring</strong>, I translate chaos into clear
           roadmaps.
+        </p>
+
+        <p>
+          My background as a recovering startup founder and ex-<strong>
+            ThoughtWorks principal
+          </strong>{" "}
+          means I speak both the language of engineers and executives.
         </p>
 
         <aside>
