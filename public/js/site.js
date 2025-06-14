@@ -65,6 +65,9 @@ const Core = {
         // Ensure search toggle still works after HTMX swap
         ensureSearchToggleWorks();
 
+        // Ensure theme toggle still works after HTMX swap (but don't re-initialize theme)
+        Theme.setupEventListeners();
+
         // Log successful content swap (for debugging)
         if (
           window.location.hostname === "localhost" ||
@@ -202,6 +205,76 @@ const Search = {
   },
 };
 
+// Theme toggle module for light/dark mode switching
+const Theme = {
+  init() {
+    this.themeToggle = document.querySelector(".theme-toggle");
+    this.currentTheme = this.getStoredTheme() || "dark"; // Default to dark mode
+
+    // Apply initial theme
+    this.applyTheme(this.currentTheme);
+
+    // Set up event listener
+    this.setupEventListeners();
+  },
+
+  setupEventListeners() {
+    if (this.themeToggle && !this.themeToggle.hasAttribute("data-theme-listener")) {
+      this.themeToggle.setAttribute("data-theme-listener", "true");
+      this.themeToggle.addEventListener("click", () => {
+        console.log("Theme toggle clicked, current theme:", this.currentTheme);
+        this.toggleTheme();
+      });
+    }
+  },
+
+  getStoredTheme() {
+    try {
+      return localStorage.getItem("theme");
+    } catch (e) {
+      return null;
+    }
+  },
+
+  setStoredTheme(theme) {
+    try {
+      localStorage.setItem("theme", theme);
+    } catch (e) {
+      // localStorage not available, continue without persisting
+    }
+  },
+
+  applyTheme(theme) {
+    const body = document.body;
+    console.log("Applying theme:", theme, "Body classes before:", body.className);
+
+    if (theme === "light") {
+      body.classList.add("light-theme");
+    } else {
+      body.classList.remove("light-theme");
+    }
+
+    console.log("Body classes after:", body.className);
+
+    this.currentTheme = theme;
+    this.setStoredTheme(theme);
+
+    // Update button aria-label for accessibility
+    if (this.themeToggle) {
+      const label = theme === "light"
+        ? "Switch to dark theme"
+        : "Switch to light theme";
+      this.themeToggle.setAttribute("aria-label", label);
+      this.themeToggle.setAttribute("title", label);
+    }
+  },
+
+  toggleTheme() {
+    const newTheme = this.currentTheme === "light" ? "dark" : "light";
+    this.applyTheme(newTheme);
+  },
+};
+
 // Simple function to ensure search functionality works
 function ensureSearchToggleWorks() {
   const searchToggle = document.querySelector(".search-toggle");
@@ -267,6 +340,7 @@ function ensureSearchToggleWorks() {
 document.addEventListener("DOMContentLoaded", function () {
   Core.init();
   Search.init();
+  Theme.init();
 
   // Initial attachment of search listeners
   ensureSearchToggleWorks();

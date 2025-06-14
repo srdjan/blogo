@@ -3,8 +3,10 @@
 This blog system is built around several key architectural principles:
 
 - **mono-jsx** architecture: Server-side JSX rendering without React overhead
-- **HTMX** for interactivity: HTMX for dynamic interactions and progressive enhancement
-- **Deno** for minimal dependencies: Leveraging Deno's standard library with minimal external dependencies
+- **HTMX** for interactivity: HTMX for dynamic interactions and progressive
+  enhancement
+- **Deno** for minimal dependencies: Leveraging Deno's standard library with
+  minimal external dependencies
 - Semantic **HTML**: Clean, accessible markup following modern best practices
 - Pure **CSS**: Minimal, semantic, responsive styling without frameworks
 
@@ -12,19 +14,23 @@ This blog system is built around several key architectural principles:
 
 - **Markdown Content**: Posts written in markdown
 - **Tag System**: Posts can be tagged and filtered by a tag
-- **Full-text Search**: Dual search experience with modal quick-search and full results page
-- **Responsive Design**: Mobile-first styling that works seamlessly across all devices
-- **Semantic Components**: Clean JSX components following semantic HTML and ARIA principles
+- **Full-text Search**: Dual search experience with modal quick-search and full
+  results page
+- **Responsive Design**: Mobile-first styling that works seamlessly across all
+  devices
+- **Semantic Components**: Clean JSX components following semantic HTML and ARIA
+  principles
 - **Elegant Interactions**: Subtle hover effects and smooth animations
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
 
 ## Architecture
 
-The project follows a light functional programming style with TypeScript, and is 
-built using a mono-jsx architecture with clean separation of concerns and semantic HTML/CSS.
-This modern approach creates a blog that's not just functional, but showcases
-the future of web development—clean, fast, accessible, and maintainable.
+The project follows a light functional programming style with TypeScript, and is
+built using a mono-jsx architecture with clean separation of concerns and
+semantic HTML/CSS. This modern approach creates a blog that's not just
+functional, but showcases the future of web development—clean, fast, accessible,
+and maintainable.
 
 ### Core Structure
 
@@ -141,8 +147,8 @@ Deno's edge computing platform.
    - Connect your GitHub repository
    - Set the entry point to `app.tsx`
 
-3. **Environment Configuration** (optional):
-   The blog can be configured through environment variables or by modifying`src/config.ts`:
+3. **Environment Configuration** (optional): The blog can be configured through
+   environment variables or by modifying`src/config.ts`:
    - Blog title and description
    - Posts per page
    - Cache TTL settings
@@ -153,14 +159,14 @@ Deno's edge computing platform.
    - Click "Settings" → "Environment Variables"
    - Add your environment variables, e.g.:
 
-      ```js
-      BLOG_TITLE=Your Blog Name
-      BLOG_DESCRIPTION=Your blog description
-      PUBLIC_URL=https://your-project.deno.dev
-      ```
+     ```js
+     BLOG_TITLE=Your Blog Name
+     BLOG_DESCRIPTION=Your blog description
+     PUBLIC_URL=https://your-project.deno.dev
+     ```
 
-4. **Deploy**:
-   On every push to `main`, Deno Deploy will automatically build and deploy your blog
+4. **Deploy**: On every push to `main`, Deno Deploy will automatically build and
+   deploy your blog
 
 #### Manual Deployment with CLI
 

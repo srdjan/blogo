@@ -16,11 +16,10 @@ export function PostView({ post }: PostViewProps) {
             </time>
             {post.tags && post.tags.length > 0 && (
               <div>
-                {post.tags.map((tag) => (
-                  <a href={`/tags/${tag}`}>#{tag}</a>
-                )).reduce((prev, curr, index) => (
-                  index === 0 ? [curr] : [...prev, " ", curr]
-                ), [] as (JSX.Element | string)[])}
+                {post.tags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)
+                  .reduce((prev, curr, index) => (
+                    index === 0 ? [curr] : [...prev, " ", curr]
+                  ), [] as (JSX.Element | string)[])}
               </div>
             )}
           </div>

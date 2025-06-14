@@ -108,7 +108,7 @@ const extractNodes = (
 
   lines.forEach((line) => {
     // Skip comments and styling directives, but not node connections that reference styled nodes
-    if (line.startsWith('%%') || line.startsWith('classDef')) {
+    if (line.startsWith("%%") || line.startsWith("classDef")) {
       return;
     }
 
@@ -130,9 +130,9 @@ const extractNodes = (
     }
 
     // Also look for standalone node definitions (nodes without connections)
-    const nodeMatch = line.match(/^\s*(\w+)\[(.*?)\](?::::\w+)?$/) || 
-                     line.match(/^\s*(\w+)\((.*?)\)(?::::\w+)?$/) ||
-                     line.match(/^\s*(\w+)\{(.*?)\}(?::::\w+)?$/);
+    const nodeMatch = line.match(/^\s*(\w+)\[(.*?)\](?::::\w+)?$/) ||
+      line.match(/^\s*(\w+)\((.*?)\)(?::::\w+)?$/) ||
+      line.match(/^\s*(\w+)\{(.*?)\}(?::::\w+)?$/);
 
     if (nodeMatch) {
       const [, id, label] = nodeMatch;
@@ -141,16 +141,20 @@ const extractNodes = (
       // Update existing node with proper label and shape, or create new one
       nodeMap.set(id, { label, shape });
     }
-    
+
     // Also check for inline node definitions in connections
-    const inlineMatch = line.match(/(\w+)\[(.*?)\]\s*(?:-->|---|\-\.-|\.\.\.|->)/);
+    const inlineMatch = line.match(
+      /(\w+)\[(.*?)\]\s*(?:-->|---|\-\.-|\.\.\.|->)/,
+    );
     if (inlineMatch) {
       const [, id, label] = inlineMatch;
       const shape = parseNodeShape(inlineMatch[0]);
       nodeMap.set(id, { label, shape });
     }
-    
-    const inlineMatchTarget = line.match(/(?:-->|---|\-\.-|\.\.\.|->)\s*(?:\|[^|]*\|)?\s*(\w+)\[(.*?)\]/);
+
+    const inlineMatchTarget = line.match(
+      /(?:-->|---|\-\.-|\.\.\.|->)\s*(?:\|[^|]*\|)?\s*(\w+)\[(.*?)\]/,
+    );
     if (inlineMatchTarget) {
       const [, id, label] = inlineMatchTarget;
       const shape = parseNodeShape(inlineMatchTarget[0]);
@@ -171,7 +175,7 @@ const extractEdges = (lines: readonly string[]): readonly MermaidEdge[] => {
 
   lines.forEach((line) => {
     // Skip comments and styling directives, but not node connections that reference styled nodes
-    if (line.startsWith('%%') || line.startsWith('classDef')) {
+    if (line.startsWith("%%") || line.startsWith("classDef")) {
       return;
     }
 
@@ -258,7 +262,8 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+        "font-family":
+          "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -278,7 +283,8 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+        "font-family":
+          "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -296,7 +302,8 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+        "font-family":
+          "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 11,
       })
     }${label}</text>`)
@@ -318,7 +325,8 @@ const renderNodeShape = (node: MermaidNode): string => {
         x,
         y: y + 5,
         "text-anchor": "middle",
-        "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+        "font-family":
+          "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
         "font-size": 12,
       })
     }${label}</text>`)
@@ -366,7 +374,8 @@ const renderEdge = (
           x: midX,
           y: midY - 5,
           "text-anchor": "middle",
-          "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+          "font-family":
+            "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
           "font-size": 10,
           fill: "#444",
         })

@@ -1,12 +1,38 @@
 /* Modern CSS with Nesting, @scope, Container Queries, and latest features
    Following the monospace web philosophy: https://owickstrom.github.io/the-monospace-web/ */
 
-/* Color palette with modern CSS custom properties */
+/* Color palette with modern CSS custom properties - Dark mode as default */
 :root {
   /* Monospace font stack following the monospace web approach */
   --font-mono: ui-monospace, "SF Mono", Monaco, "Inconsolata", "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-  /* Ultra high contrast color palette */
+  /* Dark mode colors as default */
+  --color-text: #ffffff;
+  --color-text-muted: #cccccc;
+  --color-text-subtle: #999999;
+  --color-bg: #000000;
+  --color-bg-subtle: #111111;
+  --color-border: #666666;
+  --color-border-strong: #888888;
+  --color-primary: #ffffff;
+  --color-primary-hover: #ffffff;
+  --color-accent-amber: #b8860b;
+  --color-accent-coral: #cd5c5c;
+  --color-syntax-keyword: #ff6b6b;
+  --color-syntax-string: #74c0fc;
+  --color-syntax-number: #69db7c;
+  --color-syntax-function: #da77f2;
+  --color-syntax-comment: #868e96;
+  --color-syntax-variable: #ffd43b;
+  --shadow-subtle: 0 2px 8px rgba(255, 255, 255, 0.1);
+  --shadow-medium: 0 4px 16px rgba(255, 255, 255, 0.15);
+
+  /* View Transitions */
+  view-transition-name: root;
+}
+
+/* Light theme class */
+body.light-theme {
   --color-text: #000000;
   --color-text-muted: #333333;
   --color-text-subtle: #555555;
@@ -16,8 +42,6 @@
   --color-border-strong: #666666;
   --color-primary: #000000;
   --color-primary-hover: #000000;
-  --color-accent-amber: #b8860b;
-  --color-accent-coral: #cd5c5c;
   --color-syntax-keyword: #c41e3a;
   --color-syntax-string: #1e3a8a;
   --color-syntax-number: #1565c0;
@@ -26,9 +50,6 @@
   --color-syntax-variable: #e65100;
   --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.12);
   --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.16);
-
-  /* View Transitions */
-  view-transition-name: root;
 }
 
 /* Basic reset with modern CSS */
@@ -603,6 +624,58 @@ nav {
       flex-shrink: 0;
     }
   }
+
+  /* Theme toggle button */
+  & .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    min-width: 44px;
+    min-height: 44px;
+    position: relative;
+
+    &:hover {
+      background-color: var(--color-bg-subtle);
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    & svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &:hover svg {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Icon visibility based on theme */
+    & .sun-icon {
+      display: block;
+      opacity: 1;
+    }
+
+    & .moon-icon {
+      display: block;
+      opacity: 0;
+    }
+  }
 }
 
 /* Articles with CSS Nesting */
@@ -702,7 +775,7 @@ summary {
       background: linear-gradient(135deg,
           var(--color-bg-subtle) 0%,
           var(--color-bg) 100%);
-      border-inline-start: 4px solid var(--color-accent-amber);
+      border-inline-start: 4px solid var(--color-syntax-string);
       padding: 1rem 1.25rem;
       margin: 2rem 0;
       border-radius: 0 8px 8px 0;
@@ -714,18 +787,6 @@ summary {
         font-size: 1rem;
         font-weight: 500;
         color: var(--color-border);
-      }
-
-      &::before {
-        content: "";
-        position: absolute;
-        inset-inline-start: -2px;
-        inset-block-start: 50%;
-        transform: translateY(-50%);
-        width: 8px;
-        block-size: 8px;
-        background: var(--color-accent-amber);
-        border-radius: 50%;
       }
     }
 
@@ -775,113 +836,84 @@ footer {
   }
 }
 
-/* Modern dark mode with @media */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-text: #ffffff;
-    --color-text-muted: #cccccc;
-    --color-text-subtle: #999999;
-    --color-bg: #000000;
-    --color-bg-subtle: #111111;
-    --color-border: #666666;
-    --color-border-strong: #888888;
-    --color-primary: #ffffff;
-    --color-primary-hover: #ffffff;
-    --color-syntax-keyword: #ff6b6b;
-    --color-syntax-string: #74c0fc;
-    --color-syntax-number: #69db7c;
-    --color-syntax-function: #da77f2;
-    --color-syntax-comment: #868e96;
-    --color-syntax-variable: #ffd43b;
-    --shadow-subtle: 0 2px 8px rgba(255, 255, 255, 0.1);
-    --shadow-medium: 0 4px 16px rgba(255, 255, 255, 0.15);
-  }
+/* Global HTML background for dark mode default */
+html {
+  background: #0d1117;
+  color: #f0f6fc;
+}
 
-  html {
-    background: #0d1117;
-    color: #f0f6fc;
-  }
+/* Light theme overrides */
+body.light-theme {
+  background: #ffffff;
+  color: #000000;
+}
 
-  a {
-    color: #ffffff;
-    text-decoration-color: #ffffff;
-  }
+body.light-theme html {
+  background: #ffffff;
+  color: #000000;
+}
 
-  h2 {
-    border-block-end-color: var(--color-border-strong);
-  }
+/* Global link styles */
+a {
+  color: var(--color-primary);
+  text-decoration-color: var(--color-primary);
+}
 
-  article {
-    border-block-end-color: var(--color-border-strong);
-    border-color: var(--color-border-strong);
-  }
-
-  nav {
-    border-block-end-color: var(--color-border-strong);
-    background: var(--color-bg-subtle);
-
-    & a[aria-current="page"] {
-      background: var(--color-primary);
-      color: var(--color-bg);
-    }
-  }
-
-  footer {
-    border-block-start-color: var(--color-border-strong);
-  }
-
-  @scope (ul[role="list"]) {
-    :scope li {
-      background: #21262d;
-      color: #8b949e;
-    }
-  }
-
-  @scope (section) {
-    article aside {
-      background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
-      border-inline-start-color: var(--color-accent-amber);
-    }
-  }
-
-  code {
-    background: var(--color-bg-subtle);
-    border-color: var(--color-border);
-    color: var(--color-text);
-  }
-
-  pre {
-    background: var(--color-bg-subtle);
-    border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-medium);
-  }
-
-  .hljs {
-    color: #f0f6fc;
-  }
-
-  table {
-    border-color: var(--color-border-strong);
-  }
-
-  thead {
+/* Theme-specific overrides for dark mode elements */
+@scope (ul[role="list"]) {
+  :scope li {
     background: #21262d;
+    color: #8b949e;
+  }
+}
+
+@scope (section) {
+  article aside {
+    background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+    border-inline-start-color: var(--color-accent-amber);
+  }
+}
+
+/* Light theme overrides */
+body.light-theme ul[role="list"] li {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
+}
+
+body.light-theme section article aside {
+  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+  border-inline-start-color: var(--color-accent-amber);
+}
+
+/* Theme-specific table styles */
+thead {
+  background: #21262d;
+}
+
+body.light-theme thead {
+  background: var(--color-text);
+}
+
+tbody tr {
+  &:nth-child(even) {
+    background: #161b22;
+  }
+}
+
+body.light-theme tbody tr {
+  &:nth-child(even) {
+    background: var(--color-bg-subtle);
+  }
+}
+
+/* Theme toggle icon visibility for light theme */
+body.light-theme nav .theme-toggle {
+  & .sun-icon {
+    opacity: 0;
   }
 
-  th,
-  td {
-    border-color: var(--color-border);
-  }
-
-  tbody tr {
-    &:nth-child(even) {
-      background: #161b22;
-    }
-
-  }
-
-  .table-wrapper {
-    border-color: var(--color-border-strong);
+  & .moon-icon {
+    opacity: 1;
   }
 }
 
