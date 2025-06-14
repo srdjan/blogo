@@ -10,20 +10,19 @@ export function PostView({ post }: PostViewProps) {
     <main>
       <article>
         <header>
-          <div>
-            <time dateTime={post.date}>
-              {post.formattedDate || new Date(post.date).toLocaleDateString()}
-            </time>
-            {post.tags && post.tags.length > 0 && (
-              <div>
-                {post.tags.map((tag) => (
+          <h1>{post.title}</h1>
+          <time dateTime={post.date}>
+            {post.formattedDate || new Date(post.date).toLocaleDateString()}
+          </time>
+          {post.tags && post.tags.length > 0 && (
+            <ul role="list" class="post-tags">
+              {post.tags.map((tag) => (
+                <li key={tag}>
                   <a href={`/tags/${tag}`}>#{tag}</a>
-                )).reduce((prev, curr, index) => (
-                  index === 0 ? [curr] : [...prev, " ", curr]
-                ), [] as (JSX.Element | string)[])}
-              </div>
-            )}
-          </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </header>
         <section>
           <div innerHTML={post.content}></div>
