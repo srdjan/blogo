@@ -14,6 +14,7 @@ import {
   searchPostsByQuery,
 } from "./src/utils/content-loader.ts";
 import { generateRSS } from "./src/rss.ts";
+import { generateSitemap, generateRobotsTxt } from "./src/sitemap.ts";
 
 const app = {
   async fetch(req: Request) {
@@ -101,6 +102,11 @@ const app = {
         description: post.excerpt || `Read ${post.title}`,
         path: url.pathname,
         children: <PostView post={post} />,
+        type: 'article',
+        publishedTime: post.date,
+        modifiedTime: post.modified,
+        tags: post.tags,
+        author: "Claude & Srdjan"
       });
     }
 
@@ -199,6 +205,33 @@ const app = {
         headers: {
           "Content-Type": "application/rss+xml; charset=utf-8",
           "Cache-Control": "max-age=3600", // Cache for 1 hour
+        },
+      });
+    }
+
+    // Handle XML Sitemap
+    if (url.pathname === "/sitemap.xml") {
+      const posts = await getCachedPosts();
+      const baseUrl = url.origin;
+      const sitemapContent = generateSitemap(posts, baseUrl);
+
+      return new Response(sitemapContent, {
+        headers: {
+          "Content-Type": "application/xml; charset=utf-8",
+          "Cache-Control": "max-age=3600", // Cache for 1 hour
+        },
+      });
+    }
+
+    // Handle robots.txt
+    if (url.pathname === "/robots.txt") {
+      const baseUrl = url.origin;
+      const robotsContent = generateRobotsTxt(baseUrl);
+
+      return new Response(robotsContent, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "max-age=86400", // Cache for 24 hours
         },
       });
     }

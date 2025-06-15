@@ -6,10 +6,31 @@ interface BlogLayoutProps {
   description?: string;
   path?: string;
   children: JSX.Element;
+  image?: string;
+  author?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  type?: 'website' | 'article';
 }
 
 export function createBlogLayout(props: BlogLayoutProps) {
-  const { title, description, path = "/", children } = props;
+  const { 
+    title, 
+    description, 
+    path = "/", 
+    children,
+    image,
+    author = "Claude & Srdjan",
+    publishedTime,
+    modifiedTime,
+    tags,
+    type = 'website'
+  } = props;
+  
+  const baseUrl = "https://blogo.timok.deno.net";
+  const canonicalUrl = `${baseUrl}${path}`;
+  const defaultImage = `${baseUrl}/images/og-default.png`;
   
   return (
     <html lang="en">
@@ -24,6 +45,34 @@ export function createBlogLayout(props: BlogLayoutProps) {
         {description
           ? <meta name="description" content={description} {...({} as any)} />
           : null}
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={canonicalUrl} {...({} as any)} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content={type} {...({} as any)} />
+        <meta property="og:title" content={title} {...({} as any)} />
+        {description && <meta property="og:description" content={description} {...({} as any)} />}
+        <meta property="og:url" content={canonicalUrl} {...({} as any)} />
+        <meta property="og:image" content={image || defaultImage} {...({} as any)} />
+        <meta property="og:site_name" content="Blog" {...({} as any)} />
+        {publishedTime && <meta property="article:published_time" content={publishedTime} {...({} as any)} />}
+        {modifiedTime && <meta property="article:modified_time" content={modifiedTime} {...({} as any)} />}
+        {author && <meta property="article:author" content={author} {...({} as any)} />}
+        {tags && tags.map((tag, index) => 
+          <meta key={index} property="article:tag" content={tag} {...({} as any)} />
+        )}
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" {...({} as any)} />
+        <meta name="twitter:title" content={title} {...({} as any)} />
+        {description && <meta name="twitter:description" content={description} {...({} as any)} />}
+        <meta name="twitter:image" content={image || defaultImage} {...({} as any)} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="author" content={author} {...({} as any)} />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" {...({} as any)} />
+        <meta name="theme-color" content="#000000" {...({} as any)} />
         <link
           rel="icon"
           href="/favicon.svg"
@@ -31,12 +80,47 @@ export function createBlogLayout(props: BlogLayoutProps) {
           {...({} as any)}
         />
         <link rel="stylesheet" href="/css/main.css" {...({} as any)} />
+        <link rel="preload" href="/js/htmx.min.js" as="script" {...({} as any)} />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" {...({} as any)} />
         <link
           rel="alternate"
           href="/feed.xml"
           title={`${title} RSS Feed`}
           {...({} as any)}
         />
+        {/* Structured Data (JSON-LD) */}
+        <script type="application/ld+json" {...({
+          dangerouslySetInnerHTML: {
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": type === 'article' ? "BlogPosting" : "WebSite",
+              "headline": title,
+              "description": description,
+              "url": canonicalUrl,
+              "image": image || defaultImage,
+              "author": {
+                "@type": "Person",
+                "name": author
+              },
+              "publisher": {
+                "@type": "Organization", 
+                "name": "Blog",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": `${baseUrl}/favicon.svg`
+                }
+              },
+              ...(publishedTime && { "datePublished": publishedTime }),
+              ...(modifiedTime && { "dateModified": modifiedTime }),
+              ...(tags && { "keywords": tags.join(", ") }),
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": canonicalUrl
+              }
+            })
+          }
+        } as any)} />
+        
         <script src="/js/htmx.min.js"></script>
         <script src="/js/site.js"></script>
       </head>
