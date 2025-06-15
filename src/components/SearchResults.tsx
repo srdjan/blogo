@@ -34,7 +34,7 @@ function renderPostMeta(post: Post) {
   );
 }
 
-export function SearchResultsHtml(
+export function SearchResults(
   { posts, query }: { posts: Post[]; query: string },
 ) {
   return (

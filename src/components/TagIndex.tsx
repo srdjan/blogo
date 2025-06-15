@@ -1,6 +1,6 @@
 import { TagInfo } from "../types.ts";
 
-export function TagIndexHtml({ tags }: { tags: TagInfo[] }) {
+export function TagIndex({ tags }: { tags: TagInfo[] }) {
   const sortedTags = [...tags].sort((a, b) => b.count - a.count);
 
   return (

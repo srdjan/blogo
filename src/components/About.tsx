@@ -1,4 +1,4 @@
-export function AboutHtml() {
+export function About() {
   return (
     <section>
       <article>

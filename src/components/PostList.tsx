@@ -88,7 +88,7 @@ function renderPagination(pagination: Pagination, activeTag?: string) {
   );
 }
 
-export function PostListHtml({
+export function PostList({
   posts,
   activeTag,
   pagination,

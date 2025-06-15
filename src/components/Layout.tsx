@@ -1,7 +1,7 @@
 // Blog layout component for mono-jsx
 // deno-lint-ignore-file no-explicit-any
 
-interface BlogLayoutProps {
+interface LayoutProps {
   title: string;
   description?: string;
   path?: string;
@@ -14,7 +14,7 @@ interface BlogLayoutProps {
   type?: 'website' | 'article';
 }
 
-export function createBlogLayout(props: BlogLayoutProps) {
+export function createLayout(props: LayoutProps) {
   const { 
     title, 
     description, 
