@@ -1,7 +1,7 @@
 // Render helper functions for mono-jsx compatibility (replacing string-based components)
 import { Post, TagInfo } from "../types.ts";
-import { AboutHtml } from "../components/AboutHtml.tsx";
-import { TagIndexHtml } from "../components/TagIndexHtml.tsx";
+import { AboutHtml } from "../components/About.tsx";
+import { TagIndexHtml } from "../components/TagIndex.tsx";
 
 // Define Pagination type locally since we deleted the pagination.ts file
 type Pagination = {
@@ -170,56 +170,4 @@ export function createAbout() {
   return <AboutHtml />;
 }
 
-// Create search results content
-export function createSearchResults(posts: Post[], query: string) {
-  return (
-    <main>
-      <header>
-        <h1>Search Results</h1>
-        <p>
-          Results for: <strong>"{query}"</strong>
-        </p>
-      </header>
-
-      <section>
-        {posts.length > 0
-          ? (
-            posts.map((post) => (
-              <article>
-                <header>
-                  <h2>
-                    <a
-                      href={`/posts/${post.slug}`}
-                      hx-get={`/posts/${post.slug}`}
-                      hx-target="#content-area"
-                      hx-swap="innerHTML"
-                      hx-push-url="true"
-                    >
-                      {post.title}
-                    </a>
-                  </h2>
-                  {renderPostMeta(post)}
-                </header>
-                {renderPostExcerpt(post)}
-              </article>
-            ))
-          )
-          : (
-            <aside>
-              <p>No posts found for "{query}".</p>
-              <a
-                href="/"
-                hx-get="/"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                hx-push-url="true"
-              >
-                ← Back to all posts
-              </a>
-            </aside>
-          )}
-      </section>
-    </main>
-  );
-}
 

@@ -1,9 +1,9 @@
-import { createBlogLayout } from "./src/components/BlogLayout.tsx";
+import { createBlogLayout } from "./src/components/Layout.tsx";
 import { PostView } from "./src/components/PostView.tsx";
+import { SearchResultsHtml } from "./src/components/SearchResults.tsx";
 import {
   createAbout,
   createPostList,
-  createSearchResults,
   createTagIndex,
 } from "./src/utils/render-helpers.tsx";
 import {
@@ -149,7 +149,7 @@ const app = {
         title: `Search: "${query}" - Blog`,
         description: `Search results for ${query}`,
         path: url.pathname,
-        children: createSearchResults(posts, query),
+        children: <SearchResultsHtml posts={posts} query={query} />,
       });
     }
 
