@@ -32,6 +32,13 @@ export function createBlogLayout(props: BlogLayoutProps) {
   const canonicalUrl = `${baseUrl}${path}`;
   const defaultImage = `${baseUrl}/images/og-default.png`;
   
+  // Generate dynamic OG image URL for posts
+  const ogImage = image || (
+    path.startsWith('/posts/') 
+      ? `${baseUrl}/images/og/${path.replace('/posts/', '')}.png`
+      : defaultImage
+  );
+  
   return (
     <html lang="en">
       <head>
@@ -54,7 +61,7 @@ export function createBlogLayout(props: BlogLayoutProps) {
         <meta property="og:title" content={title} {...({} as any)} />
         {description && <meta property="og:description" content={description} {...({} as any)} />}
         <meta property="og:url" content={canonicalUrl} {...({} as any)} />
-        <meta property="og:image" content={image || defaultImage} {...({} as any)} />
+        <meta property="og:image" content={ogImage} {...({} as any)} />
         <meta property="og:site_name" content="Blog" {...({} as any)} />
         {publishedTime && <meta property="article:published_time" content={publishedTime} {...({} as any)} />}
         {modifiedTime && <meta property="article:modified_time" content={modifiedTime} {...({} as any)} />}
@@ -67,7 +74,7 @@ export function createBlogLayout(props: BlogLayoutProps) {
         <meta name="twitter:card" content="summary_large_image" {...({} as any)} />
         <meta name="twitter:title" content={title} {...({} as any)} />
         {description && <meta name="twitter:description" content={description} {...({} as any)} />}
-        <meta name="twitter:image" content={image || defaultImage} {...({} as any)} />
+        <meta name="twitter:image" content={ogImage} {...({} as any)} />
         
         {/* Additional SEO meta tags */}
         <meta name="author" content={author} {...({} as any)} />
@@ -97,7 +104,7 @@ export function createBlogLayout(props: BlogLayoutProps) {
               "headline": title,
               "description": description,
               "url": canonicalUrl,
-              "image": image || defaultImage,
+              "image": ogImage,
               "author": {
                 "@type": "Person",
                 "name": author

@@ -15,6 +15,7 @@ import {
 } from "./src/utils/content-loader.ts";
 import { generateRSS } from "./src/rss.ts";
 import { generateSitemap, generateRobotsTxt } from "./src/sitemap.ts";
+import { generateOGImage, generateDefaultOGImage } from "./src/og-image.ts";
 
 const app = {
   async fetch(req: Request) {
@@ -232,6 +233,44 @@ const app = {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           "Cache-Control": "max-age=86400", // Cache for 24 hours
+        },
+      });
+    }
+
+    // Handle default OG image
+    if (url.pathname === "/images/og-default.png") {
+      const svgContent = generateDefaultOGImage();
+      
+      return new Response(svgContent, {
+        headers: {
+          "Content-Type": "image/svg+xml",
+          "Cache-Control": "max-age=3600", // Cache for 1 hour
+        },
+      });
+    }
+
+    // Handle dynamic OG images for posts: /images/og/post-slug.png
+    if (url.pathname.startsWith("/images/og/") && url.pathname.endsWith(".png")) {
+      const slug = url.pathname.replace("/images/og/", "").replace(".png", "");
+      const post = await getPostBySlug(slug);
+      
+      if (!post) {
+        // Return default image if post not found
+        const svgContent = generateDefaultOGImage();
+        return new Response(svgContent, {
+          headers: {
+            "Content-Type": "image/svg+xml",
+            "Cache-Control": "max-age=3600",
+          },
+        });
+      }
+
+      const svgContent = generateOGImage(post.title, post.excerpt, post.tags);
+      
+      return new Response(svgContent, {
+        headers: {
+          "Content-Type": "image/svg+xml",
+          "Cache-Control": "max-age=3600", // Cache for 1 hour
         },
       });
     }
