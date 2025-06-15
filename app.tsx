@@ -1,11 +1,9 @@
 import { createBlogLayout } from "./src/components/Layout.tsx";
 import { PostView } from "./src/components/PostView.tsx";
 import { SearchResultsHtml } from "./src/components/SearchResults.tsx";
-import {
-  createAbout,
-  createPostList,
-  createTagIndex,
-} from "./src/utils/render-helpers.tsx";
+import { PostListHtml } from "./src/components/PostList.tsx";
+import { AboutHtml } from "./src/components/About.tsx";
+import { TagIndexHtml } from "./src/components/TagIndex.tsx";
 import {
   getCachedPosts,
   getCachedTags,
@@ -63,7 +61,7 @@ const app = {
         title: "Blog - Home",
         description: "A minimal blog built with mono-jsx",
         path: url.pathname,
-        children: createPostList(posts),
+        children: <PostListHtml posts={posts} />,
       });
     }
 
@@ -75,7 +73,7 @@ const app = {
         title: "Tags - Blog",
         description: "Browse posts by tags",
         path: url.pathname,
-        children: createTagIndex(tags),
+        children: <TagIndexHtml tags={tags} />,
       });
     }
 
@@ -85,7 +83,7 @@ const app = {
         title: "About - Blog",
         description: "About this blog and its features",
         path: url.pathname,
-        children: createAbout(),
+        children: <AboutHtml />,
       });
     }
 
@@ -120,7 +118,7 @@ const app = {
         title: `Posts tagged "${tagName}" - Blog`,
         description: `All posts tagged with ${tagName}`,
         path: url.pathname,
-        children: createPostList(posts, tagName),
+        children: <PostListHtml posts={posts} activeTag={tagName} />,
       });
     }
 

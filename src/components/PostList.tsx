@@ -31,7 +31,7 @@ function renderPostMeta(post: Post) {
         ? (
           <ul role="list">
             {post.tags.map((tag) => (
-              <li key={tag}>
+              <li>
                 <a href={`/tags/${tag}`}>#{tag}</a>
               </li>
             ))}
@@ -127,7 +127,7 @@ export function PostListHtml({
         {posts.length > 0
           ? (
             posts.map((post) => (
-              <article key={post.slug}>
+              <article>
                 <header>
                   <h2>
                     <a
