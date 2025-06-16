@@ -19,7 +19,7 @@ const app = {
   async fetch(req: Request) {
     const url = new URL(req.url);
 
-    console.log(`mono-jsx: ${req.method} ${url.pathname}`);
+    console.log(`${req.method} ${url.pathname}`);
 
     // Handle static files
     if (

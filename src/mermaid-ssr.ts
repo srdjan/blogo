@@ -38,10 +38,12 @@ const parseNodeShape = (syntax: string): MermaidNode["shape"] =>
     .when((s) => s.includes("((") && s.includes("))"), () => "circle" as const)
     .otherwise(() => "rect" as const);
 
-const extractNodeId = (nodeText: string): string =>
-  nodeText.replace(/[\[\](){}]/g, "").replace(/:::.*$/, "").split(/\s+/)[0];
+const extractNodeId = (nodeText: string): string => {
+  // Extract just the node ID part before any brackets, parentheses, or styling
+  return nodeText.replace(/[\[\](){}].*$/, "").replace(/:::.*$/, "").split(/\s+/)[0];
+};
 
-const extractNodeLabel = (nodeText: string): string => {
+const _extractNodeLabel = (nodeText: string): string => {
   const bracketMatch = nodeText.match(/\[(.*?)\]/) ||
     nodeText.match(/\((.*?)\)/) ||
     nodeText.match(/\{(.*?)\}/);
@@ -77,23 +79,23 @@ const calculateNodePosition = (
   direction: MermaidDiagram["direction"],
 ): Point => {
   if (direction === "LR" || direction === "RL") {
-    // Horizontal layout
-    const rows = Math.ceil(Math.sqrt(total));
+    // Horizontal layout - use more columns for complex diagrams
+    const rows = Math.min(Math.ceil(Math.sqrt(total)), 8);
     const row = index % rows;
     const col = Math.floor(index / rows);
     const x = direction === "LR"
-      ? col * 200 + 100
-      : (Math.ceil(total / rows) - col - 1) * 200 + 100;
-    return [x, row * 120 + 100];
+      ? col * 250 + 125
+      : (Math.ceil(total / rows) - col - 1) * 250 + 125;
+    return [x, row * 150 + 100];
   } else {
-    // Vertical layout (TD, BT)
-    const cols = Math.ceil(Math.sqrt(total));
+    // Vertical layout (TD, BT) - use more rows for complex diagrams
+    const cols = Math.min(Math.ceil(Math.sqrt(total)), 8);
     const row = Math.floor(index / cols);
     const col = index % cols;
     const y = direction === "BT"
-      ? (Math.ceil(total / cols) - row - 1) * 120 + 100
-      : row * 120 + 100;
-    return [col * 200 + 100, y];
+      ? (Math.ceil(total / cols) - row - 1) * 150 + 100
+      : row * 150 + 100;
+    return [col * 250 + 125, y];
   }
 };
 
@@ -107,54 +109,64 @@ const extractNodes = (
   >();
 
   lines.forEach((line) => {
-    // Skip comments and styling directives, but not node connections that reference styled nodes
-    if (line.startsWith('%%') || line.startsWith('classDef')) {
+    // Skip comments, styling directives, and subgraph definitions
+    if (line.startsWith('%%') || line.startsWith('classDef') || line.startsWith('subgraph') || line.trim() === 'end') {
       return;
     }
+    
 
+    // Match edge connections with optional labels
     const connectionMatch = line.match(
-      /(\w+)(?:\[.*?\])?\s*(?:-->|---|\-\.-|\.\.\.|->)\s*(?:\|[^|]*\|)?\s*(\w+)(?:\[.*?\])?/,
+      /(\w+)(?:\[([^\]]*)\])?(?::::\w+)?\s*(?:-->|---|\-\.-|\.\.\.|->)\s*(?:\|([^|]*)\|)?\s*(\w+)(?:\[([^\]]*)\])?(?::::\w+)?/,
     );
 
     if (connectionMatch) {
-      const [, sourceNode, targetNode] = connectionMatch;
+      const [, sourceNode, sourceLabel, _edgeLabel, targetNode, targetLabel] = connectionMatch;
 
-      // For connections, we only get the node IDs, not labels
-      // Node labels come from standalone definitions or the full connection line
+      // Add source node
       if (!nodeMap.has(sourceNode)) {
-        nodeMap.set(sourceNode, { label: sourceNode, shape: "rect" });
+        nodeMap.set(sourceNode, { 
+          label: sourceLabel || sourceNode, 
+          shape: "rect" 
+        });
+      } else if (sourceLabel) {
+        // Update label if we have more specific info
+        const existing = nodeMap.get(sourceNode)!;
+        nodeMap.set(sourceNode, { ...existing, label: sourceLabel });
       }
+
+      // Add target node
       if (!nodeMap.has(targetNode)) {
-        nodeMap.set(targetNode, { label: targetNode, shape: "rect" });
+        nodeMap.set(targetNode, { 
+          label: targetLabel || targetNode, 
+          shape: "rect" 
+        });
+      } else if (targetLabel) {
+        // Update label if we have more specific info
+        const existing = nodeMap.get(targetNode)!;
+        nodeMap.set(targetNode, { ...existing, label: targetLabel });
       }
     }
 
-    // Also look for standalone node definitions (nodes without connections)
-    const nodeMatch = line.match(/^\s*(\w+)\[(.*?)\](?::::\w+)?$/) || 
-                     line.match(/^\s*(\w+)\((.*?)\)(?::::\w+)?$/) ||
-                     line.match(/^\s*(\w+)\{(.*?)\}(?::::\w+)?$/);
+    // Look for standalone node definitions (nodes without connections)
+    // Handle: A1[User/Claimant]:::userClass
+    const standaloneMatch = line.match(/^\s*(\w+)\[([^\]]*)\](?::::\w+)?\s*$/) || 
+                           line.match(/^\s*(\w+)\(([^\)]*)\)(?::::\w+)?\s*$/) ||
+                           line.match(/^\s*(\w+)\{([^\}]*)\}(?::::\w+)?\s*$/);
 
-    if (nodeMatch) {
-      const [, id, label] = nodeMatch;
+    if (standaloneMatch) {
+      const [, id, label] = standaloneMatch;
       const shape = parseNodeShape(line);
+      nodeMap.set(id, { label, shape });
+    }
 
-      // Update existing node with proper label and shape, or create new one
-      nodeMap.set(id, { label, shape });
-    }
-    
-    // Also check for inline node definitions in connections
-    const inlineMatch = line.match(/(\w+)\[(.*?)\]\s*(?:-->|---|\-\.-|\.\.\.|->)/);
-    if (inlineMatch) {
-      const [, id, label] = inlineMatch;
-      const shape = parseNodeShape(inlineMatch[0]);
-      nodeMap.set(id, { label, shape });
-    }
-    
-    const inlineMatchTarget = line.match(/(?:-->|---|\-\.-|\.\.\.|->)\s*(?:\|[^|]*\|)?\s*(\w+)\[(.*?)\]/);
-    if (inlineMatchTarget) {
-      const [, id, label] = inlineMatchTarget;
-      const shape = parseNodeShape(inlineMatchTarget[0]);
-      nodeMap.set(id, { label, shape });
+    // Handle nodes that are just IDs with class styling
+    const simpleNodeMatch = line.match(/^\s*(\w+):::(\w+)\s*$/);
+    if (simpleNodeMatch) {
+      const [, id, _className] = simpleNodeMatch;
+      if (!nodeMap.has(id)) {
+        nodeMap.set(id, { label: id, shape: "rect" });
+      }
     }
   });
 
@@ -170,24 +182,28 @@ const extractEdges = (lines: readonly string[]): readonly MermaidEdge[] => {
   const edges: MermaidEdge[] = [];
 
   lines.forEach((line) => {
-    // Skip comments and styling directives, but not node connections that reference styled nodes
-    if (line.startsWith('%%') || line.startsWith('classDef')) {
+    // Skip comments, styling directives, and subgraph definitions
+    if (line.startsWith('%%') || line.startsWith('classDef') || line.startsWith('subgraph') || line.trim() === 'end') {
       return;
     }
+    
 
+    // More comprehensive regex to handle edge connections with optional labels and node styling
     const connectionMatch = line.match(
-      /(\w+)(?:\[.*?\])?\s*(-->|---|->|\-\.-|\.\.\.)\s*(?:\|\s*([^|]+)\s*\|\s*)?(\w+)(?:\[.*?\])?/,
+      /(\w+)(?:\[[^\]]*\])?(?::::\w+)?\s*(-->|---|->|\-\.-|\.\.\.)\s*(?:\|([^|]*)\|)?\s*(\w+)(?:\[[^\]]*\])?(?::::\w+)?/,
     );
 
     if (connectionMatch) {
       const [, fromNode, connector, edgeLabel, toNode] = connectionMatch;
 
-      edges.push({
+      const edge = {
         from: extractNodeId(fromNode),
         to: extractNodeId(toNode),
         label: edgeLabel?.trim(),
         style: parseEdgeStyle(connector),
-      });
+      };
+      
+      edges.push(edge);
     }
   });
 
@@ -201,7 +217,8 @@ const parseMermaidSyntax = (mermaidText: string): ParsedMermaid => {
     const lines = mermaidText
       .split("\n")
       .map((line) => line.trim())
-      .filter((line) => line.length > 0 && !line.startsWith("%%"));
+      .filter((line) => line.length > 0);
+    
 
     if (lines.length === 0) {
       return { success: false, error: "Empty Mermaid diagram" };
@@ -211,11 +228,15 @@ const parseMermaidSyntax = (mermaidText: string): ParsedMermaid => {
     const contentLines = lines.slice(1);
     const direction = parseDirection(firstLine);
 
+    const nodes = extractNodes(contentLines, direction);
+    const edges = extractEdges(contentLines);
+
+
     const diagram: MermaidDiagram = {
       type: parseDiagramType(firstLine),
       direction,
-      nodes: extractNodes(contentLines, direction),
-      edges: extractEdges(contentLines),
+      nodes,
+      edges,
     };
 
     return { success: true, diagram };
@@ -238,14 +259,19 @@ const createSVGElement = (
 
 const renderNodeShape = (node: MermaidNode): string => {
   const { position: [x, y], label, shape } = node;
+  
+  // Calculate dynamic width based on label length
+  const textLength = label.length;
+  const minWidth = 80;
+  const dynamicWidth = Math.max(minWidth, Math.min(textLength * 8 + 20, 200));
 
   return match(shape)
     .with("rect", () => `
       ${
       createSVGElement("rect", {
-        x: x - 60,
+        x: x - dynamicWidth / 2,
         y: y - 25,
-        width: 120,
+        width: dynamicWidth,
         height: 50,
         fill: "#e1f5fe",
         stroke: "#01579b",
@@ -259,7 +285,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         y: y + 5,
         "text-anchor": "middle",
         "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
-        "font-size": 12,
+        "font-size": Math.min(12, Math.max(8, 120 / textLength)),
       })
     }${label}</text>`)
     .with("circle", () => `
@@ -267,7 +293,7 @@ const renderNodeShape = (node: MermaidNode): string => {
       createSVGElement("circle", {
         cx: x,
         cy: y,
-        r: 35,
+        r: Math.max(30, Math.min(textLength * 4 + 15, 60)),
         fill: "#f3e5f5",
         stroke: "#4a148c",
         "stroke-width": 2,
@@ -279,13 +305,15 @@ const renderNodeShape = (node: MermaidNode): string => {
         y: y + 5,
         "text-anchor": "middle",
         "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
-        "font-size": 12,
+        "font-size": Math.min(12, Math.max(8, 120 / textLength)),
       })
     }${label}</text>`)
-    .with("diamond", () => `
+    .with("diamond", () => {
+      const diamondSize = Math.max(40, Math.min(textLength * 3 + 20, 80));
+      return `
       ${
       createSVGElement("polygon", {
-        points: `${x},${y - 30} ${x + 50},${y} ${x},${y + 30} ${x - 50},${y}`,
+        points: `${x},${y - diamondSize/2} ${x + diamondSize},${y} ${x},${y + diamondSize/2} ${x - diamondSize},${y}`,
         fill: "#fff3e0",
         stroke: "#e65100",
         "stroke-width": 2,
@@ -297,15 +325,16 @@ const renderNodeShape = (node: MermaidNode): string => {
         y: y + 5,
         "text-anchor": "middle",
         "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
-        "font-size": 11,
+        "font-size": Math.min(11, Math.max(8, 100 / textLength)),
       })
-    }${label}</text>`)
+    }${label}</text>`;
+    })
     .with("rounded", () => `
       ${
       createSVGElement("rect", {
-        x: x - 60,
+        x: x - dynamicWidth / 2,
         y: y - 25,
-        width: 120,
+        width: dynamicWidth,
         height: 50,
         fill: "#e8f5e8",
         stroke: "#2e7d32",
@@ -319,7 +348,7 @@ const renderNodeShape = (node: MermaidNode): string => {
         y: y + 5,
         "text-anchor": "middle",
         "font-family": "ui-monospace, 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
-        "font-size": 12,
+        "font-size": Math.min(12, Math.max(8, 120 / textLength)),
       })
     }${label}</text>`)
     .exhaustive();
@@ -377,10 +406,10 @@ const renderEdge = (
 };
 
 const renderMermaidDiagram = (diagram: MermaidDiagram): string => {
-  const width = Math.max(600, ...diagram.nodes.map((n) => n.position[0] + 100));
+  const width = Math.max(800, ...diagram.nodes.map((n) => n.position[0] + 150));
   const height = Math.max(
-    400,
-    ...diagram.nodes.map((n) => n.position[1] + 100),
+    600,
+    ...diagram.nodes.map((n) => n.position[1] + 150),
   );
 
   const arrowMarker = `
