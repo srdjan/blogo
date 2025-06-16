@@ -43,12 +43,6 @@ const extractNodeId = (nodeText: string): string => {
   return nodeText.replace(/[\[\](){}].*$/, "").replace(/:::.*$/, "").split(/\s+/)[0];
 };
 
-const _extractNodeLabel = (nodeText: string): string => {
-  const bracketMatch = nodeText.match(/\[(.*?)\]/) ||
-    nodeText.match(/\((.*?)\)/) ||
-    nodeText.match(/\{(.*?)\}/);
-  return bracketMatch?.[1] || extractNodeId(nodeText);
-};
 
 const parseEdgeStyle = (connector: string): MermaidEdge["style"] =>
   match(connector)
