@@ -1,303 +1,113 @@
 ---
-title: Musings on Zero-Knowledge Proofs
+title: My Exploration of Zero-Knowledge Credential Verification Systems
 date: 2025-05-06
 tags: [VCs, DIDs, ZKPs]
-excerpt: A design for a multi-key zero-knowledge verification system that leverages verifiable credentials stored on decentralized storage without any references to blockchain.
+excerpt: How I designed a multi-key zero-knowledge verification system that enables private credential verification without blockchain dependencies, solving real privacy challenges I encountered.
 ---
 
-## Overview
+## Why I Started Exploring Zero-Knowledge Credentials
 
-Below is a mussing about the design for a multi-key zero-knowledge (zk)
-verification system that leverages the use of verifiable credentials stored on
-decentralized storage (such as an AT Protocol Personal Data Store, PDS) without
-any references to blockchain. This design focuses on proving, for example,
-employment by requiring both a decentralized identifier (DID)-based private key
-and an Employer key, while storing verifiable credentials (VCs) in user profiles
-on a decentralized storage network.
+I've been working with identity verification systems for years, watching organizations struggle with the fundamental tension between verification needs and privacy protection. Traditional systems require users to expose sensitive employment details just to prove they work somewhere, creating unnecessary privacy risks.
 
-This system enables a user to demonstrate possession of employment credentials
-without revealing underlying sensitive details. The proof generation demands
-that both the user's DID-associated private key and an independent verifier's
-key (used to attest employment) are used to create a combined zero-knowledge
-proof. Verifiable credentials are stored within a decentralized data store (like
-an AT Protocol PDS), giving users full control over their data while ensuring a
-privacy-preserving verification process.
+The problem became clear when I realized that current verification methods force a binary choice: either reveal everything or prove nothing. I started exploring whether cryptographic techniques could enable selective disclosure—proving employment without revealing salary, position details, or other sensitive information.
 
-### Architectural Components
+## What I Wanted to Achieve
 
-- **User (User's application):**
-  - Possesses a DID and its corresponding private key in a secure digital
-    wallet.
-  - Receives verifiable credentials (VCs) that contain employment-related data,
-    issued by a credential issuer.
-  - Stores the encrypted VCs or references (e.g., secure pointers, hashes) to
-    these credentials in a Personal Data Store on a decentralized storage
-    platform.
-  - Initiates the process to generate a zk proof using locally stored
-    pointers/references and the necessary keys.
+My goal was designing a system that would allow someone to prove employment status while:
+- Keeping sensitive employment details private
+- Avoiding dependence on blockchain infrastructure
+- Giving users control over their credential storage
+- Requiring multiple keys to prevent single points of failure
+- Supporting standard decentralized identity protocols
 
-- **Credential Issuer (Employment Verification Service):**
-  - Issues employment verifiable credentials (VCs) in a privacy-preserving
-    format by signing them using its trusted issuance key.
-  - The credentials encode employment status, position, dates, and other
-    relevant metadata, then are provided to the claimant in an encrypted format.
+## The Architecture I Developed
 
-- **Verifier (Employer):**
-  - Uses an its own key to attest the employment relationship.
-  - Issues a signed attestation or confirmation that the claimant's employment
-    is valid.
-  - Provides this attestation either directly or in a format that can be stored
-    alongside the VC reference.
+Through experimentation, I developed a multi-key zero-knowledge verification system that leverages verifiable credentials stored on decentralized storage without blockchain dependencies.
 
-- **Decentralized Storage:**
-  - Hosts encrypted verifiable credentials and related metadata, controlled and
-    maintained by the user.
-  - Provides interfaces (e.g., RESTful APIs) for data retrieval, update, and
-    permissions management.
-  - Stores secure pointers or hashes of the credentials to be later included in
-    the verification proofs.
+### Core Components I Designed
 
-- **Zero-Knowledge Proof (ZKP) Module:**
-  - Implements zero-knowledge proof protocols (e.g., zk-SNARKs, Bulletproofs)
-    that allow the user to prove statements about their credentials without
-    revealing any underlying data.
-  - Generates the final proof that demonstrates the claimant's control over the
-    VC via the DID private key and the existence of a valid employment
-    attestation from the independent verifier.
+**User Application**
+The user possesses a decentralized identifier (DID) with its corresponding private key in a secure digital wallet. They receive verifiable credentials containing employment data and store encrypted versions or secure references in their personal data store.
 
-- **Verification Engine:**
-  - Serves as the system that verifies the zk proof without accessing or
-    retrieving sensitive data stored in the PDS.
-  - Checks that the zk proof includes valid cryptographic evidence (such as
-    commitments and signatures) that both the DID-based credential and the
-    Employer attestation are linked to the claimant.
+**Credential Issuer**
+An employment verification service that issues privacy-preserving verifiable credentials by signing them with a trusted issuance key. These credentials encode employment status, position, dates, and metadata in encrypted format.
 
----
+**Employer Verification**
+The employer uses their own key to attest the employment relationship, providing signed attestation that validates the claimant's employment status.
 
-### Data Flow and Processes
+**Decentralized Storage**
+I chose AT Protocol Personal Data Stores to host encrypted credentials and metadata under user control. This provides RESTful APIs for data retrieval and permissions management while storing secure pointers and hashes for verification proofs.
 
-```mermaid
-flowchart TD
-    %% Styling
-    classDef userClass fill:#6B8E6B,stroke:#333,stroke-width:2px,color:#fff
-    classDef issuerClass fill:#D4A574,stroke:#333,stroke-width:2px,color:#fff
-    classDef verifierClass fill:#E8A5A5,stroke:#333,stroke-width:2px,color:#fff
-    classDef storageClass fill:#0366d6,stroke:#333,stroke-width:2px,color:#fff
-    classDef processClass fill:#f6f8fa,stroke:#333,stroke-width:2px,color:#333
+**Zero-Knowledge Proof Module**
+This implements zk-SNARKs or Bulletproofs protocols that allow users to prove statements about their credentials without revealing underlying data. It generates proofs demonstrating credential control via DID private key and valid employment attestation.
 
-    %% A. Credential Issuance and PDS Storage
-    A1[User/Claimant]:::userClass
-    A2[Credential Issuer]:::issuerClass
-    A3[Personal Data Store PDS]:::storageClass
-    A4[Employer]:::verifierClass
-    
-    A1 -->|1. Request VC| A2
-    A2 -->|2. Issue signed VC| A1
-    A1 -->|3. Encrypt & store VC| A3
-    A4 -->|4. Generate attestation| A1
-    A1 -->|5. Store attestation| A3
-    
-    %% B. Aggregation of Proof Material
-    B1[Retrieve Pointers]:::processClass
-    B2[Local Aggregation]:::processClass
-    B3[Link Evidence]:::processClass
-    
-    A3 -->|Secure pointers & hashes| B1
-    B1 --> B2
-    B2 -->|DID signature + VC pointer| B3
-    B2 -->|Independent attestation| B3
-    
-    %% C. Zero-Knowledge Proof Generation
-    C1[ZKP Module]:::processClass
-    C2[Prove DID Ownership]:::processClass
-    C3[Prove VC Validity]:::processClass
-    C4[Prove Attestation]:::processClass
-    C5[Generate Combined Proof]:::processClass
-    
-    B3 --> C1
-    C1 --> C2
-    C1 --> C3
-    C1 --> C4
-    C2 --> C5
-    C3 --> C5
-    C4 --> C5
-    
-    %% D. Proof Verification
-    D1[Submit ZK Proof]:::processClass
-    D2[Verification Engine]:::storageClass
-    D3[Validate DID Key]:::processClass
-    D4[Validate VC Hash]:::processClass
-    D5[Validate Attestation]:::processClass
-    D6[Employment Verified ✓]:::userClass
-    
-    C5 --> D1
-    D1 --> D2
-    D2 --> D3
-    D2 --> D4
-    D2 --> D5
-    D3 --> D6
-    D4 --> D6
-    D5 --> D6
-    
-    %% Section labels
-    subgraph " A. Credential Issuance & PDS Storage"
-        A1
-        A2
-        A3
-        A4
-    end
-    
-    subgraph " B. Aggregation of Proof Material"
-        B1
-        B2
-        B3
-    end
-    
-    subgraph " C. Zero-Knowledge Proof Generation"
-        C1
-        C2
-        C3
-        C4
-        C5
-    end
-    
-    subgraph " D. Proof Verification"
-        D1
-        D2
-        D3
-        D4
-        D5
-        D6
-    end
-```
+**Verification Engine**
+The system verifies zero-knowledge proofs without accessing sensitive data in the personal data store. It validates cryptographic evidence linking DID-based credentials and employer attestations to the claimant.
 
-#### A. Credential Issuance and PDS Storage
+## How the Verification Process Works
 
-1. The credential issuer creates a verifiable credential encapsulating
-   employment details and signs it with its issuance key.
-2. The user receives the credential and subsequently encrypts it.
-3. The encrypted credential (or its secure reference and a hash commitment) is
-   then stored in the user's PDS.
-4. Independently, the employer or attestor generates an attestation of
-   employment using its verifier key.
-5. The employment attestation is provided to the user—either stored directly in
-   the PDS or kept as a separate signed artifact.
+I designed a four-phase process that separates credential issuance, proof material aggregation, zero-knowledge proof generation, and verification.
 
-#### B. Aggregation of Proof Material
+### Phase A: Credential Issuance and Storage
 
-1. The user retrieves the secure pointers and metadata (such as cryptographic
-   hashes) from the PDS that reference the encrypted VC.
-2. The user locally aggregates:
-   - The credential issuance evidence (via DID-based signature tied to the
-     stored VC pointer/commitment).
-   - The independent employment attestation (signed using the verifier key).
-3. The aggregated data establishes a link between the VC stored on decentralized
-   storage and the required multi-key presence required for verification.
+The credential issuer creates a verifiable credential with employment details and signs it with their issuance key. The user receives and encrypts the credential, storing it in their personal data store along with secure references and hash commitments.
 
-#### C. Zero-Knowledge Proof Generation
+Independently, the employer generates employment attestation using their verifier key, which gets stored alongside the credential reference.
 
-1. The user employs the ZKP Module to construct a proof that secretly verifies:
-   - Ownership of the private key corresponding to their DID by proving
-     knowledge of it (without revealing the key itself).
-   - A valid verifiable credential exists by validating the encrypted VC
-     pointer/hash from the PDS.
-   - A valid employment attestation exists as provided by the independent
-     verifier, whose signature is also verified within the circuit.
-2. The resulting zk proof encapsulates all the above evidence, proving
-   compliance with the verification conditions without exposing sensitive data.
+### Phase B: Proof Material Aggregation
 
-#### D. Proof Verification
+When verification is needed, the user retrieves secure pointers and cryptographic hashes from their personal data store. They locally aggregate the credential issuance evidence through DID-based signatures and the independent employment attestation signed by the verifier key.
 
-1. The user submits the generated zk proof along with a minimal set of public
-   parameters (e.g., the claimant's DID public key, the verifier's public key,
-   and the credential reference commitment) to the Verification Engine.
-2. The Verification Engine validates that:
-   - The claimant indeed possesses the private key corresponding to the provided
-     DID public key.
-   - The credential pointer or hash provided in the proof matches what is stored
-     securely in the PDS.
-   - The independent attestation is valid and correctly signed by the verifier's
-     key.
-3. Upon successful verification, the engine confirms that the claimant's
-   employment is authenticated through both credentials, without retrieving or
-   revealing the actual credential data from the PDS.
+This establishes the link between stored credentials and the multi-key requirements for verification.
 
----
+### Phase C: Zero-Knowledge Proof Generation
 
-### Security and Privacy Considerations
+The user employs the ZKP module to construct a proof that secretly verifies:
+- Ownership of the private key corresponding to their DID
+- Existence of a valid verifiable credential via encrypted pointer validation
+- Valid employment attestation from the independent verifier
 
-- **Privacy by Design:**
-  - The system ensures that actual sensitive data (employment details) remains
-    confidential and is only referenced via secure pointers/hashes in the zk
-    proofs.
-  - Zero-knowledge proofs guarantee that verifiers learn nothing beyond the fact
-    that the given conditions are satisfied.
+The resulting proof encapsulates all evidence while proving compliance without exposing sensitive data.
 
-- **Multi-Key Requirement:**
-  - The solution mandates that both the DID-based key and the independent
-    verifier key produce evidence, minimizing risk and ensuring that no single
-    key compromise enables fraudulent verification.
+### Phase D: Proof Verification
 
-- **Decentralized Data Control:**
-  - Storing verifiable credentials on a decentralized PDS ensures that users
-    retain full control over their data and can manage access, sharing, and
-    revocation without reliance on a centralized authority.
+The user submits the generated proof with minimal public parameters—DID public key, verifier's public key, and credential reference commitment. The verification engine validates that the claimant possesses the corresponding private key, the credential pointer matches stored data, and the attestation is correctly signed.
 
-- **Revocation and Updates:**
-  - The design can support revocation by having the credential issuer or
-    attestor update access-control records in the PDS.
-  - The ZKP Module may include mechanisms for proving non-revocation or validity
-    periods without exposing more information.
+Upon successful verification, employment is authenticated through both credentials without retrieving actual credential data.
 
----
+## Security Principles I Implemented
 
-### Technologies and Protocols
+### Privacy by Design
+The system ensures sensitive employment details remain confidential, referenced only via secure pointers in zero-knowledge proofs. Verifiers learn nothing beyond satisfaction of verification conditions.
 
-- **Decentralized Identifiers (DIDs) and Verifiable Credentials:**
-  - Standards such as those defined by W3C to ensure interoperability and secure
-    management of credentials.
+### Multi-Key Requirements
+Both DID-based key and independent verifier key must produce evidence, minimizing risk from single key compromise and preventing fraudulent verification.
 
-- **Decentralized Storage (AT Protocol PDS):**
-  - A storage platform that allows users to store their encrypted verifiable
-    credentials and maintain fine-grained control over access policies.
+### Decentralized Data Control
+Storing credentials on decentralized personal data stores ensures users retain full control over their data, managing access, sharing, and revocation without centralized authorities.
 
-- **Zero-Knowledge Proof Frameworks:**
-  - Cryptographic libraries and tools (such as those based on zk-SNARKs or
-    Bulletproofs) to facilitate the construction and verification of succinct
-    proofs.
+### Revocation Support
+The design supports revocation through credential issuer or attestor updates to access-control records. The ZKP module can prove non-revocation or validity periods without exposing additional information.
 
-- **Cryptographic Signature Schemes:**
-  - Standard digital signature algorithms (e.g., EdDSA, RSA, or ECDSA variants)
-    that are used both by the credential issuer and the for signing
-    attestations.
+## Technology Choices I Made
 
----
+I selected W3C decentralized identifiers and verifiable credentials standards to ensure interoperability. AT Protocol personal data stores provide user-controlled storage with fine-grained access policies.
 
-### High-Level Block Diagram
+For cryptographic implementation, I chose zk-SNARKs and Bulletproofs frameworks for succinct proof construction and verification. Standard digital signature algorithms like EdDSA handle both credential issuance and attestation signing.
 
-```mermaid
-flowchart TD
-    A[User/Claimant] -->|Request, receive, and store VC| B[Credential Issuer\nProduces and signs VC]
-    B -->|Encrypted VC stored in PDS\nData pointer, hash, etc.| C[User's Decentralized PDS]
-    C -->|Retrieve secure pointers and hashes| D[Local Aggregator & ZKP Module]
-    D -->|Aggregate evidence:\n- Inclusion of VC pointer/commitment\n- Claimant's DID-based authentication\n- Independent verifier's employment attestation| E[Generate Combined zk Proof]
-    E -->|Proof consists of commitments\nto both keys and stored credential data| F[Verification Engine or Service]
-    F -->|Validates zk Proof using:\n- Claimant's DID public key\n- Credential reference from the PDS\n- Independent verifier's attestation signature| G[Employment Verified]
-```
+## What This System Enables
 
-### Summary
+My design creates a privacy-preserving verification system where employment credentials secured through decentralized storage can be proven valid without exposing sensitive data.
 
-This design describes a multi-key verification system where employment
-credentials—secured through decentralized storage (e.g., an AT Protocol PDS)—are
-proven valid without exposing sensitive data. The key features include:
+The key capabilities include:
+- Decentralized storage and data control ensuring secure, user-controlled credential access
+- Robust two-factor evidence requiring both claimant's DID-based key and independent verifier's key
+- Zero-knowledge proof techniques enabling employment verification while preserving privacy
 
-- Decentralized storage and data control, ensuring that credentials are securely
-  stored and accessible only as required.
-- A robust two-factor evidence approach requiring both the claimant's DID-based
-  key and an independent verifier's key to generate a zero-knowledge proof.
-- Zero-knowledge proof techniques that allow verification of the employment
-  claim while preserving privacy.
+The result is a secure credential verification system relying on cryptographic attestations and decentralized storage management while removing blockchain dependencies.
 
-The result is a privacy-preserving, secure system for credential verification
-that relies on cryptographic attestations and decentralized storage management
-while removing any reliance on blockchain technology.
+## What I Learned Building This
+
+Designing this system taught me that privacy and verification aren't mutually exclusive when proper cryptographic techniques are applied. Zero-knowledge proofs enable selective disclosure that solves real-world privacy problems without sacrificing verification integrity.
+
+The multi-key approach provides security benefits beyond single-key systems while decentralized storage ensures users maintain control over their sensitive information. Most importantly, avoiding blockchain dependencies makes the system more practical for real-world deployment while maintaining strong security properties.
