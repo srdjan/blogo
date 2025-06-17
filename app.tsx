@@ -62,6 +62,7 @@ const app = {
         description: "A minimal blog built with mono-jsx",
         path: url.pathname,
         children: <PostList posts={posts} />,
+        author: "Srdjan Strbanovic"
       });
     }
 
@@ -74,6 +75,7 @@ const app = {
         description: "Browse posts by tags",
         path: url.pathname,
         children: <TagIndex tags={tags} />,
+        author: "Srdjan Strbanovic"
       });
     }
 
@@ -105,7 +107,7 @@ const app = {
         publishedTime: post.date,
         modifiedTime: post.modified,
         tags: post.tags,
-        author: "Claude & Srdjan"
+        author: "Srdjan Strbanovic"
       });
     }
 
@@ -119,6 +121,7 @@ const app = {
         description: `All posts tagged with ${tagName}`,
         path: url.pathname,
         children: <PostList posts={posts} activeTag={tagName} />,
+        author: "Srdjan Strbanovic"
       });
     }
 
@@ -138,6 +141,7 @@ const app = {
               <a href="/">← Back to home</a>
             </main>
           ),
+          author: "Srdjan Strbanovic"
         });
       }
 

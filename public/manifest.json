@@ -1,0 +1,27 @@
+{
+  "name": "Blogo - Modern Development Blog",
+  "short_name": "Blogo",
+  "description": "A blog focused on modern web development, TypeScript, Deno, and functional programming",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "education", "technology"],
+  "lang": "en",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/images/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

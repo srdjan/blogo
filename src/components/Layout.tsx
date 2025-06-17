@@ -62,19 +62,24 @@ export function createLayout(props: LayoutProps) {
         {description && <meta property="og:description" content={description} {...({} as any)} />}
         <meta property="og:url" content={canonicalUrl} {...({} as any)} />
         <meta property="og:image" content={ogImage} {...({} as any)} />
-        <meta property="og:site_name" content="Blog" {...({} as any)} />
+        <meta property="og:image:alt" content={`Cover image for: ${title}`} {...({} as any)} />
+        <meta property="og:site_name" content="Blogo - Modern Development Blog" {...({} as any)} />
+        <meta property="og:locale" content="en_US" {...({} as any)} />
         {publishedTime && <meta property="article:published_time" content={publishedTime} {...({} as any)} />}
         {modifiedTime && <meta property="article:modified_time" content={modifiedTime} {...({} as any)} />}
         {author && <meta property="article:author" content={author} {...({} as any)} />}
         {tags && tags.map((tag, index) => 
           <meta key={index} property="article:tag" content={tag} {...({} as any)} />
         )}
+        {type === 'article' && <meta property="article:section" content="Technology" {...({} as any)} />}
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" {...({} as any)} />
         <meta name="twitter:title" content={title} {...({} as any)} />
         {description && <meta name="twitter:description" content={description} {...({} as any)} />}
         <meta name="twitter:image" content={ogImage} {...({} as any)} />
+        <meta name="twitter:image:alt" content={`Cover image for: ${title}`} {...({} as any)} />
+        <meta name="twitter:site" content="@your_twitter_handle" {...({} as any)} />
         
         {/* Additional SEO meta tags */}
         <meta name="author" content={author} {...({} as any)} />
@@ -89,10 +94,14 @@ export function createLayout(props: LayoutProps) {
         <link rel="stylesheet" href="/css/main.css" {...({} as any)} />
         <link rel="preload" href="/js/htmx.min.js" as="script" {...({} as any)} />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" {...({} as any)} />
+        <link rel="preconnect" href="https://fonts.googleapis.com" {...({} as any)} />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" {...({} as any)} />
+        <link rel="manifest" href="/manifest.json" {...({} as any)} />
         <link
           rel="alternate"
           href="/feed.xml"
-          title={`${title} RSS Feed`}
+          title="Blogo RSS Feed"
+          type="application/rss+xml"
           {...({} as any)}
         />
         {/* Structured Data (JSON-LD) */}
