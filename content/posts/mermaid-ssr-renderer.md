@@ -1,21 +1,21 @@
 ---
-title: My Experience Building a Mermaid SSR Renderer
+title: Building a Mermaid SSR Renderer with TypeScript
 date: 2025-06-16
 tags: [TypeScript, Functional, Parsing, SSR]
-excerpt: How I built a functional Mermaid diagram parser that renders SVG server-side, using TypeScript patterns that keep complex parsing logic manageable.
+excerpt: A functional Mermaid diagram parser that renders SVG server-side, using TypeScript patterns to keep complex parsing logic manageable.
 ---
 
-## Why I Built a Custom Mermaid Renderer
+## The Need for Custom Mermaid Rendering
 
-I needed server-side Mermaid diagram rendering for a blog built with Deno. The existing Mermaid.js library requires a browser environment, making SSR challenging. After wrestling with headless browsers and DOM simulation, I decided to build a focused renderer that handles the Mermaid syntax I actually use.
+Server-side Mermaid diagram rendering presents challenges when building applications with Deno or similar runtimes. The existing Mermaid.js library requires a browser environment, making SSR difficult. Headless browsers and DOM simulation add complexity, making a focused renderer that handles specific Mermaid syntax more practical.
 
-## What I Learned About Parsing
+## Functional Parsing Approach
 
-Parsing Mermaid syntax taught me that functional patterns make complex logic manageable. Instead of building a traditional parser, I used TypeScript's type system and pattern matching to create something maintainable.
+Parsing Mermaid syntax demonstrates how functional patterns make complex logic manageable. Rather than building a traditional parser, TypeScript's type system and pattern matching create maintainable solutions.
 
 ### The Core Architecture
 
-I structured the parser around discriminated unions that represent diagram components:
+The parser structure uses discriminated unions that represent diagram components:
 
 ```typescript
 type MermaidNode = {
@@ -33,11 +33,11 @@ type MermaidEdge = {
 };
 ```
 
-This approach gives me compile-time guarantees about diagram structure. The parser can't create invalid combinations because TypeScript prevents it.
+This approach provides compile-time guarantees about diagram structure. The parser cannot create invalid combinations because TypeScript prevents them.
 
 ### Pattern Matching for Syntax Recognition
 
-I use `ts-pattern` to match Mermaid syntax patterns:
+Using `ts-pattern` to match Mermaid syntax patterns:
 
 ```typescript
 const parseNodeShape = (syntax: string): MermaidNode["shape"] =>
@@ -50,20 +50,20 @@ const parseNodeShape = (syntax: string): MermaidNode["shape"] =>
 
 Pattern matching makes the parser logic readable. Each syntax element has a clear handler, and TypeScript ensures I handle all cases.
 
-## How I Handle Complex Diagrams
+## Handling Complex Diagrams
 
-Mermaid diagrams can have dozens of nodes and connections. My parser processes them in phases:
+Mermaid diagrams can have dozens of nodes and connections. Processing them in phases proves effective:
 
 1. **Extract nodes** from standalone definitions and edge references
 2. **Extract edges** from connection syntax
 3. **Calculate positions** using a grid layout algorithm
 4. **Render SVG** with proper scaling and styling
 
-The functional approach means each phase is a pure transformation. I can test them independently and compose them reliably.
+The functional approach makes each phase a pure transformation. This enables independent testing and reliable composition.
 
-### Node Extraction That Actually Works
+### Effective Node Extraction
 
-The trickiest part was handling node IDs correctly. Mermaid syntax like `A1[User/Claimant]:::userClass` needs to extract just "A1" as the ID:
+Handling node IDs correctly presents the greatest challenge. Mermaid syntax like `A1[User/Claimant]:::userClass` requires extracting just "A1" as the ID:
 
 ```typescript
 const extractNodeId = (nodeText: string): string => {
@@ -71,31 +71,31 @@ const extractNodeId = (nodeText: string): string => {
 };
 ```
 
-This regex-based approach handles the syntax variations I encounter in practice.
+This regex-based approach handles common syntax variations effectively.
 
-## What I Discovered About SVG Generation
+## SVG Generation Insights
 
-Generating clean SVG requires careful coordinate calculation and text sizing. I learned that dynamic sizing based on label length prevents text overflow:
+Generating clean SVG requires careful coordinate calculation and text sizing. Dynamic sizing based on label length prevents text overflow:
 
 ```typescript
 const dynamicWidth = Math.max(minWidth, Math.min(textLength * 8 + 20, 200));
 ```
 
-The renderer scales node shapes based on content, making diagrams readable regardless of label length.
+The renderer scales node shapes based on content, ensuring diagrams remain readable regardless of label length.
 
-## Results in Practice
+## Practical Results
 
-The custom renderer handles the complex zero-knowledge proof diagrams in my blog posts. It parses 18+ nodes with 30+ connections and generates clean SVG that loads instantly.
+The custom renderer handles complex diagrams with 18+ nodes and 30+ connections, generating clean SVG that loads instantly.
 
-The functional architecture made debugging straightforward. When diagrams showed only one arrow instead of full connections, I could isolate the issue to the `extractNodeId` function and fix it without touching the rest of the system.
+The functional architecture makes debugging straightforward. When diagrams show only one arrow instead of full connections, issues can be isolated to specific functions like `extractNodeId` and fixed without affecting the rest of the system.
 
-## What This Approach Enables
+## Benefits of This Approach
 
-Building a focused parser instead of adapting a general-purpose library gave me:
+Building a focused parser instead of adapting a general-purpose library provides:
 
 - **Fast SSR**: No browser dependencies or DOM simulation
 - **Predictable output**: Consistent SVG styling and sizing
 - **Easy debugging**: Pure functions isolate problems
 - **Type safety**: Impossible to generate invalid diagrams
 
-The functional patterns scale well. Adding new diagram types requires extending the discriminated unions and adding pattern match cases. The type system ensures I handle all variations.
+The functional patterns scale well. Adding new diagram types requires extending the discriminated unions and adding pattern match cases. The type system ensures all variations are handled properly.

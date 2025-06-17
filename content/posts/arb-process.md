@@ -2,21 +2,21 @@
 title: My Experience Transforming Architecture Review Boards
 date: 2025-04-06
 tags: [Architecture, Enterprise, Product, Agile]
-excerpt: How I learned to transform traditional Architecture Review Boards from gatekeepers into enablers that actually accelerate product development.
+excerpt: How to transform traditional Architecture Review Boards from gatekeepers into enablers that actually accelerate product development.
 ---
 
 ## Why I Started Questioning Traditional ARB Processes
 
-I've spent years watching Architecture Review Boards slow down product teams with lengthy approval processes and bureaucratic overhead. Teams would spend weeks preparing presentations for monthly review meetings, only to receive feedback that could have been addressed earlier in design documents.
+I've seen first-hand how Architecture Review Boards can slow down product teams with lengthy approval processes and bureaucratic overhead. Teams would spend weeks preparing presentations for monthly review meetings, only to receive feedback that could have been addressed earlier in design documents.
 
-The breaking point came when I realized our ARB had become the primary bottleneck preventing teams from delivering customer value. We were optimizing for architectural purity at the expense of business agility.
+ARB should not become the primary bottleneck preventing teams from delivering customer value, it shouldn't be optimized for architectural purity at the expense of business agility.
 
 ## Principles That Changed Everything
 
-Through experimentation and iteration, I discovered principles that transformed our ARB from a hindrance into an accelerator:
+Here are some principles that can transformed a legacy ARB process from a hindrance into an accelerator:
 
 ### Enablement Over Gatekeeping
-I learned that teams perform better when ARB acts as a supportive advisor rather than an approval bottleneck. This shift empowered teams to make confident decisions.
+Teams perform better when ARB acts as a supportive advisor rather than an approval bottleneck. This shift empowered teams to make confident decisions.
 
 ### Asynchronous Reviews That Don't Block Progress
 Conducting reviews through design documents, pull requests, and ADRs enabled teams to move forward while receiving feedback, rather than waiting for approval meetings.
@@ -25,7 +25,7 @@ Conducting reviews through design documents, pull requests, and ADRs enabled tea
 Addressing security, scalability, and compliance throughout development proved far more effective than post-development audits that required expensive rework.
 
 ### Living Architecture with Decision History
-I discovered that architecture must evolve continuously. Capturing decisions in Architecture Decision Records (ADRs) provided teams with context for future improvements.
+Architecture must evolve continuously. Capturing decisions in Architecture Decision Records (ADRs) provided teams with context for future improvements.
 
 ### Collaboration That Preserves Autonomy
 Fostering cross-functional insights from security, operations, and compliance while keeping decision-making authority with product teams created the best outcomes.
@@ -38,15 +38,15 @@ Proactively encouraging teams to leverage common business services reduced redun
 
 ## Implementation Patterns That Worked
 
-| **What I Implemented**                            | **How It Worked**                                                                                                                        | **Real Example**                                                                                                                       |
+| **What was Implemented**                            | **How It Worked**                                                                                                                        | **Real Example**                                                                                                                       |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **Asynchronous Design Reviews**                    | Teams submit standardized design documents; I provide feedback within defined timeframes without blocking progress.                       | Design docs with threaded comments replace monthly presentation meetings.                                                              |
-| **Self-Service Quality Gates**                     | I created templates and checklists that enable teams to verify baseline quality independently.                                           | Standardized checklist covering security, scalability, logging, and compliance that teams use before requesting review.               |
-| **Embedded Architecture Champions**                | I assign domain experts who proactively engage with product teams rather than waiting for formal reviews.                               | Data architect embedded with team implementing critical database migrations, providing guidance throughout the process.                |
-| **Living Decision Documentation**                   | I maintain Architecture Decision Records and tech debt registers that teams continuously update and reference.                           | Team revisits database choice documented in ADR after production scaling issues, updating the record with new constraints.            |
-| **Shared Service Discovery**                       | I proactively identify opportunities for alignment and reuse of common services across teams.                                            | Central authentication service adopted by multiple teams instead of each building separate implementations.                            |
-| **Architecture-Product Collaboration**             | I work with product teams to translate architectural improvements into customer-facing features.                                          | Observability improvements that enable better customer analytics and product insights.                                                 |
-| **AI-Powered Decision Context**                    | I integrated chatbot access to historical ADRs, enabling teams to quickly access past architectural decisions and reasoning.             | Developers query "Have we decided on Redis vs. Memcached for caching?" and receive immediate context from previous decisions.        |
+| **Asynchronous Design Reviews**                    | Teams submit standardized design documents; Architects provide feedback within defined timeframes without blocking progress.                       | Design docs with threaded comments replace monthly presentation meetings.                                                              |
+| **Self-Service Quality Gates**                     | Architects created templates and checklists that enable teams to verify baseline quality independently.                                           | Standardized checklist covering security, scalability, logging, and compliance that teams use before requesting review.               |
+| **Embedded Architecture Champions**                | Architects assign domain experts who proactively engage with product teams rather than waiting for formal reviews.                               | Data architect embedded with team implementing critical database migrations, providing guidance throughout the process.                |
+| **Living Decision Documentation**                   | Architects maintain Architecture Decision Records and tech debt registers that teams continuously update and reference.                           | Team revisits database choice documented in ADR after production scaling issues, updating the record with new constraints.            |
+| **Shared Service Discovery**                       | Architects proactively identify opportunities for alignment and reuse of common services across teams.                                            | Central authentication service adopted by multiple teams instead of each building separate implementations.                            |
+| **Architecture-Product Collaboration**             | Architects work with product teams to translate architectural improvements into customer-facing features.                                          | Observability improvements that enable better customer analytics and product insights.                                                 |
+| **AI-Powered Decision Context**                    | Architects integrated chatbot access to historical ADRs, enabling teams to quickly access past architectural decisions and reasoning.             | Developers query "Have we decided on Redis vs. Memcached for caching?" and receive immediate context from previous decisions.        |
 
 ## What This Transformation Taught Me
 

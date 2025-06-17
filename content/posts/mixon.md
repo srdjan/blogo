@@ -1,28 +1,28 @@
 ---
-title: My Journey Building Mixon - A Type-Safe Microframework for Deno
+title: Mixon - A Type-Safe Microframework for Deno
 date: 2025-04-05
 tags: [WebDev, Deno, HTMX]
-excerpt: How I built Mixon to solve the complexity and type safety challenges I faced while developing web applications in Deno.
+excerpt: Mixon addresses complexity and type safety challenges in Deno web application development through comprehensive type safety and built-in workflow management.
 ---
 
-## Why I Built Another Web Framework
+## The Need for Better Deno Web Frameworks
 
-I've been building web applications with various frameworks for years, and while each solved specific problems, I consistently encountered the same frustrations: lack of end-to-end type safety, complex configuration, and frameworks that felt too heavy for simple projects yet too limited for complex ones.
+Building web applications with existing frameworks often reveals persistent challenges: lack of end-to-end type safety, complex configuration, and frameworks that feel too heavy for simple projects yet too limited for complex ones.
 
-The breaking point came when I was working on a Deno project that needed workflow management, HTMX integration, and strong typing. Existing solutions required multiple libraries with inconsistent APIs, leading to maintenance overhead and type safety gaps.
+Deno projects requiring workflow management, HTMX integration, and strong typing often need multiple libraries with inconsistent APIs, creating maintenance overhead and type safety gaps.
 
-## What I Wanted to Achieve
+## Design Goals
 
-I set out to build something that would give me:
+Mixon aims to provide:
 - End-to-end type safety without configuration overhead
 - Built-in workflow management for stateful applications
 - First-class HTMX support for server-driven UIs
 - Zero dependencies and minimal footprint
 - Pattern matching for cleaner conditional logic
 
-## Type Safety That Actually Works
+## Comprehensive Type Safety
 
-The foundation of Mixon became comprehensive type safety throughout the entire request lifecycle. I wanted compile-time guarantees that would catch errors before they reached production:
+Mixon's foundation provides comprehensive type safety throughout the entire request lifecycle, offering compile-time guarantees that catch errors before production:
 
 ```typescript
 import { App, type } from "jsr:@srdjan/mixon";
@@ -50,11 +50,11 @@ app.post("/users", (ctx) => {
 });
 ```
 
-This approach eliminated the runtime errors I'd grown tired of debugging in production.
+This approach eliminates runtime errors common in production environments.
 
 ## Pattern Matching for Cleaner Logic
 
-I included pattern matching inspired by functional programming languages to make complex conditional logic more readable:
+Pattern matching inspired by functional programming languages makes complex conditional logic more readable:
 
 ```typescript
 import { App, match } from "jsr:@srdjan/mixon";
@@ -68,9 +68,9 @@ const result = match(response.status)
 
 This replaced nested if-else chains with declarative, exhaustive pattern matching.
 
-## Workflow Engine for Complex Business Logic
+## Built-in Workflow Engine
 
-One of Mixon's standout features became the built-in workflow engine. I needed a type-safe way to manage state transitions in business applications:
+Mixon's standout feature is the built-in workflow engine providing type-safe state transition management in business applications:
 
 ```typescript
 // Define workflow types
@@ -106,11 +106,11 @@ orderWorkflow.load({
 });
 ```
 
-The workflow engine automatically maintains audit trails and prevents invalid state transitions, solving problems I'd repeatedly encountered in e-commerce and business applications.
+The workflow engine automatically maintains audit trails and prevents invalid state transitions, solving common problems in e-commerce and business applications.
 
-## HTMX Integration That Made Sense
+## First-Class HTMX Integration
 
-I wanted first-class HTMX support that felt natural rather than bolted-on. Server-side rendering with HTMX became a core feature:
+First-class HTMX support feels natural rather than bolted-on, with server-side rendering as a core feature:
 
 ```typescript
 /** @jsx h */
@@ -146,22 +146,22 @@ app.get("/products", (ctx) => {
 });
 ```
 
-This approach kept most logic on the server while providing rich interactivity with minimal client-side JavaScript.
+This approach keeps most logic on the server while providing rich interactivity with minimal client-side JavaScript.
 
 ## Performance Through Thoughtful Design
 
-I balanced functional programming principles with strategic optimization for real-world performance:
+Balancing functional programming principles with strategic optimization delivers real-world performance:
 
 - Fast-path dispatch with O(1) middleware lookup
 - Static route matching with Map-based lookup
 - In-place context updates to minimize allocations
 - Controlled garbage collection pressure during request processing
 
-The result is a framework that feels lightweight but performs well under load.
+The result is a framework that feels lightweight while performing well under load.
 
-## Error Handling That Prevents Surprises
+## Explicit Error Handling
 
-I implemented a Result type inspired by Rust for explicit error handling throughout the framework:
+A Result type inspired by Rust provides explicit error handling throughout the framework:
 
 ```typescript
 // Type-safe error handling
@@ -176,9 +176,9 @@ const user = ctx.validated.body.value;
 
 This approach eliminates the possibility of accessing invalid data and makes error states explicit in the type system.
 
-## Getting Started Is Simple
+## Simple Getting Started
 
-I designed Mixon to work seamlessly with Deno's import system:
+Mixon works seamlessly with Deno's import system:
 
 ```typescript
 import { App } from "jsr:@srdjan/mixon";
@@ -196,12 +196,12 @@ app.listen(3000);
 
 No package managers, no complex configuration—just import and start building.
 
-## What I've Learned Building Mixon
+## Key Insights from Building Mixon
 
-Creating a web framework taught me that the best abstractions solve multiple problems with unified APIs. By combining type safety, workflow management, and HTMX support in a single, lightweight package, Mixon addresses the complexity I encountered across different projects.
+Creating a web framework demonstrates that the best abstractions solve multiple problems with unified APIs. By combining type safety, workflow management, and HTMX support in a single, lightweight package, Mixon addresses complexity common across different projects.
 
-The focus on Deno's strengths—security, TypeScript-first development, and modern JavaScript—allowed me to build something that feels native to the ecosystem rather than ported from Node.js patterns.
+Focusing on Deno's strengths—security, TypeScript-first development, and modern JavaScript—creates something that feels native to the ecosystem rather than ported from Node.js patterns.
 
-Mixon represents my approach to web development: powerful enough for complex applications, simple enough for quick prototypes, and type-safe enough to prevent the runtime errors that waste development time.
+Mixon represents an approach to web development: powerful enough for complex applications, simple enough for quick prototypes, and type-safe enough to prevent runtime errors that waste development time.
 
-Whether building APIs, workflow-driven applications, or HTMX-powered UIs, Mixon provides the tools needed while staying true to Deno's philosophy of simplicity and security.
+Whether building APIs, workflow-driven applications, or HTMX-powered UIs, Mixon provides necessary tools while staying true to Deno's philosophy of simplicity and security.
