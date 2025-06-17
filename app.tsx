@@ -173,7 +173,7 @@ const app = {
       }
 
       const listItems = posts.map((post) =>
-        `<li style="margin: 0.5rem 0;">
+        `<li>
           <a href="/posts/${post.slug}" 
              hx-get="/posts/${post.slug}" 
              hx-target="#content-area" 

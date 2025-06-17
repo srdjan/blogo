@@ -1,5 +1,5 @@
 ---
-title: From Node.js to Deno: A Better JavaScript Runtime
+title: From Node.js to Deno A Better JavaScript Runtime
 date: 2025-04-05
 tags: [Deno, TypeScript, WebDev]
 excerpt: Deno addresses Node.js's core limitations with built-in TypeScript, secure-by-default execution, and simplified dependency management.
