@@ -24,7 +24,9 @@ const app = {
     // Handle static files
     if (
       url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/") ||
-      url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico"
+      url.pathname.startsWith("/images/") ||
+      url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico" ||
+      url.pathname === "/manifest.json"
     ) {
       try {
         // Files are in public/ directory, so map /css/main.css to public/css/main.css
@@ -40,6 +42,7 @@ const app = {
         else if (ext === "html") contentType = "text/html";
         else if (ext === "svg") contentType = "image/svg+xml";
         else if (ext === "ico") contentType = "image/x-icon";
+        else if (ext === "json") contentType = "application/json";
 
         return new Response(file, {
           headers: { "Content-Type": contentType },
