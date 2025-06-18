@@ -48,7 +48,7 @@ Their dedicated support team for logistics, media, and photography shows they're
 
 In 2024, [**C I V I L I**](https://civili.deno.dev) released a modern mix of their old recordings, album, "A Call From The Past." The album is a testament to their commitment to preserving the spirit of the 1980s underground scene while infusing it with modern sensibilities. The album's tracks are a mix of their most popular songs and one new composition (**Dacha**), all of which pay homage to the era's punk and new wave influences while remaining relevant to today's listeners.
 
-![alt text](https://github.com/srdjan/blogo/blob/main/public/back-v11_djixmix.jpg?raw=true)
+![alt text](https://github.com/srdjan/blogo/blob/main/public/back-v11_djixmix.jpg){width=400}
 
 [**C I V I L I**](https://civili.deno.dev)'s revival suggests that the best way to honor musical heritage is to keep it alive and evolving. Their success lies in understanding that the underground scene wasn't about specific sounds or styles, but about maintaining creative independence and authentic expression.
 
