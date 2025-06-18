@@ -27,7 +27,10 @@ const app = {
       url.pathname.startsWith("/images/") ||
       url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico" ||
       url.pathname === "/manifest.json" ||
-      url.pathname.endsWith(".jpg") || url.pathname.endsWith(".png")
+      url.pathname.endsWith(".jpg") || url.pathname.endsWith(".png") ||
+      url.pathname.endsWith(".wav") || url.pathname.endsWith(".mp3") ||
+      url.pathname.endsWith(".ogg") || url.pathname.endsWith(".flac") ||
+      url.pathname.endsWith(".m4a") || url.pathname.endsWith(".aac")
     ) {
       try {
         // Files are in public/ directory, so map /css/main.css to public/css/main.css
@@ -46,6 +49,12 @@ const app = {
         else if (ext === "json") contentType = "application/json";
         else if (ext === "jpg" || ext === "jpeg") contentType = "image/jpeg";
         else if (ext === "png") contentType = "image/png";
+        else if (ext === "wav") contentType = "audio/wav";
+        else if (ext === "mp3") contentType = "audio/mpeg";
+        else if (ext === "ogg") contentType = "audio/ogg";
+        else if (ext === "flac") contentType = "audio/flac";
+        else if (ext === "m4a") contentType = "audio/mp4";
+        else if (ext === "aac") contentType = "audio/aac";
 
         return new Response(file, {
           headers: { "Content-Type": contentType },

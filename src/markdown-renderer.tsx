@@ -44,7 +44,23 @@ renderer.code = function (token) {
 marked.use({ renderer });
 
 /**
- * Post-process HTML to handle image attributes like {width=400}
+ * Get MIME type for audio files
+ */
+const getAudioMimeType = (filePath: string): string => {
+  const ext = filePath.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'wav': return 'audio/wav';
+    case 'mp3': return 'audio/mpeg';
+    case 'ogg': return 'audio/ogg';
+    case 'flac': return 'audio/flac';
+    case 'm4a': return 'audio/mp4';
+    case 'aac': return 'audio/aac';
+    default: return 'audio/mpeg';
+  }
+};
+
+/**
+ * Post-process HTML to handle image attributes like {width=400} and audio media
  */
 const processImageAttributes = (html: string): string => {
   // Match img tags followed by {attribute=value} patterns
@@ -55,10 +71,42 @@ const processImageAttributes = (html: string): string => {
     const attrPairs = attributes.split(',').map((attr: string) => attr.trim());
     const styleAttributes: string[] = [];
     const htmlAttributes: string[] = [];
+    let isAudio = false;
     
+    // Check if this should be converted to audio
     for (const pair of attrPairs) {
       const [key, value] = pair.split('=').map((s: string) => s.trim());
-      if (key && value) {
+      if (key === 'media' && value === 'audio') {
+        isAudio = true;
+        break;
+      }
+    }
+    
+    // If it's audio, convert img tag to audio element
+    if (isAudio) {
+      // Extract src from img attributes
+      const srcMatch = imgAttributes.match(/src="([^"]+)"/);
+      if (srcMatch) {
+        const audioSrc = srcMatch[1];
+        const mimeType = getAudioMimeType(audioSrc);
+        
+        // Extract alt text for audio description
+        const altMatch = imgAttributes.match(/alt="([^"]+)"/);
+        const altText = altMatch ? altMatch[1] : 'Audio file';
+        
+        return `<audio controls>
+  <source src="${audioSrc}" type="${mimeType}">
+  Your browser does not support the audio element.
+</audio>`;
+      }
+      // Fallback if no src found
+      return match;
+    }
+    
+    // Handle regular image attributes
+    for (const pair of attrPairs) {
+      const [key, value] = pair.split('=').map((s: string) => s.trim());
+      if (key && value && key !== 'media') {
         if (key === 'width' || key === 'height') {
           // Add as CSS style and HTML attribute
           const cssValue = value.includes('px') || value.includes('%') ? value : `${value}px`;
