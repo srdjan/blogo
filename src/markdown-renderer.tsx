@@ -60,6 +60,18 @@ const getAudioMimeType = (filePath: string): string => {
 };
 
 /**
+ * Escape HTML characters in text
+ */
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+/**
  * Post-process HTML to handle image attributes like {width=400} and audio media
  */
 const processImageAttributes = (html: string): string => {
@@ -92,12 +104,13 @@ const processImageAttributes = (html: string): string => {
         
         // Extract alt text for audio description
         const altMatch = imgAttributes.match(/alt="([^"]+)"/);
-        const altText = altMatch ? altMatch[1] : 'Audio file';
+        const altText = altMatch ? escapeHtml(altMatch[1]) : 'Audio file';
         
         return `<audio controls>
   <source src="${audioSrc}" type="${mimeType}">
   Your browser does not support the audio element.
-</audio>`;
+</audio>
+<p class="audio-caption">${altText}</p>`;
       }
       // Fallback if no src found
       return match;
@@ -138,6 +151,17 @@ const processImageAttributes = (html: string): string => {
   });
 };
 
+/**
+ * Clean up HTML to fix nested paragraph issues with audio elements
+ */
+const cleanupAudioHTML = (html: string): string => {
+  // Fix cases where audio + caption are wrapped in <p> tags
+  return html.replace(
+    /<p>(<audio[^>]*>[\s\S]*?<\/audio>\s*<p class="audio-caption">[^<]*<\/p>)<\/p>/g,
+    '$1'
+  );
+};
+
 export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   try {
     // Parse markdown to HTML
@@ -145,6 +169,9 @@ export const markdownToHtml = (markdown: string): Result<string, AppError> => {
     
     // Post-process to handle image attributes
     html = processImageAttributes(html);
+    
+    // Clean up any nested paragraph issues with audio elements
+    html = cleanupAudioHTML(html);
 
     return { ok: true, value: html };
   } catch (error) {

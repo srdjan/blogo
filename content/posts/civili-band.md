@@ -13,9 +13,15 @@ A rock band from **Zajecar**, Yugoslavia, were a part of the underground punk an
 
 ## Discovering **CIVILI's** Sound
 
-[**CIVILI's**](https://civili.deno.dev) music channels the spirit of iconic bands like Ekatarina Velika (EKV), Film, and Disciplina Kičme. Their blend of punk and new wave creates something that feels both nostalgic and immediate. The raw energy in their music carries that defiant spirit of that time. The songs are short, direct, and packed with emotion. There are love songs, songs about growing up, friendship, and the trials of youth. Their performances at various events and festivals demonstrate how this strong were they playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
+[**CIVILI's**](https://civili.deno.dev) music channels the spirit of iconic bands like Ekatarina Velika (EKV), Film, and Disciplina Kičme. Their blend of punk and new wave creates something that feels both nostalgic and immediate. The raw energy in their music carries that defiant spirit of that time. The songs are short, direct, and packed with emotion. There are love songs, songs about growing up, friendship, and the trials of youth.
 
-### Band Memebers
+![Uzalud](/B3-Uzalud-6.mp3){media=audio}
+
+Their performances at various events and festivals demonstrate how this strong were they playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
+
+![Trebas Mi](/B1-TrebasMi-18c.mp3){media=audio}
+
+### Band Members
 
 Their lineup brings together taleneted musicians who lived and breathed the underground scene:
 

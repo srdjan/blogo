@@ -1425,3 +1425,31 @@ article img {
     max-width: 100%;
   }
 }
+
+/* Audio elements and captions */
+article audio {
+  display: block;
+  margin: 1.5rem auto;
+  max-width: 100%;
+  width: 100%;
+  
+  @container (min-width: 48rem) {
+    width: 80%;
+  }
+}
+
+.audio-caption {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: -1rem auto 1.5rem auto;
+  max-width: 100%;
+  line-height: 1.4;
+  
+  @container (min-width: 48rem) {
+    font-size: 0.85rem;
+    width: 80%;
+  }
+}
