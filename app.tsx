@@ -26,7 +26,8 @@ const app = {
       url.pathname.startsWith("/css/") || url.pathname.startsWith("/js/") ||
       url.pathname.startsWith("/images/") ||
       url.pathname === "/favicon.svg" || url.pathname === "/favicon.ico" ||
-      url.pathname === "/manifest.json"
+      url.pathname === "/manifest.json" ||
+      url.pathname.endsWith(".jpg") || url.pathname.endsWith(".png")
     ) {
       try {
         // Files are in public/ directory, so map /css/main.css to public/css/main.css
@@ -43,6 +44,8 @@ const app = {
         else if (ext === "svg") contentType = "image/svg+xml";
         else if (ext === "ico") contentType = "image/x-icon";
         else if (ext === "json") contentType = "application/json";
+        else if (ext === "jpg" || ext === "jpeg") contentType = "image/jpeg";
+        else if (ext === "png") contentType = "image/png";
 
         return new Response(file, {
           headers: { "Content-Type": contentType },
