@@ -19,7 +19,7 @@
   },
   "imports": {
     "mono-jsx": "npm:mono-jsx@^0.6.7",
-    "@rendermaid/core": "jsr:@rendermaid/core@^0.4.0",
+    "@rendermaid/core": "jsr:@rendermaid/core@^0.5.0",
     "ts-pattern": "npm:ts-pattern@^5.7.1",
     "marked": "https://esm.sh/marked@15.0.12",
     "highlight.js": "https://esm.sh/highlight.js@11.11.1",

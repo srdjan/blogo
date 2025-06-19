@@ -14,6 +14,7 @@ Current verification methods force a binary choice: either reveal everything or 
 ## Design Goals
 
 The system should allow proving employment status while:
+
 - Keeping sensitive employment details private
 - Avoiding dependence on blockchain infrastructure
 - Giving users control over their credential storage
@@ -63,6 +64,7 @@ This establishes the link between stored credentials and the multi-key requireme
 ### Phase C: Zero-Knowledge Proof Generation
 
 The user employs the ZKP module to construct a proof that secretly verifies:
+
 - Ownership of the private key corresponding to their DID
 - Existence of a valid verifiable credential via encrypted pointer validation
 - Valid employment attestation from the independent verifier
@@ -75,18 +77,35 @@ The user submits the generated proof with minimal public parameters—DID public
 
 Upon successful verification, employment is authenticated through both credentials without retrieving actual credential data.
 
+### Data Flow and Processes
+
+```mermaid
+flowchart TD
+    TS[Trusted Setup] --> P[Prover]
+    TS --> V[Verifier]
+    P --> P2[Generate ZK proof using secret + public parameters]
+    P2 --> V2[Send proof]
+    V2 --> V3{Verify proof using public parameters}
+    V3 -->|Proof is valid| A1[✅ Accept - Employment verified]
+    V3 -->|Proof is invalid| A2[❌ Reject - Verification failed]
+```
+
 ## Security Principles
 
 ### Privacy by Design
+
 The system ensures sensitive employment details remain confidential, referenced only via secure pointers in zero-knowledge proofs. Verifiers learn nothing beyond satisfaction of verification conditions.
 
 ### Multi-Key Requirements
+
 Both DID-based key and independent verifier key must produce evidence, minimizing risk from single key compromise and preventing fraudulent verification.
 
 ### Decentralized Data Control
+
 Storing credentials on decentralized personal data stores ensures users retain full control over their data, managing access, sharing, and revocation without centralized authorities.
 
 ### Revocation Support
+
 The design supports revocation through credential issuer or attestor updates to access-control records. The ZKP module can prove non-revocation or validity periods without exposing additional information.
 
 ## Technology Choices
@@ -100,6 +119,7 @@ For cryptographic implementation, zk-SNARKs and Bulletproofs frameworks enable s
 This design creates a privacy-preserving verification system where employment credentials secured through decentralized storage can be proven valid without exposing sensitive data.
 
 The key capabilities include:
+
 - Decentralized storage and data control ensuring secure, user-controlled credential access
 - Robust two-factor evidence requiring both claimant's DID-based key and independent verifier's key
 - Zero-knowledge proof techniques enabling employment verification while preserving privacy

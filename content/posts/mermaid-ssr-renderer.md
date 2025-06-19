@@ -9,7 +9,7 @@ excerpt: A functional Mermaid diagram parser that renders SVG server-side, using
 
 Server-side Mermaid diagram rendering presents challenges when building applications with Deno or similar runtimes. The existing Mermaid.js library requires a browser environment, making SSR difficult. Headless browsers and DOM simulation add complexity, making a focused renderer that handles specific Mermaid syntax more practical.
 
-**Update (2025-06-19):** This blog has been migrated to use [@rendermaid/core](https://github.com/srdjan/rendermaid), a high-performance, functional TypeScript library that provides the same benefits described below but with enhanced features, better performance, and comprehensive type safety.
+**Update (2025-06-19):** This blog has been migrated to use [@rendermaid/core v0.5.0](https://github.com/srdjan/rendermaid), a high-performance, functional TypeScript library that provides the same benefits described below but with enhanced features, better performance, and comprehensive type safety. Note that v0.5.0 requires `flowchart TD` syntax instead of `graph TD` and currently supports flowchart diagrams.
 
 ## Functional Parsing Approach
 

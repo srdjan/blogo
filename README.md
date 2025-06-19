@@ -124,7 +124,7 @@ Write your post content in markdown here. Supports:
 - Lists and tables
 
 ```mermaid
-graph TD
+flowchart TD
     A[Start] --> B[Process]
     B --> C[End]
 ```

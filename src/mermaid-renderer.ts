@@ -1,4 +1,4 @@
-import { parseMermaid, renderSvg } from "@rendermaid/core";
+import { parseMermaid, renderSvg, type SvgConfig } from "@rendermaid/core";
 import { match } from "ts-pattern";
 
 // === Result Type for Error Handling ===
@@ -9,11 +9,11 @@ type RenderResult =
 
 // === Configuration ===
 
-const DEFAULT_SVG_CONFIG = {
+const DEFAULT_SVG_CONFIG: SvgConfig = {
   width: 800,
   height: 600,
-  theme: "light" as const,
-  nodeSpacing: 150,
+  theme: "light",
+  nodeSpacing: 120, // Optimized spacing from v0.5.0
 };
 
 // === Main Renderer Function ===
@@ -42,8 +42,25 @@ export const renderMermaidToSVG = (mermaidText: string): string => {
  */
 const renderMermaidDiagram = (mermaidText: string): RenderResult => {
   try {
+    const trimmedText = mermaidText.trim();
+
+    // Provide helpful error messages for common syntax issues
+    if (trimmedText.startsWith("graph ")) {
+      return {
+        success: false,
+        error: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.5.0",
+      };
+    }
+
+    if (trimmedText.startsWith("sequenceDiagram")) {
+      return {
+        success: false,
+        error: "Sequence diagrams are not yet supported in @rendermaid/core v0.5.0. Please use flowchart format.",
+      };
+    }
+
     // Parse the Mermaid diagram using @rendermaid/core
-    const parseResult = parseMermaid(mermaidText.trim());
+    const parseResult = parseMermaid(trimmedText);
 
     if (!parseResult.success) {
       return {
