@@ -27,14 +27,23 @@ Their performances at various events and festivals demonstrate the band's full f
 
 Their lineup brings together taleneted musicians who lived and breathed the underground scene:
 
-- [Boba:]() delivers vocals, lyrics that carry both melody and attitude
-- [Zdene]() creates guitar work that bridges punk aggression with new wave sophistication  
-- [Srle Crnac]() songs author & provides bass lines that anchor the band's rhythmic foundation
-- [Miđa]() drives the energy with drumming that captures the underground scene's intensity
+- [Boba](): delivers vocals, lyrics that carry both melody and attitude
+![Box](/images/box.jpeg){width=200}
 
-Their dedicated support team for logistics, media, and photography shows they're serious about their craft and presentation.
+- [Zdene]() creates guitar work that bridges punk aggression with new wave sophistication  
+![Zmaj](/images/zdenko.jpeg){width=200}
+
+- [Srle Crnac]() songs author & provides bass lines that anchor the band's rhythmic foundation
+![Crnac](/images/srle.jpeg){width=200}
+
+- [Miđa]() drives the energy with drumming that captures the underground scene's intensity
+![Midja](/images/midja-3.jpeg){width=200}
+
+
 
 #### Helping hands...
+
+The musicians and friends that have contributed to their live shows and recordings:
 
 - [Paja Gerard](): Guitars
 - [Saša Maca](): Guitars
@@ -44,6 +53,8 @@ Their dedicated support team for logistics, media, and photography shows they're
 - [Bona](): Viola
 
 #### ...and some friends
+
+Their dedicated support team for logistics, media, and photography shows they're serious about their craft and presentation.
 
 - [Pedja†](): Roadie
 - [Kole](): Good vibes
