@@ -1,5 +1,5 @@
 import { Post, PostMeta, Result } from "./types.ts";
-import { parse as parseYaml } from "https://deno.land/std/yaml/mod.ts";
+import { parse as parseYaml } from "@std/yaml";
 import { chain, createError, tryCatch } from "./error.ts";
 import { CONFIG } from "./config.ts";
 import { formatDate, logger } from "./utils.ts";

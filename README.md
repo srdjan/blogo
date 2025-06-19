@@ -374,7 +374,7 @@ body {
 - **Styling**: Modern CSS with nesting, @scope, container queries
 - **Layout**: CSS logical properties and modern selectors
 - **Content**: Markdown documents
-- **Diagrams**: Mermaid.js integration
+- **Diagrams**: @rendermaid/core integration for server-side Mermaid rendering
 - **Search**: Client-side modal search with minimal results display
 - **Hosting**: Deno Deploy (edge computing platform)
 - **Language**: TypeScript

@@ -2,12 +2,14 @@
 title: Building a Mermaid SSR Renderer with TypeScript
 date: 2025-06-16
 tags: [TypeScript, Functional, Parsing, SSR]
-excerpt: A functional Mermaid diagram parser that renders SVG server-side, using TypeScript patterns to keep complex parsing logic manageable.
+excerpt: A functional Mermaid diagram parser that renders SVG server-side, using TypeScript patterns to keep complex parsing logic manageable. Now powered by @rendermaid/core for enhanced performance and features.
 ---
 
 ## The Need for Custom Mermaid Rendering
 
 Server-side Mermaid diagram rendering presents challenges when building applications with Deno or similar runtimes. The existing Mermaid.js library requires a browser environment, making SSR difficult. Headless browsers and DOM simulation add complexity, making a focused renderer that handles specific Mermaid syntax more practical.
+
+**Update (2025-06-19):** This blog has been migrated to use [@rendermaid/core](https://github.com/srdjan/rendermaid), a high-performance, functional TypeScript library that provides the same benefits described below but with enhanced features, better performance, and comprehensive type safety.
 
 ## Functional Parsing Approach
 
@@ -99,3 +101,15 @@ Building a focused parser instead of adapting a general-purpose library provides
 - **Type safety**: Impossible to generate invalid diagrams
 
 The functional patterns scale well. Adding new diagram types requires extending the discriminated unions and adding pattern match cases. The type system ensures all variations are handled properly.
+
+## Migration to @rendermaid/core
+
+This blog now uses [@rendermaid/core](https://github.com/srdjan/rendermaid) which provides all the benefits described above plus:
+
+- **Enhanced Performance**: Optimized tokenization-based parser with spatial grid rendering
+- **Multi-format Output**: SVG, HTML, JSON, and round-trip Mermaid rendering
+- **Smart Edge Routing**: Intelligent collision avoidance for clean diagrams
+- **Professional Styling**: White backgrounds with proper contrast and typography
+- **Comprehensive Testing**: Performance benchmarks and validation included
+
+The migration maintains the same functional programming principles while providing a more robust and feature-complete solution.

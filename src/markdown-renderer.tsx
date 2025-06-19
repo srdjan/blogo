@@ -1,8 +1,8 @@
-import { marked } from "https://esm.sh/marked@15.0.12";
-import hljs from "https://esm.sh/highlight.js@11.10.0";
+import { marked } from "marked";
+import hljs from "highlight.js";
 import { Result } from "./types.ts";
 import { createError } from "./error.ts";
-import { renderMermaidToSVG } from "./mermaid-ssr.ts";
+import { renderMermaidToSVG } from "./mermaid-renderer.ts";
 
 // Custom renderer for mermaid blocks
 const renderer = new marked.Renderer();
