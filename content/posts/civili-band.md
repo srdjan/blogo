@@ -9,6 +9,8 @@ excerpt: "Discover CIVILI and why their revival captures the authentic spirit of
 
 Growing up I always followed stories about the vibrant music scene of 1980s Yugoslavia, and wondered what that energy actually felt like. The tales of underground clubs, defiant punk attitudes, and the raw creativity born from cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.deno.dev). My brother and friends started a band and it all got super close...
 
+![Live!](/PICT0030.jpg){width=400}
+
 As rock band from **Zajecar** - Yugoslavia, initially they were on the outside of Belgrade, Zagreb, Ljubljana, and other major cities, but they quickly became a part of the underground punk and new wave scene of the 1980s. Those were goldeen years of Yugoslavian rock music, and once their songs started to spin on popular radio stations (legendary **Studio B**), they've managed to break to the scene that was vibrant, busy, and full of authenticity.
 
 ## Discovering **CIVILI's** Sound
