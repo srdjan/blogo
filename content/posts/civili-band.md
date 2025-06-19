@@ -7,9 +7,9 @@ excerpt: "Discover CIVILI and why their revival captures the authentic spirit of
 
 ## Yugoslavia's 80s Music Underground Scene
 
-Growing up hearing stories about the vibrant music scene of 1980s Yugoslavia, I always wondered what that energy actually felt like. The tales of underground clubs, defiant punk attitudes, and the raw creativity born from cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.deno.dev). My brother and friends started a band and it all got super close...
+Growing up I always followed stories about the vibrant music scene of 1980s Yugoslavia, and wondered what that energy actually felt like. The tales of underground clubs, defiant punk attitudes, and the raw creativity born from cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.deno.dev). My brother and friends started a band and it all got super close...
 
-A rock band from **Zajecar**, Yugoslavia, were a part of the underground punk and new wave scene of the 1980s. Those were goldeen years of Yugoslavian rock music. With their music played on popular radio stations (legendary **Studio B**), they've managed to break to the scene that was vibrant, busy, and full of authenticity.
+As rock band from **Zajecar** - Yugoslavia, initially they were on the outside of Belgrade, Zagreb, Ljubljana, and other major cities, but they quickly became a part of the underground punk and new wave scene of the 1980s. Those were goldeen years of Yugoslavian rock music, and once their songs started to spin on popular radio stations (legendary **Studio B**), they've managed to break to the scene that was vibrant, busy, and full of authenticity.
 
 ## Discovering **CIVILI's** Sound
 
@@ -17,7 +17,7 @@ A rock band from **Zajecar**, Yugoslavia, were a part of the underground punk an
 
 ![Uzalud](/B3-Uzalud-6.mp3){media=audio}
 
-Their performances at various events and festivals demonstrate how this strong were they playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
+Their performances at various events and festivals demonstrate the band's full force when playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
 
 ![Trebas Mi](/B1-TrebasMi-18c.mp3){media=audio}
 
