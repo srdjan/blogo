@@ -28,9 +28,148 @@ type RenderResult =
 
 const DEFAULT_SVG_CONFIG: SvgConfig = {
   width: 800,
-  height: 600,
+  height: 800, // Increased from 600 to prevent bottom overflow
   theme: "light",
   nodeSpacing: 120, // Optimized spacing from v0.6.0
+};
+
+/**
+ * Calculate dynamic SVG configuration based on diagram complexity
+ */
+const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
+  const baseConfig = { ...DEFAULT_SVG_CONFIG };
+
+  // Calculate minimum height based on diagram structure
+  const depth = analysis.depth || 3;
+
+  // Dynamic height calculation with generous bottom padding
+  const nodeHeight = 60; // Estimated node height including labels
+  const layerSpacing = baseConfig.nodeSpacing * 1.5; // Layer spacing from @rendermaid/core
+  const topPadding = 80; // Top margin
+  const bottomPadding = 120; // Generous bottom padding to prevent overflow
+  const edgeLabelPadding = 40; // Additional space for edge labels
+
+  const calculatedHeight = topPadding + (depth * layerSpacing) + nodeHeight + bottomPadding + edgeLabelPadding;
+
+  // Use the larger of default height or calculated height
+  const dynamicHeight = Math.max(baseConfig.height, calculatedHeight);
+
+  // For complex diagrams, add extra height and width
+  if (analysis.complexity > 20) {
+    return {
+      ...baseConfig,
+      height: Math.max(dynamicHeight, 1000), // Minimum 1000px for complex diagrams
+      width: Math.max(baseConfig.width, 1000), // Also increase width for complex diagrams
+    };
+  }
+
+  return {
+    ...baseConfig,
+    height: dynamicHeight,
+  };
+};
+
+/**
+ * Enhanced rendering function with custom configuration override
+ */
+export const renderMermaidWithConfig = (mermaidText: string, customConfig?: Partial<SvgConfig>): string => {
+  const renderResult = renderMermaidDiagramWithConfig(mermaidText, customConfig);
+
+  return match(renderResult)
+    .with({ success: true }, ({ content }) => content)
+    .with(
+      { success: false },
+      ({ error }) =>
+        `<div class="mermaid-error" style="padding: 1rem; border: 1px solid #ff6b6b; background: #ffe0e0; color: #d63031; border-radius: 4px;">
+        <strong>Mermaid Parse Error:</strong> ${error}
+      </div>`,
+    )
+    .exhaustive();
+};
+
+/**
+ * Core rendering function with custom configuration support
+ */
+const renderMermaidDiagramWithConfig = (mermaidText: string, customConfig?: Partial<SvgConfig>): RenderResult => {
+  try {
+    const trimmedText = mermaidText.trim();
+
+    // Provide helpful error messages for common syntax issues
+    if (trimmedText.startsWith("graph ")) {
+      return {
+        success: false,
+        error: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+      };
+    }
+
+    if (trimmedText.startsWith("sequenceDiagram")) {
+      return {
+        success: false,
+        error: "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+      };
+    }
+
+    // Parse the Mermaid diagram using @rendermaid/core
+    const parseResult = parseMermaid(trimmedText);
+
+    if (!parseResult.success) {
+      return {
+        success: false,
+        error: parseResult.error || "Failed to parse Mermaid diagram",
+      };
+    }
+
+    const ast = parseResult.data;
+
+    // v0.6.0: Validate AST integrity before rendering
+    const validationErrors = validateAST(ast);
+    if (validationErrors.length > 0) {
+      return {
+        success: false,
+        error: `Validation errors: ${validationErrors.join(", ")}`,
+      };
+    }
+
+    // v0.6.0: Enhance AST with analysis metadata
+    const enhancedAST = enhanceAST(ast);
+
+    // v0.6.0: Analyze diagram complexity for optimization
+    const analysis = analyzeAST(enhancedAST);
+
+    // Calculate dynamic configuration or use custom config
+    const finalConfig = customConfig
+      ? { ...calculateDynamicConfig(analysis), ...customConfig }
+      : calculateDynamicConfig(analysis);
+
+    // v0.6.0: Use performance monitoring for complex diagrams
+    const renderFunction = analysis.complexity > 20
+      ? withPerformanceMonitoring(renderSvg, "Complex Mermaid Rendering")
+      : renderSvg;
+
+    // Render to SVG using @rendermaid/core with final configuration
+    const svgResult = renderFunction(enhancedAST, finalConfig);
+
+    if (!svgResult.success) {
+      return {
+        success: false,
+        error: svgResult.error || "Failed to render SVG",
+      };
+    }
+
+    // Wrap the SVG with the expected CSS class for styling consistency
+    const wrappedSvg = wrapSvgWithClass(svgResult.data);
+
+    return {
+      success: true,
+      content: wrappedSvg,
+      analysis, // Include analysis data for debugging/optimization
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Rendering error: ${String(error)}`,
+    };
+  }
 };
 
 // === Main Renderer Function ===
@@ -103,13 +242,16 @@ const renderMermaidDiagram = (mermaidText: string): RenderResult => {
     // v0.6.0: Analyze diagram complexity for optimization
     const analysis = analyzeAST(enhancedAST);
 
+    // Calculate dynamic configuration to prevent bottom overflow
+    const dynamicConfig = calculateDynamicConfig(analysis);
+
     // v0.6.0: Use performance monitoring for complex diagrams
     const renderFunction = analysis.complexity > 20
       ? withPerformanceMonitoring(renderSvg, "Complex Mermaid Rendering")
       : renderSvg;
 
-    // Render to SVG using @rendermaid/core with enhanced AST
-    const svgResult = renderFunction(enhancedAST, DEFAULT_SVG_CONFIG);
+    // Render to SVG using @rendermaid/core with dynamic configuration
+    const svgResult = renderFunction(enhancedAST, dynamicConfig);
 
     if (!svgResult.success) {
       return {
@@ -246,9 +388,12 @@ export const renderWithMetrics = (mermaidText: string): {
     const validationErrors = validateAST(ast);
     const analysis = analyzeAST(ast);
 
+    // Calculate dynamic configuration to prevent bottom overflow
+    const dynamicConfig = calculateDynamicConfig(analysis);
+
     // Use performance monitoring for rendering
     const monitoredRender = withPerformanceMonitoring(renderSvg, "Mermaid Rendering");
-    const svgResult = monitoredRender(ast, DEFAULT_SVG_CONFIG);
+    const svgResult = monitoredRender(ast, dynamicConfig);
 
     const endTime = performance.now();
 

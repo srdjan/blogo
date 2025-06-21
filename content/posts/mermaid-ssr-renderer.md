@@ -34,6 +34,7 @@ v0.6.0 introduces comprehensive analysis capabilities:
 - **Dynamic Node Sizing**: Automatic sizing based on label content
 - **Enhanced Collision Avoidance**: Intelligent edge routing with spatial grid optimization
 - **Better Label Positioning**: Improved text placement and background handling
+- **Bottom Overflow Prevention**: Dynamic height calculation with generous padding to prevent content clipping
 
 ### Syntax Requirements
 
@@ -116,6 +117,80 @@ const CONNECTION_PATTERNS = [
 ```
 
 The enhanced pattern matching provides better performance through pre-compilation and more comprehensive syntax support.
+
+## Dynamic Configuration & Overflow Prevention
+
+### Intelligent Canvas Sizing
+
+v0.6.0 introduces dynamic configuration that prevents bottom overflow issues:
+
+```typescript
+import { renderMermaidToSVG, renderMermaidWithConfig } from "./mermaid-renderer";
+
+// Automatic dynamic sizing based on diagram complexity
+const diagram = `
+flowchart TD
+    A[Start] --> B[Step 1]
+    B --> C[Step 2]
+    C --> D[Step 3]
+    D --> E[Step 4]
+    E --> F[Step 5]
+    F --> G[End]
+`;
+
+// Dynamic configuration automatically calculated
+const result = renderMermaidToSVG(diagram);
+// Height automatically increased based on diagram depth
+
+// Custom configuration override when needed
+const customResult = renderMermaidWithConfig(diagram, {
+  height: 1200,
+  width: 1000,
+  theme: "dark"
+});
+```
+
+### Configuration Algorithm
+
+The dynamic configuration system calculates optimal canvas size:
+
+```typescript
+const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
+  const depth = analysis.depth || 3;
+  const nodeHeight = 60; // Estimated node height including labels
+  const layerSpacing = 120 * 1.5; // Layer spacing
+  const topPadding = 80; // Top margin
+  const bottomPadding = 120; // Generous bottom padding
+  const edgeLabelPadding = 40; // Additional space for edge labels
+
+  const calculatedHeight = topPadding + (depth * layerSpacing) +
+                          nodeHeight + bottomPadding + edgeLabelPadding;
+
+  // Complex diagrams get minimum 1000x1000px canvas
+  if (analysis.complexity > 20) {
+    return {
+      width: Math.max(1000, baseWidth),
+      height: Math.max(1000, calculatedHeight),
+      theme: "light",
+      nodeSpacing: 120
+    };
+  }
+
+  return {
+    width: 800,
+    height: Math.max(800, calculatedHeight), // Increased from 600px default
+    theme: "light",
+    nodeSpacing: 120
+  };
+};
+```
+
+### Benefits of Dynamic Sizing
+
+- **No Content Clipping**: Bottom elements are never cut off
+- **Optimal Space Usage**: Canvas size matches diagram complexity
+- **Performance Optimization**: Complex diagrams get larger canvas automatically
+- **Custom Override**: Manual configuration when specific dimensions needed
 
 ## Advanced Analysis Features in v0.6.0
 
