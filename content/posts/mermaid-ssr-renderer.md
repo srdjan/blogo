@@ -2,14 +2,14 @@
 title: Building a Mermaid SSR Renderer with TypeScript
 date: 2025-06-16
 tags: [TypeScript, Functional, Parsing, SSR]
-excerpt: A comprehensive guide to server-side Mermaid diagram rendering using @rendermaid/core v0.5.0, featuring enhanced performance, markdown file processing, and functional TypeScript patterns for maintainable parsing logic.
+excerpt: A comprehensive guide to server-side Mermaid diagram rendering using @rendermaid/core v0.6.0, featuring enhanced performance, advanced analysis capabilities, improved rendering quality, and functional TypeScript patterns for maintainable parsing logic.
 ---
 
 ## The Evolution of Server-Side Mermaid Rendering
 
-Server-side Mermaid diagram rendering has evolved significantly with the introduction of [@rendermaid/core v0.5.0](https://github.com/srdjan/rendermaid). While traditional approaches required browser environments or complex DOM simulation, modern functional TypeScript libraries now provide elegant solutions for SSR Mermaid rendering.
+Server-side Mermaid diagram rendering has evolved significantly with the introduction of [@rendermaid/core v0.6.0](https://github.com/srdjan/rendermaid). While traditional approaches required browser environments or complex DOM simulation, modern functional TypeScript libraries now provide elegant solutions for SSR Mermaid rendering.
 
-**@rendermaid/core v0.5.0** represents a major advancement in Mermaid processing, offering:
+**@rendermaid/core v0.6.0** represents a major advancement in Mermaid processing, offering:
 
 - **Native TypeScript Implementation**: No browser dependencies or DOM simulation required
 - **Markdown File Processing**: Direct extraction and parsing of Mermaid diagrams from markdown files
@@ -17,11 +17,27 @@ Server-side Mermaid diagram rendering has evolved significantly with the introdu
 - **Comprehensive Type Safety**: Full TypeScript support with exhaustive pattern matching
 - **Multi-format Output**: SVG, HTML, JSON, and round-trip Mermaid rendering
 
-## Key Changes in v0.5.0
+## Key Enhancements in v0.6.0
+
+### Advanced Analysis & Validation
+
+v0.6.0 introduces comprehensive analysis capabilities:
+
+- **AST Validation**: Comprehensive integrity checking with detailed error reporting
+- **Complexity Analysis**: Automatic complexity scoring based on nodes, edges, and variety
+- **Cycle Detection**: Identifies circular dependencies in diagram structure
+- **Performance Monitoring**: Built-in timing and optimization metrics
+
+### Improved Rendering Quality
+
+- **Shape-Aware Connection Points**: Accurate edge routing based on node shapes
+- **Dynamic Node Sizing**: Automatic sizing based on label content
+- **Enhanced Collision Avoidance**: Intelligent edge routing with spatial grid optimization
+- **Better Label Positioning**: Improved text placement and background handling
 
 ### Syntax Requirements
 
-v0.5.0 introduces stricter parsing requirements for better consistency:
+v0.6.0 maintains the same syntax requirements as v0.5.0:
 
 - **Flowchart Header**: Use `flowchart TD` instead of `graph TD`
 - **Supported Diagrams**: Currently focuses on flowchart diagrams with plans for sequence diagrams
@@ -100,6 +116,86 @@ const CONNECTION_PATTERNS = [
 ```
 
 The enhanced pattern matching provides better performance through pre-compilation and more comprehensive syntax support.
+
+## Advanced Analysis Features in v0.6.0
+
+### Comprehensive AST Validation
+
+v0.6.0 introduces robust validation that catches structural issues:
+
+```typescript
+import { parseMermaid, validateAST, analyzeAST } from "@rendermaid/core";
+
+const diagram = `
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Process]
+    B -->|No| D[Skip]
+    C --> E[End]
+    D --> E
+`;
+
+const parseResult = parseMermaid(diagram);
+if (parseResult.success) {
+  const ast = parseResult.data;
+
+  // Validate diagram integrity
+  const validationErrors = validateAST(ast);
+  if (validationErrors.length > 0) {
+    console.log("Validation issues:", validationErrors);
+    // Example: ["Edge references non-existent source node: X"]
+  }
+
+  // Analyze diagram complexity and structure
+  const analysis = analyzeAST(ast);
+  console.log("Complexity score:", analysis.complexity);
+  console.log("Node shapes used:", analysis.nodeShapes);
+  console.log("Edge types used:", analysis.edgeTypes);
+  console.log("Maximum depth:", analysis.depth);
+  console.log("Contains cycles:", analysis.cycleDetected);
+}
+```
+
+### Performance Monitoring Integration
+
+v0.6.0 includes built-in performance monitoring for optimization:
+
+```typescript
+import { withPerformanceMonitoring, renderSvg } from "@rendermaid/core";
+
+// Wrap rendering with performance monitoring
+const monitoredRender = withPerformanceMonitoring(renderSvg, "Complex Diagram");
+
+const result = monitoredRender(ast, {
+  width: 1200,
+  height: 800,
+  theme: "light",
+  nodeSpacing: 150
+});
+
+// Console output: "⏱️ Complex Diagram: 12.34ms"
+```
+
+### Enhanced AST Transformation
+
+v0.6.0 provides utilities for AST enhancement and transformation:
+
+```typescript
+import { enhanceAST, transformAST } from "@rendermaid/core";
+
+// Enhance AST with analysis metadata
+const enhancedAST = enhanceAST(ast);
+console.log(enhancedAST.metadata.get("analysis")); // Full analysis results
+console.log(enhancedAST.metadata.get("enhancedAt")); // Timestamp
+
+// Transform AST with custom logic
+const transformedAST = transformAST(ast, (currentAST) => {
+  // Add custom metadata or modify structure
+  const newMetadata = new Map(currentAST.metadata);
+  newMetadata.set("customProcessed", true);
+  return { ...currentAST, metadata: newMetadata };
+});
+```
 
 ## Advanced Features in v0.5.0
 
@@ -283,11 +379,15 @@ const result = monitoredRender(ast, config);
 - **Memory Efficient**: Functional approach with minimal memory footprint
 - **Type Safe**: Compile-time guarantees prevent runtime errors
 
-## Migration Guide to v0.5.0
+## Migration Guide to v0.6.0
 
-### Syntax Updates Required
+### From v0.5.0 to v0.6.0
 
-When migrating to v0.5.0, update your diagram syntax:
+v0.6.0 is fully backward compatible with v0.5.0 - no syntax changes required! Simply update your dependency and optionally leverage new features.
+
+### From Earlier Versions
+
+When migrating from v0.4.0 or earlier, update your diagram syntax:
 
 ```typescript
 // ❌ Old syntax (v0.4.0 and earlier)
@@ -305,43 +405,78 @@ flowchart TD
 `;
 ```
 
-### API Migration
+### Enhanced API in v0.6.0
 
 ```typescript
-// v0.5.0 enhanced imports
+// v0.6.0 comprehensive imports
 import {
   parseMermaid,
   renderSvg,
   analyzeAST,
   validateAST,
+  enhanceAST,
+  transformAST,
+  withPerformanceMonitoring,
   extractMermaidFromMarkdown,
-  type SvgConfig,
-  type MermaidAST
+  type SvgConfig
 } from "@rendermaid/core";
 
 // Enhanced configuration with type safety
 const config: SvgConfig = {
   width: 800,
   height: 600,
-  nodeSpacing: 120, // Optimized from 150
-  theme: "light"
+  nodeSpacing: 120, // Optimized spacing
+  theme: "light" // "light" | "dark" | "neutral"
 };
+
+// v0.6.0: Use enhanced rendering with validation and analysis
+const parseResult = parseMermaid(diagram);
+if (parseResult.success) {
+  const ast = parseResult.data;
+
+  // Validate before rendering
+  const errors = validateAST(ast);
+  if (errors.length === 0) {
+    // Enhance with metadata
+    const enhancedAST = enhanceAST(ast);
+
+    // Render with performance monitoring
+    const monitoredRender = withPerformanceMonitoring(renderSvg, "Diagram Render");
+    const result = monitoredRender(enhancedAST, config);
+  }
+}
 ```
 
-### Error Handling Improvements
+### Error Handling & Validation Improvements
 
-v0.5.0 provides more helpful error messages:
+v0.6.0 provides comprehensive error handling and validation:
 
 ```typescript
 const result = parseMermaid(diagramText);
 if (!result.success) {
   // Enhanced error messages guide users to correct syntax
   console.error(result.error);
-  // Example: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.5.0"
+  // Example: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0"
+} else {
+  // Additional validation for structural integrity
+  const validationErrors = validateAST(result.data);
+  if (validationErrors.length > 0) {
+    console.error("Structural issues:", validationErrors);
+    // Example: ["Edge references non-existent source node: InvalidNode"]
+  }
+
+  // Analyze for potential optimization opportunities
+  const analysis = analyzeAST(result.data);
+  if (analysis.complexity > 50) {
+    console.warn("High complexity diagram detected:", analysis.complexity);
+  }
+  if (analysis.cycleDetected) {
+    console.warn("Circular dependencies detected in diagram");
+  }
 }
 ```
 
-## Benefits of @rendermaid/core v0.5.0
+## Benefits of @rendermaid/core v0.6.0
 
 The latest version provides comprehensive advantages:
 
@@ -352,13 +487,15 @@ The latest version provides comprehensive advantages:
 - **Functional Architecture**: Pure functions enable reliable composition and testing
 - **Multi-format Output**: SVG, HTML, JSON, and Mermaid round-trip support
 
-### v0.5.0 Enhancements
+### v0.6.0 Enhancements
 
+- **Advanced Analysis**: Comprehensive complexity scoring, cycle detection, and structural analysis
+- **Enhanced Validation**: Multi-level validation with detailed error reporting
+- **Performance Monitoring**: Built-in timing and optimization metrics
+- **Improved Rendering**: Shape-aware connection points and dynamic node sizing
+- **AST Enhancement**: Metadata enrichment and transformation utilities
+- **Spatial Grid Optimization**: Intelligent collision avoidance with improved edge routing
 - **Markdown Integration**: Direct processing of markdown files with embedded diagrams
-- **Spatial Grid Rendering**: Intelligent layout with collision avoidance
-- **Performance Optimization**: Pre-compiled patterns and optimized algorithms
-- **Enhanced Validation**: Comprehensive error checking with helpful messages
-- **Analysis Tools**: Built-in complexity analysis and AST transformation utilities
 
 ### Production Ready Features
 
@@ -435,4 +572,4 @@ diagrams.forEach(diagramText => {
 });
 ```
 
-@rendermaid/core v0.5.0 represents the evolution of server-side Mermaid rendering, combining functional programming principles with modern TypeScript features to deliver a robust, performant, and type-safe solution for diagram processing.
+@rendermaid/core v0.6.0 represents the evolution of server-side Mermaid rendering, combining functional programming principles with modern TypeScript features to deliver a robust, performant, and type-safe solution for diagram processing. With advanced analysis capabilities, enhanced validation, and improved rendering quality, v0.6.0 sets the standard for professional diagram processing in TypeScript applications.

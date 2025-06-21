@@ -1,15 +1,15 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@rendermaid/core@0.5": "0.5.0",
+    "jsr:@rendermaid/core@0.6": "0.6.0",
     "jsr:@std/yaml@^1.0.8": "1.0.8",
     "npm:mono-jsx@~0.6.7": "0.6.7",
     "npm:ts-pattern@5.0.5": "5.0.5",
     "npm:ts-pattern@^5.7.1": "5.7.1"
   },
   "jsr": {
-    "@rendermaid/core@0.5.0": {
-      "integrity": "112cd1648b4820e93136d00c10891a2f96d519ddbaebdf281c921e3a1c86d2b0",
+    "@rendermaid/core@0.6.0": {
+      "integrity": "057f87e6a57c24352051643d32a0f3c8ff7573db35fad8c8b287fb752ccf2b17",
       "dependencies": [
         "npm:ts-pattern@5.0.5",
         "npm:ts-pattern@^5.7.1"
@@ -471,7 +471,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@rendermaid/core@0.5",
+      "jsr:@rendermaid/core@0.6",
       "jsr:@std/yaml@^1.0.8",
       "npm:mono-jsx@~0.6.7",
       "npm:ts-pattern@^5.7.1"
