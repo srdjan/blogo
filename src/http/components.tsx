@@ -40,18 +40,21 @@ export const PostList = (props: {
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (
                   <div class="tags">
-                    {post.tags.map((tag) => (
-                      <a
-                        key={tag}
-                        href={`/tags/${encodeURIComponent(tag)}`}
-                        hx-get={`/tags/${encodeURIComponent(tag)}`}
-                        hx-target="#content-area"
-                        hx-swap="innerHTML"
-                        hx-push-url="true"
-                        class="tag"
-                      >
-                        {tag}
-                      </a>
+                    {post.tags.map((tag, index) => (
+                      <>
+                        <a
+                          key={tag}
+                          href={`/tags/${encodeURIComponent(tag)}`}
+                          hx-get={`/tags/${encodeURIComponent(tag)}`}
+                          hx-target="#content-area"
+                          hx-swap="innerHTML"
+                          hx-push-url="true"
+                          class="tag"
+                        >
+                          {tag}
+                        </a>
+                        {index < post.tags.length - 1 && " "}
+                      </>
                     ))}
                   </div>
                 )}
@@ -75,18 +78,21 @@ export const PostView = (props: { readonly post: Post }): JSX.Element => {
           {post.formattedDate && <time>{post.formattedDate}</time>}
           {post.tags && post.tags.length > 0 && (
             <div class="tags">
-              {post.tags.map((tag) => (
-                <a
-                  key={tag}
-                  href={`/tags/${encodeURIComponent(tag)}`}
-                  hx-get={`/tags/${encodeURIComponent(tag)}`}
-                  hx-target="#content-area"
-                  hx-swap="innerHTML"
-                  hx-push-url="true"
-                  class="tag"
-                >
-                  {tag}
-                </a>
+              {post.tags.map((tag, index) => (
+                <>
+                  <a
+                    key={tag}
+                    href={`/tags/${encodeURIComponent(tag)}`}
+                    hx-get={`/tags/${encodeURIComponent(tag)}`}
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    class="tag"
+                  >
+                    {tag}
+                  </a>
+                  {index < post.tags.length - 1 && " "}
+                </>
               ))}
             </div>
           )}
@@ -111,21 +117,24 @@ export const TagIndex = (props: { readonly tags: readonly TagInfo[] }): JSX.Elem
       {tags.length === 0 ? (
         <p>No tags found.</p>
       ) : (
-        <ul>
-          {tags.map((tag) => (
-            <li key={tag.name}>
+        <div class="tags">
+          {tags.map((tag, index) => (
+            <>
               <a
+                key={tag.name}
                 href={`/tags/${encodeURIComponent(tag.name)}`}
                 hx-get={`/tags/${encodeURIComponent(tag.name)}`}
                 hx-target="#content-area"
                 hx-swap="innerHTML"
                 hx-push-url="true"
+                class="tag"
               >
-                {tag.name} ({tag.count})
+                {tag.name}({tag.count})
               </a>
-            </li>
+              {index < tags.length - 1 && " "}
+            </>
           ))}
-        </ul>
+        </div>
       )}
     </main>
   );
