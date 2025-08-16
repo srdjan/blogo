@@ -1,7 +1,13 @@
 {
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env --allow-write app.tsx",
-    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch app.tsx",
+    "start": "deno run --allow-net --allow-read --allow-env --allow-write src/app/main.ts",
+    "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch src/app/main.ts",
+    "test": "deno test --allow-none",
+    "test:watch": "deno test --allow-none --watch",
+    "coverage": "deno test --allow-none --coverage=coverage && deno coverage coverage",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check src/app/main.ts",
     "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
   },
   "fmt": {
@@ -13,27 +19,35 @@
   },
   "lint": {
     "include": [
-      "src/",
-      "app.tsx"
+      "src/"
     ]
   },
   "imports": {
-    "mono-jsx": "npm:mono-jsx@^0.6.7",
-    "@rendermaid/core": "jsr:@rendermaid/core@^0.6.0",
-    "ts-pattern": "npm:ts-pattern@^5.7.1",
+    "mono-jsx": "npm:mono-jsx@0.6.11",
+    "@rendermaid/core": "jsr:@rendermaid/core@0.6.0",
+    "ts-pattern": "npm:ts-pattern@5.8.0",
     "marked": "https://esm.sh/marked@15.0.12",
     "highlight.js": "https://esm.sh/highlight.js@11.11.1",
-    "@std/yaml": "jsr:@std/yaml@^1.0.8"
+    "@std/yaml": "jsr:@std/yaml@1.0.9",
+    "@std/http": "jsr:@std/http@1.0.20",
+    "@std/assert": "jsr:@std/assert@1.0.14"
   },
   "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
     "jsx": "react-jsx",
     "jsxImportSource": "mono-jsx"
   },
   "deploy": {
     "exclude": [
-      "**/node_modules"
+      "**/node_modules",
+      "coverage/",
+      "tests/"
     ],
     "include": [],
-    "entrypoint": "app.tsx"
-  }
+    "entrypoint": "src/app/main.ts"
+  },
+  "lock": true
 }

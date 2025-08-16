@@ -11,14 +11,14 @@ import { match } from "ts-pattern";
 
 // === Types ===
 
-// Analysis results interface (matching v0.6.0 ASTAnalysis)
-interface DiagramAnalysis {
-  complexity: number;
-  nodeShapes: Record<string, number>;
-  edgeTypes: Record<string, number>;
-  depth: number;
-  cycleDetected: boolean;
-}
+// Analysis results type (matching v0.6.0 ASTAnalysis)
+type DiagramAnalysis = {
+  readonly complexity: number;
+  readonly nodeShapes: Record<string, number>;
+  readonly edgeTypes: Record<string, number>;
+  readonly depth: number;
+  readonly cycleDetected: boolean;
+};
 
 type RenderResult =
   | { success: true; content: string; analysis?: DiagramAnalysis }

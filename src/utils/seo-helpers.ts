@@ -4,20 +4,20 @@
 
 import { calculateReadingTime, type ReadingTimeResult } from "./reading-time.ts";
 
-export interface SEOAnalysis {
-  readingTime: ReadingTimeResult;
-  wordCount: number;
-  titleLength: number;
-  descriptionLength: number;
-  headingStructure: HeadingInfo[];
-  recommendations: string[];
-}
+export type SEOAnalysis = {
+  readonly readingTime: ReadingTimeResult;
+  readonly wordCount: number;
+  readonly titleLength: number;
+  readonly descriptionLength: number;
+  readonly headingStructure: HeadingInfo[];
+  readonly recommendations: string[];
+};
 
-export interface HeadingInfo {
-  level: number;
-  text: string;
-  slug: string;
-}
+export type HeadingInfo = {
+  readonly level: number;
+  readonly text: string;
+  readonly slug: string;
+};
 
 /**
  * Extract headings from markdown content

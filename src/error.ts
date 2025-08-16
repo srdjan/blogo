@@ -1,4 +1,4 @@
-import type { Result } from "./types.ts";
+  import type { Result } from "./types.ts";
 
 /**
  * Application-specific error types
@@ -12,14 +12,14 @@ export type AppErrorKind =
   | "NetworkError"
   | "RenderError";
 
-export interface AppError {
-  kind: AppErrorKind;
-  message: string;
-  cause?: unknown;
-  timestamp?: number; // When the error occurred
-  path?: string; // Path or context where error happened
-  retryable?: boolean; // Whether this error can be retried
-}
+export type AppError = {
+  readonly kind: AppErrorKind;
+  readonly message: string;
+  readonly cause?: unknown;
+  readonly timestamp?: number; // When the error occurred
+  readonly path?: string; // Path or context where error happened
+  readonly retryable?: boolean; // Whether this error can be retried
+};
 
 /**
  * Create a new application error with enhanced metadata
@@ -32,14 +32,24 @@ export const createError = (
     path?: string;
     retryable?: boolean;
   },
-): AppError => ({
-  kind,
-  message,
-  cause,
-  timestamp: Date.now(),
-  path: options?.path,
-  retryable: options?.retryable,
-});
+): AppError => {
+  const error: AppError = {
+    kind,
+    message,
+    cause,
+    timestamp: Date.now(),
+  };
+
+  if (options?.path !== undefined) {
+    (error as any).path = options.path;
+  }
+
+  if (options?.retryable !== undefined) {
+    (error as any).retryable = options.retryable;
+  }
+
+  return error;
+};
 
 /**
  * Format error details for logging

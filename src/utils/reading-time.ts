@@ -3,11 +3,11 @@
  * Based on average reading speed of 200-250 words per minute
  */
 
-export interface ReadingTimeResult {
-  minutes: number;
-  words: number;
-  text: string;
-}
+export type ReadingTimeResult = {
+  readonly minutes: number;
+  readonly words: number;
+  readonly text: string;
+};
 
 const WORDS_PER_MINUTE = 225; // Average reading speed
 

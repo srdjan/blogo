@@ -1,27 +1,27 @@
 export type Environment = "development" | "production" | "test";
 
-export interface Config {
-  server: {
-    port: number;
-    host: string;
-    publicUrl: string;
+export type Config = {
+  readonly server: {
+    readonly port: number;
+    readonly host: string;
+    readonly publicUrl: string;
   };
 
-  blog: {
-    title: string;
-    description: string;
-    postsDir: string;
-    postsPerPage: number;
+  readonly blog: {
+    readonly title: string;
+    readonly description: string;
+    readonly postsDir: string;
+    readonly postsPerPage: number;
   };
 
-  env: Environment;
+  readonly env: Environment;
 
-  debug: {
-    enableLogs: boolean;
-    verboseLogs: boolean;
-    showStackTraces: boolean;
+  readonly debug: {
+    readonly enableLogs: boolean;
+    readonly verboseLogs: boolean;
+    readonly showStackTraces: boolean;
   };
-}
+};
 
 /**
  * Get environment from environment variable with validation
