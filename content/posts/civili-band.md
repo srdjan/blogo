@@ -9,7 +9,7 @@ excerpt: "Discover CIVILI and why their revival captures the authentic spirit of
 
 Growing up I always followed stories about the vibrant music scene of 1980s Yugoslavia, and wondered what that energy actually felt like. The tales of underground clubs, defiant punk attitudes, and the raw creativity born from cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.deno.dev). My brother and friends started a band and it all got super close...
 
-![Live!](/PICT0030.jpg){width=400}
+![Live!](/images/PICT0030.jpg){width=400}
 
 As rock band from **Zajecar** - Yugoslavia, initially they were on the outside of Belgrade, Zagreb, Ljubljana, and other major cities, but they quickly became a part of the underground punk and new wave scene of the 1980s. Those were goldeen years of Yugoslavian rock music, and once their songs started to spin on popular radio stations (legendary **Studio B**), they've managed to break to the scene that was vibrant, busy, and full of authenticity.
 
@@ -17,11 +17,11 @@ As rock band from **Zajecar** - Yugoslavia, initially they were on the outside o
 
 [**CIVILI's**](https://civili.deno.dev) music channels the spirit of iconic bands like Ekatarina Velika (EKV), Film, and Disciplina Kičme. Their blend of punk and new wave creates something that feels both nostalgic and immediate. The raw energy in their music carries that defiant spirit of that time. The songs are short, direct, and packed with emotion. There are love songs, songs about growing up, friendship, and the trials of youth.
 
-![Uzalud](/B3-Uzalud-6.mp3){media=audio}
+![Uzalud](/audio/B3-Uzalud-6.mp3){media=audio}
 
 Their performances at various events and festivals demonstrate the band's full force when playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
 
-![Trebas Mi](/B1-TrebasMi-18c.mp3){media=audio}
+![Trebas Mi](/audio/B1-TrebasMi-18c.mp3){media=audio}
 
 ### Band Members
 
@@ -65,10 +65,10 @@ Their dedicated support team for logistics, media, and photography shows they're
 
 ## Album "A Call From The Past"
 
-![A Call From The Past - CIVILI](/back-v11_djixmix.jpg){width=400}
+![A Call From The Past - CIVILI](/images/back-v11_djixmix.jpg){width=400}
 
 In 2024, [CIVILI](https://civili.deno.dev) released a modern mix of their old recordings, album, "A Call From The Past." The album is a testament to their commitment to preserving the spirit of the 1980s underground scene while infusing it with modern sensibilities. The album's tracks are a mix of their most popular songs and one new composition, [Dacha](), all of which pay homage to the era's punk and new wave influences while remaining relevant to today's listeners.
 
-![Dacha](/A5-Dacha-35a.mp3){media=audio}
+![Dacha](/audio/A5-Dacha-35a.mp3){media=audio}
 
 [CIVILI](https://civili.deno.dev)'s revival suggests that the best way to honor musical heritage is to keep it alive and evolving. Their success lies in understanding that the underground scene wasn't about specific sounds or styles, but about maintaining creative independence and authentic expression.
