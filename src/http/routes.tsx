@@ -1,6 +1,6 @@
 import type { RouteHandler } from "./types.ts";
 import type { ContentService } from "../domain/content.ts";
-import { createLayout } from "./layout.tsx";
+import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
 import { TagIndex } from "../components/TagIndex.tsx";
