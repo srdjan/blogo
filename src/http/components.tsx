@@ -1,12 +1,10 @@
 import type { Post, TagInfo, TagName } from "../lib/types.ts";
-
-// Create a raw HTML fragment that mono-jsx can render
-const createRawHTML = (html: string): string => html;
+import { html } from "mono-jsx/jsx-runtime";
 
 export const PostList = (props: { 
   readonly posts: readonly Post[]; 
   readonly activeTag?: TagName;
-}): JSX.Element => {
+}) => {
   const { posts, activeTag } = props;
 
   return (
@@ -65,7 +63,7 @@ export const PostList = (props: {
   );
 };
 
-export const PostView = (props: { readonly post: Post }): JSX.Element => {
+export const PostView = (props: { readonly post: Post }) => {
   const { post } = props;
 
   return (
@@ -105,7 +103,7 @@ export const PostView = (props: { readonly post: Post }): JSX.Element => {
   );
 };
 
-export const TagIndex = (props: { readonly tags: readonly TagInfo[] }): JSX.Element => {
+export const TagIndex = (props: { readonly tags: readonly TagInfo[] }) => {
   const { tags } = props;
 
   return (
@@ -139,7 +137,7 @@ export const TagIndex = (props: { readonly tags: readonly TagInfo[] }): JSX.Elem
 export const SearchResults = (props: { 
   readonly posts: readonly Post[]; 
   readonly query: string;
-}): JSX.Element => {
+}) => {
   const { posts, query } = props;
 
   return (
@@ -180,7 +178,7 @@ export const SearchResults = (props: {
   );
 };
 
-export const About = (): JSX.Element => {
+export const About = () => {
   return (
     <main>
       <h1>About This Blog</h1>
@@ -219,7 +217,7 @@ export const About = (): JSX.Element => {
   );
 };
 
-export const NotFound = (): JSX.Element => {
+export const NotFound = () => {
   return (
     <main>
       <h1>404 - Page Not Found</h1>

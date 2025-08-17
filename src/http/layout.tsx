@@ -48,7 +48,8 @@ export const createLayout = (props: LayoutProps): Response => {
         {publishedTime && <meta {...{"property": "article:published_time"}} content={publishedTime} />}
         {modifiedTime && <meta {...{"property": "article:modified_time"}} content={modifiedTime} />}
         {author && <meta {...{"property": "article:author"}} content={author} />}
-        {tags && tags.map((tag, index) => 
+        {tags && tags.map((tag, _index) => 
+          // deno-lint-ignore jsx-key
           <meta {...{"property": "article:tag"}} content={tag} />
         )}
         {type === 'article' && <meta {...{"property": "article:section"}} content="Technology" />}

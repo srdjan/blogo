@@ -14,9 +14,9 @@ export function startServer(handler: Handler, options: ServerOptions): Deno.Http
   const { port, hostname = "localhost", signal } = options;
   console.log(`Server listening on http://${hostname}:${port}`);
   
-  const serveOptions: Deno.ServeTcpOptions = { port, hostname };
+  const serveOptions: Deno.ServeTcpOptions & { signal?: AbortSignal } = { port, hostname };
   if (signal) {
-    (serveOptions as any).signal = signal;
+    serveOptions.signal = signal;
   }
   
   return Deno.serve(serveOptions, wrapped);

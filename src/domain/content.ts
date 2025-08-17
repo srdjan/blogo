@@ -232,19 +232,10 @@ async function parseFrontmatter(frontmatter: string, slug: Slug): Promise<AppRes
       title: meta.title as string,
       date: dateString as string,
       slug: (meta.slug as Slug) || slug,
+      ...(typeof meta.excerpt === "string" && { excerpt: meta.excerpt }),
+      ...(tags && { tags }),
+      ...(typeof meta.modified === "string" && { modified: meta.modified }),
     };
-    
-    if (typeof meta.excerpt === "string") {
-      (result as any).excerpt = meta.excerpt;
-    }
-    
-    if (tags) {
-      (result as any).tags = tags;
-    }
-    
-    if (typeof meta.modified === "string") {
-      (result as any).modified = meta.modified;
-    }
     
     return ok(result);
   } catch (error) {

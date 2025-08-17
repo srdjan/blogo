@@ -5,7 +5,7 @@ interface LayoutProps {
   title: string;
   description?: string;
   path?: string;
-  children: JSX.Element;
+  children: any;
   image?: string;
   author?: string;
   publishedTime?: string;

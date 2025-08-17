@@ -345,15 +345,28 @@ export const getMermaidInfo = (mermaidText: string): {
     // v0.6.0: Detailed analysis
     const analysis = analyzeAST(ast);
 
-    return {
+    const result: {
+      isValid: boolean;
+      nodeCount: number;
+      edgeCount: number;
+      diagramType: unknown;
+      complexity: number;
+      analysis: DiagramAnalysis;
+      validationErrors?: string[];
+    } = {
       isValid: validationErrors.length === 0,
       nodeCount: ast.nodes.size,
       edgeCount: ast.edges.length,
       diagramType: ast.diagramType,
       complexity: analysis.complexity,
       analysis,
-      validationErrors: validationErrors.length > 0 ? validationErrors : undefined,
     };
+
+    if (validationErrors.length > 0) {
+      result.validationErrors = validationErrors;
+    }
+
+    return result;
   } catch (error) {
     return {
       isValid: false,
@@ -398,21 +411,42 @@ export const renderWithMetrics = (mermaidText: string): {
     const endTime = performance.now();
 
     if (!svgResult.success) {
-      return {
+      const result: {
+        result: string;
+        renderTime: number;
+        analysis: DiagramAnalysis;
+        validationErrors?: string[];
+        error: string;
+      } = {
         result: "",
         renderTime: endTime - startTime,
         analysis,
-        validationErrors: validationErrors.length > 0 ? validationErrors : undefined,
         error: svgResult.error || "Render error",
       };
+
+      if (validationErrors.length > 0) {
+        result.validationErrors = validationErrors;
+      }
+
+      return result;
     }
 
-    return {
+    const result: {
+      result: string;
+      renderTime: number;
+      analysis: DiagramAnalysis;
+      validationErrors?: string[];
+    } = {
       result: wrapSvgWithClass(svgResult.data),
       renderTime: endTime - startTime,
       analysis,
-      validationErrors: validationErrors.length > 0 ? validationErrors : undefined,
     };
+
+    if (validationErrors.length > 0) {
+      result.validationErrors = validationErrors;
+    }
+
+    return result;
   } catch (error) {
     const endTime = performance.now();
     return {

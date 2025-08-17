@@ -48,7 +48,7 @@ export type LayoutProps = {
   readonly title: string;
   readonly description?: string;
   readonly path?: UrlPath;
-  readonly children: any; // JSX element - using any for mono-jsx compatibility
+  readonly children: JSX.Element; // JSX element
   readonly image?: string;
   readonly author?: string;
   readonly publishedTime?: string;
