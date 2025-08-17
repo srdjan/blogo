@@ -11,7 +11,6 @@ export const PostList = (props: {
 
   return (
     <main>
-      <h1>Blog Posts</h1>
       {activeTag && (
         <p>
           Posts tagged with <strong>{activeTag}</strong> -{" "}
@@ -23,7 +22,7 @@ export const PostList = (props: {
       ) : (
         <ul>
           {posts.map((post) => (
-            <li key={post.slug}>
+            <li>
               <article>
                 <h2>
                   <a
@@ -43,7 +42,6 @@ export const PostList = (props: {
                     {post.tags.map((tag, index) => (
                       <>
                         <a
-                          key={tag}
                           href={`/tags/${encodeURIComponent(tag)}`}
                           hx-get={`/tags/${encodeURIComponent(tag)}`}
                           hx-target="#content-area"
@@ -53,7 +51,7 @@ export const PostList = (props: {
                         >
                           {tag}
                         </a>
-                        {index < post.tags.length - 1 && " "}
+                        {index < (post.tags?.length ?? 0) - 1 && " "}
                       </>
                     ))}
                   </div>
@@ -81,7 +79,6 @@ export const PostView = (props: { readonly post: Post }): JSX.Element => {
               {post.tags.map((tag, index) => (
                 <>
                   <a
-                    key={tag}
                     href={`/tags/${encodeURIComponent(tag)}`}
                     hx-get={`/tags/${encodeURIComponent(tag)}`}
                     hx-target="#content-area"
@@ -91,7 +88,7 @@ export const PostView = (props: { readonly post: Post }): JSX.Element => {
                   >
                     {tag}
                   </a>
-                  {index < post.tags.length - 1 && " "}
+                  {index < (post.tags?.length ?? 0) - 1 && " "}
                 </>
               ))}
             </div>
@@ -121,7 +118,6 @@ export const TagIndex = (props: { readonly tags: readonly TagInfo[] }): JSX.Elem
           {tags.map((tag, index) => (
             <>
               <a
-                key={tag.name}
                 href={`/tags/${encodeURIComponent(tag.name)}`}
                 hx-get={`/tags/${encodeURIComponent(tag.name)}`}
                 hx-target="#content-area"
@@ -157,7 +153,7 @@ export const SearchResults = (props: {
       {posts.length > 0 && (
         <ul>
           {posts.map((post) => (
-            <li key={post.slug}>
+            <li>
               <article>
                 <h2>
                   <a

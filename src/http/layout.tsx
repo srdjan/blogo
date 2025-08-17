@@ -37,21 +37,21 @@ export const createLayout = (props: LayoutProps): Response => {
         
         <link rel="canonical" href={canonicalUrl} />
         
-        <meta property="og:type" content={type} />
-        <meta property="og:title" content={title} />
-        {description && <meta property="og:description" content={description} />}
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:image:alt" content={`Cover image for: ${title}`} />
-        <meta property="og:site_name" content="Blogo - Modern Development Blog" />
-        <meta property="og:locale" content="en_US" />
-        {publishedTime && <meta property="article:published_time" content={publishedTime} />}
-        {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
-        {author && <meta property="article:author" content={author} />}
+        <meta {...{"property": "og:type"}} content={type} />
+        <meta {...{"property": "og:title"}} content={title} />
+        {description && <meta {...{"property": "og:description"}} content={description} />}
+        <meta {...{"property": "og:url"}} content={canonicalUrl} />
+        <meta {...{"property": "og:image"}} content={ogImage} />
+        <meta {...{"property": "og:image:alt"}} content={`Cover image for: ${title}`} />
+        <meta {...{"property": "og:site_name"}} content="Blogo - Modern Development Blog" />
+        <meta {...{"property": "og:locale"}} content="en_US" />
+        {publishedTime && <meta {...{"property": "article:published_time"}} content={publishedTime} />}
+        {modifiedTime && <meta {...{"property": "article:modified_time"}} content={modifiedTime} />}
+        {author && <meta {...{"property": "article:author"}} content={author} />}
         {tags && tags.map((tag, index) => 
-          <meta key={index} property="article:tag" content={tag} />
+          <meta {...{"property": "article:tag"}} content={tag} />
         )}
-        {type === 'article' && <meta property="article:section" content="Technology" />}
+        {type === 'article' && <meta {...{"property": "article:section"}} content="Technology" />}
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
@@ -77,8 +77,8 @@ export const createLayout = (props: LayoutProps): Response => {
           type="application/rss+xml"
         />
         
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+        <script type="application/ld+json">
+          {JSON.stringify({
             "@context": "https://schema.org",
             "@type": type === 'article' ? "BlogPosting" : "WebSite",
             "headline": title,
@@ -104,8 +104,8 @@ export const createLayout = (props: LayoutProps): Response => {
               "@type": "WebPage",
               "@id": canonicalUrl
             }
-          })
-        }} />
+          })}
+        </script>
         
         <script src="/js/htmx.min.js"></script>
         <script src="/js/site.js"></script>

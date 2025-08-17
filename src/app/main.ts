@@ -7,7 +7,7 @@ import { createConfig } from "../domain/config.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
-import type { Post } from "../types.ts";
+import type { Post } from "../lib/types.ts";
 
 function main() {
   const config = createConfig();

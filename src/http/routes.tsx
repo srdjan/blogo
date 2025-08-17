@@ -109,7 +109,7 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
           type: 'article',
           publishedTime: post.date,
           ...(post.modified && { modifiedTime: post.modified }),
-          tags: post.tags,
+          ...(post.tags && { tags: post.tags }),
           author: "Srdjan Strbanovic"
         });
       },

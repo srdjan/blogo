@@ -1,4 +1,4 @@
-import { Post } from "./types.ts";
+import type { Post } from "./lib/types.ts";
 import { escapeXml } from "./utils.ts";
 
 /**

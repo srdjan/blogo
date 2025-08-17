@@ -1,5 +1,5 @@
 // XML Sitemap generation for SEO
-import { Post } from "./types.ts";
+import type { Post } from "./lib/types.ts";
 
 export function generateSitemap(posts: Post[], baseUrl: string): string {
   const staticPages = [

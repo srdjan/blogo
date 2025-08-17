@@ -1,7 +1,7 @@
 import { marked } from "marked";
 import hljs from "highlight.js";
-import { Result } from "./types.ts";
-import { createError } from "./error.ts";
+import type { AppResult } from "./lib/types.ts";
+import { createError } from "./lib/error.ts";
 import { renderMermaidToSVG } from "./mermaid-renderer.ts";
 
 // Custom renderer for mermaid blocks
@@ -162,7 +162,7 @@ const cleanupAudioHTML = (html: string): string => {
   );
 };
 
-export const markdownToHtml = (markdown: string): Result<string, AppError> => {
+export const markdownToHtml = (markdown: string): AppResult<string> => {
   try {
     // Parse markdown to HTML
     let html = marked.parse(markdown) as string;
@@ -186,5 +186,3 @@ export const markdownToHtml = (markdown: string): Result<string, AppError> => {
   }
 };
 
-// Application-specific error type
-type AppError = import("./error.ts").AppError;

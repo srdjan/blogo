@@ -371,7 +371,6 @@ export const handler = async (req: Request): Promise<Response> => {
   // For direct access, return full page
   const html = await render(
     <main>
-      <h1>Blog Posts</h1>
       <div id="posts-container">
         {posts.map(post => <PostCard key={post.id} post={post} />)}
         <LoadMoreTrigger page={page} hasMore={hasMore} />

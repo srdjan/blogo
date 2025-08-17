@@ -11,6 +11,7 @@ export const createSlug = (value: string): Slug => {
   return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") as Slug;
 };
 
+export const createPostId = (value: string): PostId => value as PostId;
 export const createTagName = (value: string): TagName => value as TagName;
 export const createUrlPath = (value: string): UrlPath => value as UrlPath;
 

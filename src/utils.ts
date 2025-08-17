@@ -36,5 +36,4 @@ export const stripHtml = (html: string): string => {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 };
 
-// Re-export logger from unified location
-export { logger } from "./utils/logger.ts";
+// Logger is now injected via dependency injection pattern - see ports/logger.ts

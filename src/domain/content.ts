@@ -5,6 +5,7 @@ import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Logger } from "../ports/logger.ts";
 import type { Cache } from "../ports/cache.ts";
+import { markdownToHtml } from "../markdown-renderer.tsx";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
@@ -37,7 +38,7 @@ export const createContentService = (deps: ContentDependencies): ContentService 
       if (!metaResult.ok) return metaResult;
       
       const meta = metaResult.value;
-      const htmlResult = await markdownToHtml(markdown);
+      const htmlResult = markdownToHtml(markdown);
       
       if (!htmlResult.ok) return htmlResult;
       
@@ -83,7 +84,7 @@ export const createContentService = (deps: ContentDependencies): ContentService 
         return combinedResult;
       }
 
-      const sortedPosts = combinedResult.value.sort((a, b) =>
+      const sortedPosts = [...combinedResult.value].sort((a: Post, b: Post) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
@@ -221,34 +222,36 @@ async function parseFrontmatter(frontmatter: string, slug: Slug): Promise<AppRes
 
     const dateString = meta.date instanceof Date 
       ? meta.date.toISOString().split('T')[0] 
-      : meta.date as string;
+      : String(meta.date);
 
     const tags = Array.isArray(meta.tags) 
       ? meta.tags.filter((t): t is string => typeof t === "string").map(t => t as TagName)
       : undefined;
 
-    return ok({
-      title: meta.title,
-      date: dateString,
-      slug: meta.slug as Slug || slug,
-      excerpt: typeof meta.excerpt === "string" ? meta.excerpt : undefined,
-      tags,
-      modified: typeof meta.modified === "string" ? meta.modified : undefined,
-    });
+    const result: PostMeta = {
+      title: meta.title as string,
+      date: dateString as string,
+      slug: (meta.slug as Slug) || slug,
+    };
+    
+    if (typeof meta.excerpt === "string") {
+      (result as any).excerpt = meta.excerpt;
+    }
+    
+    if (tags) {
+      (result as any).tags = tags;
+    }
+    
+    if (typeof meta.modified === "string") {
+      (result as any).modified = meta.modified;
+    }
+    
+    return ok(result);
   } catch (error) {
     return err(createError("ParseError", "Failed to parse frontmatter YAML", error));
   }
 }
 
-async function markdownToHtml(markdown: string): Promise<AppResult<string>> {
-  try {
-    const { marked } = await import("marked");
-    const html = marked.parse(markdown) as string;
-    return ok(html);
-  } catch (error) {
-    return err(createError("ParseError", "Failed to parse markdown", error));
-  }
-}
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString();
