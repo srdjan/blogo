@@ -1,89 +1,45 @@
 import type { Post } from "../lib/types.ts";
 
-// Helper to create post excerpt
-function renderPostExcerpt(post: Post) {
-  if (!post.excerpt) return null;
+export const SearchResults = (props: { 
+  readonly posts: readonly Post[]; 
+  readonly query: string;
+}) => {
+  const { posts, query } = props;
 
-  return (
-    <summary>
-      {post.excerpt}
-    </summary>
-  );
-}
-
-// Helper to create post meta information
-function renderPostMeta(post: Post) {
-  const formattedDate = post.formattedDate ||
-    new Date(post.date).toLocaleDateString();
-
-  return (
-    <div>
-      <time dateTime={post.date}>{formattedDate}</time>
-      {post.tags && post.tags.length > 0
-        ? (
-          <ul role="list">
-            {post.tags.map((tag) => (
-              <li>
-                <a href={`/tags/${tag}`}>#{tag}</a>
-              </li>
-            ))}
-          </ul>
-        )
-        : null}
-    </div>
-  );
-}
-
-export function SearchResults(
-  { posts, query }: { posts: Post[]; query: string },
-) {
   return (
     <main>
-      <header>
-        <h1>Search Results</h1>
-        <p>
-          Results for: <strong>"{query}"</strong>
-        </p>
-      </header>
-
-      <section>
-        {posts.length > 0
-          ? (
-            posts.map((post) => (
+      <h1>Search Results</h1>
+      <p>
+        {posts.length === 0
+          ? `No posts found for "${query}".`
+          : `Found ${posts.length} post${posts.length === 1 ? "" : "s"} for "${query}".`}
+      </p>
+      {posts.length > 0 && (
+        <ul>
+          {posts.map((post) => (
+            <li>
               <article>
-                <header>
-                  <h2>
-                    <a
-                      href={`/posts/${post.slug}`}
-                      hx-get={`/posts/${post.slug}`}
-                      hx-target="#content-area"
-                      hx-swap="innerHTML"
-                      hx-push-url="true"
-                    >
-                      {post.title}
-                    </a>
-                  </h2>
-                  {renderPostMeta(post)}
-                </header>
-                {renderPostExcerpt(post)}
+                <h2>
+                  <a
+                    href={`/posts/${post.slug}`}
+                    hx-get={`/posts/${post.slug}`}
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                  >
+                    {post.title}
+                  </a>
+                </h2>
+                {post.formattedDate && <time>{post.formattedDate}</time>}
+                {post.excerpt && <p>{post.excerpt}</p>}
               </article>
-            ))
-          )
-          : (
-            <aside>
-              <p>No posts found for "{query}".</p>
-              <a
-                href="/"
-                hx-get="/"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                hx-push-url="true"
-              >
-                ← Back to all posts
-              </a>
-            </aside>
-          )}
-      </section>
+            </li>
+          ))}
+        </ul>
+      )}
+      <nav>
+        <a href="/">← Back to home</a>
+      </nav>
     </main>
   );
-}
+};

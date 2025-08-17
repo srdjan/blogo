@@ -1,7 +1,11 @@
 import type { RouteHandler } from "./types.ts";
 import type { ContentService } from "../domain/content.ts";
 import { createLayout } from "./layout.tsx";
-import { PostList, PostView, TagIndex, SearchResults, About } from "./components.tsx";
+import { PostList } from "../components/PostList.tsx";
+import { PostView } from "../components/PostView.tsx";
+import { TagIndex } from "../components/TagIndex.tsx";
+import { SearchResults } from "../components/SearchResults.tsx";
+import { About } from "../components/About.tsx";
 import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
 import { match } from "../lib/result.ts";
 

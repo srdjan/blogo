@@ -1,29 +1,32 @@
 import type { TagInfo } from "../lib/types.ts";
 
-export function TagIndex({ tags }: { tags: TagInfo[] }) {
-  const sortedTags = [...tags].sort((a, b) => b.count - a.count);
+export const TagIndex = (props: { readonly tags: readonly TagInfo[] }) => {
+  const { tags } = props;
 
   return (
-    <section>
-      <ul role="list">
-        {sortedTags.map((tag) => {
-          return (
-            <li>
+    <main>
+      <h1>Tags</h1>
+      {tags.length === 0 ? (
+        <p>No tags found.</p>
+      ) : (
+        <div class="tags">
+          {tags.map((tag, index) => (
+            <>
               <a
-                href={`/tags/${tag.name}`}
-                hx-get={`/tags/${tag.name}`}
+                href={`/tags/${encodeURIComponent(tag.name)}`}
+                hx-get={`/tags/${encodeURIComponent(tag.name)}`}
                 hx-target="#content-area"
                 hx-swap="innerHTML"
                 hx-push-url="true"
-                title={`${tag.count} posts`}
+                class="tag"
               >
-                # {tag.name}
-              </a>{" "}
-              <small>{tag.count}</small>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+                {tag.name}({tag.count})
+              </a>
+              {index < tags.length - 1 && " "}
+            </>
+          ))}
+        </div>
+      )}
+    </main>
   );
-}
+};

@@ -1,36 +1,38 @@
-export function About() {
+export const About = () => {
   return (
-    <section>
-      <article>
-        <p>
-          Hi, I'm Srdjan,
-          <a
-            href="https://srdjan.github.io"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>⊣˚∆˚⊢</span>
-          </a>, a recovering startup founder and ex-<strong>ThoughtWorks Technical Principal</strong>{" "} 
-          with a passion for turning big ideas into resilient, impactful products.
-        </p>
+    <main>
+      <h1>About This Blog</h1>
+      <p>
+        This is a minimal blog built with{" "}
+        <a href="https://github.com/srdjan/mono-jsx" target="_blank" rel="noopener noreferrer">
+          mono-jsx
+        </a>{" "}
+        and HTMX for seamless navigation.
+      </p>
+      
+      <h2>Features</h2>
+      <ul>
+        <li>Server-side rendering with mono-jsx</li>
+        <li>HTMX for dynamic content loading</li>
+        <li>Markdown content with frontmatter</li>
+        <li>Tag-based organization</li>
+        <li>Search functionality</li>
+        <li>RSS feed</li>
+        <li>SEO optimized</li>
+      </ul>
 
-        <h3>Welcome to my corner of the internet.</h3>
+      <h2>Technology Stack</h2>
+      <ul>
+        <li>Deno runtime</li>
+        <li>TypeScript</li>
+        <li>mono-jsx for templating</li>
+        <li>HTMX for interactivity</li>
+        <li>Modern CSS with nesting</li>
+      </ul>
 
-        <p>
-        This blog captures my experiences, from navigating leadership challenges to exploring emerging technologies
-        like generative AI, blockchain, and cloud-native architectures. I'll write about my musings and opinions
-        on product, architecture, agile engineering, & other technology topics that interest me. 
-        I hope you find something of value here.
-        </p>
-
-        <hr />
-
-        <p>
-          If you're building something{" "}
-          <strong>audacious</strong>, stuck in a legacy quagmire, or just
-          curious about the human side of tech — stick around.
-        </p>
-      </article>
-    </section>
+      <nav>
+        <a href="/">← Back to home</a>
+      </nav>
+    </main>
   );
-}
+};

@@ -1,161 +1,63 @@
-import type { Post } from "../lib/types.ts";
+import type { Post, TagName } from "../lib/types.ts";
 
-// Define Pagination type locally
-type Pagination = {
-  currentPage: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};
+export const PostList = (props: { 
+  readonly posts: readonly Post[]; 
+  readonly activeTag?: TagName;
+}) => {
+  const { posts, activeTag } = props;
 
-// Helper to create post excerpt
-function renderPostExcerpt(post: Post) {
-  if (!post.excerpt) return null;
-
-  return (
-    <summary>
-      {post.excerpt}
-    </summary>
-  );
-}
-
-// Helper to create post meta information
-function renderPostMeta(post: Post) {
-  const formattedDate = post.formattedDate ||
-    new Date(post.date).toLocaleDateString();
-
-  return (
-    <div>
-      <time dateTime={post.date}>{formattedDate}</time>
-      {post.tags && post.tags.length > 0
-        ? (
-          <ul role="list">
-            {post.tags.map((tag) => (
-              <li>
-                <a href={`/tags/${tag}`}>#{tag}</a>
-              </li>
-            ))}
-          </ul>
-        )
-        : null}
-    </div>
-  );
-}
-
-// Helper to create pagination
-function renderPagination(pagination: Pagination, activeTag?: string) {
-  const { currentPage, totalPages, hasNextPage, hasPrevPage } = pagination;
-
-  // Don't render pagination if there's only one page
-  if (totalPages <= 1) return null;
-
-  const baseUrl = activeTag ? `/tags/${activeTag}` : "/";
-
-  return (
-    <nav aria-label="pagination">
-      {hasPrevPage
-        ? (
-          <a
-            href={`${baseUrl}?page=${currentPage - 1}`}
-            hx-get={`${baseUrl}?page=${currentPage - 1}`}
-            hx-target="#content-area"
-            hx-swap="innerHTML"
-            hx-push-url="true"
-            aria-label="Previous page"
-          >
-            Previous
-          </a>
-        )
-        : <span aria-disabled="true">Previous</span>}
-
-      <span>Page {currentPage} of {totalPages}</span>
-
-      {hasNextPage
-        ? (
-          <a
-            href={`${baseUrl}?page=${currentPage + 1}`}
-            hx-get={`${baseUrl}?page=${currentPage + 1}`}
-            hx-target="#content-area"
-            hx-swap="innerHTML"
-            hx-push-url="true"
-            aria-label="Next page"
-          >
-            Next
-          </a>
-        )
-        : <span aria-disabled="true">Next</span>}
-    </nav>
-  );
-}
-
-export function PostList({
-  posts,
-  activeTag,
-  pagination,
-}: {
-  posts: Post[];
-  activeTag?: string;
-  pagination?: Pagination;
-}) {
   return (
     <main>
-      {activeTag
-        ? (
-          <header>
-            <h1>Posts Tagged "{activeTag}"</h1>
-            <aside role="banner">
-              <p>
-                Showing {posts.length} {posts.length === 1 ? "post" : "posts"}
-                {" "}
-                tagged with <strong>{activeTag}</strong>
-              </p>
-              <a
-                href="/"
-                hx-get="/"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                hx-push-url="true"
-              >
-                Show All Posts
-              </a>
-            </aside>
-          </header>
-        )
-        : null}
-
-      <section>
-        {posts.length > 0
-          ? (
-            posts.map((post) => (
+      {activeTag && (
+        <p>
+          Posts tagged with <strong>{activeTag}</strong> -{" "}
+          <a href="/tags">View all tags</a>
+        </p>
+      )}
+      {posts.length === 0 ? (
+        <p>No posts found.</p>
+      ) : (
+        <ul>
+          {posts.map((post) => (
+            <li>
               <article>
-                <header>
-                  <h2>
-                    <a
-                      href={`/posts/${post.slug}`}
-                      hx-get={`/posts/${post.slug}`}
-                      hx-target="#content-area"
-                      hx-swap="innerHTML"
-                      hx-push-url="true"
-                    >
-                      {post.title}
-                    </a>
-                  </h2>
-                  {renderPostMeta(post)}
-                </header>
-                {renderPostExcerpt(post)}
+                <h2>
+                  <a
+                    href={`/posts/${post.slug}`}
+                    hx-get={`/posts/${post.slug}`}
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                  >
+                    {post.title}
+                  </a>
+                </h2>
+                {post.formattedDate && <time>{post.formattedDate}</time>}
+                {post.excerpt && <p>{post.excerpt}</p>}
+                {post.tags && post.tags.length > 0 && (
+                  <div class="tags">
+                    {post.tags.map((tag, index) => (
+                      <>
+                        <a
+                          href={`/tags/${encodeURIComponent(tag)}`}
+                          hx-get={`/tags/${encodeURIComponent(tag)}`}
+                          hx-target="#content-area"
+                          hx-swap="innerHTML"
+                          hx-push-url="true"
+                          class="tag"
+                        >
+                          {tag}
+                        </a>
+                        {index < (post.tags?.length ?? 0) - 1 && " "}
+                      </>
+                    ))}
+                  </div>
+                )}
               </article>
-            ))
-          )
-          : (
-            <aside>
-              <p>
-                No posts found{activeTag ? ` tagged with "${activeTag}"` : ""}.
-              </p>
-            </aside>
-          )}
-      </section>
-
-      {pagination ? renderPagination(pagination, activeTag) : null}
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
-}
+};
