@@ -1,4 +1,4 @@
-import { Post } from "../types.ts";
+import type { Post } from "../lib/types.ts";
 
 // Helper to create post excerpt
 function renderPostExcerpt(post: Post) {

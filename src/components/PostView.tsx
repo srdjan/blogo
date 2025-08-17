@@ -1,5 +1,5 @@
 // Individual post view component for mono-jsx
-import { Post } from "../types.ts";
+import type { Post } from "../lib/types.ts";
 
 interface PostViewProps {
   post: Post;

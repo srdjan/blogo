@@ -1,4 +1,4 @@
-import { TagInfo } from "../types.ts";
+import type { TagInfo } from "../lib/types.ts";
 
 export function TagIndex({ tags }: { tags: TagInfo[] }) {
   const sortedTags = [...tags].sort((a, b) => b.count - a.count);
