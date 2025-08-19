@@ -4,6 +4,7 @@ import { accessLog, staticFiles } from "../http/middleware.ts";
 import { createRouteHandlers } from "../http/routes.tsx";
 import { createContentService } from "../domain/content.ts";
 import { createConfig } from "../domain/config.ts";
+import { createHealthService } from "../domain/health.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
@@ -11,7 +12,8 @@ import type { Post } from "../lib/types.ts";
 
 function main() {
   const config = createConfig();
-  
+  const startTime = Date.now();
+
   const logger = createLogger({
     enableLogs: config.debug.enableLogs,
     verboseLogs: config.debug.verboseLogs,
@@ -20,6 +22,7 @@ function main() {
 
   const fileSystem = createFileSystem();
   const cache = createInMemoryCache<readonly Post[]>();
+  const healthCache = createInMemoryCache<unknown>();
 
   const contentService = createContentService({
     fileSystem,
@@ -28,8 +31,15 @@ function main() {
     postsDir: config.blog.postsDir,
   });
 
-  const routes = createRouteHandlers(contentService);
-  
+  const healthService = createHealthService({
+    fileSystem,
+    cache: healthCache,
+    postsDir: config.blog.postsDir,
+    startTime,
+  });
+
+  const routes = createRouteHandlers(contentService, healthService);
+
   const router = createRouter()
     .get("/", routes.home)
     .get("/about", routes.about)
@@ -42,7 +52,8 @@ function main() {
     .get("/sitemap.xml", routes.sitemap)
     .get("/robots.txt", routes.robots)
     .get("/images/og-default.png", routes.ogImageDefault)
-    .get(/^\/images\/og\/(.+)\.png$/, routes.ogImagePost);
+    .get(/^\/images\/og\/(.+)\.png$/, routes.ogImagePost)
+    .get("/health", routes.health);
 
   // Graceful shutdown setup
   const abortController = new AbortController();
@@ -64,7 +75,7 @@ function main() {
       return new Response("Internal Server Error", { status: 500 });
     },
   });
-  
+
   const shutdown = () => {
     logger.info("Shutting down server...");
     abortController.abort();

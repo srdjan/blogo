@@ -2,8 +2,8 @@
   "tasks": {
     "start": "deno run --allow-net --allow-read --allow-env --allow-write src/app/main.ts",
     "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch src/app/main.ts",
-    "test": "deno test --allow-none",
-    "test:watch": "deno test --allow-none --watch",
+    "test": "deno test --allow-read --allow-write",
+    "test:watch": "deno test --allow-read --allow-write --watch",
     "coverage": "deno test --allow-none --coverage=coverage && deno coverage coverage",
     "lint": "deno lint",
     "fmt": "deno fmt",

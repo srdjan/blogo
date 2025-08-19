@@ -8,7 +8,10 @@ export type TagName = Brand<string, "TagName">;
 export type UrlPath = Brand<string, "UrlPath">;
 
 export const createSlug = (value: string): Slug => {
-  return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") as Slug;
+  return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(
+    /-+/g,
+    "-",
+  ) as Slug;
 };
 
 export const createPostId = (value: string): PostId => value as PostId;
@@ -48,7 +51,7 @@ export type LayoutProps = {
   readonly title: string;
   readonly description?: string;
   readonly path?: UrlPath;
-  readonly children: JSX.Element; // JSX element
+  readonly children: unknown; // JSX element - using unknown to avoid type conflicts
   readonly image?: string;
   readonly author?: string;
   readonly publishedTime?: string;

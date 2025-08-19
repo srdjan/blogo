@@ -1,5 +1,6 @@
 import type { RouteHandler } from "./types.ts";
 import type { ContentService } from "../domain/content.ts";
+import type { HealthService } from "../domain/health.ts";
 import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
@@ -22,26 +23,32 @@ export type RouteHandlers = {
   readonly robots: RouteHandler;
   readonly ogImageDefault: RouteHandler;
   readonly ogImagePost: RouteHandler;
+  readonly health: RouteHandler;
 };
 
-export const createRouteHandlers = (contentService: ContentService): RouteHandlers => {
+export const createRouteHandlers = (
+  contentService: ContentService,
+  healthService: HealthService,
+): RouteHandlers => {
   const home: RouteHandler = async (ctx) => {
     const postsResult = await contentService.loadPosts();
-    
+
     return match(postsResult, {
-      ok: (posts) => createLayout({
-        title: "Blog - Home",
-        description: "A minimal blog built with mono-jsx",
-        path: createUrlPath(ctx.pathname),
-        children: <PostList posts={posts} />,
-        author: "Srdjan Strbanovic"
-      }),
-      error: () => createLayout({
-        title: "Error - Blog",
-        description: "Failed to load posts",
-        path: createUrlPath(ctx.pathname),
-        children: <div>Failed to load posts</div>,
-      }),
+      ok: (posts) =>
+        createLayout({
+          title: "Blog - Home",
+          description: "A minimal blog built with mono-jsx",
+          path: createUrlPath(ctx.pathname),
+          children: <PostList posts={posts} />,
+          author: "Srdjan Strbanovic",
+        }),
+      error: () =>
+        createLayout({
+          title: "Error - Blog",
+          description: "Failed to load posts",
+          path: createUrlPath(ctx.pathname),
+          children: <div>Failed to load posts</div>,
+        }),
     });
   };
 
@@ -56,65 +63,71 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
 
   const tags: RouteHandler = async (ctx) => {
     const tagsResult = await contentService.getTags();
-    
+
     return match(tagsResult, {
-      ok: (tags) => createLayout({
-        title: "Tags - Blog",
-        description: "Browse posts by tags",
-        path: createUrlPath(ctx.pathname),
-        children: <TagIndex tags={tags} />,
-        author: "Srdjan Strbanovic"
-      }),
-      error: () => createLayout({
-        title: "Error - Blog",
-        description: "Failed to load tags",
-        path: createUrlPath(ctx.pathname),
-        children: <div>Failed to load tags</div>,
-      }),
+      ok: (tags) =>
+        createLayout({
+          title: "Tags - Blog",
+          description: "Browse posts by tags",
+          path: createUrlPath(ctx.pathname),
+          children: <TagIndex tags={tags} />,
+          author: "Srdjan Strbanovic",
+        }),
+      error: () =>
+        createLayout({
+          title: "Error - Blog",
+          description: "Failed to load tags",
+          path: createUrlPath(ctx.pathname),
+          children: <div>Failed to load tags</div>,
+        }),
     });
   };
 
   const tagPosts: RouteHandler = async (ctx) => {
-    const tagName = createTagName(decodeURIComponent(ctx.pathname.replace("/tags/", "")));
+    const tagName = createTagName(
+      decodeURIComponent(ctx.pathname.replace("/tags/", "")),
+    );
     const postsResult = await contentService.getPostsByTag(tagName);
-    
+
     return match(postsResult, {
-      ok: (posts) => createLayout({
-        title: `Posts tagged "${tagName}" - Blog`,
-        description: `All posts tagged with ${tagName}`,
-        path: createUrlPath(ctx.pathname),
-        children: <PostList posts={posts} activeTag={tagName} />,
-        author: "Srdjan Strbanovic"
-      }),
-      error: () => createLayout({
-        title: "Error - Blog",
-        description: "Failed to load posts for tag",
-        path: createUrlPath(ctx.pathname),
-        children: <div>Failed to load posts for tag</div>,
-      }),
+      ok: (posts) =>
+        createLayout({
+          title: `Posts tagged "${tagName}" - Blog`,
+          description: `All posts tagged with ${tagName}`,
+          path: createUrlPath(ctx.pathname),
+          children: <PostList posts={posts} activeTag={tagName} />,
+          author: "Srdjan Strbanovic",
+        }),
+      error: () =>
+        createLayout({
+          title: "Error - Blog",
+          description: "Failed to load posts for tag",
+          path: createUrlPath(ctx.pathname),
+          children: <div>Failed to load posts for tag</div>,
+        }),
     });
   };
 
   const post: RouteHandler = async (ctx) => {
     const slug = createSlug(ctx.pathname.replace("/posts/", ""));
     const postResult = await contentService.getPostBySlug(slug);
-    
+
     return match(postResult, {
       ok: (post) => {
         if (!post) {
           return new Response("Post not found", { status: 404 });
         }
-        
+
         return createLayout({
           title: `${post.title} - Blog`,
           description: post.excerpt || `Read ${post.title}`,
           path: createUrlPath(ctx.pathname),
           children: <PostView post={post} />,
-          type: 'article',
+          type: "article",
           publishedTime: post.date,
           ...(post.modified && { modifiedTime: post.modified }),
           ...(post.tags && { tags: post.tags }),
-          author: "Srdjan Strbanovic"
+          author: "Srdjan Strbanovic",
         });
       },
       error: () => new Response("Failed to load post", { status: 500 }),
@@ -136,25 +149,27 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
             <a href="/">← Back to home</a>
           </main>
         ),
-        author: "Srdjan Strbanovic"
+        author: "Srdjan Strbanovic",
       });
     }
 
     const postsResult = await contentService.searchPosts(query);
-    
+
     return match(postsResult, {
-      ok: (posts) => createLayout({
-        title: `Search: "${query}" - Blog`,
-        description: `Search results for ${query}`,
-        path: createUrlPath(ctx.pathname),
-        children: <SearchResults posts={posts} query={query} />,
-      }),
-      error: () => createLayout({
-        title: "Error - Blog",
-        description: "Failed to search posts",
-        path: createUrlPath(ctx.pathname),
-        children: <div>Failed to search posts</div>,
-      }),
+      ok: (posts) =>
+        createLayout({
+          title: `Search: "${query}" - Blog`,
+          description: `Search results for ${query}`,
+          path: createUrlPath(ctx.pathname),
+          children: <SearchResults posts={posts} query={query} />,
+        }),
+      error: () =>
+        createLayout({
+          title: "Error - Blog",
+          description: "Failed to search posts",
+          path: createUrlPath(ctx.pathname),
+          children: <div>Failed to search posts</div>,
+        }),
     });
   };
 
@@ -166,7 +181,7 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
     }
 
     const postsResult = await contentService.searchPosts(query);
-    
+
     return match(postsResult, {
       ok: (posts) => {
         if (posts.length === 0) {
@@ -188,7 +203,8 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
           </li>`
         ).join("");
 
-        const html = `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
+        const html =
+          `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
 
         return new Response(html, {
           headers: { "Content-Type": "text/html" },
@@ -200,12 +216,17 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
 
   const rss: RouteHandler = async () => {
     const postsResult = await contentService.loadPosts();
-    
+
     return match(postsResult, {
       ok: (posts) => {
         const baseUrl = "https://blogo.timok.deno.net";
-        const rssContent = generateRSS(posts, "Blog", baseUrl, "A minimal blog built with mono-jsx");
-        
+        const rssContent = generateRSS(
+          posts,
+          "Blog",
+          baseUrl,
+          "A minimal blog built with mono-jsx",
+        );
+
         return new Response(rssContent, {
           headers: {
             "Content-Type": "application/rss+xml; charset=utf-8",
@@ -219,12 +240,12 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
 
   const sitemap: RouteHandler = async () => {
     const postsResult = await contentService.loadPosts();
-    
+
     return match(postsResult, {
       ok: (posts) => {
         const baseUrl = "https://blogo.timok.deno.net";
         const sitemapContent = generateSitemap(posts, baseUrl);
-        
+
         return new Response(sitemapContent, {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
@@ -239,7 +260,7 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
   const robots: RouteHandler = () => {
     const baseUrl = "https://blogo.timok.deno.net";
     const robotsContent = generateRobotsTxt(baseUrl);
-    
+
     return new Response(robotsContent, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
@@ -250,7 +271,7 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
 
   const ogImageDefault: RouteHandler = () => {
     const svgContent = generateDefaultOGImage();
-    
+
     return new Response(svgContent, {
       headers: {
         "Content-Type": "image/svg+xml",
@@ -260,9 +281,11 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
   };
 
   const ogImagePost: RouteHandler = async (ctx) => {
-    const slug = createSlug(ctx.pathname.replace("/images/og/", "").replace(".png", ""));
+    const slug = createSlug(
+      ctx.pathname.replace("/images/og/", "").replace(".png", ""),
+    );
     const postResult = await contentService.getPostBySlug(slug);
-    
+
     return match(postResult, {
       ok: (post) => {
         if (!post) {
@@ -276,7 +299,7 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
         }
 
         const svgContent = generateOGImage(post.title, post.excerpt, post.tags);
-        
+
         return new Response(svgContent, {
           headers: {
             "Content-Type": "image/svg+xml",
@@ -296,6 +319,43 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
     });
   };
 
+  const health: RouteHandler = async () => {
+    const healthResult = await healthService.checkHealth();
+
+    return match(healthResult, {
+      ok: (health) => {
+        const status = health.status === "healthy"
+          ? 200
+          : health.status === "degraded"
+          ? 200
+          : 503;
+
+        return new Response(JSON.stringify(health, null, 2), {
+          status,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-cache",
+          },
+        });
+      },
+      error: (error) => {
+        const errorResponse = {
+          status: "unhealthy",
+          timestamp: new Date().toISOString(),
+          error: error.message,
+        };
+
+        return new Response(JSON.stringify(errorResponse, null, 2), {
+          status: 503,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-cache",
+          },
+        });
+      },
+    });
+  };
+
   return {
     home,
     about,
@@ -309,13 +369,19 @@ export const createRouteHandlers = (contentService: ContentService): RouteHandle
     robots,
     ogImageDefault,
     ogImagePost,
+    health,
   };
 };
 
 // Helper functions (temporary - should be moved to dedicated modules)
-function generateRSS(posts: readonly import("../lib/types.ts").Post[], title: string, baseUrl: string, description: string): string {
+function generateRSS(
+  posts: readonly import("../lib/types.ts").Post[],
+  title: string,
+  baseUrl: string,
+  description: string,
+): string {
   // Simplified RSS generation - in real implementation, move to separate module
-  const items = posts.slice(0, 20).map(post => `
+  const items = posts.slice(0, 20).map((post) => `
     <item>
       <title>${escapeXml(post.title)}</title>
       <link>${baseUrl}/posts/${post.slug}</link>
@@ -338,8 +404,11 @@ function generateRSS(posts: readonly import("../lib/types.ts").Post[], title: st
 </rss>`;
 }
 
-function generateSitemap(posts: readonly import("../lib/types.ts").Post[], baseUrl: string): string {
-  const postUrls = posts.map(post => `
+function generateSitemap(
+  posts: readonly import("../lib/types.ts").Post[],
+  baseUrl: string,
+): string {
+  const postUrls = posts.map((post) => `
   <url>
     <loc>${baseUrl}/posts/${post.slug}</loc>
     <lastmod>${post.modified || post.date}</lastmod>
@@ -351,19 +420,19 @@ function generateSitemap(posts: readonly import("../lib/types.ts").Post[], baseU
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>${baseUrl}/tags</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>${baseUrl}/about</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -387,15 +456,27 @@ function generateDefaultOGImage(): string {
   </svg>`;
 }
 
-function generateOGImage(title: string, excerpt?: string, _tags?: readonly string[]): string {
+function generateOGImage(
+  title: string,
+  excerpt?: string,
+  _tags?: readonly string[],
+): string {
   return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
     <rect width="100%" height="100%" fill="#1a1a1a"/>
     <text x="600" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="#ffffff">
       ${escapeXml(title.length > 50 ? title.substring(0, 50) + "..." : title)}
     </text>
-    ${excerpt ? `<text x="600" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#cccccc">
-      ${escapeXml(excerpt.length > 80 ? excerpt.substring(0, 80) + "..." : excerpt)}
-    </text>` : ""}
+    ${
+    excerpt
+      ? `<text x="600" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#cccccc">
+      ${
+        escapeXml(
+          excerpt.length > 80 ? excerpt.substring(0, 80) + "..." : excerpt,
+        )
+      }
+    </text>`
+      : ""
+  }
   </svg>`;
 }
 

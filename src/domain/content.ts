@@ -1,16 +1,30 @@
-import type { Post, PostMeta, TagInfo, Slug, TagName, AppResult } from "../lib/types.ts";
+import type {
+  AppResult,
+  Post,
+  PostMeta,
+  Slug,
+  TagInfo,
+  TagName,
+} from "../lib/types.ts";
 import type { Result } from "../lib/result.ts";
-import { ok, err, combine } from "../lib/result.ts";
+import { combine, err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Logger } from "../ports/logger.ts";
 import type { Cache } from "../ports/cache.ts";
 import { markdownToHtml } from "../markdown-renderer.tsx";
+import {
+  validateFrontmatter,
+  validateImageReferences,
+  validateMarkdownContent,
+} from "./validation.ts";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
   readonly getPostBySlug: (slug: Slug) => Promise<AppResult<Post | null>>;
-  readonly getPostsByTag: (tagName: TagName) => Promise<AppResult<readonly Post[]>>;
+  readonly getPostsByTag: (
+    tagName: TagName,
+  ) => Promise<AppResult<readonly Post[]>>;
   readonly getTags: () => Promise<AppResult<readonly TagInfo[]>>;
   readonly searchPosts: (query: string) => Promise<AppResult<readonly Post[]>>;
 }
@@ -22,28 +36,54 @@ export type ContentDependencies = {
   readonly postsDir: string;
 };
 
-export const createContentService = (deps: ContentDependencies): ContentService => {
+export const createContentService = (
+  deps: ContentDependencies,
+): ContentService => {
   const { fileSystem, logger, cache, postsDir } = deps;
 
-  const parseMarkdown = async (filePath: string, slug: Slug): Promise<AppResult<Post>> => {
+  const parseMarkdown = async (
+    filePath: string,
+    slug: Slug,
+  ): Promise<AppResult<Post>> => {
     try {
       const content = await fileSystem.readFile(filePath);
       const result = extractFrontmatter(content);
-      
+
       if (!result.ok) return result;
-      
+
       const { frontmatter, markdown } = result.value;
+
+      // Validate markdown content
+      const contentValidation = validateMarkdownContent(markdown);
+      if (!contentValidation.ok) {
+        logger.warn(
+          `Content validation issues for ${filePath}`,
+          contentValidation.error,
+        );
+        // Continue processing despite content warnings
+      }
+
+      // Validate image references
+      const imageValidation = validateImageReferences(markdown);
+      if (!imageValidation.ok) {
+        logger.warn(
+          `Image validation issues for ${filePath}`,
+          imageValidation.error,
+        );
+        // Continue processing despite image warnings
+      }
+
       const metaResult = await parseFrontmatter(frontmatter, slug);
-      
+
       if (!metaResult.ok) return metaResult;
-      
+
       const meta = metaResult.value;
       const htmlResult = markdownToHtml(markdown);
-      
+
       if (!htmlResult.ok) return htmlResult;
-      
+
       const formattedDate = formatDate(meta.date);
-      
+
       return ok({
         ...meta,
         content: htmlResult.value,
@@ -54,7 +94,7 @@ export const createContentService = (deps: ContentDependencies): ContentService 
         "IOError",
         `Failed to parse markdown file: ${filePath}`,
         error,
-        { path: filePath }
+        { path: filePath },
       ));
     }
   };
@@ -62,8 +102,8 @@ export const createContentService = (deps: ContentDependencies): ContentService 
   const loadPostsFromDisk = async (): Promise<AppResult<readonly Post[]>> => {
     try {
       const entries = await fileSystem.readDir(postsDir);
-      const markdownFiles = entries.filter(name => name.endsWith(".md"));
-      
+      const markdownFiles = entries.filter((name) => name.endsWith(".md"));
+
       if (markdownFiles.length === 0) {
         logger.warn(`No markdown files found in ${postsDir}`);
         return ok([]);
@@ -74,11 +114,11 @@ export const createContentService = (deps: ContentDependencies): ContentService 
           const slug = filename.replace(/\.md$/, "") as Slug;
           const filePath = `${postsDir}/${filename}`;
           return await parseMarkdown(filePath, slug);
-        })
+        }),
       );
 
       const combinedResult = combine(postResults);
-      
+
       if (!combinedResult.ok) {
         logger.error("Failed to load some posts", combinedResult.error);
         return combinedResult;
@@ -95,14 +135,14 @@ export const createContentService = (deps: ContentDependencies): ContentService 
         "IOError",
         `Failed to load posts from ${postsDir}`,
         error,
-        { path: postsDir }
+        { path: postsDir },
       ));
     }
   };
 
   const loadPosts = async (): Promise<AppResult<readonly Post[]>> => {
     const cached = cache.get("posts");
-    
+
     if (cached.ok && cached.value) {
       logger.debug("Using cached posts");
       return ok(cached.value);
@@ -110,39 +150,41 @@ export const createContentService = (deps: ContentDependencies): ContentService 
 
     logger.info("Loading posts from disk");
     const result = await loadPostsFromDisk();
-    
+
     if (result.ok) {
       cache.set("posts", result.value, 5 * 60 * 1000); // 5 minutes TTL
     }
-    
+
     return result;
   };
 
   const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
-    
-    const post = postsResult.value.find(p => p.slug === slug) ?? null;
+
+    const post = postsResult.value.find((p) => p.slug === slug) ?? null;
     return ok(post);
   };
 
-  const getPostsByTag = async (tagName: TagName): Promise<AppResult<readonly Post[]>> => {
+  const getPostsByTag = async (
+    tagName: TagName,
+  ): Promise<AppResult<readonly Post[]>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
-    
-    const filteredPosts = postsResult.value.filter(post =>
+
+    const filteredPosts = postsResult.value.filter((post) =>
       post.tags?.includes(tagName) ?? false
     );
-    
+
     return ok(filteredPosts);
   };
 
   const getTags = async (): Promise<AppResult<readonly TagInfo[]>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
-    
+
     const tagMap = new Map<TagName, TagInfo>();
-    
+
     for (const post of postsResult.value) {
       if (post.tags) {
         for (const tagName of post.tags) {
@@ -163,24 +205,27 @@ export const createContentService = (deps: ContentDependencies): ContentService 
         }
       }
     }
-    
+
     const tags = Array.from(tagMap.values()).sort((a, b) => b.count - a.count);
     return ok(tags);
   };
 
-  const searchPosts = async (query: string): Promise<AppResult<readonly Post[]>> => {
+  const searchPosts = async (
+    query: string,
+  ): Promise<AppResult<readonly Post[]>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
-    
+
     const lowerQuery = query.toLowerCase();
-    
-    const matchingPosts = postsResult.value.filter(post =>
+
+    const matchingPosts = postsResult.value.filter((post) =>
       post.title.toLowerCase().includes(lowerQuery) ||
       post.content.toLowerCase().includes(lowerQuery) ||
       (post.excerpt && post.excerpt.toLowerCase().includes(lowerQuery)) ||
-      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
+      (post.tags &&
+        post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)))
     );
-    
+
     return ok(matchingPosts);
   };
 
@@ -194,7 +239,12 @@ export const createContentService = (deps: ContentDependencies): ContentService 
 };
 
 // Helper functions
-function extractFrontmatter(text: string): Result<{ frontmatter: string; markdown: string }, import("../lib/types.ts").AppError> {
+function extractFrontmatter(
+  text: string,
+): Result<
+  { frontmatter: string; markdown: string },
+  import("../lib/types.ts").AppError
+> {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
 
   if (!match) {
@@ -207,42 +257,42 @@ function extractFrontmatter(text: string): Result<{ frontmatter: string; markdow
   });
 }
 
-async function parseFrontmatter(frontmatter: string, slug: Slug): Promise<AppResult<PostMeta>> {
+async function parseFrontmatter(
+  frontmatter: string,
+  slug: Slug,
+): Promise<AppResult<PostMeta>> {
   try {
     const { parse } = await import("@std/yaml");
     const meta = parse(frontmatter) as Record<string, unknown>;
 
-    if (!meta.title || typeof meta.title !== "string") {
-      return err(createError("ValidationError", "Post title is required in frontmatter"));
+    // Use comprehensive frontmatter validation
+    const validationResult = validateFrontmatter(meta);
+    if (!validationResult.ok) {
+      return validationResult;
     }
 
-    if (!meta.date || (typeof meta.date !== "string" && !(meta.date instanceof Date))) {
-      return err(createError("ValidationError", "Post date is required in frontmatter"));
-    }
+    const validatedMeta = validationResult.value;
 
-    const dateString = meta.date instanceof Date 
-      ? meta.date.toISOString().split('T')[0] 
-      : String(meta.date);
-
-    const tags = Array.isArray(meta.tags) 
-      ? meta.tags.filter((t): t is string => typeof t === "string").map(t => t as TagName)
-      : undefined;
+    // Convert validated data to PostMeta format
+    const dateString = validatedMeta.date;
+    const tags = validatedMeta.tags?.map((t) => t as TagName);
 
     const result: PostMeta = {
-      title: meta.title as string,
-      date: dateString as string,
-      slug: (meta.slug as Slug) || slug,
-      ...(typeof meta.excerpt === "string" && { excerpt: meta.excerpt }),
+      title: validatedMeta.title,
+      date: dateString,
+      slug: (validatedMeta.slug as Slug) || slug,
+      ...(validatedMeta.excerpt && { excerpt: validatedMeta.excerpt }),
       ...(tags && { tags }),
-      ...(typeof meta.modified === "string" && { modified: meta.modified }),
+      ...(validatedMeta.modified && { modified: validatedMeta.modified }),
     };
-    
+
     return ok(result);
   } catch (error) {
-    return err(createError("ParseError", "Failed to parse frontmatter YAML", error));
+    return err(
+      createError("ParseError", "Failed to parse frontmatter YAML", error),
+    );
   }
 }
-
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString();
