@@ -1,6 +1,6 @@
-/* Blogo - Open Props UI Implementation
-   Maintaining exact visual appearance while using Open Props design system
-   Following the monospace web philosophy: https://owickstrom.github.io/the-monospace-web/ */
+/* Blogo - Modern Fluid Typography Implementation
+   Replacing inconsistent font sizing with proportional scaling system
+   Following modern CSS best practices with cascade layers and fluid design */
 
 /* Import Open Props */
 @import "https://unpkg.com/open-props@1.7.6/open-props.min.css";
@@ -70,36 +70,61 @@
   }
 }
 
-/* Custom properties extending Open Props for Blogo's specific design */
-:root {
-  /* Monospace font stack following the monospace web approach */
-  --font-mono:
-    ui-monospace, "SF Mono", Monaco, "Inconsolata", "Roboto Mono",
-    "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+/* Tokens Layer - Design system foundation with fluid typography */
+@layer tokens {
+  :root {
+    /* Monospace font stack following the monospace web approach */
+    --font-mono:
+      ui-monospace, "SF Mono", Monaco, "Inconsolata", "Roboto Mono",
+      "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-  /* Ultra high contrast color palette - overriding Open Props */
-  --color-text: #000000;
-  --color-text-muted: #333333;
-  --color-text-subtle: #555555;
-  --color-bg: #ffffff;
-  --color-bg-subtle: #f0f0f0;
-  --color-border: #999999;
-  --color-border-strong: #666666;
-  --color-primary: #000000;
-  --color-primary-hover: #000000;
-  --color-accent-amber: #b8860b;
-  --color-accent-coral: #cd5c5c;
-  --color-syntax-keyword: #c41e3a;
-  --color-syntax-string: #1e3a8a;
-  --color-syntax-number: #1565c0;
-  --color-syntax-function: #5e35b1;
-  --color-syntax-comment: #546e7a;
-  --color-syntax-variable: #e65100;
-  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.12);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.16);
+    /* Fluid Typography Scale - Mobile First with Proportional Scaling */
+    /* Base font size scales smoothly from 0.9rem (mobile) to 0.7rem (desktop) */
+    --font-size-base: clamp(0.7rem, 0.9rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 0.9rem);
 
-  /* View Transitions */
-  view-transition-name: root;
+    /* Typography scale using modular scale with fluid scaling */
+    --font-size-xs: clamp(0.65rem, 0.8rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.8rem);
+    --font-size-sm: clamp(0.75rem, 0.95rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 0.95rem);
+    --font-size-md: var(--font-size-base);
+    --font-size-lg: clamp(1rem, 1.2rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
+    --font-size-xl: clamp(1.25rem, 1.5rem + -0.25 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
+    --font-size-2xl: clamp(1.5rem, 1.875rem + -0.375 * (100vw - 20rem) / (80rem - 20rem), 1.875rem);
+    --font-size-3xl: clamp(1.875rem, 2.25rem + -0.375 * (100vw - 20rem) / (80rem - 20rem), 2.25rem);
+
+    /* Line heights for optimal readability */
+    --line-height-tight: 1.25;
+    --line-height-base: 1.6;
+    --line-height-relaxed: 1.75;
+
+    /* Letter spacing for monospace optimization */
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-base: 0.01em;
+    --letter-spacing-wide: 0.025em;
+
+    /* Ultra high contrast color palette - overriding Open Props */
+    --color-text: #000000;
+    --color-text-muted: #333333;
+    --color-text-subtle: #555555;
+    --color-bg: #ffffff;
+    --color-bg-subtle: #f0f0f0;
+    --color-border: #999999;
+    --color-border-strong: #666666;
+    --color-primary: #000000;
+    --color-primary-hover: #000000;
+    --color-accent-amber: #b8860b;
+    --color-accent-coral: #cd5c5c;
+    --color-syntax-keyword: #c41e3a;
+    --color-syntax-string: #1e3a8a;
+    --color-syntax-number: #1565c0;
+    --color-syntax-function: #5e35b1;
+    --color-syntax-comment: #546e7a;
+    --color-syntax-variable: #e65100;
+    --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.16);
+
+    /* View Transitions */
+    view-transition-name: root;
+  }
 }
 
 /* Basic reset with Open Props normalization */
@@ -112,58 +137,68 @@
   list-style-type: none;
 }
 
-/* Body and layout using Open Props sizing and spacing */
+/* Body and layout with fluid typography */
 body {
   font-family: var(--font-mono);
-  font-size: var(--font-size-0); /* 0.85rem equivalent */
-  line-height: var(--font-lineheight-4); /* 1.7 equivalent */
-  letter-spacing: 0.01em;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-base);
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-text-size-adjust: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: var(--size-3); /* 0.75rem */
+  padding: var(--size-3);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   container-type: inline-size;
 }
 
-/* Responsive breakpoints using Open Props media queries */
+/* Main content area constraint - responsive width management */
+main {
+  width: 100%; /* Full width on mobile */
+  margin: 0 auto;
+}
+
+/* Progressive width reduction for larger screens */
 @media (min-width: 48rem) {
-  body {
-    max-width: 42rem;
-    padding: var(--size-6); /* 1.5rem */
+  main {
+    width: 90%; /* Slightly narrower on tablet */
   }
 }
 
 @media (min-width: 64rem) {
-  body {
-    max-width: 48rem;
-    padding: var(--size-8); /* 2rem */
-    font-size: 0.8rem; /* Slightly smaller for desktop */
+  main {
+    width: 80%; /* More constrained on small desktop */
   }
 }
 
 @media (min-width: 75rem) {
-  body {
-    max-width: 52rem;
-    padding: var(--size-10); /* 2.5rem */
-    font-size: 0.75rem; /* Moderately smaller for large desktop */
+  main {
+    width: 70%; /* Target 70% on large desktop */
   }
 }
 
-/* Typography using Open Props font sizes */
+/* Responsive container with fluid scaling */
+@container (min-width: 30rem) {
+  body {
+    max-width: clamp(30rem, 70vw, 52rem);
+    padding: clamp(1rem, 4vw, 2.5rem);
+  }
+}
+
+/* Typography hierarchy with fluid scaling */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: var(--font-weight-7); /* bold */
-  line-height: var(--font-lineheight-2); /* 1.3 */
-  margin-block: var(--size-6) var(--size-3); /* 1.5rem 0.75rem */
+  font-weight: var(--font-weight-7);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-block: var(--size-6) var(--size-3);
 
   &:first-child {
     margin-block-start: 0;
@@ -171,53 +206,58 @@ h6 {
 }
 
 h1 {
-  font-size: var(--font-size-4); /* 1.5rem */
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-7);
-
-  @container (min-width: 48rem) {
-    font-size: var(--font-size-5); /* 1.75rem */
-  }
 }
 
 h2 {
-  font-size: var(--font-size-3); /* 1.25rem */
+  font-size: var(--font-size-2xl);
   border-block-end: 1px solid var(--color-border);
-  padding-block-end: var(--size-2); /* 0.5rem */
-  margin-block: var(--size-10) var(--size-4); /* 2.5rem 1rem */
+  padding-block-end: var(--size-2);
+  margin-block: var(--size-10) var(--size-4);
   color: var(--color-text);
-
-  @container (min-width: 48rem) {
-    font-size: var(--font-size-4); /* 1.375rem */
-  }
 }
 
 h3 {
-  font-size: var(--font-size-2); /* 1rem */
-  margin-block: var(--size-8) var(--size-3); /* 2rem 0.875rem */
-
-  @container (min-width: 48rem) {
-    font-size: var(--font-size-3); /* 1.125rem */
-  }
+  font-size: var(--font-size-xl);
+  margin-block: var(--size-8) var(--size-3);
 }
 
-/* Paragraph styling for monospace readability */
+h4 {
+  font-size: var(--font-size-lg);
+  margin-block: var(--size-6) var(--size-2);
+}
+
+h5 {
+  font-size: var(--font-size-md);
+  margin-block: var(--size-4) var(--size-2);
+}
+
+h6 {
+  font-size: var(--font-size-sm);
+  margin-block: var(--size-3) var(--size-1);
+}
+
+/* Paragraph styling with fluid typography */
 p {
-  margin-block-end: var(--size-5); /* 1.2rem */
-  line-height: var(--font-lineheight-4); /* 1.7 */
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-base);
+  margin-block-end: var(--size-5);
 
   &:last-child {
     margin-block-end: 0;
   }
 }
 
-/* Table styling using Open Props */
+/* Table styling with fluid typography */
 table {
   width: 100%;
-  margin-block: var(--size-6); /* 1.5rem */
+  margin-block: var(--size-6);
   border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: var(--font-size-0); /* 0.8rem */
-  line-height: var(--font-lineheight-3); /* 1.5 */
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
   display: table;
   table-layout: fixed;
   word-wrap: break-word;
@@ -228,23 +268,23 @@ thead {
   color: var(--color-bg);
 
   & th {
-    font-weight: var(--font-weight-7); /* bold */
+    font-weight: var(--font-weight-7);
     text-align: left;
   }
 }
 
 th,
 td {
-  padding: var(--size-3) var(--size-4); /* 0.75rem 1rem */
+  padding: var(--size-3) var(--size-4);
   border: 2px solid var(--color-border);
   vertical-align: top;
 
   &:first-child {
-    padding-left: var(--size-4); /* 1rem */
+    padding-left: var(--size-4);
   }
 
   &:last-child {
-    padding-right: var(--size-4); /* 1rem */
+    padding-right: var(--size-4);
   }
 }
 
@@ -265,9 +305,9 @@ tbody {
 /* Responsive table wrapper */
 .table-wrapper {
   overflow-x: auto;
-  margin-block: var(--size-6); /* 1.5rem */
+  margin-block: var(--size-6);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-2); /* 6px */
+  border-radius: var(--radius-2);
 
   & table {
     margin: 0;
@@ -284,8 +324,8 @@ a {
   color: #ec407a;
   display: inline-flex;
   align-items: center;
-  font-weight: var(--font-weight-6); /* 600 */
-  border-radius: var(--radius-1); /* 2px */
+  font-weight: var(--font-weight-6);
+  border-radius: var(--radius-1);
   cursor: pointer;
 
   &::after {
@@ -316,11 +356,11 @@ a {
 /* Lists using Open Props spacing */
 ul,
 ol {
-  padding-inline-start: var(--size-6); /* 1.5rem */
-  margin-block-end: var(--size-3); /* 0.875rem */
+  padding-inline-start: var(--size-6);
+  margin-block-end: var(--size-3);
 
   & li {
-    margin-block-end: var(--size-1); /* 0.25rem */
+    margin-block-end: var(--size-1);
   }
 }
 
@@ -331,22 +371,22 @@ ol {
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-2); /* 0.375rem */
+    gap: var(--size-2);
     justify-content: flex-start;
-    margin-block: var(--size-2) 0; /* 0.5rem 0 */
+    margin-block: var(--size-2) 0;
 
     & li {
       margin: 0;
       display: inline-flex;
       align-items: center;
       width: fit-content;
-      padding: var(--size-1) var(--size-2); /* 0.1rem 0.35rem */
+      padding: var(--size-1) var(--size-2);
       background: var(--color-bg-subtle);
-      border-radius: var(--radius-1); /* 3px */
+      border-radius: var(--radius-1);
       border: 1px solid var(--color-border);
       color: var(--color-text-muted);
-      font-size: var(--font-size-00); /* 0.7rem */
-      line-height: var(--font-lineheight-0); /* 1 */
+      font-size: var(--font-size-xs);
+      line-height: var(--line-height-base);
       transition: all var(--animation-speed-fast) ease;
       white-space: nowrap;
       block-size: auto;
@@ -370,10 +410,10 @@ ol {
   ul[role="list"] {
     list-style: none;
     padding: 0;
-    margin-block: var(--size-8); /* 2rem */
+    margin-block: var(--size-8);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
-    gap: var(--size-3); /* 0.75rem */
+    gap: var(--size-3);
     justify-content: start;
 
     & li {
@@ -382,9 +422,9 @@ ol {
       justify-content: space-between;
       width: fit-content;
       min-width: 150px;
-      padding: var(--size-1) var(--size-2); /* 0.25rem 0.5rem */
+      padding: var(--size-1) var(--size-2);
       background: var(--color-bg-subtle);
-      border-radius: var(--radius-2); /* 4px */
+      border-radius: var(--radius-2);
       border: 1px solid var(--color-border);
       transition: all var(--animation-speed-fast) ease;
       white-space: nowrap;
@@ -398,7 +438,7 @@ ol {
 
       & small {
         color: var(--color-text-muted);
-        font-weight: var(--font-weight-5); /* 500 */
+        font-weight: var(--font-weight-5);
         opacity: 0.8;
         transition: opacity var(--animation-speed-fast) ease;
       }
@@ -406,59 +446,61 @@ ol {
 
     @container (min-width: 48rem) {
       grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
-      gap: var(--size-4); /* 1rem */
+      gap: var(--size-4);
 
       & li {
-        padding: var(--size-2) var(--size-3); /* 0.4rem 0.75rem */
+        padding: var(--size-2) var(--size-3);
         min-width: 180px;
       }
     }
   }
 }
 
-/* Code highlighting using Open Props */
+/* Code highlighting with fluid typography */
 code {
   font-family: var(--font-mono);
-  font-size: var(--font-size-1); /* 0.9rem */
+  font-size: var(--font-size-sm);
   background: var(--color-bg-subtle);
   color: var(--color-text);
-  padding: var(--size-1) var(--size-2); /* 0.3rem 0.6rem */
-  border-radius: var(--radius-2); /* 4px */
+  padding: var(--size-1) var(--size-2);
+  border-radius: var(--radius-2);
   word-wrap: break-word;
   border: 2px solid var(--color-border);
-  font-weight: var(--font-weight-7); /* 700 */
+  font-weight: var(--font-weight-7);
+  letter-spacing: var(--letter-spacing-base);
 }
 
 pre {
   background: var(--color-bg-subtle);
-  padding: var(--size-6); /* 1.5rem */
-  border-radius: var(--radius-3); /* 8px */
+  padding: var(--size-6);
+  border-radius: var(--radius-3);
   overflow-x: auto;
-  margin-block: var(--size-6); /* 1.5rem */
-  font-size: var(--font-size-0); /* 0.75rem */
+  margin-block: var(--size-6);
+  font-size: var(--font-size-sm);
   border: 1px solid var(--color-border);
   position: relative;
-  line-height: var(--font-lineheight-3); /* 1.5 */
+  line-height: var(--line-height-base);
+  letter-spacing: var(--letter-spacing-base);
 
   &[class*="language-"]::before {
     content: attr(class);
     position: absolute;
-    inset-block-start: var(--size-3); /* 0.75rem */
-    inset-inline-end: var(--size-3); /* 0.75rem */
+    inset-block-start: var(--size-3);
+    inset-inline-end: var(--size-3);
     background: linear-gradient(
       135deg,
       var(--color-syntax-keyword),
       var(--color-syntax-function)
     );
     color: white;
-    padding: var(--size-1) var(--size-2); /* 0.2rem 0.6rem */
-    border-radius: var(--radius-2); /* 4px */
-    font-size: var(--font-size-00); /* 0.65rem */
-    font-weight: var(--font-weight-6); /* 600 */
+    padding: var(--size-1) var(--size-2);
+    border-radius: var(--radius-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-6);
     text-transform: uppercase;
     opacity: 0.9;
-    letter-spacing: 0.5px;
-    box-shadow: var(--shadow-2); /* 0 2px 4px rgba(0, 0, 0, 0.2) */
+    letter-spacing: var(--letter-spacing-wide);
+    box-shadow: var(--shadow-2);
   }
 
   & code {
@@ -466,16 +508,7 @@ pre {
     padding: 0;
     font-size: inherit;
     border: none;
-  }
-
-  @container (min-width: 48rem) {
-    font-size: var(--font-size-0); /* 0.8rem */
-    padding: var(--size-5); /* 1.25rem */
-
-    &[class*="language-"]::before {
-      inset-block-start: var(--size-3); /* 0.75rem */
-      inset-inline-end: var(--size-3); /* 0.75rem */
-    }
+    letter-spacing: inherit;
   }
 }
 
@@ -502,7 +535,7 @@ pre {
 .hljs-type,
 .hljs-built_in {
   color: var(--color-syntax-keyword);
-  font-weight: var(--font-weight-6); /* 600 */
+  font-weight: var(--font-weight-6);
 }
 
 /* Strings and literals */
@@ -511,14 +544,14 @@ pre {
 .hljs-symbol,
 .hljs-bullet {
   color: var(--color-syntax-string);
-  font-weight: var(--font-weight-5); /* 500 */
+  font-weight: var(--font-weight-5);
 }
 
 /* Numbers and constants */
 .hljs-number,
 .hljs-regexp {
   color: var(--color-syntax-number);
-  font-weight: var(--font-weight-5); /* 500 */
+  font-weight: var(--font-weight-5);
 }
 
 /* Variables, attributes, and identifiers */
@@ -527,7 +560,7 @@ pre {
 .hljs-attr,
 .hljs-attribute {
   color: var(--color-syntax-variable);
-  font-weight: var(--font-weight-5); /* 500 */
+  font-weight: var(--font-weight-5);
 }
 
 /* Functions and methods */
@@ -535,13 +568,13 @@ pre {
 .hljs-title,
 .hljs-section {
   color: var(--color-syntax-function);
-  font-weight: var(--font-weight-7); /* 700 */
+  font-weight: var(--font-weight-7);
 }
 
 /* Class names */
 .hljs-class .hljs-title {
   color: var(--color-syntax-function);
-  font-weight: var(--font-weight-7); /* 700 */
+  font-weight: var(--font-weight-7);
 }
 
 /* Tags and markup */
@@ -550,7 +583,7 @@ pre {
 .hljs-selector-id,
 .hljs-selector-class {
   color: var(--color-syntax-keyword);
-  font-weight: var(--font-weight-6); /* 600 */
+  font-weight: var(--font-weight-6);
 }
 
 /* Operators and punctuation */
@@ -579,7 +612,7 @@ pre {
 /* Language-specific styling */
 .hljs-doctag,
 .hljs-strong {
-  font-weight: var(--font-weight-7); /* bold */
+  font-weight: var(--font-weight-7);
 }
 
 .hljs-emphasis {
@@ -601,54 +634,36 @@ pre {
   font-style: italic;
 }
 
-/* Navigation using Open Props */
+/* Navigation with fluid typography */
 nav {
-  padding-block: var(--size-4); /* 1rem */
-  margin-block-end: var(--size-6); /* 1.5rem */
+  padding-block: var(--size-4);
+  margin-block-end: var(--size-6);
 
   & ul {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--size-2); /* 0.5rem */
+    gap: clamp(0.5rem, 2vw, 2rem);
     list-style: none;
     padding: 0;
     margin: 0;
     text-align: center;
-
-    @container (min-width: 30rem) {
-      gap: var(--size-3); /* 0.625rem */
-    }
-
-    @container (min-width: 48rem) {
-      gap: var(--size-3); /* 0.875rem */
-    }
-
-    @container (min-width: 64rem) {
-      gap: var(--size-6); /* 1.5rem */
-    }
-
-    @container (min-width: 90rem) {
-      gap: var(--size-8); /* 2rem */
-    }
   }
 
   & a,
   & button {
     color: var(--color-text);
-    font-weight: var(--font-weight-5); /* 500 */
-    font-size: clamp(
-      var(--font-size-0),
-      3vw,
-      var(--font-size-2)
-    ); /* clamp(0.8rem, 3vw, 1rem) */
+    font-weight: var(--font-weight-5);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing-base);
     min-block-size: 44px;
-    padding: var(--size-2) var(--size-3); /* 0.5rem 0.75rem */
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-2); /* 6px */
+    border-radius: var(--radius-2);
     transition:
       background-color var(--animation-speed-fast) ease,
       color var(--animation-speed-fast) ease;
@@ -660,34 +675,11 @@ nav {
       color: var(--color-bg);
       background: var(--color-primary);
       text-decoration: none;
-      font-weight: var(--font-weight-7); /* bold */
+      font-weight: var(--font-weight-7);
     }
 
     &:focus {
       outline: none;
-    }
-
-    @container (min-width: 30rem) {
-      padding: var(--size-3) var(--size-4); /* 0.625rem 1rem */
-    }
-
-    @container (min-width: 37.5rem) {
-      padding: var(--size-2) var(--size-3); /* 0.5rem 0.875rem */
-    }
-
-    @container (min-width: 48rem) {
-      padding: var(--size-2) var(--size-4); /* 0.5rem 1rem */
-      font-size: var(--font-size-1); /* 0.9rem */
-    }
-
-    @container (min-width: 64rem) {
-      padding: var(--size-3) var(--size-5); /* 0.625rem 1.25rem */
-      font-size: var(--font-size-2); /* 1rem */
-    }
-
-    @container (min-width: 90rem) {
-      padding: var(--size-3) var(--size-6); /* 0.75rem 1.5rem */
-      font-size: var(--font-size-2); /* 1rem */
     }
   }
 
@@ -708,11 +700,11 @@ nav {
 
 /* Articles using Open Props */
 article {
-  margin-block-end: var(--size-8); /* 2rem */
-  padding-block-end: var(--size-6); /* 1.5rem */
+  margin-block-end: var(--size-8);
+  padding-block-end: var(--size-6);
   border-block-end: 1px solid var(--color-border);
-  border-radius: var(--radius-3); /* 8px */
-  padding: var(--size-8); /* 2rem */
+  border-radius: var(--radius-3);
+  padding: var(--size-8);
   background: var(--color-bg);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-medium);
@@ -762,7 +754,7 @@ article {
       padding: 0;
 
       /* Vertical spacing between posts */
-      margin-block-end: var(--size-8); /* 2rem */
+      margin-block-end: var(--size-8);
 
       /* Prevent shrinking and ensure proper flow */
       min-inline-size: 0;
@@ -789,21 +781,22 @@ article {
 
       /* Reset any inherited margins that could cause width issues */
       margin: 0;
-      padding: var(--size-4); /* 1rem */
+      padding: var(--size-4);
 
       /* Enable responsive behavior via container queries */
       container-type: inline-size;
       contain: layout style;
 
       & header {
-        margin-block-end: var(--size-3); /* 0.875rem */
+        margin-block-end: var(--size-3);
 
         & h2 {
-          margin: 0 0 var(--size-2); /* 0 0 0.5rem */
+          margin: 0 0 var(--size-2);
           border: none;
           padding: 0;
-          font-size: var(--font-size-1); /* 0.95rem */
-          line-height: var(--font-lineheight-2); /* 1.3 */
+          font-size: var(--font-size-lg);
+          line-height: var(--line-height-tight);
+          letter-spacing: var(--letter-spacing-tight);
 
           & a {
             color: var(--color-text);
@@ -815,20 +808,17 @@ article {
               outline-offset: 2px;
             }
           }
-
-          @container (min-width: 48rem) {
-            font-size: var(--font-size-4); /* 1.35rem */
-          }
         }
       }
 
-      @container (min-width: 48rem) {
-        padding: var(--size-6); /* 1.5rem */
+      & p, & div, & span, & li, & ul, & ol {
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-relaxed);
+        letter-spacing: var(--letter-spacing-base);
       }
 
-      @container (min-width: 64rem) {
-        padding: var(--size-8); /* 2rem */
-        font-size: 0.8rem; /* Slightly smaller text for large screens */
+      @container (min-width: 30rem) {
+        padding: clamp(1rem, 4vw, 2rem);
       }
     }
   }
@@ -861,59 +851,59 @@ article {
     max-inline-size: 100% !important;
   }
 
-  /* Moderate font size reduction for desktop readability */
-  @media (min-width: 64rem) {
-    body, main, article, p, div, span, li {
-      font-size: 0.8rem !important;
-    }
-  }
-
-  @media (min-width: 75rem) {
-    body, main, article, p, div, span, li {
-      font-size: 0.75rem !important;
-    }
+  /* Typography consistency enforcement - fluid system handles scaling automatically */
+  /* Ensure lists within articles use consistent font sizing */
+  article ul,
+  article ol,
+  article li {
+    font-size: var(--font-size-base) !important;
+    line-height: var(--line-height-relaxed) !important;
+    letter-spacing: var(--letter-spacing-base) !important;
   }
 }
 
-/* Time and semantic elements using Open Props */
+/* Time and semantic elements with fluid typography */
 time,
 small {
   color: var(--color-text-muted);
-  font-size: var(--font-size-0); /* 0.75rem */
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  letter-spacing: var(--letter-spacing-base);
   display: block;
-  margin-block-end: var(--size-2); /* 0.5rem */
+  margin-block-end: var(--size-2);
 }
 
 time {
-  font-weight: var(--font-weight-5); /* 500 */
+  font-weight: var(--font-weight-5);
   color: var(--color-primary);
 }
 
 summary {
   color: var(--color-text-muted);
-  line-height: var(--font-lineheight-3); /* 1.5 */
-  font-size: var(--font-size-0); /* 0.8rem */
+  line-height: var(--line-height-base);
+  font-size: var(--font-size-base);
+  letter-spacing: var(--letter-spacing-base);
   font-style: italic;
   border-inline-start: 3px solid var(--color-accent-amber);
-  padding-inline-start: var(--size-3); /* 0.75rem */
-  margin-block: var(--size-3); /* 0.75rem */
+  padding-inline-start: var(--size-3);
+  margin-block: var(--size-3);
 }
 
 /* About page styling using Open Props */
 @scope (section) {
   article {
     & p {
-      margin-block-end: var(--size-6); /* 1.5rem */
-      line-height: var(--font-lineheight-4); /* 1.7 */
+      margin-block-end: var(--size-6);
+      line-height: var(--line-height-relaxed);
 
       &:last-child {
         margin-block-end: 0;
       }
 
       &:first-of-type {
-        font-size: var(--font-size-0); /* 0.8rem */
+        font-size: var(--font-size-base);
         color: var(--color-text);
-        font-weight: var(--font-weight-5); /* 500 */
+        font-weight: var(--font-weight-5);
       }
     }
 
@@ -924,16 +914,16 @@ summary {
         var(--color-bg) 100%
       );
       border-inline-start: 4px solid var(--color-accent-amber);
-      padding: var(--size-4) var(--size-5); /* 1rem 1.25rem */
-      margin: var(--size-8) 0; /* 2rem 0 */
-      border-radius: 0 var(--radius-3) var(--radius-3) 0; /* 0 8px 8px 0 */
+      padding: var(--size-4) var(--size-5);
+      margin: var(--size-8) 0;
+      border-radius: 0 var(--radius-3) var(--radius-3) 0;
       position: relative;
       box-shadow: var(--shadow-subtle);
 
       & p {
         margin: 0;
-        font-size: var(--font-size-1); /* 0.9rem */
-        font-weight: var(--font-weight-5); /* 500 */
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-5);
         color: var(--color-border);
       }
 
@@ -946,7 +936,7 @@ summary {
         width: 8px;
         block-size: 8px;
         background: var(--color-accent-amber);
-        border-radius: var(--radius-round); /* 50% */
+        border-radius: var(--radius-round);
       }
     }
 
@@ -959,7 +949,7 @@ summary {
         var(--color-border),
         transparent
       );
-      margin: var(--size-10) 0; /* 2.5rem 0 */
+      margin: var(--size-10) 0;
       opacity: 0.6;
     }
 
@@ -971,7 +961,7 @@ summary {
 
     & strong {
       color: var(--color-syntax-comment);
-      font-weight: var(--font-weight-6); /* 600 */
+      font-weight: var(--font-weight-6);
     }
   }
 }
@@ -979,10 +969,12 @@ summary {
 /* Footer using Open Props */
 footer {
   border-block-start: 1px solid var(--color-border);
-  padding-block: var(--size-4); /* 1rem */
+  padding-block: var(--size-4);
   text-align: center;
   color: var(--color-text-muted);
-  font-size: var(--font-size-0); /* 0.75rem */
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  letter-spacing: var(--letter-spacing-base);
   margin-block-start: auto;
 
   & a {
@@ -1007,7 +999,7 @@ dialog {
   background: rgba(0, 0, 0, 0.8);
   border: none;
   padding: 0;
-  z-index: var(--layer-5); /* 1000 */
+  z-index: var(--layer-5);
   display: none;
   align-items: center;
   justify-content: center;
@@ -1025,39 +1017,39 @@ dialog {
   & > div {
     background: var(--color-bg);
     border: 2px solid var(--color-border-strong);
-    border-radius: var(--radius-3); /* 8px */
-    padding: var(--size-6); /* 1.5rem */
+    border-radius: var(--radius-3);
+    padding: var(--size-6);
     width: 90%;
     max-width: 500px;
     max-block-size: 80vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-6); /* 0 25px 50px rgba(0, 0, 0, 0.25) */
+    box-shadow: var(--shadow-6);
     position: relative;
 
     @container (min-width: 48rem) {
-      padding: var(--size-8); /* 2rem */
+      padding: var(--size-8);
       width: 80%;
     }
   }
 
   & h2 {
-    margin: 0 0 var(--size-4); /* 0 0 1rem */
-    font-size: var(--font-size-3); /* 1.25rem */
+    margin: 0 0 var(--size-4);
+    font-size: var(--font-size-xl);
     color: var(--color-text);
     border: none;
     padding: 0;
   }
 
   & form {
-    margin-block-end: var(--size-6); /* 1.5rem */
+    margin-block-end: var(--size-6);
 
     & input {
       width: 100%;
-      padding: var(--size-3) var(--size-4); /* 0.75rem 1rem */
+      padding: var(--size-3) var(--size-4);
       border: 2px solid var(--color-border);
-      border-radius: var(--radius-2); /* 6px */
+      border-radius: var(--radius-2);
       font-family: var(--font-mono);
-      font-size: var(--font-size-1); /* 0.9rem */
+      font-size: var(--font-size-sm);
       background: var(--color-bg);
       color: var(--color-text);
       transition: border-color var(--animation-speed-fast) ease;
@@ -1077,15 +1069,15 @@ dialog {
 
   & button {
     position: absolute;
-    inset-block-start: var(--size-4); /* 1rem */
-    inset-inline-end: var(--size-4); /* 1rem */
+    inset-block-start: var(--size-4);
+    inset-inline-end: var(--size-4);
     background: none;
     border: none;
-    font-size: var(--font-size-4); /* 1.5rem */
+    font-size: var(--font-size-2xl);
     color: var(--color-text-muted);
     cursor: pointer;
-    padding: var(--size-2); /* 0.5rem */
-    border-radius: var(--radius-2); /* 6px */
+    padding: var(--size-2);
+    border-radius: var(--radius-2);
     transition: color var(--animation-speed-fast) ease;
     min-block-size: 44px;
     min-width: 44px;
@@ -1111,13 +1103,13 @@ dialog {
     overflow-y: auto;
 
     & li {
-      margin-block-end: var(--size-3); /* 0.75rem */
+      margin-block-end: var(--size-3);
 
       & a {
         display: block;
-        padding: var(--size-3) var(--size-4); /* 0.75rem 1rem */
+        padding: var(--size-3) var(--size-4);
         border: 1px solid var(--color-border);
-        border-radius: var(--radius-2); /* 6px */
+        border-radius: var(--radius-2);
         text-decoration: none;
         color: var(--color-text);
         background: var(--color-bg-subtle);
@@ -1137,17 +1129,17 @@ dialog {
         }
 
         & h3 {
-          margin: 0 0 var(--size-1); /* 0 0 0.25rem */
-          font-size: var(--font-size-1); /* 0.9rem */
-          font-weight: var(--font-weight-6); /* 600 */
+          margin: 0 0 var(--size-1);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-6);
           color: var(--color-text);
         }
 
         & p {
           margin: 0;
-          font-size: var(--font-size-0); /* 0.8rem */
+          font-size: var(--font-size-xs);
           color: var(--color-text-muted);
-          line-height: var(--font-lineheight-3); /* 1.5 */
+          line-height: var(--line-height-base);
         }
       }
     }
@@ -1157,14 +1149,14 @@ dialog {
 /* Blockquotes using Open Props */
 blockquote {
   border-inline-start: 4px solid var(--color-accent-coral);
-  padding: var(--size-4) var(--size-5); /* 1rem 1.25rem */
-  margin: var(--size-6) 0; /* 1.5rem 0 */
+  padding: var(--size-4) var(--size-5);
+  margin: var(--size-6) 0;
   background: linear-gradient(
     135deg,
     var(--color-bg-subtle) 0%,
     var(--color-bg) 100%
   );
-  border-radius: 0 var(--radius-3) var(--radius-3) 0; /* 0 8px 8px 0 */
+  border-radius: 0 var(--radius-3) var(--radius-3) 0;
   font-style: italic;
   position: relative;
   box-shadow: var(--shadow-subtle);
@@ -1172,8 +1164,8 @@ blockquote {
   & p {
     margin: 0;
     color: var(--color-text-subtle);
-    font-size: var(--font-size-1); /* 0.9rem */
-    line-height: var(--font-lineheight-4); /* 1.7 */
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
   }
 
   &::before {
@@ -1185,7 +1177,7 @@ blockquote {
     width: 8px;
     block-size: 8px;
     background: var(--color-accent-coral);
-    border-radius: var(--radius-round); /* 50% */
+    border-radius: var(--radius-round);
   }
 }
 
@@ -1193,31 +1185,31 @@ blockquote {
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--size-2); /* 0.375rem */
-  margin-block: var(--size-2) 0; /* 0.5rem 0 */
+  gap: var(--size-2);
+  margin-block: var(--size-2) 0;
   align-items: center;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: var(--size-1) var(--size-2); /* 0.1rem 0.35rem */
+  padding: var(--size-1) var(--size-2);
   background: var(--color-bg-subtle);
-  border-radius: var(--radius-1); /* 3px */
+  border-radius: var(--radius-1);
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
-  font-size: var(--font-size-00); /* 0.7rem */
-  line-height: var(--font-lineheight-0); /* 1 */
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
   text-decoration: none;
   transition: all var(--animation-speed-fast) ease;
   white-space: nowrap;
-  font-weight: var(--font-weight-5); /* 500 */
+  font-weight: var(--font-weight-5);
 
   &:hover {
     background: var(--color-border);
     color: var(--color-text);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-2); /* 0 2px 4px rgba(0, 0, 0, 0.1) */
+    box-shadow: var(--shadow-2);
   }
 
   &:focus {
@@ -1231,8 +1223,8 @@ blockquote {
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--size-2); /* 0.5rem */
-  border-radius: var(--radius-2); /* 4px */
+  padding: var(--size-2);
+  border-radius: var(--radius-2);
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
@@ -1250,14 +1242,14 @@ blockquote {
   }
 
   & svg {
-    width: var(--size-5); /* 1.2rem */
-    height: var(--size-5); /* 1.2rem */
+    width: var(--size-5);
+    height: var(--size-5);
   }
 }
 
 /* Content area styling */
 .content {
-  line-height: var(--font-lineheight-4); /* 1.7 */
+  line-height: var(--line-height-relaxed);
 
   & > *:first-child {
     margin-block-start: 0;
@@ -1271,41 +1263,41 @@ blockquote {
 /* Mermaid diagram styles using Open Props */
 .mermaid-diagram {
   display: block;
-  margin: var(--size-6) auto; /* 1.5rem auto */
+  margin: var(--size-6) auto;
   max-width: 100%;
   height: auto;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-3); /* 8px */
+  border-radius: var(--radius-3);
   background: var(--color-bg);
   box-shadow: var(--shadow-2);
-  padding: var(--size-4); /* 1rem */
+  padding: var(--size-4);
 
   @container (min-width: 48rem) {
-    margin: var(--size-8) auto; /* 2rem auto */
-    padding: var(--size-6); /* 1.5rem */
+    margin: var(--size-8) auto;
+    padding: var(--size-6);
   }
 }
 
 .mermaid-error {
-  margin: var(--size-6) 0; /* 1.5rem 0 */
+  margin: var(--size-6) 0;
   font-family: var(--font-mono);
-  font-size: var(--font-size-1); /* 0.9rem */
+  font-size: var(--font-size-sm);
   color: var(--color-accent-coral);
-  padding: var(--size-4); /* 1rem */
+  padding: var(--size-4);
   background: var(--color-bg-subtle);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-2); /* 6px */
+  border-radius: var(--radius-2);
 
   @container (min-width: 48rem) {
-    margin: var(--size-8) 0; /* 2rem 0 */
+    margin: var(--size-8) 0;
   }
 }
 
 /* Reading time indicator using Open Props */
 .reading-time {
-  font-size: var(--font-size-0); /* 0.75rem */
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-  margin-left: var(--size-4); /* 1rem */
+  margin-left: var(--size-4);
 
   &::before {
     content: "⏱ ";
@@ -1318,8 +1310,8 @@ article img {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: var(--size-6) auto; /* 1.5rem auto */
-  border-radius: var(--radius-3); /* 8px */
+  margin: var(--size-6) auto;
+  border-radius: var(--radius-3);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-subtle);
 
@@ -1332,7 +1324,7 @@ article img {
 /* Audio elements and captions using Open Props */
 article audio {
   display: block;
-  margin: var(--size-6) auto; /* 1.5rem auto */
+  margin: var(--size-6) auto;
   max-width: 100%;
   width: 100%;
 
@@ -1344,16 +1336,15 @@ article audio {
 .audio-caption {
   display: block;
   text-align: center;
-  font-size: var(--font-size-0); /* 0.8rem */
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   font-style: italic;
-  margin: calc(-1 * var(--size-4)) auto var(--size-6)
-    auto; /* -1rem auto 1.5rem auto */
+  margin: calc(-1 * var(--size-4)) auto var(--size-6) auto;
   max-width: 100%;
-  line-height: var(--font-lineheight-3); /* 1.4 */
+  line-height: var(--line-height-base);
 
   @container (min-width: 48rem) {
-    font-size: var(--font-size-1); /* 0.85rem */
+    font-size: var(--font-size-sm);
     width: 80%;
   }
 }
@@ -1522,9 +1513,9 @@ article audio {
   body {
     max-width: none;
     margin: 0;
-    padding: var(--size-4); /* 1rem */
-    font-size: var(--font-size-1); /* 12pt equivalent */
-    line-height: var(--font-lineheight-3); /* 1.5 */
+    padding: var(--size-4);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
   }
 
   a {
@@ -1537,7 +1528,7 @@ article audio {
     border: none;
     box-shadow: none;
     padding: 0;
-    margin-block-end: var(--size-8); /* 2rem */
+    margin-block-end: var(--size-8);
   }
 
   h1, h2, h3, h4, h5, h6 {
