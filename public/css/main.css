@@ -824,10 +824,14 @@ dialog {
   border: none;
   padding: 0;
   z-index: var(--layer-5); /* 1000 */
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
+
+  &[open] {
+    display: flex;
+  }
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.8);

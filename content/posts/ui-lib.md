@@ -1,5 +1,5 @@
 ---
-title: ui-lib: UI comonents with SSR, DOM, and HTMX
+title: UI components library with SSR, DOM, and HTMX
 date: 2025-09-22
 tags: [WebDev, HTMX, Typescript, SSR]
 excerpt: Server-side rendered pages with progressive
