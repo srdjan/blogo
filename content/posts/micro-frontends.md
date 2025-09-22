@@ -5,8 +5,6 @@ tags: [Frontend, Architecture, Signals, HTMX]
 excerpt: Reactive signals and HTMX create a powerful micro frontend architecture that keeps components independent while maintaining seamless communication.
 ---
 
-## The Complexity Problem in Micro Frontends
-
 Modern frontend development has grown increasingly complex, with applications requiring hundreds of dependencies to render simple dashboards. This raises questions about whether current approaches solve the right problems.
 
 Building modular dashboards where different teams can deploy components independently presents significant challenges. Traditional approaches require complex state management libraries, build coordination, and elaborate communication patterns between micro frontends.

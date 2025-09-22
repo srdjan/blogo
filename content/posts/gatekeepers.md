@@ -5,8 +5,6 @@ tags: [Architecture, Enterprise, Product, Agile, Legacy]
 excerpt: Common gatekeeping antipatterns that create bottlenecks in software delivery and proven approaches to transform them into enablement practices.
 ---
 
-## The Problem with Manual Approval Processes
-
 Organizations often implement manual approval processes where every code change requires sign-off from multiple teams. While intended to ensure quality, these processes frequently create the opposite effect: slower delivery, frustrated developers, and quality issues that slip through because responsibility becomes diffused.
 
 These "quality gates" often become primary bottlenecks that prevent organizations from responding to customer needs, optimizing for perceived safety at the expense of actual business value.

@@ -5,8 +5,6 @@ tags: [Functional, TypeScript, Gleam]
 excerpt: Gleam's `use` syntax provides an elegant solution to callback hell that improves functional programming ergonomics across multiple domains.
 ---
 
-## The Problem with Traditional Resource Management
-
 Callback hell and resource management create persistent challenges across programming languages. Whether handling errors in TypeScript, managing database connections, or processing lists, the same pattern emerges: deeply nested code that obscures business logic and makes debugging difficult.
 
 Traditional approaches often require more time managing control flow than solving actual problems, raising questions about whether functional programming complexity is necessary or if more elegant approaches exist.

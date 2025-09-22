@@ -5,8 +5,6 @@ tags: [Architecture, Enterprise, Product, Agile]
 excerpt: How to transform traditional Architecture Review Boards from gatekeepers into enablers that actually accelerate product development.
 ---
 
-## Why I Started Questioning Traditional ARB Processes
-
 I've seen first-hand how Architecture Review Boards can slow down product teams with lengthy approval processes and bureaucratic overhead. Teams would spend weeks preparing presentations for monthly review meetings, only to receive feedback that could have been addressed earlier in design documents.
 
 ARB should not become the primary bottleneck preventing teams from delivering customer value, it shouldn't be optimized for architectural purity at the expense of business agility.

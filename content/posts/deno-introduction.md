@@ -5,8 +5,6 @@ tags: [Deno, TypeScript, WebDev]
 excerpt: Deno addresses Node.js's core limitations with built-in TypeScript, secure-by-default execution, and simplified dependency management.
 ---
 
-## Beyond Node.js Limitations
-
 Node.js enabled server-side JavaScript development but introduced significant
 complexity over time. Dependency management through npm creates sprawling
 node_modules directories, security vulnerabilities emerge from unrestricted

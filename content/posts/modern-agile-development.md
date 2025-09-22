@@ -5,8 +5,6 @@ tags: [Architecture, Agile, Product]
 excerpt: Moving beyond rigid Scrum ceremonies to embrace flexible, value-driven development that delivers measurable results.
 ---
 
-## Problems with Traditional Agile
-
 Organizations often practice Scrum religiously—daily stand-ups, sprint planning, retrospectives, and story pointing. While these ceremonies provide structure, they can become obstacles rather than enablers. Teams spend more time in meetings than building software, and rigid sprint boundaries prevent response to urgent customer needs.
 
 Many teams optimize for process compliance rather than customer value, achieving perfect sprint velocities while building features nobody uses.

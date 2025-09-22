@@ -5,8 +5,6 @@ tags: [WebDev, HTMX]
 excerpt: HTMX transforms interactive web development by extending HTML's capabilities rather than requiring complex JavaScript frameworks.
 ---
 
-## The Complexity Problem in Modern Web Development
-
 Modern frontend development has grown increasingly complex over time. What began as simple websites requiring basic interactivity has evolved into elaborate build processes, state management libraries, and framework-specific patterns that often feel heavier than the problems they solve.
 
 Developers frequently spend more time configuring webpack, managing npm dependencies, and debugging framework-specific issues than building features users actually need. This raises questions about whether such complexity is necessary for most web applications.

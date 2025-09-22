@@ -1,16 +1,10 @@
 ---
-title: UI components library with SSR, DOM, and HTMX
+title: Building the Web Like It's 2025, How ui-lib Rethinks Component Architecture
 date: 2025-09-22
 tags: [WebDev, HTMX, Typescript, SSR]
 excerpt: Server-side rendered pages with progressive
   enhancement, colocated API endpoints and simplified shared components
   patterns.
----
-
-# Building the Web Like It's 2025: How ui-lib Rethinks Component Architecture
-
-*A TypeScript library that puts the DOM back in control*
-
 ---
 
 The web development landscape has become increasingly complex. We've moved from simple HTML pages to intricate client-side applications requiring megabytes of JavaScript, complex state management, and elaborate hydration processes. But what if there was a better way? What if we could build modern, interactive applications while embracing the web platform's native capabilities rather than fighting against them?

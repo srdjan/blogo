@@ -5,8 +5,6 @@ tags: [WebDev, HATEOAS, HTMX, HAL]
 excerpt: HATEOAS transforms API design and frontend development by creating self-describing systems that adapt dynamically to changing requirements.
 ---
 
-## The Problem with Static API Design
-
 Traditional APIs often become increasingly brittle over time. Every client needs to know specific URLs, and any server-side change requires coordinating updates across multiple applications. The maintenance burden grows with each new integration.
 
 Many "RESTful" APIs aren't actually RESTful—they're just HTTP endpoints with predictable URLs. This raises questions about whether better approaches exist for building APIs that can evolve without breaking existing integrations.

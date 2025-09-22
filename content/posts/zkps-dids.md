@@ -5,8 +5,6 @@ tags: [VCs, DIDs, ZKPs]
 excerpt: A multi-key zero-knowledge verification system that enables private credential verification without blockchain dependencies, solving real privacy challenges in identity systems.
 ---
 
-## The Identity Verification Challenge
-
 Organizations struggle with the fundamental tension between verification needs and privacy protection. Traditional systems require users to expose sensitive employment details just to prove they work somewhere, creating unnecessary privacy risks.
 
 Current verification methods force a binary choice: either reveal everything or prove nothing. Cryptographic techniques could enable selective disclosure—proving employment without revealing salary, position details, or other sensitive information.

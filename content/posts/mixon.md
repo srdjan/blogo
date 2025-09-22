@@ -5,8 +5,6 @@ tags: [WebDev, Deno, HTMX]
 excerpt: Mixon addresses complexity and type safety challenges in Deno web application development through comprehensive type safety and built-in workflow management.
 ---
 
-## The Need for Better Deno Web Frameworks
-
 Building web applications with existing frameworks often reveals persistent challenges: lack of end-to-end type safety, complex configuration, and frameworks that feel too heavy for simple projects yet too limited for complex ones.
 
 Deno projects requiring workflow management, HTMX integration, and strong typing often need multiple libraries with inconsistent APIs, creating maintenance overhead and type safety gaps.

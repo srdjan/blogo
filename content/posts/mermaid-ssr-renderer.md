@@ -5,8 +5,6 @@ tags: [TypeScript, Functional, Parsing, SSR]
 excerpt: A comprehensive guide to server-side Mermaid diagram rendering using @rendermaid/core v0.6.0, featuring enhanced performance, advanced analysis capabilities, improved rendering quality, and functional TypeScript patterns for maintainable parsing logic.
 ---
 
-## The Evolution of Server-Side Mermaid Rendering
-
 Server-side Mermaid diagram rendering has evolved significantly with the introduction of [@rendermaid/core v0.6.0](https://github.com/srdjan/rendermaid). While traditional approaches required browser environments or complex DOM simulation, modern functional TypeScript libraries now provide elegant solutions for SSR Mermaid rendering.
 
 **@rendermaid/core v0.6.0** represents a major advancement in Mermaid processing, offering:

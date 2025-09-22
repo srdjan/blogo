@@ -5,8 +5,6 @@ tags: [Functional, TypeScript]
 excerpt: Effect-TS transforms TypeScript into a business-focused language where technical concerns fade into the background, enabling focus on solving actual problems.
 ---
 
-## Problems with Standard TypeScript Patterns
-
 Building TypeScript applications often results in unnecessary complexity. User profile loading functions become mazes of try-catch blocks, async/await ceremony, and manual error handling that obscure actual business logic.
 
 Developers often spend more time wrestling with technical plumbing than solving user problems. Code becomes a collection of implementation details rather than clear expression of business requirements.

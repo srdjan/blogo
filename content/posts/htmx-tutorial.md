@@ -5,8 +5,6 @@ tags: [WebDev, Typescript, HTMX]
 excerpt: Exploring the shift from complex JavaScript frameworks to HTMX's hypermedia-driven simplicity, and practical patterns that emerge from this approach.
 ---
 
-## Returning to HTML's Roots
-
 Modern web development often feels caught in an endless cycle of JavaScript framework complexity. Simple applications require hundreds of dependencies, complex build pipelines, and state management solutions that weigh more than the problems they solve.
 
 HTMX presents a different approach. At just 14k minified, this library rekindles appreciation for HTML's inherent power while adding the interactivity modern applications need. What's compelling isn't the technical specs—it's how HTMX challenges assumptions about web development by sending HTML over the wire instead of JSON. Applications can still use JSON APIs when needed, utilizing HTTP Content Negotiation as intended.

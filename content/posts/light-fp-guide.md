@@ -5,8 +5,6 @@ tags: [TypeScript, Functional, Architecture, Patterns]
 excerpt: A practical guide to implementing Light FP patterns in TypeScript - clean, testable code without the complexity of full functional programming frameworks.
 ---
 
-## The Problem with Complex Codebases
-
 Modern TypeScript applications often suffer from a mixture of object-oriented and functional paradigms that create confusion about data modeling, error handling, and dependency management. Teams struggle with:
 
 - **Mixed metaphors**: Some code uses classes, others use functions
