@@ -36,7 +36,6 @@ export const accessLog: Middleware = (next) => async (req) => {
       timestamp: new Date().toISOString(),
     };
 
-    console.log(JSON.stringify(logData));
 
     // Update request metrics
     updateRequestMetrics(parseFloat(duration), res.status >= 400);
@@ -270,7 +269,6 @@ export const performanceMonitoring: Middleware = (next) => async (req) => {
       type: "SLOW_REQUEST",
     };
 
-    console.warn(JSON.stringify(perfLog));
   }
 
   return response;

@@ -27,12 +27,6 @@ const Core = {
           // Extract only the content from within #content-area
           event.detail.serverResponse = contentAreaInResponse.innerHTML;
 
-          if (
-            window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1"
-          ) {
-            console.log("Filtered full page response to content-area only");
-          }
         }
       }
     });
@@ -65,16 +59,6 @@ const Core = {
         // Ensure search toggle still works after HTMX swap
         ensureSearchToggleWorks();
 
-        // Log successful content swap (for debugging)
-        if (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        ) {
-          console.log("HTMX content swap successful:", {
-            path: event.detail.pathInfo.path,
-            target: event.detail.target.id,
-          });
-        }
       }
     });
 
@@ -191,13 +175,6 @@ const Search = {
       })
       .catch((err) => {
         this.searchResults.innerHTML = "Error: Could not perform search.";
-        // Only log errors in development
-        if (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        ) {
-          console.error("Search error:", err);
-        }
       });
   },
 };
@@ -210,11 +187,6 @@ function ensureSearchToggleWorks() {
   );
   const searchModal = document.getElementById("search-modal");
 
-  console.log("Ensuring search functionality works", {
-    toggle: !!searchToggle,
-    closeBtn: !!searchCloseBtn,
-    modal: !!searchModal,
-  });
 
   // Search toggle
   if (searchToggle && !searchToggle.hasAttribute("data-listener-attached")) {
@@ -222,7 +194,6 @@ function ensureSearchToggleWorks() {
 
     searchToggle.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("Search toggle clicked - direct listener");
       const modal = document.getElementById("search-modal");
       const input = document.getElementById("search-input");
       if (modal) {
