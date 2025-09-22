@@ -6,6 +6,70 @@
 @import "https://unpkg.com/open-props@1.7.6/open-props.min.css";
 @import "https://unpkg.com/open-props@1.7.6/normalize.min.css";
 
+/* Cascade Layers for organized CSS architecture */
+@layer reset, tokens, utilities, components, overrides;
+
+/* Reset Layer - Fundamental browser normalization */
+@layer reset {
+  /* Enhanced list reset for layout control */
+  ul,
+  ol {
+    /* Remove any browser inconsistencies */
+    margin-block: 0;
+    margin-inline: 0;
+    padding-block: 0;
+    padding-inline: 0;
+
+    /* Ensure lists can be full-width containers */
+    width: auto;
+    max-width: none;
+    min-width: 0;
+
+    /* Block-level behavior for layout */
+    display: block;
+    box-sizing: border-box;
+  }
+
+  li {
+    /* Reset list item constraints */
+    margin-block: 0;
+    margin-inline: 0;
+    padding-block: 0;
+    padding-inline: 0;
+
+    /* Full width potential */
+    width: auto;
+    max-width: none;
+    min-width: 0;
+
+    /* Block-level for full width */
+    display: block;
+    box-sizing: border-box;
+  }
+}
+
+/* Utilities Layer - Layout primitives */
+@layer utilities {
+  /* Full width utility - private API */
+  .u-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Width reset utility - private API */
+  .u-width-reset {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    inline-size: auto !important;
+    max-inline-size: none !important;
+    min-inline-size: 0 !important;
+  }
+}
+
 /* Custom properties extending Open Props for Blogo's specific design */
 :root {
   /* Monospace font stack following the monospace web approach */
@@ -78,6 +142,7 @@ body {
   body {
     max-width: 48rem;
     padding: var(--size-8); /* 2rem */
+    font-size: 0.8rem; /* Slightly smaller for desktop */
   }
 }
 
@@ -85,6 +150,7 @@ body {
   body {
     max-width: 52rem;
     padding: var(--size-10); /* 2.5rem */
+    font-size: 0.75rem; /* Moderately smaller for large desktop */
   }
 }
 
@@ -654,40 +720,158 @@ article {
   &:last-child {
     border-block-end: none;
   }
+}
 
-  & header {
-    margin-block-end: var(--size-3); /* 0.875rem */
-
-    & h2 {
-      margin: 0 0 var(--size-2); /* 0 0 0.5rem */
-      border: none;
+/* Components Layer - Semantic components with proper API */
+@layer components {
+  /* Blog post list component - public API */
+  @scope (main) {
+    :scope > ul {
+      /* Complete list reset */
+      list-style: none;
       padding: 0;
-      font-size: var(--font-size-1); /* 0.95rem */
-      line-height: var(--font-lineheight-2); /* 1.3 */
+      margin: 0;
 
-      & a {
-        color: var(--color-text);
-        min-block-size: auto;
-        display: inline;
+      /* Full width container with containment */
+      width: 100%;
+      max-width: 100%;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      display: block;
 
-        &:focus {
-          outline: 2px solid var(--color-primary);
-          outline-offset: 2px;
-        }
-      }
+      /* Enable container queries for responsive behavior */
+      container-type: inline-size;
+      container-name: post-list;
 
-      @container (min-width: 48rem) {
-        font-size: var(--font-size-4); /* 1.35rem */
+      /* Prevent any width constraints from parent */
+      box-sizing: border-box;
+      contain: layout style;
+    }
+
+    :scope > ul > li {
+      /* Explicit full width with containment */
+      width: 100%;
+      max-width: 100%;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      box-sizing: border-box;
+
+      /* Block-level for full width behavior */
+      display: block;
+      margin: 0;
+      padding: 0;
+
+      /* Vertical spacing between posts */
+      margin-block-end: var(--size-8); /* 2rem */
+
+      /* Prevent shrinking and ensure proper flow */
+      min-inline-size: 0;
+      flex: none;
+
+      /* Layout containment for performance */
+      contain: layout;
+
+      &:last-child {
+        margin-block-end: 0;
       }
     }
   }
 
-  @container (min-width: 48rem) {
-    margin-block-end: var(--size-10); /* 2.5rem */
+  /* Blog post article component within list items */
+  @scope (main > ul > li) {
+    :scope > article {
+      /* Full width article within li container */
+      width: 100%;
+      max-width: 100%;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      box-sizing: border-box;
+
+      /* Reset any inherited margins that could cause width issues */
+      margin: 0;
+      padding: var(--size-4); /* 1rem */
+
+      /* Enable responsive behavior via container queries */
+      container-type: inline-size;
+      contain: layout style;
+
+      & header {
+        margin-block-end: var(--size-3); /* 0.875rem */
+
+        & h2 {
+          margin: 0 0 var(--size-2); /* 0 0 0.5rem */
+          border: none;
+          padding: 0;
+          font-size: var(--font-size-1); /* 0.95rem */
+          line-height: var(--font-lineheight-2); /* 1.3 */
+
+          & a {
+            color: var(--color-text);
+            min-block-size: auto;
+            display: inline;
+
+            &:focus {
+              outline: 2px solid var(--color-primary);
+              outline-offset: 2px;
+            }
+          }
+
+          @container (min-width: 48rem) {
+            font-size: var(--font-size-4); /* 1.35rem */
+          }
+        }
+      }
+
+      @container (min-width: 48rem) {
+        padding: var(--size-6); /* 1.5rem */
+      }
+
+      @container (min-width: 64rem) {
+        padding: var(--size-8); /* 2rem */
+        font-size: 0.8rem; /* Slightly smaller text for large screens */
+      }
+    }
+  }
+} /* End components layer */
+
+/* Overrides Layer - Final escape hatch for consumers */
+@layer overrides {
+  /* Debug utility for layout issues - can be enabled when needed */
+  /*
+  main > ul,
+  main > ul > li,
+  main > ul > li > article {
+    outline: 1px solid red !important;
+    outline-offset: -1px !important;
+  }
+  */
+
+  /* Ensure blog post list always uses full width - override any specificity conflicts */
+  main > ul {
+    width: 100% !important;
+    max-width: 100% !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
   }
 
-  @container (min-width: 64rem) {
-    margin-block-end: var(--size-12); /* 3rem */
+  main > ul > li {
+    width: 100% !important;
+    max-width: 100% !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+  }
+
+  /* Moderate font size reduction for desktop readability */
+  @media (min-width: 64rem) {
+    body, main, article, p, div, span, li {
+      font-size: 0.8rem !important;
+    }
+  }
+
+  @media (min-width: 75rem) {
+    body, main, article, p, div, span, li {
+      font-size: 0.75rem !important;
+    }
   }
 }
 
