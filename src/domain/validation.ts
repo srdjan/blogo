@@ -242,44 +242,47 @@ export function validateMarkdownContent(content: string): AppResult<string> {
 }
 
 /**
- * Validate that referenced images exist (basic check)
+ * Validate that referenced media files (images/audio) exist (basic check)
  */
 export function validateImageReferences(content: string): AppResult<string[]> {
-  const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-  const images: string[] = [];
+  const mediaRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const mediaFiles: string[] = [];
   const errors: string[] = [];
 
   let match;
-  while ((match = imageRegex.exec(content)) !== null) {
-    const imagePath = match[2];
-    if (!imagePath) continue; // Skip if no image path found
+  while ((match = mediaRegex.exec(content)) !== null) {
+    const mediaPath = match[2];
+    if (!mediaPath) continue; // Skip if no media path found
 
-    images.push(imagePath);
+    mediaFiles.push(mediaPath);
 
-    // Basic validation for image paths
-    if (!imagePath.startsWith("/") && !imagePath.startsWith("http")) {
-      errors.push(`Image path should be absolute or HTTP(S): ${imagePath}`);
+    // Basic validation for media paths
+    if (!mediaPath.startsWith("/") && !mediaPath.startsWith("http")) {
+      errors.push(`Media path should be absolute or HTTP(S): ${mediaPath}`);
     }
 
-    // Check for common image extensions
-    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"];
+    // Check for common image and audio extensions
+    const validExtensions = [
+      ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", // images
+      ".mp3", ".wav", ".ogg", ".m4a", ".flac", // audio
+    ];
     const hasValidExtension = validExtensions.some((ext) =>
-      imagePath.toLowerCase().includes(ext)
+      mediaPath.toLowerCase().includes(ext)
     );
 
     if (!hasValidExtension) {
-      errors.push(`Image may have invalid extension: ${imagePath}`);
+      errors.push(`Media file may have invalid extension: ${mediaPath}`);
     }
   }
 
   if (errors.length > 0) {
     return err(createError(
       "ValidationError",
-      `Image validation failed: ${errors.join(", ")}`,
+      `Media validation failed: ${errors.join(", ")}`,
       undefined,
       { retryable: false },
     ));
   }
 
-  return ok(images);
+  return ok(mediaFiles);
 }
