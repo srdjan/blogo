@@ -482,6 +482,27 @@ pre {
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-base);
 
+  /* Gray scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #999999 transparent;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #999999;
+    border-radius: var(--radius-2);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #666666;
+  }
+
   &[class*="language-"]::before {
     content: attr(class);
     position: absolute;
@@ -1428,6 +1449,17 @@ article audio {
     background: var(--color-bg-subtle);
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-medium);
+
+    /* Dark mode scrollbar */
+    scrollbar-color: #666666 transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: #666666;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #888888;
+    }
   }
 
   .hljs {
