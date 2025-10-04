@@ -78,18 +78,22 @@
       "JetBrains Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
       "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-    /* Fluid Typography Scale - Mobile First with Proportional Scaling */
-    /* Base font size scales smoothly from 0.75rem (mobile) to 0.6rem (desktop) - reduced for density */
-    --font-size-base: clamp(0.6rem, 0.75rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.75rem);
+    /* Serif font stack with Lora for elegant body text */
+    --font-serif:
+      "Lora", "Georgia", "Palatino Linotype", "Book Antiqua", Palatino, serif;
 
-    /* Typography scale using modular scale with fluid scaling - reduced ~15-20% for density */
-    --font-size-xs: clamp(0.55rem, 0.68rem + -0.13 * (100vw - 20rem) / (80rem - 20rem), 0.68rem);
-    --font-size-sm: clamp(0.64rem, 0.8rem + -0.16 * (100vw - 20rem) / (80rem - 20rem), 0.8rem);
+    /* Fluid Typography Scale - Mobile First with Proportional Scaling */
+    /* Base font size increased by ~15% for better readability */
+    --font-size-base: clamp(0.8rem, 0.95rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.95rem);
+
+    /* Typography scale using modular scale with fluid scaling - increased ~15% */
+    --font-size-xs: clamp(0.7rem, 0.82rem + -0.12 * (100vw - 20rem) / (80rem - 20rem), 0.82rem);
+    --font-size-sm: clamp(0.75rem, 0.9rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.9rem);
     --font-size-md: var(--font-size-base);
-    --font-size-lg: clamp(0.85rem, 1rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 1rem);
-    --font-size-xl: clamp(1.05rem, 1.25rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.25rem);
-    --font-size-2xl: clamp(1.25rem, 1.55rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.55rem);
-    --font-size-3xl: clamp(1.55rem, 1.85rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.85rem);
+    --font-size-lg: clamp(1rem, 1.2rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
+    --font-size-xl: clamp(1.25rem, 1.5rem + -0.25 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
+    --font-size-2xl: clamp(1.5rem, 1.85rem + -0.35 * (100vw - 20rem) / (80rem - 20rem), 1.85rem);
+    --font-size-3xl: clamp(1.85rem, 2.2rem + -0.35 * (100vw - 20rem) / (80rem - 20rem), 2.2rem);
 
     /* Line heights optimized for JetBrains Mono readability */
     --line-height-tight: 1.3;
@@ -106,14 +110,19 @@
     --font-features-text: 'liga' 0, 'calt' 0;
     --font-features-ui: normal;
 
+    /* Font feature settings for Lora serif */
+    --font-features-serif: 'liga' 1, 'calt' 1, 'onum' 1;
+    --font-optical-sizing: auto;
+
     /* Font rendering optimization */
     --font-smooth: antialiased;
     --moz-font-smooth: grayscale;
 
     /* Ultra high contrast color palette - overriding Open Props */
     --color-text: #000000;
-    --color-text-muted: #333333;
-    --color-text-subtle: #555555;
+    --color-text-muted: #4a4a4a;
+    --color-text-subtle: #6b6b6b;
+    --color-text-metadata: #8b7355;
     --color-bg: #ffffff;
     --color-bg-subtle: #f0f0f0;
     --color-border: #999999;
@@ -146,9 +155,9 @@
   list-style-type: none;
 }
 
-/* Body and layout with fluid typography */
+/* Body and layout with fluid typography - serif for readability */
 body {
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   letter-spacing: var(--letter-spacing-base);
@@ -157,7 +166,8 @@ body {
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: var(--font-smooth);
   -moz-osx-font-smoothing: var(--moz-font-smooth);
-  font-feature-settings: var(--font-features-text);
+  font-feature-settings: var(--font-features-serif);
+  font-optical-sizing: var(--font-optical-sizing);
   max-width: 100%;
   margin: 0 auto;
   padding: var(--size-2);
@@ -213,13 +223,14 @@ main {
   }
 }
 
-/* Typography hierarchy with fluid scaling */
+/* Typography hierarchy with fluid scaling - serif for all headings */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-serif);
   font-weight: var(--font-weight-7);
   line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-tight);
@@ -266,6 +277,65 @@ h6 {
   font-size: var(--font-size-sm);
   margin-block: var(--size-2) var(--size-1);
   font-weight: 500;
+}
+
+/* Enhanced article heading hierarchy with serif font */
+article header h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 2.5rem + 0.5 * (100vw - 20rem) / (80rem - 20rem), 3rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-block-end: var(--size-4);
+  color: var(--color-text);
+}
+
+article .content h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 1.75rem + 0.35 * (100vw - 20rem) / (80rem - 20rem), 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin-block: var(--size-8) var(--size-4);
+  padding-block-end: var(--size-2);
+  border-block-end: 2px solid var(--color-border);
+  position: relative;
+
+  /* Subtle decorative element */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-end: -2px;
+    inset-inline-start: 0;
+    width: 3rem;
+    height: 2px;
+    background: var(--color-accent-coral);
+  }
+}
+
+article .content h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 1.4rem + 0.2 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  margin-block: var(--size-7) var(--size-3);
+  color: var(--color-text);
+}
+
+article .content h4 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 1.15rem + 0.1 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-block: var(--size-6) var(--size-3);
+}
+
+article .content h5,
+article .content h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 /* Paragraph styling with fluid typography */
@@ -496,9 +566,9 @@ ol {
   }
 }
 
-/* Code highlighting with fluid typography */
+/* Code highlighting with fluid typography - always monospace */
 code {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono) !important;
   font-size: var(--font-size-sm);
   background: var(--color-bg-subtle);
   color: var(--color-text);
@@ -509,6 +579,19 @@ code {
   font-weight: var(--font-weight-7);
   letter-spacing: var(--letter-spacing-base);
   font-feature-settings: var(--font-features-code);
+}
+
+/* Ensure code within article content stays monospace */
+article .content code,
+article .content pre {
+  font-family: var(--font-mono) !important;
+  font-optical-sizing: auto;
+}
+
+article .content pre code {
+  border: none;
+  padding: 0;
+  background: transparent;
 }
 
 pre {
@@ -697,10 +780,11 @@ pre {
   font-style: italic;
 }
 
-/* Navigation with fluid typography */
+/* Navigation with fluid typography - monospace for UI */
 nav {
   padding-block: var(--size-4);
   margin-block-end: var(--size-6);
+  font-family: var(--font-mono);
 
   & ul {
     display: flex;
@@ -716,9 +800,10 @@ nav {
 
   & a,
   & button {
+    font-family: var(--font-mono);
     color: var(--color-text);
     font-weight: var(--font-weight-5);
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     line-height: var(--line-height-base);
     letter-spacing: var(--letter-spacing-base);
     min-block-size: 44px;
@@ -941,6 +1026,35 @@ time {
   color: var(--color-primary);
 }
 
+/* Enhanced time element styling in article headers */
+article header time {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-metadata);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin-block-end: var(--size-3);
+  position: relative;
+  padding-inline-start: var(--size-5);
+
+  /* Calendar icon before date */
+  &::before {
+    content: "📅";
+    position: absolute;
+    inset-inline-start: 0;
+    opacity: 0.7;
+    font-size: 1em;
+  }
+}
+
+/* Metadata styling - tags container in articles */
+article header .tags {
+  margin-block-start: var(--size-3);
+  padding-block-start: var(--size-3);
+  border-block-start: 1px solid var(--color-border);
+}
+
 summary {
   color: var(--color-text-muted);
   line-height: var(--line-height-base);
@@ -1029,8 +1143,9 @@ summary {
   }
 }
 
-/* Footer using Open Props */
+/* Footer using Open Props - monospace for UI */
 footer {
+  font-family: var(--font-mono);
   border-block-start: 1px solid var(--color-border);
   padding-block: var(--size-4);
   text-align: center;
@@ -1209,11 +1324,11 @@ dialog {
   }
 }
 
-/* Blockquotes using Open Props */
+/* Blockquotes using Open Props - Enhanced with serif and decorative quotes */
 blockquote {
   border-inline-start: 4px solid var(--color-accent-coral);
-  padding: var(--size-4) var(--size-5);
-  margin: var(--size-6) 0;
+  padding: var(--size-5) var(--size-6) var(--size-5) var(--size-8);
+  margin: var(--size-8) 0;
   background: linear-gradient(
     135deg,
     var(--color-bg-subtle) 0%,
@@ -1223,24 +1338,55 @@ blockquote {
   font-style: italic;
   position: relative;
   box-shadow: var(--shadow-subtle);
+  font-family: var(--font-serif);
 
   & p {
     margin: 0;
-    color: var(--color-text-subtle);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-relaxed);
+    color: var(--color-text);
+    font-size: clamp(0.95rem, 1.05rem + 0.1 * (100vw - 20rem) / (80rem - 20rem), 1.1rem);
+    line-height: 1.75;
+    font-family: var(--font-serif);
+    font-weight: 500;
   }
 
+  /* Large decorative opening quote */
   &::before {
+    content: "\201C";
+    position: absolute;
+    inset-inline-start: var(--size-3);
+    inset-block-start: var(--size-2);
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--color-accent-coral);
+    opacity: 0.4;
+    font-weight: 700;
+  }
+
+  /* Accent marker */
+  &::after {
     content: "";
     position: absolute;
     inset-inline-start: -2px;
-    inset-block-start: 50%;
-    transform: translateY(-50%);
+    inset-block-start: var(--size-3);
     width: 8px;
     block-size: 8px;
     background: var(--color-accent-coral);
     border-radius: var(--radius-round);
+  }
+}
+
+/* Citation within blockquote */
+blockquote cite {
+  display: block;
+  margin-block-start: var(--size-3);
+  font-size: var(--font-size-sm);
+  font-style: normal;
+  color: var(--color-text-metadata);
+  font-family: var(--font-serif);
+
+  &::before {
+    content: "— ";
   }
 }
 
@@ -1310,7 +1456,7 @@ blockquote {
   }
 }
 
-/* Content area styling */
+/* Content area styling - Article body uses serif for readability */
 .content {
   line-height: var(--line-height-relaxed);
 
@@ -1321,6 +1467,45 @@ blockquote {
   & > *:last-child {
     margin-block-end: 0;
   }
+}
+
+/* Article content uses serif font for enhanced readability */
+article .content {
+  font-family: var(--font-serif);
+  font-optical-sizing: var(--font-optical-sizing);
+  font-feature-settings: var(--font-features-serif);
+
+  /* Improved paragraph rhythm for serif text */
+  & p {
+    font-family: var(--font-serif);
+    line-height: 1.8;
+    margin-block-end: var(--size-5);
+    font-size: clamp(0.9rem, 1.05rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 1.05rem);
+  }
+
+  /* Lists inherit serif styling */
+  & ul,
+  & ol {
+    font-family: var(--font-serif);
+    line-height: 1.7;
+  }
+
+  & li {
+    margin-block-end: var(--size-2);
+  }
+}
+
+/* Drop caps for article opening - elegant visual anchor */
+article .content > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 4.2em;
+  line-height: 0.85;
+  font-weight: 700;
+  color: var(--color-accent-coral);
+  margin-inline-end: var(--size-2);
+  margin-block-start: 0.1em;
+  padding-inline-end: var(--size-1);
 }
 
 /* Mermaid diagram styles using Open Props */
