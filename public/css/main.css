@@ -80,11 +80,6 @@
       "IBM Plex Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
       "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-    /* Primary sans-serif font stack for body and headings */
-    --font-serif:
-      "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
-      "Noto Sans", system-ui, -apple-system, sans-serif;
-
     /* Alias to reduce confusion: sans stack used across body/headings */
     --font-sans:
       "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
