@@ -79,22 +79,22 @@
       "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
-    /* Base font size scales smoothly from 0.9rem (mobile) to 0.7rem (desktop) */
-    --font-size-base: clamp(0.7rem, 0.9rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 0.9rem);
+    /* Base font size scales smoothly from 0.75rem (mobile) to 0.6rem (desktop) - reduced for density */
+    --font-size-base: clamp(0.6rem, 0.75rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.75rem);
 
-    /* Typography scale using modular scale with fluid scaling */
-    --font-size-xs: clamp(0.65rem, 0.8rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.8rem);
-    --font-size-sm: clamp(0.75rem, 0.95rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 0.95rem);
+    /* Typography scale using modular scale with fluid scaling - reduced ~15-20% for density */
+    --font-size-xs: clamp(0.55rem, 0.68rem + -0.13 * (100vw - 20rem) / (80rem - 20rem), 0.68rem);
+    --font-size-sm: clamp(0.64rem, 0.8rem + -0.16 * (100vw - 20rem) / (80rem - 20rem), 0.8rem);
     --font-size-md: var(--font-size-base);
-    --font-size-lg: clamp(1rem, 1.2rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
-    --font-size-xl: clamp(1.25rem, 1.5rem + -0.25 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
-    --font-size-2xl: clamp(1.5rem, 1.875rem + -0.375 * (100vw - 20rem) / (80rem - 20rem), 1.875rem);
-    --font-size-3xl: clamp(1.875rem, 2.25rem + -0.375 * (100vw - 20rem) / (80rem - 20rem), 2.25rem);
+    --font-size-lg: clamp(0.85rem, 1rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 1rem);
+    --font-size-xl: clamp(1.05rem, 1.25rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.25rem);
+    --font-size-2xl: clamp(1.25rem, 1.55rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.55rem);
+    --font-size-3xl: clamp(1.55rem, 1.85rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.85rem);
 
-    /* Line heights for optimal readability */
+    /* Line heights for optimal readability - tightened for density */
     --line-height-tight: 1.25;
-    --line-height-base: 1.6;
-    --line-height-relaxed: 1.75;
+    --line-height-base: 1.5;
+    --line-height-relaxed: 1.6;
 
     /* Letter spacing for monospace optimization */
     --letter-spacing-tight: -0.025em;
@@ -148,7 +148,7 @@ body {
   -webkit-text-size-adjust: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: var(--size-3);
+  padding: var(--size-2);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -161,7 +161,7 @@ main {
   margin: 0 auto;
 }
 
-/* Progressive width reduction for larger screens */
+/* Progressive width reduction for larger screens - expanded for density */
 @media (min-width: 48rem) {
   main {
     width: 90%; /* Slightly narrower on tablet */
@@ -170,21 +170,34 @@ main {
 
 @media (min-width: 64rem) {
   main {
-    width: 80%; /* More constrained on small desktop */
+    width: 85%; /* Less constrained on small desktop */
   }
 }
 
 @media (min-width: 75rem) {
   main {
-    width: 70%; /* Target 70% on large desktop */
+    width: 80%; /* Wider on large desktop */
   }
 }
 
-/* Responsive container with fluid scaling */
+@media (min-width: 90rem) {
+  main {
+    width: 85%; /* Even wider on extra-large screens */
+  }
+}
+
+/* Responsive container with fluid scaling - expanded max-width for density */
 @container (min-width: 30rem) {
   body {
-    max-width: clamp(30rem, 70vw, 52rem);
-    padding: clamp(1rem, 4vw, 2.5rem);
+    max-width: clamp(30rem, 80vw, 70rem);
+    padding: clamp(0.75rem, 3vw, 2rem);
+  }
+}
+
+/* Extra-large screen container expansion */
+@container (min-width: 90rem) {
+  body {
+    max-width: clamp(70rem, 85vw, 85rem);
   }
 }
 
@@ -198,7 +211,7 @@ h6 {
   font-weight: var(--font-weight-7);
   line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-tight);
-  margin-block: var(--size-6) var(--size-3);
+  margin-block: var(--size-5) var(--size-2);
 
   &:first-child {
     margin-block-start: 0;
@@ -213,29 +226,29 @@ h1 {
 h2 {
   font-size: var(--font-size-2xl);
   border-block-end: 1px solid var(--color-border);
-  padding-block-end: var(--size-2);
-  margin-block: var(--size-10) var(--size-4);
+  padding-block-end: var(--size-1);
+  margin-block: var(--size-8) var(--size-3);
   color: var(--color-text);
 }
 
 h3 {
   font-size: var(--font-size-xl);
-  margin-block: var(--size-8) var(--size-3);
+  margin-block: var(--size-6) var(--size-2);
 }
 
 h4 {
   font-size: var(--font-size-lg);
-  margin-block: var(--size-6) var(--size-2);
+  margin-block: var(--size-4) var(--size-2);
 }
 
 h5 {
   font-size: var(--font-size-md);
-  margin-block: var(--size-4) var(--size-2);
+  margin-block: var(--size-3) var(--size-2);
 }
 
 h6 {
   font-size: var(--font-size-sm);
-  margin-block: var(--size-3) var(--size-1);
+  margin-block: var(--size-2) var(--size-1);
 }
 
 /* Paragraph styling with fluid typography */
@@ -243,7 +256,7 @@ p {
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   letter-spacing: var(--letter-spacing-base);
-  margin-block-end: var(--size-5);
+  margin-block-end: var(--size-4);
 
   &:last-child {
     margin-block-end: 0;
@@ -253,7 +266,7 @@ p {
 /* Table styling with fluid typography */
 table {
   width: 100%;
-  margin-block: var(--size-6);
+  margin-block: var(--size-5);
   border-collapse: collapse;
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
@@ -275,16 +288,16 @@ thead {
 
 th,
 td {
-  padding: var(--size-3) var(--size-4);
+  padding: var(--size-2) var(--size-3);
   border: 2px solid var(--color-border);
   vertical-align: top;
 
   &:first-child {
-    padding-left: var(--size-4);
+    padding-left: var(--size-3);
   }
 
   &:last-child {
-    padding-right: var(--size-4);
+    padding-right: var(--size-3);
   }
 }
 
@@ -472,10 +485,10 @@ code {
 
 pre {
   background: var(--color-bg-subtle);
-  padding: var(--size-6);
+  padding: var(--size-4);
   border-radius: var(--radius-3);
   overflow-x: auto;
-  margin-block: var(--size-6);
+  margin-block: var(--size-5);
   font-size: var(--font-size-sm);
   border: 1px solid var(--color-border);
   position: relative;
@@ -721,11 +734,11 @@ nav {
 
 /* Articles using Open Props */
 article {
-  margin-block-end: var(--size-8);
-  padding-block-end: var(--size-6);
+  margin-block-end: var(--size-6);
+  padding-block-end: var(--size-4);
   border-block-end: 1px solid var(--color-border);
   border-radius: var(--radius-3);
-  padding: var(--size-8);
+  padding: var(--size-6);
   background: var(--color-bg);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-medium);
@@ -775,7 +788,7 @@ article {
       padding: 0;
 
       /* Vertical spacing between posts */
-      margin-block-end: var(--size-8);
+      margin-block-end: var(--size-6);
 
       /* Prevent shrinking and ensure proper flow */
       min-inline-size: 0;
@@ -839,7 +852,7 @@ article {
       }
 
       @container (min-width: 30rem) {
-        padding: clamp(1rem, 4vw, 2rem);
+        padding: clamp(0.75rem, 3vw, 1.5rem);
       }
     }
   }
