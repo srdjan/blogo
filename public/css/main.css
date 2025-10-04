@@ -1,6 +1,6 @@
 /* Blogo - Modern Fluid Typography Implementation
-   Replacing inconsistent font sizing with proportional scaling system
-   Following modern CSS best practices with cascade layers and fluid design */
+   Following modern CSS best practices with cascade layers and fluid design
+*/
 
 /* Import Open Props */
 @import "https://unpkg.com/open-props@1.7.6/open-props.min.css";
@@ -82,6 +82,11 @@
 
     /* Primary sans-serif font stack for body and headings */
     --font-serif:
+      "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
+      "Noto Sans", system-ui, -apple-system, sans-serif;
+
+    /* Alias to reduce confusion: sans stack used across body/headings */
+    --font-sans:
       "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
       "Noto Sans", system-ui, -apple-system, sans-serif;
 
@@ -198,7 +203,7 @@
 
 /* Body and layout with fluid typography - Montserrat for readability */
 body {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   letter-spacing: var(--letter-spacing-base);
@@ -273,7 +278,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-weight: var(--font-weight-7);
   line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-tight);
@@ -339,7 +344,7 @@ article header {
 
 article header h1 {
   /* Post title styled exactly as home page post titles (h2 > a) */
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-7);
   line-height: var(--line-height-tight);
@@ -351,7 +356,7 @@ article header h1 {
 }
 
 article .content h2 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: clamp(
     1.76rem,
     2.15rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
@@ -378,7 +383,7 @@ article .content h2 {
 }
 
 article .content h3 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: clamp(
     1.49rem,
     1.74rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
@@ -392,7 +397,7 @@ article .content h3 {
 }
 
 article .content h4 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: clamp(
     1.3rem,
     1.43rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
@@ -405,7 +410,7 @@ article .content h4 {
 
 article .content h5,
 article .content h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -1152,7 +1157,7 @@ time {
 /* Enhanced time element styling in article headers */
 article header time {
   display: inline-block;
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   color: var(--color-text-metadata);
   font-weight: 500;
@@ -1478,7 +1483,7 @@ blockquote {
   font-style: italic;
   position: relative;
   box-shadow: var(--shadow-subtle);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
 
   & p {
     margin: 0;
@@ -1489,7 +1494,7 @@ blockquote {
       1.38rem
     );
     line-height: 1.75;
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-weight: 500;
   }
 
@@ -1499,7 +1504,7 @@ blockquote {
     position: absolute;
     inset-inline-start: var(--size-3);
     inset-block-start: var(--size-2);
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: 3.5rem;
     line-height: 1;
     color: var(--color-accent-coral);
@@ -1527,7 +1532,7 @@ blockquote cite {
   font-size: var(--font-size-sm);
   font-style: normal;
   color: var(--color-text-metadata);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
 
   &::before {
     content: "— ";
@@ -1622,7 +1627,7 @@ blockquote cite {
 
 /* Article content uses Montserrat for enhanced readability */
 article .content {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-optical-sizing: var(--font-optical-sizing);
   font-feature-settings: var(--font-features-serif);
   /* Ensure content container takes full available width */
@@ -1632,7 +1637,7 @@ article .content {
 
   /* Improved paragraph rhythm for Montserrat text */
   & p {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     line-height: 1.8;
     margin-block-end: var(--size-5);
     font-size: clamp(
@@ -1649,7 +1654,7 @@ article .content {
   /* Lists inherit Montserrat styling */
   & ul,
   & ol {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     line-height: 1.7;
     /* Ensure lists take full available width */
     width: 100%;
@@ -1669,7 +1674,7 @@ article .content {
 /* Drop caps for article opening - elegant visual anchor */
 article .content > p:first-of-type::first-letter {
   float: left;
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 4.2em;
   line-height: 0.85;
   font-weight: 700;
