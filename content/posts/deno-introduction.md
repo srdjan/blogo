@@ -297,7 +297,7 @@ services while maintaining the flexibility to scale applications globally.
 
 ## The Deno Advantage
 
-Deno demonstrates that development tools should solve problems rather than
+Deno demonstrates that development tools can solve problems rather than
 create new ones. The focus on security, simplicity, and web standards produces a
 natural development experience without fighting unnecessary complexity.
 
