@@ -92,8 +92,9 @@ export const createLayout = (props: LayoutProps): Response => {
         />
         <meta name="theme-color" content="#000000" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
+        <link rel="stylesheet" href="/css/vendor/open-props.min.css" />
         <link rel="stylesheet" href="/css/main.css" />
-        <link rel="preload" href="/js/htmx.min.js" as="script" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -143,8 +144,8 @@ export const createLayout = (props: LayoutProps): Response => {
           })}
         </script>
 
-        <script src="/js/htmx.min.js"></script>
-        <script src="/js/site.js"></script>
+        <script src="/js/htmx.min.js" defer></script>
+        <script src="/js/site.js" defer></script>
       </head>
       <body>
         <div id="app-layout">
