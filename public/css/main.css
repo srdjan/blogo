@@ -73,27 +73,58 @@
 /* Tokens Layer - Design system foundation with fluid typography */
 @layer tokens {
   :root {
-    /* Monospace font stack with JetBrains Mono for optimal readability */
+    /* Modern developer-friendly monospace font stack for optimal readability */
     --font-mono:
-      "JetBrains Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
-      "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+      "JetBrains Mono", "Fira Code", "Cascadia Code", "Source Code Pro",
+      "IBM Plex Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
+      "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-    /* Serif font stack with Lora for elegant body text */
+    /* Developer-friendly monospace font stack for body text (monospace web philosophy) */
     --font-serif:
-      "Lora", "Georgia", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+      "JetBrains Mono", "Fira Code", "Cascadia Code", "Source Code Pro",
+      "IBM Plex Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
+      "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
-    /* Base font size increased by ~15% for better readability */
-    --font-size-base: clamp(0.8rem, 0.95rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.95rem);
+    /* Base font size increased for improved readability - enhanced 12% larger */
+    --font-size-base: clamp(
+      1.05rem,
+      1.25rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.25rem
+    );
 
-    /* Typography scale using modular scale with fluid scaling - increased ~15% */
-    --font-size-xs: clamp(0.7rem, 0.82rem + -0.12 * (100vw - 20rem) / (80rem - 20rem), 0.82rem);
-    --font-size-sm: clamp(0.75rem, 0.9rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 0.9rem);
+    /* Typography scale using modular scale with fluid scaling - enhanced sizing */
+    --font-size-xs: clamp(
+      0.9rem,
+      1.05rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.05rem
+    );
+    --font-size-sm: clamp(
+      1.0rem,
+      1.18rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.18rem
+    );
     --font-size-md: var(--font-size-base);
-    --font-size-lg: clamp(1rem, 1.2rem + -0.2 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
-    --font-size-xl: clamp(1.25rem, 1.5rem + -0.25 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
-    --font-size-2xl: clamp(1.5rem, 1.85rem + -0.35 * (100vw - 20rem) / (80rem - 20rem), 1.85rem);
-    --font-size-3xl: clamp(1.85rem, 2.2rem + -0.35 * (100vw - 20rem) / (80rem - 20rem), 2.2rem);
+    --font-size-lg: clamp(
+      1.35rem,
+      1.58rem + -0.2 * (100vw - 20rem) / (80rem - 20rem),
+      1.58rem
+    );
+    --font-size-xl: clamp(
+      1.7rem,
+      1.98rem + -0.25 * (100vw - 20rem) / (80rem - 20rem),
+      1.98rem
+    );
+    --font-size-2xl: clamp(
+      2.0rem,
+      2.4rem + -0.35 * (100vw - 20rem) / (80rem - 20rem),
+      2.4rem
+    );
+    --font-size-3xl: clamp(
+      2.5rem,
+      2.9rem + -0.4 * (100vw - 20rem) / (80rem - 20rem),
+      2.9rem
+    );
 
     /* Line heights optimized for JetBrains Mono readability */
     --line-height-tight: 1.3;
@@ -106,12 +137,12 @@
     --letter-spacing-wide: 0.02em;
 
     /* Font feature settings for JetBrains Mono */
-    --font-features-code: 'liga' 0, 'calt' 0;
-    --font-features-text: 'liga' 0, 'calt' 0;
+    --font-features-code: "liga" 0, "calt" 0;
+    --font-features-text: "liga" 0, "calt" 0;
     --font-features-ui: normal;
 
     /* Font feature settings for Lora serif */
-    --font-features-serif: 'liga' 1, 'calt' 1, 'onum' 1;
+    --font-features-serif: "liga" 1, "calt" 1, "onum" 1;
     --font-optical-sizing: auto;
 
     /* Font rendering optimization */
@@ -120,9 +151,9 @@
 
     /* Ultra high contrast color palette - overriding Open Props */
     --color-text: #000000;
-    --color-text-muted: #4a4a4a;
-    --color-text-subtle: #6b6b6b;
-    --color-text-metadata: #8b7355;
+    --color-text-muted: #1a1a1a;
+    --color-text-subtle: #333333;
+    --color-text-metadata: #5a4a35;
     --color-bg: #ffffff;
     --color-bg-subtle: #f0f0f0;
     --color-border: #999999;
@@ -282,7 +313,11 @@ h6 {
 /* Enhanced article heading hierarchy with serif font */
 article header h1 {
   font-family: var(--font-serif);
-  font-size: clamp(2rem, 2.5rem + 0.5 * (100vw - 20rem) / (80rem - 20rem), 3rem);
+  font-size: clamp(
+    2.25rem,
+    2.8rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
+    3.4rem
+  );
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.2;
@@ -292,7 +327,11 @@ article header h1 {
 
 article .content h2 {
   font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 1.75rem + 0.35 * (100vw - 20rem) / (80rem - 20rem), 2rem);
+  font-size: clamp(
+    1.6rem,
+    1.95rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
+    2.25rem
+  );
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.3;
@@ -315,7 +354,11 @@ article .content h2 {
 
 article .content h3 {
   font-family: var(--font-serif);
-  font-size: clamp(1.2rem, 1.4rem + 0.2 * (100vw - 20rem) / (80rem - 20rem), 1.5rem);
+  font-size: clamp(
+    1.35rem,
+    1.58rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
+    1.7rem
+  );
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.35;
@@ -325,7 +368,11 @@ article .content h3 {
 
 article .content h4 {
   font-family: var(--font-serif);
-  font-size: clamp(1.05rem, 1.15rem + 0.1 * (100vw - 20rem) / (80rem - 20rem), 1.2rem);
+  font-size: clamp(
+    1.18rem,
+    1.3rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
+    1.35rem
+  );
   font-weight: 600;
   letter-spacing: -0.01em;
   margin-block: var(--size-6) var(--size-3);
@@ -569,7 +616,7 @@ ol {
 /* Code highlighting with fluid typography - always monospace */
 code {
   font-family: var(--font-mono) !important;
-  font-size: var(--font-size-sm);
+  font-size: 0.75em; /* 75% of surrounding text size for better visual hierarchy */
   background: var(--color-bg-subtle);
   color: var(--color-text);
   padding: var(--size-1) var(--size-2);
@@ -652,7 +699,7 @@ pre {
   & code {
     background: none;
     padding: 0;
-    font-size: inherit;
+    /* font-size: inherit; */
     border: none;
     letter-spacing: inherit;
   }
@@ -1360,7 +1407,11 @@ blockquote {
   & p {
     margin: 0;
     color: var(--color-text);
-    font-size: clamp(0.95rem, 1.05rem + 0.1 * (100vw - 20rem) / (80rem - 20rem), 1.1rem);
+    font-size: clamp(
+      1.05rem,
+      1.18rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
+      1.25rem
+    );
     line-height: 1.75;
     font-family: var(--font-serif);
     font-weight: 500;
@@ -1494,13 +1545,25 @@ article .content {
   font-family: var(--font-serif);
   font-optical-sizing: var(--font-optical-sizing);
   font-feature-settings: var(--font-features-serif);
+  /* Ensure content container takes full available width */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
   /* Improved paragraph rhythm for serif text */
   & p {
     font-family: var(--font-serif);
     line-height: 1.8;
     margin-block-end: var(--size-5);
-    font-size: clamp(0.9rem, 1.05rem + -0.15 * (100vw - 20rem) / (80rem - 20rem), 1.05rem);
+    font-size: clamp(
+      1.18rem,
+      1.35rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.35rem
+    );
+    /* Ensure paragraphs take full available width */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Lists inherit serif styling */
@@ -1508,10 +1571,18 @@ article .content {
   & ol {
     font-family: var(--font-serif);
     line-height: 1.7;
+    /* Ensure lists take full available width */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   & li {
     margin-block-end: var(--size-2);
+    /* Ensure list items take full available width */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -1621,8 +1692,8 @@ article audio {
 @media (prefers-color-scheme: dark) {
   :root {
     --color-text: #ffffff;
-    --color-text-muted: #cccccc;
-    --color-text-subtle: #999999;
+    --color-text-muted: #e5e5e5;
+    --color-text-subtle: #cccccc;
     --color-bg: #000000;
     --color-bg-subtle: #111111;
     --color-border: #666666;
