@@ -1,0 +1,44 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <circle cx="100" cy="100" r="95" fill="#f8f8f8"/>
+  <g transform="translate(100,100)">
+    <!-- Outer ring -->
+    <circle r="80" fill="none" stroke="#2a2a2a" stroke-width="2.5"/>
+    
+    <!-- Lotus petals -->
+    <g id="lotus-petal">
+      <path d="M 0,-75 Q -20,-60 -15,-35 Q -8,-20 0,-15 Q 8,-20 15,-35 Q 20,-60 0,-75" 
+            fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M 0,-70 Q -15,-55 -10,-35 Q -5,-22 0,-18 Q 5,-22 10,-35 Q 15,-55 0,-70" 
+            fill="#2a2a2a" opacity="0.12"/>
+    </g>
+    <use href="#lotus-petal" transform="rotate(30)"/>
+    <use href="#lotus-petal" transform="rotate(60)"/>
+    <use href="#lotus-petal" transform="rotate(90)"/>
+    <use href="#lotus-petal" transform="rotate(120)"/>
+    <use href="#lotus-petal" transform="rotate(150)"/>
+    <use href="#lotus-petal" transform="rotate(180)"/>
+    <use href="#lotus-petal" transform="rotate(210)"/>
+    <use href="#lotus-petal" transform="rotate(240)"/>
+    <use href="#lotus-petal" transform="rotate(270)"/>
+    <use href="#lotus-petal" transform="rotate(300)"/>
+    <use href="#lotus-petal" transform="rotate(330)"/>
+    
+    <!-- Inner lotus layer -->
+    <g id="inner-petal">
+      <path d="M 0,-45 Q -12,-35 -8,-20 Q -4,-12 0,-10 Q 4,-12 8,-20 Q 12,-35 0,-45" 
+            fill="none" stroke="#2a2a2a" stroke-width="1.8"/>
+    </g>
+    <use href="#inner-petal" transform="rotate(45)"/>
+    <use href="#inner-petal" transform="rotate(90)"/>
+    <use href="#inner-petal" transform="rotate(135)"/>
+    <use href="#inner-petal" transform="rotate(180)"/>
+    <use href="#inner-petal" transform="rotate(225)"/>
+    <use href="#inner-petal" transform="rotate(270)"/>
+    <use href="#inner-petal" transform="rotate(315)"/>
+    
+    <!-- Center bindi dot -->
+    <circle r="8" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+    <circle r="5" fill="#2a2a2a"/>
+    <circle r="2" fill="#f8f8f8"/>
+  </g>
+</svg>

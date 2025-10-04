@@ -85,6 +85,16 @@
       "IBM Plex Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
       "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
+    /* Subtle SVG background patterns for visual interest */
+    /* Dot grid pattern - technical/graph paper aesthetic */
+    --pattern-dots: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23000' opacity='0.18'/%3E%3C/svg%3E");
+
+    /* Diagonal lines pattern - subtle texture */
+    --pattern-lines: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0' stroke='%23000' stroke-width='0.5' opacity='0.15'/%3E%3C/svg%3E");
+
+    /* Circuit board inspired pattern - developer aesthetic */
+    --pattern-circuit: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v20M30 40v20M0 30h20M40 30h20' stroke='%23000' stroke-width='0.5' opacity='0.12'/%3E%3Ccircle cx='30' cy='30' r='3' fill='none' stroke='%23000' stroke-width='0.5' opacity='0.12'/%3E%3C/svg%3E");
+
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
     /* Base font size increased for improved readability - enhanced 22% larger total */
     --font-size-base: clamp(
@@ -311,12 +321,22 @@ h6 {
 }
 
 /* Enhanced article heading hierarchy with serif font */
+/* Article header with subtle background pattern */
+article header {
+  position: relative;
+  padding: var(--size-6) 0;
+  background-image: var(--pattern-dots);
+  background-size: 20px 20px;
+  background-repeat: repeat;
+  border-radius: var(--radius-2);
+}
+
 article header h1 {
   font-family: var(--font-serif);
   font-size: clamp(
-    2.48rem,
-    3.08rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
-    3.74rem
+    2.85rem,
+    3.55rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
+    4.3rem
   );
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -614,16 +634,17 @@ ol {
 }
 
 /* Code highlighting with fluid typography - always monospace */
+/* Subtle inline code styling that blends with text content */
 code {
   font-family: var(--font-mono) !important;
   font-size: 0.75em; /* 75% of surrounding text size for better visual hierarchy */
   background: var(--color-bg-subtle);
   color: var(--color-text);
-  padding: var(--size-1) var(--size-2);
-  border-radius: var(--radius-2);
+  padding: 0.15em 0.4em; /* Minimal padding for subtle appearance */
+  border-radius: var(--radius-1); /* Smaller radius for subtlety */
   word-wrap: break-word;
-  border: 2px solid var(--color-border);
-  font-weight: var(--font-weight-7);
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Very subtle border */
+  font-weight: var(--font-weight-5); /* Normal weight, not bold */
   letter-spacing: var(--letter-spacing-base);
   font-feature-settings: var(--font-features-code);
 }
@@ -642,7 +663,11 @@ article .content pre code {
 }
 
 pre {
-  background: var(--color-bg-subtle);
+  background:
+    var(--color-bg-subtle),
+    var(--pattern-circuit);
+  background-size: auto, 60px 60px;
+  background-repeat: no-repeat, repeat;
   padding: var(--size-4);
   border-radius: var(--radius-3);
   overflow-x: auto;
@@ -1393,11 +1418,15 @@ blockquote {
   border-inline-start: 4px solid var(--color-accent-coral);
   padding: var(--size-5) var(--size-6) var(--size-5) var(--size-8);
   margin: var(--size-8) 0;
-  background: linear-gradient(
-    135deg,
-    var(--color-bg-subtle) 0%,
-    var(--color-bg) 100%
-  );
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-bg-subtle) 0%,
+      var(--color-bg) 100%
+    ),
+    var(--pattern-lines);
+  background-size: auto, 40px 40px;
+  background-repeat: no-repeat, repeat;
   border-radius: 0 var(--radius-3) var(--radius-3) 0;
   font-style: italic;
   position: relative;
@@ -1708,6 +1737,11 @@ article audio {
     --color-syntax-variable: #ffd43b;
     --shadow-subtle: 0 2px 8px rgba(255, 255, 255, 0.1);
     --shadow-medium: 0 4px 16px rgba(255, 255, 255, 0.15);
+
+    /* Dark mode SVG patterns - lighter colors for visibility on dark backgrounds */
+    --pattern-dots: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23fff' opacity='0.18'/%3E%3C/svg%3E");
+    --pattern-lines: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0' stroke='%23fff' stroke-width='0.5' opacity='0.15'/%3E%3C/svg%3E");
+    --pattern-circuit: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v20M30 40v20M0 30h20M40 30h20' stroke='%23fff' stroke-width='0.5' opacity='0.12'/%3E%3Ccircle cx='30' cy='30' r='3' fill='none' stroke='%23fff' stroke-width='0.5' opacity='0.12'/%3E%3C/svg%3E");
   }
 
   html {
@@ -1784,6 +1818,11 @@ article audio {
     color: #f0f6fc;
   }
 
+  /* Subtle inline code border for dark mode */
+  code {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   table {
     border-color: var(--color-border-strong);
   }
@@ -1819,7 +1858,11 @@ article audio {
   }
 
   blockquote {
-    background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+    background:
+      linear-gradient(135deg, #21262d 0%, #161b22 100%),
+      var(--pattern-lines);
+    background-size: auto, 40px 40px;
+    background-repeat: no-repeat, repeat;
     border-inline-start-color: var(--color-accent-coral);
   }
 }
