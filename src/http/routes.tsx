@@ -4,7 +4,9 @@ import type { HealthService } from "../domain/health.ts";
 import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
-import { TagIndex } from "../components/TagIndex.tsx";
+// import { TagIndex } from "../components/TagIndex.tsx";
+import { TopicsIndex } from "../components/TopicsIndex.tsx";
+import { groupTagsByTopic } from "../config/topics.ts";
 import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
 import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
@@ -70,7 +72,7 @@ export const createRouteHandlers = (
           title: "Tags - Blog",
           description: "Browse posts by tags",
           path: createUrlPath(ctx.pathname),
-          children: <TagIndex tags={tags} />,
+          children: <TopicsIndex groups={groupTagsByTopic(tags)} />,
           author: "Srdjan Strbanovic",
         }),
       error: () =>

@@ -9,6 +9,7 @@ export type FrontmatterSchema = {
   readonly slug?: string;
   readonly excerpt?: string;
   readonly tags?: readonly string[];
+  readonly topics?: readonly string[]; // Optional, derived automatically if absent
   readonly modified?: string;
   readonly draft?: boolean;
   readonly author?: string;
@@ -133,6 +134,35 @@ export function validateFrontmatter(
       const uniqueTags = new Set(obj.tags);
       if (uniqueTags.size !== obj.tags.length) {
         errors.push("Duplicate tags are not allowed");
+      }
+    }
+  }
+  // Validate optional topics (same constraints as tags)
+  if (obj.topics !== undefined) {
+    if (!Array.isArray(obj.topics)) {
+      errors.push("Topics must be an array");
+    } else {
+      if (obj.topics.length > MAX_TAGS) {
+        errors.push(`Cannot have more than ${MAX_TAGS} topics`);
+      }
+
+      for (const [index, topic] of obj.topics.entries()) {
+        if (typeof topic !== "string") {
+          errors.push(`Topic at index ${index} must be a string`);
+        } else if (topic.length > TAG_MAX_LENGTH) {
+          errors.push(
+            `Topic "${topic}" is too long (max ${TAG_MAX_LENGTH} characters)`,
+          );
+        } else if (topic.trim() !== topic) {
+          errors.push(
+            `Topic "${topic}" cannot have leading or trailing whitespace`,
+          );
+        }
+      }
+
+      const uniqueTopics = new Set(obj.topics);
+      if (uniqueTopics.size !== obj.topics.length) {
+        errors.push("Duplicate topics are not allowed");
       }
     }
   }
@@ -263,8 +293,17 @@ export function validateImageReferences(content: string): AppResult<string[]> {
 
     // Check for common image and audio extensions
     const validExtensions = [
-      ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", // images
-      ".mp3", ".wav", ".ogg", ".m4a", ".flac", // audio
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".svg",
+      ".webp", // images
+      ".mp3",
+      ".wav",
+      ".ogg",
+      ".m4a",
+      ".flac", // audio
     ];
     const hasValidExtension = validExtensions.some((ext) =>
       mediaPath.toLowerCase().includes(ext)

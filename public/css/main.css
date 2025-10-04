@@ -290,6 +290,7 @@ h1 {
 h2 {
   font-size: var(--font-size-2xl);
   border-block-end: 1px solid var(--color-border);
+  padding-block-start: var(--size-5);
   padding-block-end: var(--size-1);
   margin-block: var(--size-8) var(--size-3);
   color: var(--color-text);
