@@ -333,17 +333,15 @@ article header {
 }
 
 article header h1 {
-  /* Hero heading uses primary Montserrat font for visual impact */
+  /* Post title styled exactly as home page post titles (h2 > a) */
   font-family: var(--font-serif);
-  font-size: clamp(
-    3.15rem,
-    3.9rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
-    4.75rem
-  );
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  margin-block-end: var(--size-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-7);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  margin: 0 0 var(--size-2);
+  padding: 0;
+  border: none;
   color: var(--color-text);
 }
 
@@ -1081,22 +1079,25 @@ article {
     margin-block: var(--size-2);
   }
 
+  /* Shared RSS chip styles */
+  .rss-subscription .feed-link,
+  .rss-subscription button.copy {
+    border: 1px solid var(--border-1, rgba(255, 255, 255, 0.12));
+    border-radius: var(--radius-2, 6px);
+  }
+
   .rss-subscription .feed-link {
-    font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 0.95em;
     text-decoration: none;
     color: inherit;
     background: var(--surface-2, rgba(255, 255, 255, 0.04));
-    border: 1px solid var(--border-1, rgba(255, 255, 255, 0.12));
     padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-2, 6px);
     word-break: break-all;
   }
 
   .rss-subscription button.copy {
     padding: 0.35rem 0.65rem;
-    border-radius: var(--radius-2, 6px);
-    border: 1px solid var(--border-1, rgba(255, 255, 255, 0.12));
     background: var(--surface-3, rgba(255, 255, 255, 0.06));
     color: inherit;
     cursor: pointer;
@@ -1156,14 +1157,6 @@ article header time {
     opacity: 0.7;
     font-size: 1em;
   }
-}
-
-/* Metadata styling - tags container in articles */
-article header .tags {
-  margin-block-start: var(--size-3);
-  padding-block-start: var(--size-3);
-  padding-block-end: var(--size-3);
-  border-block-start: 1px solid var(--color-border);
 }
 
 summary {
