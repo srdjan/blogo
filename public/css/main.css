@@ -218,6 +218,8 @@ body {
   container-type: inline-size;
 }
 
+/* ===== Section: Main content width and responsive constraints ===== */
+
 /* Main content area constraint - responsive width management */
 main {
   width: 100%; /* Full width on mobile */
@@ -329,6 +331,9 @@ article header {
   background-image: var(--pattern-dots);
   background-size: 20px 20px;
   background-repeat: repeat;
+
+  /* ===== Section: Article header titles (serif), sizes and hierarchy ===== */
+
   border-radius: var(--radius-2);
 }
 
@@ -625,6 +630,8 @@ ol {
       grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
       gap: var(--size-4);
 
+      /* ===== Section: Code, inline code, and preformatted blocks (monospace) ===== */
+
       & li {
         padding: var(--size-2) var(--size-3);
         min-width: 180px;
@@ -853,6 +860,9 @@ pre {
 }
 
 /* Navigation with fluid typography - monospace for UI */
+
+/* ===== Section: Navigation (monospace UI) ===== */
+
 nav {
   padding-block: var(--size-4);
   margin-block-end: var(--size-6);
@@ -1056,6 +1066,8 @@ article {
   }
   */
 
+  /* ===== Section: RSS subscription page ===== */
+
   /* Ensure blog post list always uses full width - override any specificity conflicts */
   main > ul {
     width: 100% !important;
@@ -1246,6 +1258,8 @@ summary {
     }
   }
 }
+
+/* ===== Section: Footer ===== */
 
 /* Footer using Open Props - monospace for UI */
 footer {
@@ -1444,6 +1458,8 @@ dialog {
   }
 }
 
+/* ===== Section: Blockquotes (decorative, serif) ===== */
+
 /* Blockquotes using Open Props - Enhanced with Montserrat and decorative quotes */
 blockquote {
   border-inline-start: 4px solid var(--color-accent-coral);
@@ -1517,6 +1533,8 @@ blockquote cite {
     content: "— ";
   }
 }
+
+/* ===== Section: Tags and tag chips (monospace UI) ===== */
 
 /* Tag styling - compact metadata labels with monospace aesthetic */
 .tags {
@@ -1599,6 +1617,8 @@ blockquote cite {
     margin-block-end: 0;
   }
 }
+
+/* ===== Section: Article content (serif body) ===== */
 
 /* Article content uses Montserrat for enhanced readability */
 article .content {
