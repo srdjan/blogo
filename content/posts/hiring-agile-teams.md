@@ -1,6 +1,6 @@
 ---
 title: Why Your Agile Transformation Fails at the Hiring Stage
-date: 2025-10-03
+date: 2025-09-05
 tags: [Hiring, Agile, Teams, Culture]
 excerpt: Agile frameworks can't overcome poor hiring decisions. Building responsive, collaborative teams requires fundamentally different recruitment approaches that prioritize mindset over credentials.
 ---

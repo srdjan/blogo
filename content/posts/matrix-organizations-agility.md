@@ -1,6 +1,6 @@
 ---
 title: Matrix Organizations as the Foundation for Business Agility
-date: 2025-10-03
+date: 2025-09-03
 tags: [Organization, Agile, Leadership, Teams]
 excerpt: Traditional hierarchies can't support true agility. Matrix organizations provide the structural foundation that enables cross-functional teams, dynamic resource allocation, and responsive decision-making.
 ---
