@@ -21,7 +21,7 @@ export const TOPICS: Readonly<Record<Topic, readonly string[]>> = {
     "HATEOAS",
     "HAL",
     "design", // ad-hoc from pattern-test
-    "test",   // ad-hoc from pattern-test
+    "test", // ad-hoc from pattern-test
   ],
   ["Architecture & Design" as Topic]: [
     "Architecture",
@@ -96,6 +96,22 @@ export const deriveTopicsFromTags = (
   return [...set.keys()];
 };
 
+export const ALL_TOPICS = Object.keys(TOPICS) as readonly Topic[];
+
+export const topicToSlug = (
+  topic: Topic,
+): string => (String(topic).toLowerCase()
+  .replace(/&/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-+|-+$/g, ""));
+
+export const slugToTopic = (slug: string): Topic | null => {
+  const found = (Object.keys(TOPICS) as Topic[]).find((t) =>
+    topicToSlug(t) === slug
+  );
+  return found ?? null;
+};
+
 export type TagsByTopic = ReadonlyArray<{
   readonly topic: Topic;
   readonly tags: readonly TagInfo[];
@@ -108,7 +124,7 @@ export const groupTagsByTopic = (
   for (const tag of tags) {
     const topics = tagToTopicsIndexCI[normalize(tag.name as string)] ?? [];
     // Put into each matching topic; if none match, bucket under "Web Development" as a sensible default
-    const targets = topics.length > 0 ? topics : (["Web Development" as Topic]);
+    const targets = topics.length > 0 ? topics : ["Web Development" as Topic];
     for (const topic of targets) {
       const arr = buckets.get(topic) ?? [];
       arr.push(tag);
@@ -125,4 +141,3 @@ export const groupTagsByTopic = (
       tags: [...(buckets.get(t) ?? [])].sort((a, b) => b.count - a.count),
     }));
 };
-

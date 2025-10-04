@@ -48,7 +48,12 @@ function main() {
     .get("/posts/:slug", routes.post)
     .get("/search", routes.search)
     .get("/search-modal", routes.searchModal)
+    // RSS page and feeds
+    .get("/rss", routes.rssPage)
+    .get("/rss/topic/:topicSlug", routes.rssByTopic)
+    // Full feed (back-compat: serve both /feed.xml and /rss.xml)
     .get("/feed.xml", routes.rss)
+    .get("/rss.xml", routes.rss)
     .get("/sitemap.xml", routes.sitemap)
     .get("/robots.txt", routes.robots)
     .get("/images/og-default.png", routes.ogImageDefault)

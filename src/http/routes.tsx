@@ -4,9 +4,17 @@ import type { HealthService } from "../domain/health.ts";
 import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
-// import { TagIndex } from "../components/TagIndex.tsx";
+// // import { TagIndex } from "../components/TagIndex.tsx";
 import { TopicsIndex } from "../components/TopicsIndex.tsx";
-import { groupTagsByTopic } from "../config/topics.ts";
+import { RSSSubscription } from "../components/RSSSubscription.tsx";
+import {
+  ALL_TOPICS,
+  deriveTopicsFromTags,
+  groupTagsByTopic,
+  slugToTopic,
+  topicToSlug,
+} from "../config/topics.ts";
+import { generateTopicRssFeed } from "../rss.ts";
 import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
 import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
@@ -21,6 +29,8 @@ export type RouteHandlers = {
   readonly search: RouteHandler;
   readonly searchModal: RouteHandler;
   readonly rss: RouteHandler;
+  readonly rssPage: RouteHandler;
+  readonly rssByTopic: RouteHandler;
   readonly sitemap: RouteHandler;
   readonly robots: RouteHandler;
   readonly ogImageDefault: RouteHandler;
@@ -194,11 +204,11 @@ export const createRouteHandlers = (
 
         const listItems = posts.map((post) =>
           `<li>
-            <a href="/posts/${post.slug}" 
-               hx-get="/posts/${post.slug}" 
-               hx-target="#content-area" 
-               hx-swap="innerHTML" 
-               hx-push-url="true" 
+            <a href="/posts/${post.slug}"
+               hx-get="/posts/${post.slug}"
+               hx-target="#content-area"
+               hx-swap="innerHTML"
+               hx-push-url="true"
                class="search-result-link">
               ${post.title}
             </a>
@@ -240,14 +250,81 @@ export const createRouteHandlers = (
     });
   };
 
+  // RSS subscription page
+  const rssPage: RouteHandler = async (ctx) => {
+    const postsResult = await contentService.loadPosts();
+    return match(postsResult, {
+      ok: (posts) => {
+        const topicCounts = new Map<string, number>();
+        for (const post of posts) {
+          const topics = deriveTopicsFromTags(
+            (post.tags as readonly string[]) ?? [],
+          );
+          for (const t of topics) {
+            topicCounts.set(t, (topicCounts.get(t) ?? 0) + 1);
+          }
+        }
+        const baseUrl = `${ctx.url.protocol}//${ctx.url.host}`;
+        const list = (ALL_TOPICS as readonly string[]).map((t) => ({
+          topic: t as any,
+          feedPath: `/rss/topic/${topicToSlug(t as any)}`,
+          count: topicCounts.get(t) ?? 0,
+        }));
+        return createLayout({
+          title: "RSS Subscriptions - Blog",
+          description: "Subscribe to the full feed or topic-specific feeds",
+          path: createUrlPath(ctx.pathname),
+          children: <RSSSubscription baseUrl={baseUrl} topics={list} />,
+        });
+      },
+      error: () =>
+        createLayout({
+          title: "Error - Blog",
+          description: "Failed to load RSS data",
+          path: createUrlPath(ctx.pathname),
+          children: <div>Failed to load RSS data</div>,
+        }),
+    });
+  };
+
+  // Topic-specific RSS feed
+  const rssByTopic: RouteHandler = async (ctx) => {
+    const slug = ctx.pathname.replace("/rss/topic/", "");
+    const topic = slugToTopic(slug);
+    if (!topic) return new Response("Topic not found", { status: 404 });
+
+    const postsResult = await contentService.loadPosts();
+    return match(postsResult, {
+      ok: (posts) => {
+        const filtered = posts.filter((p) =>
+          deriveTopicsFromTags((p.tags as readonly string[]) ?? []).includes(
+            topic,
+          )
+        );
+        const baseUrl = `${ctx.url.protocol}//${ctx.url.host}`;
+        const xml = generateTopicRssFeed(
+          filtered as any,
+          String(topic),
+          baseUrl,
+          `/rss/topic/${slug}`,
+        );
+        return new Response(xml, {
+          headers: {
+            "Content-Type": "application/rss+xml; charset=utf-8",
+            "Cache-Control": "max-age=3600",
+          },
+        });
+      },
+      error: () => new Response("Failed to generate RSS", { status: 500 }),
+    });
+  };
+
   const sitemap: RouteHandler = async () => {
     const postsResult = await contentService.loadPosts();
-
     return match(postsResult, {
       ok: (posts) => {
         const baseUrl = "https://blogo.timok.deno.net";
         const sitemapContent = generateSitemap(posts, baseUrl);
-
         return new Response(sitemapContent, {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
@@ -367,6 +444,8 @@ export const createRouteHandlers = (
     search,
     searchModal,
     rss,
+    rssPage,
+    rssByTopic,
     sitemap,
     robots,
     ogImageDefault,
