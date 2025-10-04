@@ -73,10 +73,10 @@
 /* Tokens Layer - Design system foundation with fluid typography */
 @layer tokens {
   :root {
-    /* Monospace font stack following the monospace web approach */
+    /* Monospace font stack with JetBrains Mono for optimal readability */
     --font-mono:
-      ui-monospace, "SF Mono", Monaco, "Inconsolata", "Roboto Mono",
-      "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+      "JetBrains Mono", ui-monospace, "SF Mono", Monaco, "Inconsolata",
+      "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
     /* Base font size scales smoothly from 0.75rem (mobile) to 0.6rem (desktop) - reduced for density */
@@ -91,15 +91,24 @@
     --font-size-2xl: clamp(1.25rem, 1.55rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.55rem);
     --font-size-3xl: clamp(1.55rem, 1.85rem + -0.3 * (100vw - 20rem) / (80rem - 20rem), 1.85rem);
 
-    /* Line heights for optimal readability - tightened for density */
-    --line-height-tight: 1.25;
-    --line-height-base: 1.5;
-    --line-height-relaxed: 1.6;
+    /* Line heights optimized for JetBrains Mono readability */
+    --line-height-tight: 1.3;
+    --line-height-base: 1.6;
+    --line-height-relaxed: 1.75;
 
-    /* Letter spacing for monospace optimization */
-    --letter-spacing-tight: -0.025em;
-    --letter-spacing-base: 0.01em;
-    --letter-spacing-wide: 0.025em;
+    /* Letter spacing optimized for JetBrains Mono */
+    --letter-spacing-tight: -0.015em;
+    --letter-spacing-base: 0;
+    --letter-spacing-wide: 0.02em;
+
+    /* Font feature settings for JetBrains Mono */
+    --font-features-code: 'liga' 0, 'calt' 0;
+    --font-features-text: 'liga' 0, 'calt' 0;
+    --font-features-ui: normal;
+
+    /* Font rendering optimization */
+    --font-smooth: antialiased;
+    --moz-font-smooth: grayscale;
 
     /* Ultra high contrast color palette - overriding Open Props */
     --color-text: #000000;
@@ -146,6 +155,9 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: var(--font-smooth);
+  -moz-osx-font-smoothing: var(--moz-font-smooth);
+  font-feature-settings: var(--font-features-text);
   max-width: 100%;
   margin: 0 auto;
   padding: var(--size-2);
@@ -220,7 +232,7 @@ h6 {
 
 h1 {
   font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-7);
+  font-weight: 700;
 }
 
 h2 {
@@ -229,26 +241,31 @@ h2 {
   padding-block-end: var(--size-1);
   margin-block: var(--size-8) var(--size-3);
   color: var(--color-text);
+  font-weight: 700;
 }
 
 h3 {
   font-size: var(--font-size-xl);
   margin-block: var(--size-6) var(--size-2);
+  font-weight: 600;
 }
 
 h4 {
   font-size: var(--font-size-lg);
   margin-block: var(--size-4) var(--size-2);
+  font-weight: 600;
 }
 
 h5 {
   font-size: var(--font-size-md);
   margin-block: var(--size-3) var(--size-2);
+  font-weight: 500;
 }
 
 h6 {
   font-size: var(--font-size-sm);
   margin-block: var(--size-2) var(--size-1);
+  font-weight: 500;
 }
 
 /* Paragraph styling with fluid typography */
@@ -261,6 +278,16 @@ p {
   &:last-child {
     margin-block-end: 0;
   }
+}
+
+/* Text emphasis with JetBrains Mono weights */
+strong {
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* Table styling with fluid typography */
@@ -481,6 +508,7 @@ code {
   border: 2px solid var(--color-border);
   font-weight: var(--font-weight-7);
   letter-spacing: var(--letter-spacing-base);
+  font-feature-settings: var(--font-features-code);
 }
 
 pre {
@@ -494,6 +522,7 @@ pre {
   position: relative;
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-base);
+  font-feature-settings: var(--font-features-code);
 
   /* Gray scrollbar styling */
   scrollbar-width: thin;
