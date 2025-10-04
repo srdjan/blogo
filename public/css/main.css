@@ -1052,6 +1052,7 @@ article header time {
 article header .tags {
   margin-block-start: var(--size-3);
   padding-block-start: var(--size-3);
+  padding-block-end: var(--size-3);
   border-block-start: 1px solid var(--color-border);
 }
 
@@ -1148,12 +1149,28 @@ footer {
   font-family: var(--font-mono);
   border-block-start: 1px solid var(--color-border);
   padding-block: var(--size-4);
+  padding-inline: var(--size-2);
   text-align: center;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-base);
-  margin-block-start: auto;
+  margin-block-start: var(--size-5);
+  width: 100%;
+  margin-inline: auto;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & p {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 
   & a {
     border: none;
@@ -1390,39 +1407,42 @@ blockquote cite {
   }
 }
 
-/* Tag styling for .tags and .tag classes using Open Props */
+/* Tag styling - compact metadata labels with monospace aesthetic */
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--size-2);
+  gap: var(--size-1);
   margin-block: var(--size-2) 0;
   align-items: center;
 }
 
 .tag {
+  font-family: var(--font-mono);
   display: inline-flex;
   align-items: center;
-  padding: var(--size-1) var(--size-2);
-  background: var(--color-bg-subtle);
-  border-radius: var(--radius-1);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-base);
+  padding: 0.15rem 0.5rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 0.75rem;
+  border: none;
+  color: var(--color-text-subtle);
+  font-size: 0.65rem;
+  line-height: 1.4;
   text-decoration: none;
-  transition: all var(--animation-speed-fast) ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
-  font-weight: var(--font-weight-5);
+  font-weight: 400;
+  letter-spacing: 0.01em;
 
   &:hover {
-    background: var(--color-border);
-    color: var(--color-text);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-2);
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
 
   &:focus {
-    outline: 2px solid var(--color-primary);
+    outline: 1px solid var(--color-text-subtle);
     outline-offset: 2px;
   }
 }
@@ -1717,9 +1737,14 @@ article audio {
   }
 
   .tag {
-    background: #21262d;
+    background: rgba(255, 255, 255, 0.08);
     color: #8b949e;
-    border-color: var(--color-border);
+    border: none;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #c9d1d9;
+    }
   }
 
   blockquote {
@@ -1750,8 +1775,8 @@ article audio {
   }
 
   .tag {
-    border-color: #000;
-    border-width: 2px;
+    background: rgba(0, 0, 0, 0.12);
+    outline: 1px solid #000;
   }
 }
 
@@ -1799,7 +1824,8 @@ article audio {
   }
 
   .tag {
-    border: 1px solid #000;
-    background: transparent;
+    border: none;
+    background: rgba(0, 0, 0, 0.08);
+    outline: 1px solid #000;
   }
 }
