@@ -86,44 +86,44 @@
       "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
-    /* Base font size increased for improved readability - enhanced 12% larger */
+    /* Base font size increased for improved readability - enhanced 22% larger total */
     --font-size-base: clamp(
-      1.05rem,
-      1.25rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.25rem
+      1.15rem,
+      1.38rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.38rem
     );
 
     /* Typography scale using modular scale with fluid scaling - enhanced sizing */
     --font-size-xs: clamp(
-      0.9rem,
-      1.05rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.05rem
+      0.99rem,
+      1.16rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.16rem
     );
     --font-size-sm: clamp(
-      1.0rem,
-      1.18rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.18rem
+      1.1rem,
+      1.3rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.3rem
     );
     --font-size-md: var(--font-size-base);
     --font-size-lg: clamp(
-      1.35rem,
-      1.58rem + -0.2 * (100vw - 20rem) / (80rem - 20rem),
-      1.58rem
+      1.49rem,
+      1.74rem + -0.2 * (100vw - 20rem) / (80rem - 20rem),
+      1.74rem
     );
     --font-size-xl: clamp(
-      1.7rem,
-      1.98rem + -0.25 * (100vw - 20rem) / (80rem - 20rem),
-      1.98rem
+      1.87rem,
+      2.18rem + -0.25 * (100vw - 20rem) / (80rem - 20rem),
+      2.18rem
     );
     --font-size-2xl: clamp(
-      2.0rem,
-      2.4rem + -0.35 * (100vw - 20rem) / (80rem - 20rem),
-      2.4rem
+      2.2rem,
+      2.64rem + -0.35 * (100vw - 20rem) / (80rem - 20rem),
+      2.64rem
     );
     --font-size-3xl: clamp(
-      2.5rem,
-      2.9rem + -0.4 * (100vw - 20rem) / (80rem - 20rem),
-      2.9rem
+      2.75rem,
+      3.19rem + -0.4 * (100vw - 20rem) / (80rem - 20rem),
+      3.19rem
     );
 
     /* Line heights optimized for JetBrains Mono readability */
@@ -314,9 +314,9 @@ h6 {
 article header h1 {
   font-family: var(--font-serif);
   font-size: clamp(
-    2.25rem,
-    2.8rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
-    3.4rem
+    2.48rem,
+    3.08rem + 0.5 * (100vw - 20rem) / (80rem - 20rem),
+    3.74rem
   );
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -328,9 +328,9 @@ article header h1 {
 article .content h2 {
   font-family: var(--font-serif);
   font-size: clamp(
-    1.6rem,
-    1.95rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
-    2.25rem
+    1.76rem,
+    2.15rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
+    2.48rem
   );
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -355,9 +355,9 @@ article .content h2 {
 article .content h3 {
   font-family: var(--font-serif);
   font-size: clamp(
-    1.35rem,
-    1.58rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
-    1.7rem
+    1.49rem,
+    1.74rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
+    1.87rem
   );
   font-weight: 600;
   letter-spacing: -0.015em;
@@ -369,9 +369,9 @@ article .content h3 {
 article .content h4 {
   font-family: var(--font-serif);
   font-size: clamp(
-    1.18rem,
-    1.3rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
-    1.35rem
+    1.3rem,
+    1.43rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
+    1.49rem
   );
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -1408,9 +1408,9 @@ blockquote {
     margin: 0;
     color: var(--color-text);
     font-size: clamp(
-      1.05rem,
-      1.18rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
-      1.25rem
+      1.16rem,
+      1.3rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
+      1.38rem
     );
     line-height: 1.75;
     font-family: var(--font-serif);
@@ -1556,9 +1556,9 @@ article .content {
     line-height: 1.8;
     margin-block-end: var(--size-5);
     font-size: clamp(
-      1.18rem,
-      1.35rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.35rem
+      1.3rem,
+      1.49rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.49rem
     );
     /* Ensure paragraphs take full available width */
     width: 100%;
