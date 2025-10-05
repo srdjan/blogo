@@ -96,44 +96,44 @@
     --pattern-circuit: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v20M30 40v20M0 30h20M40 30h20' stroke='%23000' stroke-width='0.5' opacity='0.12'/%3E%3Ccircle cx='30' cy='30' r='3' fill='none' stroke='%23000' stroke-width='0.5' opacity='0.12'/%3E%3C/svg%3E");
 
     /* Fluid Typography Scale - Mobile First with Proportional Scaling */
-    /* Base font size increased for improved readability - enhanced 22% larger total */
+    /* Base font size increased for improved readability - enhanced 30% larger total */
     --font-size-base: clamp(
-      1.15rem,
-      1.38rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.38rem
+      1.25rem,
+      1.5rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.5rem
     );
 
     /* Typography scale using modular scale with fluid scaling - enhanced sizing */
     --font-size-xs: clamp(
-      0.99rem,
-      1.16rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.16rem
+      1.08rem,
+      1.26rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.26rem
     );
     --font-size-sm: clamp(
-      1.1rem,
-      1.3rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
-      1.3rem
+      1.2rem,
+      1.42rem + -0.15 * (100vw - 20rem) / (80rem - 20rem),
+      1.42rem
     );
     --font-size-md: var(--font-size-base);
     --font-size-lg: clamp(
-      1.49rem,
-      1.74rem + -0.2 * (100vw - 20rem) / (80rem - 20rem),
-      1.74rem
+      1.62rem,
+      1.89rem + -0.2 * (100vw - 20rem) / (80rem - 20rem),
+      1.89rem
     );
     --font-size-xl: clamp(
-      1.87rem,
-      2.18rem + -0.25 * (100vw - 20rem) / (80rem - 20rem),
-      2.18rem
+      2.04rem,
+      2.37rem + -0.25 * (100vw - 20rem) / (80rem - 20rem),
+      2.37rem
     );
     --font-size-2xl: clamp(
-      2.2rem,
-      2.64rem + -0.35 * (100vw - 20rem) / (80rem - 20rem),
-      2.64rem
+      2.39rem,
+      2.87rem + -0.35 * (100vw - 20rem) / (80rem - 20rem),
+      2.87rem
     );
     --font-size-3xl: clamp(
-      2.75rem,
-      3.19rem + -0.4 * (100vw - 20rem) / (80rem - 20rem),
-      3.19rem
+      2.99rem,
+      3.47rem + -0.4 * (100vw - 20rem) / (80rem - 20rem),
+      3.47rem
     );
 
     /* Line heights tuned for Montserrat readability */
