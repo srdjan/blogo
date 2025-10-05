@@ -224,7 +224,7 @@
   }
 
   .u-shell {
-    width: min(100%, var(--layout-max-width));
+    width: min(80vw, 72rem);
     margin-inline: auto;
     padding-inline: var(--layout-inline-padding);
   }
@@ -590,7 +590,6 @@
 /* Responsive container with fluid scaling */
 @container (min-width: 30rem) {
   body {
-    max-width: var(--page-max-width);
     padding: clamp(0.75rem, 3vw, 2rem);
   }
 }
@@ -1206,6 +1205,7 @@ article {
     margin: 0;
     padding: var(--size-4);
     container-type: inline-size;
+    text-align: left;
 
     & header {
       margin-block-end: var(--size-3);
