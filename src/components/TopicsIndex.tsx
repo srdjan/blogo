@@ -5,12 +5,12 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
 
   return (
     <>
-      <h1 class="u-text-center">Topics & Tags</h1>
+      <h1 style="text-align: center;">Topics & Tags</h1>
       {groups.length === 0 ? <p>No tags found.</p> : (
         groups.map(({ topic, tags }) => (
-          <section key={topic}>
-            <h2 class="u-text-center">{topic}</h2>
-            <ul class="tag-grid u-center-inline" aria-label={`${topic} tags`}>
+          <section class="topic-section" key={topic}>
+            <h2>{topic}</h2>
+            <ul class="tag-grid" aria-label={`${topic} tags`}>
               {tags.map((tag) => (
                 <li key={tag.name}>
                   <a
@@ -21,9 +21,8 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
                     hx-push-url="true"
                     class="tag"
                   >
-                    {tag.name}
+                    {tag.name} ({tag.count})
                   </a>
-                  <small>({tag.count})</small>
                 </li>
               ))}
             </ul>

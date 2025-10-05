@@ -17,10 +17,10 @@ export const PostList = (props: {
       {posts.length === 0 ? (
         <p>No posts found.</p>
       ) : (
-        <ul class="post-list u-flow-lg">
+        <ul class="post-list">
           {posts.map((post) => (
             <li>
-              <article>
+              <article class="post-card">
                 <h2>
                   <a
                     href={`/posts/${post.slug}`}
@@ -35,7 +35,7 @@ export const PostList = (props: {
                 {post.formattedDate && <time>{post.formattedDate}</time>}
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (
-                  <nav class="tags u-cluster u-cluster-tight u-center-inline" aria-label="Post tags">
+                  <nav class="tags" aria-label="Post tags">
                     {post.tags.map((tag, index) => (
                       <>
                         <a

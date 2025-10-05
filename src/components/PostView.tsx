@@ -8,8 +8,7 @@ export const PostView = (props: { readonly post: Post }) => {
 
   return (
     <>
-      <article>
-        <header class="post-header">
+      <article class="post-content">
           <h1>{post.title}</h1>
           {post.formattedDate && <time>{post.formattedDate}</time>}
           {/* Derived topics shown above tags for hierarchy */}
@@ -28,7 +27,7 @@ export const PostView = (props: { readonly post: Post }) => {
           })()}
 
           {post.tags && post.tags.length > 0 && (
-            <nav class="tags u-cluster u-cluster-tight u-center-inline" aria-label="Post tags">
+            <nav class="tags" aria-label="Post tags">
               {post.tags.map((tag, index) => (
                 <>
                   <a
@@ -46,12 +45,11 @@ export const PostView = (props: { readonly post: Post }) => {
               ))}
             </nav>
           )}
-        </header>
         <div class="content">
           {html(post.content)}
         </div>
       </article>
-      <nav class="u-shell u-text-center">
+      <nav style="text-align: center; margin-top: var(--space-xl);">
         <a href="/">← Back to home</a>
       </nav>
     </>
