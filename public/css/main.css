@@ -43,35 +43,41 @@
     container-type: inline-size;
   }
 
-  :where(main,
+  :where(
+    main,
     nav,
     section,
     article,
     aside,
     header,
     footer,
-    dialog) {
+    dialog
+  ) {
     display: block;
   }
 
-  :where(h1,
+  :where(
+    h1,
     h2,
     h3,
     h4,
     h5,
-    h6) {
+    h6
+  ) {
     font-family: var(--font-sans);
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-tight);
     margin-block: var(--size-5) var(--size-2);
   }
 
-  :where(h1,
+  :where(
+    h1,
     h2,
     h3,
     h4,
     h5,
-    h6):where(:first-child) {
+    h6
+  ):where(:first-child) {
     margin-block-start: 0;
   }
 
@@ -114,14 +120,19 @@
     margin-block-end: 0;
   }
 
-  :where(ul,
-    ol) {
+  :where(
+    ul,
+    ol
+  ) {
     margin-block: 0 var(--size-3);
     padding-inline-start: var(--size-6);
   }
 
-  :where(ul,
-    ol) > :where(li) {
+  :where(
+    ul,
+    ol
+  )
+    > :where(li) {
     margin-block-end: var(--size-1);
   }
 
@@ -134,8 +145,10 @@
     font-weight: 400;
   }
 
-  :where(time,
-    small) {
+  :where(
+    time,
+    small
+  ) {
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
     line-height: var(--line-height-base);
@@ -409,8 +422,8 @@
       "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
       "Noto Sans", system-ui, -apple-system, sans-serif;
 
-    /* Consistent page content width */
-    --page-max-width: 72rem;
+    /* Consistent page content width - clamped for huge screens */
+    --page-max-width: min(80vw, 72rem);
 
     /* Subtle SVG background patterns for visual interest */
     /* Dot grid pattern - technical/graph paper aesthetic */
@@ -572,13 +585,12 @@
   .layout-rss .topic-feed {
     margin-block: var(--size-4);
   }
-
 }
 
 /* Responsive container with fluid scaling */
 @container (min-width: 30rem) {
   body {
-    max-width: none;
+    max-width: var(--page-max-width);
     padding: clamp(0.75rem, 3vw, 2rem);
   }
 }
@@ -1289,6 +1301,7 @@ time {
   font-size: var(--font-size-sm);
   color: var(--color-text-metadata);
   font-weight: 500;
+
   letter-spacing: 0.01em;
   margin-block-end: var(--size-3);
   position: relative;
@@ -1310,9 +1323,17 @@ summary {
   font-size: var(--font-size-base);
   letter-spacing: var(--letter-spacing-base);
   font-style: italic;
+
   border-inline-start: 3px solid var(--color-accent-amber);
   padding-inline-start: var(--size-3);
   margin-block: var(--size-3);
+}
+
+/* Listing pages: simpler class-based hook for time alignment */
+.post-list article time {
+  display: block;
+  text-align: left;
+  margin-inline: 0;
 }
 
 /* About page styling using Open Props */

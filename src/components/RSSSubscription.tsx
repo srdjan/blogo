@@ -18,7 +18,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
 
   return (
     <div class="layout-rss">
-      <h1>RSS Subscriptions</h1>
+      <h1 class="u-text-center">RSS Subscriptions</h1>
       <p>
         RSS lets you subscribe to updates using your favorite reader (Feedly,
         Inoreader, NetNewsWire, Reeder, etc.). Copy a feed URL and add it to
@@ -26,7 +26,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
       </p>
 
       <section>
-        <h2>Main Blog Feed</h2>
+        <h2 class="u-text-center">Main Blog Feed</h2>
         <p class="feed-row u-cluster u-cluster-wide u-center-inline">
           <a
             class="feed-link"
@@ -43,7 +43,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
       </section>
 
       <section>
-        <h2>Topic Feeds</h2>
+        <h2 class="u-text-center">Topic Feeds</h2>
         {topics.map(({ topic, feedPath, count }) => {
           const url = `${baseUrl}${feedPath}`;
           return (
@@ -68,7 +68,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
       </section>
 
       <section>
-        <h2>How to use these feeds</h2>
+        <h2 class="u-text-center">How to use these feeds</h2>
         <ul>
           <li>
             Feedly / Inoreader: Paste the URL in "Add Content" or "Add
