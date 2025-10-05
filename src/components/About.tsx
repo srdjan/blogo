@@ -20,16 +20,6 @@ export const About = () => {
         <li>RSS feed</li>
         <li>SEO optimized</li>
       </ul>
-
-      <h2>Technology Stack</h2>
-      <ul>
-        <li>Deno runtime</li>
-        <li>TypeScript</li>
-        <li>mono-jsx for templating</li>
-        <li>HTMX for interactivity</li>
-        <li>Modern CSS with nesting</li>
-      </ul>
-
       <nav>
         <a href="/">← Back to home</a>
       </nav>
