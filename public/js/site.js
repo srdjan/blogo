@@ -1,6 +1,7 @@
 const Core = {
   init() {
     this.setupEventListeners();
+    this.initTheme();
 
     // Initialize home link to have correct behavior on first page load
     const homeLink = document.querySelector('a[href="/"].link');
@@ -11,6 +12,45 @@ const Core = {
 
     // Set active nav link on initial page load
     this.updateActiveNavLink();
+  },
+
+  initTheme() {
+    // Get saved theme or default to system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+    // Apply theme
+    document.documentElement.setAttribute('data-theme', theme);
+    this.updateThemeIcon(theme);
+
+    // Listen for theme toggle button clicks
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => this.toggleTheme());
+    }
+  },
+
+  toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    this.updateThemeIcon(newTheme);
+  },
+
+  updateThemeIcon(theme) {
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+
+    if (theme === 'dark') {
+      sunIcon?.style.setProperty('display', 'block');
+      moonIcon?.style.setProperty('display', 'none');
+    } else {
+      sunIcon?.style.setProperty('display', 'none');
+      moonIcon?.style.setProperty('display', 'block');
+    }
   },
 
   setupEventListeners() {

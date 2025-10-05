@@ -660,6 +660,38 @@ dialog button:hover {
 }
 
 /* ====================================
+   THEME SWITCHER
+   ==================================== */
+.theme-toggle {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+    position: absolute;
+    transition: opacity var(--transition-speed) var(--transition-easing),
+                transform var(--transition-speed) var(--transition-easing);
+}
+
+.theme-toggle .moon-icon {
+    display: block;
+}
+
+.theme-toggle .sun-icon {
+    display: none;
+}
+
+.theme-toggle:hover .sun-icon,
+.theme-toggle:hover .moon-icon {
+    transform: rotate(20deg) scale(1.1);
+}
+
+/* ====================================
    DARK MODE
    ==================================== */
 @media (prefers-color-scheme: dark) {
@@ -688,6 +720,41 @@ dialog button:hover {
         --color-link-visited: #B9A8F5;
         --color-code-bg: #252420;
     }
+}
+
+/* Manual theme override with data-theme attribute */
+[data-theme="dark"] {
+    --color-bg: #1C1B18;
+    --color-surface: #252420;
+    --color-text-primary: #E8E6E1;
+    --color-text-secondary: #C4C2BC;
+    --color-text-muted: #8A8983;
+    --color-accent: #9B8FE8;
+    --color-accent-hover: #B5ABF0;
+    --color-accent-subtle: #2D2940;
+    --color-border-light: #333229;
+    --color-border: #444339;
+    --color-border-strong: #666;
+    --color-link: #9B8FE8;
+    --color-link-visited: #B9A8F5;
+    --color-code-bg: #252420;
+}
+
+[data-theme="light"] {
+    --color-bg: #FEFDF8;
+    --color-surface: #F9F8F3;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #3a3a3a;
+    --color-text-muted: #6a6a6a;
+    --color-accent: #5B4FC6;
+    --color-accent-hover: #453AA3;
+    --color-accent-subtle: #E8E5F7;
+    --color-border-light: #E8E6DF;
+    --color-border: #D4D2C8;
+    --color-border-strong: #2a2a2a;
+    --color-link: #5B4FC6;
+    --color-link-visited: #7B6FD6;
+    --color-code-bg: #F5F4EF;
 }
 
 /* ====================================
