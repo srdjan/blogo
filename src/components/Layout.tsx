@@ -151,7 +151,7 @@ export const createLayout = (props: LayoutProps): Response => {
         <div id="app-layout">
           <header id="site-header">
             <nav class="u-shell">
-              <ul>
+              <ul class="site-nav u-cluster u-cluster-wide u-center-inline">
                 <li>
                   <a
                     href="/"
@@ -299,7 +299,7 @@ export const createLayout = (props: LayoutProps): Response => {
             </dialog>
           </header>
 
-          <main id="content-area" class="u-shell u-layout-stack u-text-center">
+          <main id="content-area" class="u-shell u-layout-stack u-text-center u-flow-lg">
             {children}
           </main>
 

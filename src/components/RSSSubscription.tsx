@@ -27,7 +27,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
 
       <section>
         <h2>Main Blog Feed</h2>
-        <p class="feed-row">
+        <p class="feed-row u-cluster u-cluster-wide u-center-inline">
           <a
             class="feed-link"
             href={mainFeed}
@@ -49,7 +49,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
           return (
             <article class="topic-feed">
               <h3>{topic}</h3>
-              <p class="feed-row">
+              <p class="feed-row u-cluster u-cluster-wide u-center-inline">
                 <a
                   class="feed-link"
                   href={url}

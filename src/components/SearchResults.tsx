@@ -15,7 +15,7 @@ export const SearchResults = (props: {
           : `Found ${posts.length} post${posts.length === 1 ? "" : "s"} for "${query}".`}
       </p>
       {posts.length > 0 && (
-        <ul>
+        <ul class="post-list u-flow-lg">
           {posts.map((post) => (
             <li>
               <article>

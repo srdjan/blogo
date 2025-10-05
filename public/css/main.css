@@ -147,7 +147,7 @@
 
 /* Utilities Layer - Layout primitives and common patterns */
 @layer utilities {
-  /* Width utilities - private API */
+  /* Width utilities */
   .u-full-width {
     width: 100% !important;
     max-width: 100% !important;
@@ -165,49 +165,85 @@
     min-inline-size: 0 !important;
   }
 
-  /* Centering utilities - replace duplicate centering patterns */
-  .u-center-content {
-    text-align: center;
-    margin-inline: auto;
-  }
-
-  .u-center-block {
-    margin-inline: auto;
-  }
-
-  .u-max-content-width {
-    max-width: var(--content-max-width);
-  }
-
-  /* Flexbox utilities - replace repeated flex patterns */
-  .u-flex-col-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .u-flex-wrap-center {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--size-2);
-  }
-
-  .u-flex-row-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--size-3);
-  }
-
   .u-shell {
     width: min(100%, var(--layout-max-width));
     margin-inline: auto;
     padding-inline: var(--layout-inline-padding);
   }
 
+  .u-center-inline {
+    margin-inline: auto;
+  }
+
   .u-text-center {
     text-align: center;
+  }
+
+  .u-center-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Flow and stack utilities */
+  .u-flow {
+    --flow-space: var(--size-4);
+  }
+
+  .u-flow > * + * {
+    margin-block-start: var(--flow-space);
+  }
+
+  .u-flow-sm {
+    --flow-space: var(--size-3);
+  }
+
+  .u-flow-lg {
+    --flow-space: var(--size-6);
+  }
+
+  .u-flow-xl {
+    --flow-space: var(--size-8);
+  }
+
+  .u-stack {
+    --stack-gap: var(--size-4);
+    --stack-align: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: var(--stack-align);
+    gap: var(--stack-gap);
+  }
+
+  .u-stack-sm {
+    --stack-gap: var(--size-3);
+  }
+
+  .u-stack-lg {
+    --stack-gap: var(--size-6);
+  }
+
+  /* Cluster utilities for horizontal groupings */
+  .u-cluster {
+    --cluster-gap: var(--size-2);
+    --cluster-justify: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: var(--cluster-justify);
+    gap: var(--cluster-gap);
+  }
+
+  .u-cluster-tight {
+    --cluster-gap: var(--size-1);
+  }
+
+  .u-cluster-wide {
+    --cluster-gap: var(--size-3);
+  }
+
+  .u-cluster-left {
+    --cluster-justify: flex-start;
   }
 
   .u-layout-stack {
@@ -215,55 +251,10 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    text-align: center;
   }
 
   .u-layout-stack > * {
     width: 100%;
-  }
-
-  .u-layout-stack > :where(ul,
-    ol) {
-    text-align: center;
-    padding-inline-start: 0;
-    list-style-position: inside;
-    width: 100%;
-  }
-
-  .u-layout-stack > :where(section) {
-    margin-block: var(--layout-block-spacing);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .u-layout-stack > :where(section) > :where(h2,
-    h3) {
-    width: 100%;
-  }
-
-  .u-layout-stack > :where(section) > .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--size-2);
-    justify-content: center;
-    align-items: center;
-  }
-
-  .u-layout-stack > nav {
-    margin-block-start: var(--layout-block-spacing);
-  }
-
-  .u-layout-stack > article {
-    width: 100%;
-  }
-
-  .u-layout-stack > article .content > :where(ul,
-    ol) {
-    display: inline-block;
-    text-align: left;
-    margin-inline: auto;
   }
 }
 
@@ -425,11 +416,7 @@
 
   /* RSS-specific components */
   .layout-rss .feed-row {
-    display: flex;
-    align-items: center;
-    gap: var(--size-3);
-    flex-wrap: wrap;
-    justify-content: center;
+    --cluster-gap: var(--size-3);
     margin-block: var(--size-2);
   }
 
@@ -513,7 +500,7 @@ h6 {
 
 /* Enhanced article heading hierarchy with Montserrat */
 /* Article header with subtle background pattern */
-article header {
+.post-header {
   position: relative;
   padding: var(--size-6) 0;
   background-image: var(--pattern-dots);
@@ -525,7 +512,7 @@ article header {
   border-radius: var(--radius-2);
 }
 
-article header h1 {
+.post-header h1 {
   /* Post title styled exactly as home page post titles (h2 > a) */
   font-family: var(--font-sans);
   font-size: var(--font-size-lg);
@@ -538,7 +525,7 @@ article header h1 {
   color: var(--color-text);
 }
 
-article .content h2 {
+.content h2 {
   margin-block: var(--size-8) var(--size-4);
   padding-block-end: var(--size-2);
   border-block-end: 2px solid var(--color-border);
@@ -556,12 +543,12 @@ article .content h2 {
   }
 }
 
-article .content h3 {
+.content h3 {
   margin-block: var(--size-7) var(--size-3);
   color: var(--color-text);
 }
 
-article .content h4 {
+.content h4 {
   margin-block: var(--size-6) var(--size-3);
 }
 
@@ -706,23 +693,31 @@ ul[role="list"] {
 }
 
 /* Tag index grid (used on /tags page) */
-section ul[role="list"] {
+.tag-grid {
   margin-block: var(--size-8);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
   gap: var(--size-3);
   justify-content: start;
 
-  & li {
+  & > li {
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: var(--size-1);
     min-width: 150px;
     border-radius: var(--radius-2);
 
-    & small {
+    & > a {
+      flex: 1;
+    }
+
+    & > small {
       color: var(--color-text-muted);
       font-weight: var(--font-weight-5);
       opacity: 0.8;
       transition: opacity var(--animation-speed-fast) ease;
+      white-space: nowrap;
     }
   }
 
@@ -730,7 +725,7 @@ section ul[role="list"] {
     grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
     gap: var(--size-4);
 
-    & li {
+    & > li {
       padding: var(--size-2) var(--size-3);
       min-width: 180px;
     }
@@ -753,14 +748,14 @@ code {
   font-feature-settings: var(--font-features-code);
 }
 
-/* Ensure code within article content stays monospace */
-article .content code,
-article .content pre {
+/* Ensure code within post content stays monospace */
+.content code,
+.content pre {
   font-family: var(--font-mono) !important;
   font-optical-sizing: auto;
 }
 
-article .content pre code {
+.content pre code {
   border: none;
   padding: 0;
   background: transparent;
@@ -964,18 +959,6 @@ nav {
   font-family: var(--font-mono);
   margin-block-end: var(--layout-block-spacing);
 
-  & ul {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: clamp(0.5rem, 2vw, 2rem);
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-  }
-
   & a,
   & button {
     font-family: var(--font-mono);
@@ -1024,6 +1007,14 @@ nav {
   }
 }
 
+.site-nav {
+  --cluster-gap: clamp(0.5rem, 2vw, 2rem);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
 /* Articles using Open Props */
 article {
   margin-block-end: var(--size-6);
@@ -1042,68 +1033,68 @@ article {
 
 /* Components Layer - Semantic components with proper API */
 @layer components {
-  /* Blog post list component - targets main#content-area direct children */
-  main#content-area > ul {
+  /* Blog post list component */
+  .post-list {
     list-style: none;
     padding: 0;
     margin: 0;
     width: 100%;
     container-type: inline-size;
     container-name: post-list;
+  }
 
-    & > li {
-      width: 100%;
-      margin-block-end: var(--size-6);
+  .post-list > li {
+    width: 100%;
+  }
 
-      &:last-child {
-        margin-block-end: 0;
-      }
+  .post-list > li > article {
+    width: 100%;
+    margin: 0;
+    padding: var(--size-4);
+    container-type: inline-size;
 
-      & > article {
-        width: 100%;
-        margin: 0;
-        padding: var(--size-4);
-        container-type: inline-size;
+    & header {
+      margin-block-end: var(--size-3);
 
-        & header {
-          margin-block-end: var(--size-3);
+      & h2 {
+        margin: 0 0 var(--size-2);
+        border: none;
+        padding: 0;
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-tight);
+        letter-spacing: var(--letter-spacing-tight);
 
-          & h2 {
-            margin: 0 0 var(--size-2);
-            border: none;
-            padding: 0;
-            font-size: var(--font-size-lg);
-            line-height: var(--line-height-tight);
-            letter-spacing: var(--letter-spacing-tight);
+        & a {
+          color: var(--color-text);
+          display: inline;
 
-            & a {
-              color: var(--color-text);
-              display: inline;
-
-              &:focus {
-                outline: 2px solid var(--color-primary);
-                outline-offset: 2px;
-              }
-            }
+          &:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
           }
         }
-
-        & p, & div, & span, & li, & ul, & ol {
-          font-size: var(--font-size-base);
-          line-height: var(--line-height-relaxed);
-          letter-spacing: var(--letter-spacing-base);
-        }
-
-        & > time {
-          display: block;
-          text-align: left;
-          margin-inline: 0;
-        }
-
-        @container (min-width: 30rem) {
-          padding: clamp(0.75rem, 3vw, 1.5rem);
-        }
       }
+    }
+
+    & p,
+    & div,
+    & span,
+    & li,
+    & ul,
+    & ol {
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-relaxed);
+      letter-spacing: var(--letter-spacing-base);
+    }
+
+    & > time {
+      display: block;
+      text-align: left;
+      margin-inline: 0;
+    }
+
+    @container (min-width: 30rem) {
+      padding: clamp(0.75rem, 3vw, 1.5rem);
     }
   }
 
@@ -1135,9 +1126,9 @@ article {
 /* Overrides Layer - Final escape hatch for consumers */
 @layer overrides {
   /* Typography consistency - removed !important, using cascade layers properly */
-  article ul,
-  article ol,
-  article li {
+  .content ul,
+  .content ol,
+  .content li {
     font-size: var(--font-size-base);
     line-height: var(--line-height-relaxed);
     letter-spacing: var(--letter-spacing-base);
@@ -1149,8 +1140,8 @@ time {
   color: var(--color-primary);
 }
 
-/* Enhanced time element styling in article headers */
-article header time {
+/* Enhanced time element styling in post headers */
+.post-header time {
   display: inline-block;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
@@ -1535,12 +1526,8 @@ blockquote cite {
 
 /* Tag styling - compact metadata labels with monospace aesthetic */
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--size-1);
+  --cluster-gap: var(--size-1);
   margin-block: var(--size-2) 0;
-  align-items: center;
-  justify-content: center; /* center tag chips on their line */
 }
 
 .tag {
@@ -1619,7 +1606,7 @@ blockquote cite {
 /* ===== Section: Article content (serif body) ===== */
 
 /* Article content uses Montserrat for enhanced readability */
-article .content {
+.content {
   --heading-1: var(--heading-prose-1);
   --heading-2: var(--heading-prose-2);
   --heading-3: var(--heading-prose-3);
@@ -1671,7 +1658,7 @@ article .content {
 }
 
 /* Drop caps for article opening - elegant visual anchor */
-article .content > p:first-of-type::first-letter {
+.content > p:first-of-type::first-letter {
   float: left;
   font-family: var(--font-sans);
   font-size: 4.2em;
@@ -1729,7 +1716,7 @@ article .content > p:first-of-type::first-letter {
 }
 
 /* Image styling for articles using Open Props */
-article img {
+.content img {
   max-width: 100%;
   height: auto;
   display: block;
@@ -1745,7 +1732,7 @@ article img {
 }
 
 /* Audio elements and captions using Open Props */
-article audio {
+.content audio {
   display: block;
   margin: var(--size-6) auto;
   max-width: 100%;
@@ -1832,11 +1819,9 @@ article audio {
     border-block-start-color: var(--color-border-strong);
   }
 
-  @scope (ul[role="list"]) {
-    :scope li {
-      background: #21262d;
-      color: #8b949e;
-    }
+  .tag-grid > li {
+    background: #21262d;
+    color: #8b949e;
   }
 
   @scope (section) {
