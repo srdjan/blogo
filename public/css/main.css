@@ -9,40 +9,139 @@
 
 /* Reset Layer - Fundamental browser normalization */
 @layer reset {
-  /* Enhanced list reset for layout control */
-  ul,
-  ol {
-    /* Remove any browser inconsistencies */
-    margin-block: 0;
-    margin-inline: 0;
-    padding-block: 0;
-    padding-inline: 0;
-
-    /* Ensure lists can be full-width containers */
-    width: auto;
-    max-width: none;
-    min-width: 0;
-
-    /* Block-level behavior for layout */
-    display: block;
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
   }
 
-  li {
-    /* Reset list item constraints */
-    margin-block: 0;
-    margin-inline: 0;
-    padding-block: 0;
-    padding-inline: 0;
+  :where(html) {
+    block-size: 100%;
+  }
 
-    /* Full width potential */
-    width: auto;
-    max-width: none;
-    min-width: 0;
+  :where(body) {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: var(--letter-spacing-base);
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: var(--font-smooth);
+    -moz-osx-font-smoothing: var(--moz-font-smooth);
+    font-feature-settings: var(--font-features-serif);
+    font-optical-sizing: var(--font-optical-sizing);
+    max-width: 100%;
+    margin: 0 auto;
+    padding: var(--size-2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
 
-    /* Block-level for full width */
+  :where(main,
+    nav,
+    section,
+    article,
+    aside,
+    header,
+    footer,
+    dialog) {
     display: block;
-    box-sizing: border-box;
+  }
+
+  :where(h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6) {
+    font-family: var(--font-sans);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    margin-block: var(--size-5) var(--size-2);
+  }
+
+  :where(h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6):where(:first-child) {
+    margin-block-start: 0;
+  }
+
+  :where(h1) {
+    font-size: var(--heading-1);
+  }
+
+  :where(h2) {
+    font-size: var(--heading-2);
+  }
+
+  :where(h3) {
+    font-size: var(--heading-3);
+    font-weight: var(--font-weight-6);
+  }
+
+  :where(h4) {
+    font-size: var(--heading-4);
+    font-weight: var(--font-weight-6);
+  }
+
+  :where(h5) {
+    font-size: var(--heading-5);
+    font-weight: var(--font-weight-5);
+  }
+
+  :where(h6) {
+    font-size: var(--heading-6);
+    font-weight: var(--font-weight-5);
+  }
+
+  :where(p) {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: var(--letter-spacing-base);
+    margin-block-end: var(--size-4);
+  }
+
+  :where(p:last-child) {
+    margin-block-end: 0;
+  }
+
+  :where(ul,
+    ol) {
+    margin-block: 0 var(--size-3);
+    padding-inline-start: var(--size-6);
+  }
+
+  :where(ul,
+    ol) > :where(li) {
+    margin-block-end: var(--size-1);
+  }
+
+  :where(strong) {
+    font-weight: 600;
+  }
+
+  :where(em) {
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  :where(time,
+    small) {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing-base);
+    display: block;
+    margin-block: var(--size-2);
   }
 }
 
@@ -99,6 +198,72 @@
     align-items: center;
     justify-content: center;
     gap: var(--size-3);
+  }
+
+  .u-shell {
+    width: min(100%, var(--layout-max-width));
+    margin-inline: auto;
+    padding-inline: var(--layout-inline-padding);
+  }
+
+  .u-text-center {
+    text-align: center;
+  }
+
+  .u-layout-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .u-layout-stack > * {
+    width: 100%;
+  }
+
+  .u-layout-stack > :where(ul,
+    ol) {
+    text-align: center;
+    padding-inline-start: 0;
+    list-style-position: inside;
+    width: 100%;
+  }
+
+  .u-layout-stack > :where(section) {
+    margin-block: var(--layout-block-spacing);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .u-layout-stack > :where(section) > :where(h2,
+    h3) {
+    width: 100%;
+  }
+
+  .u-layout-stack > :where(section) > .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-2);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .u-layout-stack > nav {
+    margin-block-start: var(--layout-block-spacing);
+  }
+
+  .u-layout-stack > article {
+    width: 100%;
+  }
+
+  .u-layout-stack > article .content > :where(ul,
+    ol) {
+    display: inline-block;
+    text-align: left;
+    margin-inline: auto;
   }
 }
 
@@ -170,6 +335,34 @@
       3.47rem
     );
 
+    /* Heading scale indirection so contexts can adjust typography via CSS variables */
+    --heading-1: var(--font-size-3xl);
+    --heading-2: var(--font-size-2xl);
+    --heading-3: var(--font-size-xl);
+    --heading-4: var(--font-size-lg);
+    --heading-5: var(--font-size-md);
+    --heading-6: var(--font-size-sm);
+
+    /* Prose-specific heading scale mirrors previous article styles */
+    --heading-prose-1: var(--font-size-2xl);
+    --heading-prose-2: clamp(
+      1.76rem,
+      2.15rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
+      2.48rem
+    );
+    --heading-prose-3: clamp(
+      1.49rem,
+      1.74rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
+      1.87rem
+    );
+    --heading-prose-4: clamp(
+      1.3rem,
+      1.43rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
+      1.49rem
+    );
+    --heading-prose-5: var(--font-size-md);
+    --heading-prose-6: var(--font-size-sm);
+
     /* Line heights tuned for Montserrat readability */
     --line-height-tight: 1.3;
     --line-height-base: 1.6;
@@ -220,38 +413,6 @@
   }
 }
 
-/* Basic reset with Open Props normalization */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-/* Body and layout with fluid typography - Montserrat for readability */
-body {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
-  letter-spacing: var(--letter-spacing-base);
-  color: var(--color-text);
-  background: var(--color-bg);
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: var(--font-smooth);
-  -moz-osx-font-smoothing: var(--moz-font-smooth);
-  font-feature-settings: var(--font-features-serif);
-  font-optical-sizing: var(--font-optical-sizing);
-  max-width: 100%;
-  margin: 0 auto;
-  padding: var(--size-2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  container-type: inline-size;
-}
-
 /* Layout Layer - Unified page layout system */
 @layer layout {
   /* Layout spacing tokens */
@@ -261,84 +422,6 @@ body {
     --layout-max-width: var(--page-max-width);
     --content-max-width: 100%;
   }
-
-  /* Base layout for nav, footer - consistent width constraints and centering */
-  nav, footer {
-    width: 100%;
-    max-width: var(--layout-max-width);
-    margin-inline: auto;
-    padding-inline: var(--layout-inline-padding);
-    text-align: center;
-  }
-
-  /* Unified main content area - single semantic main element */
-  main#content-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: var(--layout-max-width);
-    margin-inline: auto;
-    padding-inline: var(--layout-inline-padding);
-    text-align: center;
-
-  /* All direct children inherit centering and take full width */
-  & > * {
-    width: 100%;
-  }
-
-  /* Regular lists (not in articles) should be centered */
-  & > ul,
-  & > ol {
-    text-align: center;
-    padding-inline-start: 0;
-    list-style-position: inside;
-    width: 100%;
-  }
-
-  /* Articles - inherit centering from parent */
-  & > article {
-    width: 100%;
-
-    /* Lists in article content need left alignment */
-    & .content > ul,
-    & .content > ol {
-      display: inline-block;
-      text-align: left;
-      margin-inline: auto;
-    }
-  }
-
-  /* Sections - inherit centering, add vertical spacing */
-  & > section {
-    margin-block: var(--layout-block-spacing);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    /* Ensure section headings are centered */
-    & > h2,
-    & > h3 {
-      width: 100%;
-      text-align: center;
-    }
-
-    /* Tags wrapper uses flexbox centering */
-    & > .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--size-2);
-      justify-content: center;
-      align-items: center;
-    }
-  }
-
-  /* Navigation links - add top spacing */
-  & > nav {
-    margin-block-start: var(--layout-block-spacing);
-  }
-}
 
   /* RSS-specific components */
   .layout-rss .feed-row {
@@ -354,34 +437,6 @@ body {
     margin-block: var(--size-4);
   }
 
-  /* Progressive width reduction for larger screens */
-  @media (min-width: 48rem) {
-    nav, main, footer {
-      width: 100%;
-      max-width: var(--layout-max-width);
-    }
-  }
-
-  @media (min-width: 64rem) {
-    nav, main, footer {
-      width: 100%;
-      max-width: var(--layout-max-width);
-    }
-  }
-
-  @media (min-width: 75rem) {
-    nav, main, footer {
-      width: 100%;
-      max-width: var(--layout-max-width);
-    }
-  }
-
-  @media (min-width: 90rem) {
-    nav, main, footer {
-      width: 100%;
-      max-width: var(--layout-max-width);
-    }
-  }
 }
 
 /* Responsive container with fluid scaling - expanded max-width for density */
@@ -484,15 +539,6 @@ article header h1 {
 }
 
 article .content h2 {
-  font-family: var(--font-sans);
-  font-size: clamp(
-    1.76rem,
-    2.15rem + 0.35 * (100vw - 20rem) / (80rem - 20rem),
-    2.48rem
-  );
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.3;
   margin-block: var(--size-8) var(--size-4);
   padding-block-end: var(--size-2);
   border-block-end: 2px solid var(--color-border);
@@ -511,58 +557,12 @@ article .content h2 {
 }
 
 article .content h3 {
-  font-family: var(--font-sans);
-  font-size: clamp(
-    1.49rem,
-    1.74rem + 0.2 * (100vw - 20rem) / (80rem - 20rem),
-    1.87rem
-  );
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.35;
   margin-block: var(--size-7) var(--size-3);
   color: var(--color-text);
 }
 
 article .content h4 {
-  font-family: var(--font-sans);
-  font-size: clamp(
-    1.3rem,
-    1.43rem + 0.1 * (100vw - 20rem) / (80rem - 20rem),
-    1.49rem
-  );
-  font-weight: 600;
-  letter-spacing: -0.01em;
   margin-block: var(--size-6) var(--size-3);
-}
-
-article .content h5,
-article .content h6 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-/* Paragraph styling with fluid typography */
-p {
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
-  letter-spacing: var(--letter-spacing-base);
-  margin-block-end: var(--size-4);
-
-  &:last-child {
-    margin-block-end: 0;
-  }
-}
-
-/* Text emphasis with Montserrat weights */
-strong {
-  font-weight: 600;
-}
-
-em {
-  font-style: italic;
-  font-weight: 400;
 }
 
 /* Table styling with fluid typography */
@@ -665,17 +665,6 @@ a {
   &:focus {
     outline: 3px solid var(--color-primary);
     outline-offset: 2px;
-  }
-}
-
-/* Lists using Open Props spacing */
-ul,
-ol {
-  padding-inline-start: var(--size-6);
-  margin-block-end: var(--size-3);
-
-  & li {
-    margin-block-end: var(--size-1);
   }
 }
 
@@ -1155,18 +1144,6 @@ article {
   }
 }
 
-/* Time and semantic elements with fluid typography */
-time,
-small {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-base);
-  letter-spacing: var(--letter-spacing-base);
-  display: block;
-  margin-block-start: var(--size-2);
-  margin-block-end: var(--size-2);
-}
-
 time {
   font-weight: var(--font-weight-5);
   color: var(--color-primary);
@@ -1296,9 +1273,6 @@ footer {
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-base);
   margin-block-start: var(--size-5);
-  width: 100%;
-  margin-inline: auto;
-  max-width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1646,6 +1620,12 @@ blockquote cite {
 
 /* Article content uses Montserrat for enhanced readability */
 article .content {
+  --heading-1: var(--heading-prose-1);
+  --heading-2: var(--heading-prose-2);
+  --heading-3: var(--heading-prose-3);
+  --heading-4: var(--heading-prose-4);
+  --heading-5: var(--heading-prose-5);
+  --heading-6: var(--heading-prose-6);
   font-family: var(--font-sans);
   font-optical-sizing: var(--font-optical-sizing);
   font-feature-settings: var(--font-features-serif);

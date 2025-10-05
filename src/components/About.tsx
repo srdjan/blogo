@@ -20,7 +20,7 @@ export const About = () => {
         <li>RSS feed</li>
         <li>SEO optimized</li>
       </ul>
-      <nav>
+      <nav class="u-shell u-text-center">
         <a href="/">← Back to home</a>
       </nav>
     </>

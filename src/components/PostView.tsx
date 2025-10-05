@@ -51,7 +51,7 @@ export const PostView = (props: { readonly post: Post }) => {
           {html(post.content)}
         </div>
       </article>
-      <nav>
+      <nav class="u-shell u-text-center">
         <a href="/">← Back to home</a>
       </nav>
     </>
