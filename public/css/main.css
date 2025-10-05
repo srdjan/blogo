@@ -46,9 +46,9 @@
   }
 }
 
-/* Utilities Layer - Layout primitives */
+/* Utilities Layer - Layout primitives and common patterns */
 @layer utilities {
-  /* Full width utility - private API */
+  /* Width utilities - private API */
   .u-full-width {
     width: 100% !important;
     max-width: 100% !important;
@@ -57,7 +57,6 @@
     box-sizing: border-box !important;
   }
 
-  /* Width reset utility - private API */
   .u-width-reset {
     width: auto !important;
     max-width: none !important;
@@ -65,6 +64,41 @@
     inline-size: auto !important;
     max-inline-size: none !important;
     min-inline-size: 0 !important;
+  }
+
+  /* Centering utilities - replace duplicate centering patterns */
+  .u-center-content {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .u-center-block {
+    margin-inline: auto;
+  }
+
+  .u-max-content-width {
+    max-width: var(--content-max-width);
+  }
+
+  /* Flexbox utilities - replace repeated flex patterns */
+  .u-flex-col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .u-flex-wrap-center {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--size-2);
+  }
+
+  .u-flex-row-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-3);
   }
 }
 
@@ -263,150 +297,52 @@ body {
     padding-inline: var(--layout-inline-padding);
     text-align: center;
 
-  /* All direct children centered */
+  /* All direct children inherit centering and take full width */
   & > * {
-    text-align: center;
-    margin-inline: auto;
     width: 100%;
   }
 
-  /* Headings */
-  & > h1,
-  & > h2 {
-    text-align: center;
-    margin-inline: auto;
-    width: 100%;
-  }
-
-  /* Paragraphs */
-  & > p {
-    text-align: center;
-    margin-inline: auto;
-    width: 100%;
-  }
-
-  /* Lists - full width */
-  & > ul,
-  & > ol {
-    margin-inline: auto;
-    text-align: center;
-    width: 100%;
-  }
-
-  /* Articles - centered content */
+  /* Articles - inherit centering from parent */
   & > article {
     width: 100%;
-    max-width: 100%;
-    text-align: center;
-    margin-inline: auto;
 
-    /* Article content centered */
-    & > header {
-      text-align: center;
-      margin-inline: auto;
-    }
-
-    & .content {
-      text-align: center;
-      margin-inline: auto;
-      width: 100%;
-
-      /* Content paragraphs */
-      & > p {
-        text-align: center;
-        margin-inline: auto;
-        width: 100%;
-      }
-
-      /* Content headings centered */
-      & > h2,
-      & > h3,
-      & > h4,
-      & > h5,
-      & > h6 {
-        text-align: center;
-        margin-inline: auto;
-        width: 100%;
-      }
-
-      /* Lists in content */
-      & > ul,
-      & > ol {
-        margin-inline: auto;
-        display: inline-block;
-        text-align: left;
-        width: 100%;
-      }
-
-      /* Blockquotes */
-      & > blockquote {
-        margin-inline: auto;
-        width: 100%;
-      }
-
-      /* Code blocks */
-      & > pre {
-        margin-inline: auto;
-        width: 100%;
-      }
+    /* Lists in article content need left alignment */
+    & .content > ul,
+    & .content > ol {
+      display: inline-block;
+      text-align: left;
     }
   }
 
-  /* Sections - centered */
+  /* Sections - inherit centering, add vertical spacing */
   & > section {
-    margin-inline: auto;
-    text-align: center;
     margin-block: var(--layout-block-spacing);
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 
-    & > h2,
-    & > h3 {
-      text-align: center;
-      margin-inline: auto;
-      width: 100%;
-    }
-
-    & > p {
-      text-align: center;
-      margin-inline: auto;
-      width: 100%;
-    }
-
-    & > ul,
-    & > ol {
-      margin-inline: auto;
-      text-align: center;
-    }
-
+    /* Tags wrapper uses flexbox centering */
     & > .tags {
       display: flex;
       flex-wrap: wrap;
       gap: var(--size-2);
       justify-content: center;
       align-items: center;
-      margin-inline: auto;
     }
   }
 
-  /* Navigation links */
+  /* Navigation links - add top spacing */
   & > nav {
-    text-align: center;
     margin-block-start: var(--layout-block-spacing);
-    margin-inline: auto;
   }
 }
 
-  /* RSS-specific feed rows */
+  /* RSS-specific components */
   main.layout-rss .feed-row {
     display: flex;
     align-items: center;
     gap: var(--size-3);
     flex-wrap: wrap;
-    margin-block: var(--size-2);
     justify-content: center;
+    margin-block: var(--size-2);
   }
 
   main.layout-rss .topic-feed {
