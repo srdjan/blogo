@@ -4,7 +4,7 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
   const { groups } = props;
 
   return (
-    <main>
+    <>
       <h1>Topics & Tags</h1>
       {groups.length === 0 ? (
         <p>No tags found.</p>
@@ -12,7 +12,7 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
         groups.map(({ topic, tags }) => (
           <section>
             <h2>{topic}</h2>
-            <div class="tags">
+            <nav class="tags" aria-label={`${topic} tags`}>
               {tags.map((tag, index) => (
                 <>
                   <a
@@ -28,11 +28,11 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
                   {index < tags.length - 1 && " "}
                 </>
               ))}
-            </div>
+            </nav>
           </section>
         ))
       )}
-    </main>
+    </>
   );
 };
 

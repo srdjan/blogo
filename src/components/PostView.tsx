@@ -7,7 +7,7 @@ export const PostView = (props: { readonly post: Post }) => {
   const { post } = props;
 
   return (
-    <main>
+    <>
       <article>
         <header>
           <h1>{post.title}</h1>
@@ -28,7 +28,7 @@ export const PostView = (props: { readonly post: Post }) => {
           })()}
 
           {post.tags && post.tags.length > 0 && (
-            <div class="tags">
+            <nav class="tags" aria-label="Post tags">
               {post.tags.map((tag, index) => (
                 <>
                   <a
@@ -44,7 +44,7 @@ export const PostView = (props: { readonly post: Post }) => {
                   {index < (post.tags?.length ?? 0) - 1 && " "}
                 </>
               ))}
-            </div>
+            </nav>
           )}
         </header>
         <div class="content">
@@ -54,6 +54,6 @@ export const PostView = (props: { readonly post: Post }) => {
       <nav>
         <a href="/">← Back to home</a>
       </nav>
-    </main>
+    </>
   );
 };

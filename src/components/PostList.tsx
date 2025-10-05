@@ -1,13 +1,13 @@
 import type { Post, TagName } from "../lib/types.ts";
 
-export const PostList = (props: { 
-  readonly posts: readonly Post[]; 
+export const PostList = (props: {
+  readonly posts: readonly Post[];
   readonly activeTag?: TagName;
 }) => {
   const { posts, activeTag } = props;
 
   return (
-    <main>
+    <>
       {activeTag && (
         <p>
           Posts tagged with <strong>{activeTag}</strong> -{" "}
@@ -35,7 +35,7 @@ export const PostList = (props: {
                 {post.formattedDate && <time>{post.formattedDate}</time>}
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (
-                  <div class="tags">
+                  <nav class="tags" aria-label="Post tags">
                     {post.tags.map((tag, index) => (
                       <>
                         <a
@@ -51,13 +51,13 @@ export const PostList = (props: {
                         {index < (post.tags?.length ?? 0) - 1 && " "}
                       </>
                     ))}
-                  </div>
+                  </nav>
                 )}
               </article>
             </li>
           ))}
         </ul>
       )}
-    </main>
+    </>
   );
 };

@@ -271,34 +271,28 @@ body {
     text-align: center;
   }
 
-  /* Outer main container (#content-main) - no padding, just container */
-  main#content-main {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-    margin: 0;
-  }
-
-  /* Content area wrapper */
-  #content-area {
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  /* Inner main element (from components) - unified content layout */
-  #content-area > main {
+  /* Unified main content area - single semantic main element */
+  main#content-area {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     max-width: var(--layout-max-width);
+    margin-inline: auto;
     padding-inline: var(--layout-inline-padding);
     text-align: center;
 
   /* All direct children inherit centering and take full width */
   & > * {
+    width: 100%;
+  }
+
+  /* Regular lists (not in articles) should be centered */
+  & > ul,
+  & > ol {
+    text-align: center;
+    padding-inline-start: 0;
+    list-style-position: inside;
     width: 100%;
   }
 
@@ -311,6 +305,7 @@ body {
     & .content > ol {
       display: inline-block;
       text-align: left;
+      margin-inline: auto;
     }
   }
 
@@ -318,6 +313,16 @@ body {
   & > section {
     margin-block: var(--layout-block-spacing);
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* Ensure section headings are centered */
+    & > h2,
+    & > h3 {
+      width: 100%;
+      text-align: center;
+    }
 
     /* Tags wrapper uses flexbox centering */
     & > .tags {
@@ -336,7 +341,7 @@ body {
 }
 
   /* RSS-specific components */
-  main.layout-rss .feed-row {
+  .layout-rss .feed-row {
     display: flex;
     align-items: center;
     gap: var(--size-3);
@@ -345,7 +350,7 @@ body {
     margin-block: var(--size-2);
   }
 
-  main.layout-rss .topic-feed {
+  .layout-rss .topic-feed {
     margin-block: var(--size-4);
   }
 
@@ -674,96 +679,71 @@ ol {
   }
 }
 
-/* Tag lists using @scope */
-@scope (ul[role="list"]) {
-  :scope {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--size-2);
-    justify-content: flex-start;
-    margin-block: var(--size-2) 0;
+/* Tag components - consolidated from 3 @scope blocks */
+/* Inline tag list (used in post cards) */
+ul[role="list"] {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-2);
+  justify-content: flex-start;
+  margin-block: var(--size-2) 0;
 
-    & li {
-      margin: 0;
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      padding: var(--size-1) var(--size-2);
-      background: var(--color-bg-subtle);
-      border-radius: var(--radius-1);
-      border: 1px solid var(--color-border);
-      color: var(--color-text-muted);
-      font-size: var(--font-size-xs);
-      line-height: var(--line-height-base);
-      transition: all var(--animation-speed-fast) ease;
-      white-space: nowrap;
-      block-size: auto;
-      min-block-size: auto;
+  & li {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: var(--size-1) var(--size-2);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-1);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-base);
+    transition: all var(--animation-speed-fast) ease;
+    white-space: nowrap;
 
-      & a {
-        color: inherit;
-        text-decoration: none;
-        display: inline-block;
-        padding: 0;
-        width: 100%;
-        text-align: center;
-        min-block-size: auto;
-      }
+    & a {
+      color: inherit;
+      text-decoration: none;
+      display: inline-block;
+      padding: 0;
+      width: 100%;
+      text-align: center;
     }
   }
 }
 
-/* Tag index page using @scope */
-@scope (section) {
-  ul[role="list"] {
-    list-style: none;
-    padding: 0;
-    margin-block: var(--size-8);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
-    gap: var(--size-3);
-    justify-content: start;
+/* Tag index grid (used on /tags page) */
+section ul[role="list"] {
+  margin-block: var(--size-8);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+  gap: var(--size-3);
+  justify-content: start;
+
+  & li {
+    justify-content: space-between;
+    min-width: 150px;
+    border-radius: var(--radius-2);
+
+    & small {
+      color: var(--color-text-muted);
+      font-weight: var(--font-weight-5);
+      opacity: 0.8;
+      transition: opacity var(--animation-speed-fast) ease;
+    }
+  }
+
+  @container (min-width: 48rem) {
+    grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
+    gap: var(--size-4);
 
     & li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: fit-content;
-      min-width: 150px;
-      padding: var(--size-1) var(--size-2);
-      background: var(--color-bg-subtle);
-      border-radius: var(--radius-2);
-      border: 1px solid var(--color-border);
-      transition: all var(--animation-speed-fast) ease;
-      white-space: nowrap;
-      block-size: auto;
-      min-block-size: auto;
-
-      & a {
-        min-block-size: auto;
-        block-size: auto;
-      }
-
-      & small {
-        color: var(--color-text-muted);
-        font-weight: var(--font-weight-5);
-        opacity: 0.8;
-        transition: opacity var(--animation-speed-fast) ease;
-      }
-    }
-
-    @container (min-width: 48rem) {
-      grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
-      gap: var(--size-4);
-
-      /* ===== Section: Code, inline code, and preformatted blocks (monospace) ===== */
-
-      & li {
-        padding: var(--size-2) var(--size-3);
-        min-width: 180px;
-      }
+      padding: var(--size-2) var(--size-3);
+      min-width: 180px;
     }
   }
 }
@@ -1073,109 +1053,67 @@ article {
 
 /* Components Layer - Semantic components with proper API */
 @layer components {
-  /* Blog post list component - public API */
-  @scope (main) {
-    :scope > ul {
-      /* Complete list reset */
-      list-style: none;
-      padding: 0;
-      margin: 0;
+  /* Blog post list component - targets main#content-area direct children */
+  main#content-area > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    container-type: inline-size;
+    container-name: post-list;
 
-      /* Full width container with containment */
+    & > li {
       width: 100%;
-      max-width: 100%;
-      inline-size: 100%;
-      max-inline-size: 100%;
-      display: block;
-
-      /* Enable container queries for responsive behavior */
-      container-type: inline-size;
-      container-name: post-list;
-
-      /* Prevent any width constraints from parent */
-      box-sizing: border-box;
-      contain: layout style;
-    }
-
-    :scope > ul > li {
-      /* Explicit full width with containment */
-      width: 100%;
-      max-width: 100%;
-      inline-size: 100%;
-      max-inline-size: 100%;
-      box-sizing: border-box;
-
-      /* Block-level for full width behavior */
-      display: block;
-      margin: 0;
-      padding: 0;
-
-      /* Vertical spacing between posts */
       margin-block-end: var(--size-6);
-
-      /* Prevent shrinking and ensure proper flow */
-      min-inline-size: 0;
-      flex: none;
-
-      /* Layout containment for performance */
-      contain: layout;
 
       &:last-child {
         margin-block-end: 0;
       }
-    }
-  }
 
-  /* Blog post article component within list items */
-  @scope (main > ul > li) {
-    :scope > article {
-      /* Full width article within li container */
-      width: 100%;
-      max-width: 100%;
-      inline-size: 100%;
-      max-inline-size: 100%;
-      box-sizing: border-box;
+      & > article {
+        width: 100%;
+        margin: 0;
+        padding: var(--size-4);
+        container-type: inline-size;
 
-      /* Reset any inherited margins that could cause width issues */
-      margin: 0;
-      padding: var(--size-4);
+        & header {
+          margin-block-end: var(--size-3);
 
-      /* Enable responsive behavior via container queries */
-      container-type: inline-size;
-      contain: layout style;
+          & h2 {
+            margin: 0 0 var(--size-2);
+            border: none;
+            padding: 0;
+            font-size: var(--font-size-lg);
+            line-height: var(--line-height-tight);
+            letter-spacing: var(--letter-spacing-tight);
 
-      & header {
-        margin-block-end: var(--size-3);
+            & a {
+              color: var(--color-text);
+              display: inline;
 
-        & h2 {
-          margin: 0 0 var(--size-2);
-          border: none;
-          padding: 0;
-          font-size: var(--font-size-lg);
-          line-height: var(--line-height-tight);
-          letter-spacing: var(--letter-spacing-tight);
-
-          & a {
-            color: var(--color-text);
-            min-block-size: auto;
-            display: inline;
-
-            &:focus {
-              outline: 2px solid var(--color-primary);
-              outline-offset: 2px;
+              &:focus {
+                outline: 2px solid var(--color-primary);
+                outline-offset: 2px;
+              }
             }
           }
         }
-      }
 
-      & p, & div, & span, & li, & ul, & ol {
-        font-size: var(--font-size-base);
-        line-height: var(--line-height-relaxed);
-        letter-spacing: var(--letter-spacing-base);
-      }
+        & p, & div, & span, & li, & ul, & ol {
+          font-size: var(--font-size-base);
+          line-height: var(--line-height-relaxed);
+          letter-spacing: var(--letter-spacing-base);
+        }
 
-      @container (min-width: 30rem) {
-        padding: clamp(0.75rem, 3vw, 1.5rem);
+        & > time {
+          display: block;
+          text-align: left;
+          margin-inline: 0;
+        }
+
+        @container (min-width: 30rem) {
+          padding: clamp(0.75rem, 3vw, 1.5rem);
+        }
       }
     }
   }
@@ -1207,46 +1145,13 @@ article {
 
 /* Overrides Layer - Final escape hatch for consumers */
 @layer overrides {
-  /* Debug utility for layout issues - can be enabled when needed */
-  /*
-  main > ul,
-  main > ul > li,
-  main > ul > li > article {
-    outline: 1px solid red !important;
-    outline-offset: -1px !important;
-  }
-  */
-
-  /* Home/Listing pages: left-align the time meta under each post card */
-  #content-area > main > ul > li > article > time {
-    display: block;
-    text-align: left;
-    margin-inline: 0;
-  }
-
-  /* Ensure blog post list always uses full width */
-  main > ul {
-    width: 100% !important;
-    max-width: 100% !important;
-    inline-size: 100% !important;
-    max-inline-size: 100% !important;
-  }
-
-  main > ul > li {
-    width: 100% !important;
-    max-width: 100% !important;
-    inline-size: 100% !important;
-    max-inline-size: 100% !important;
-  }
-
-  /* Typography consistency enforcement - fluid system handles scaling automatically */
-  /* Ensure lists within articles use consistent font sizing */
+  /* Typography consistency - removed !important, using cascade layers properly */
   article ul,
   article ol,
   article li {
-    font-size: var(--font-size-base) !important;
-    line-height: var(--line-height-relaxed) !important;
-    letter-spacing: var(--letter-spacing-base) !important;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: var(--letter-spacing-base);
   }
 }
 

@@ -299,10 +299,8 @@ export const createLayout = (props: LayoutProps): Response => {
             </dialog>
           </header>
 
-          <main id="content-main">
-            <div id="content-area">
-              {children}
-            </div>
+          <main id="content-area">
+            {children}
           </main>
 
           <footer>

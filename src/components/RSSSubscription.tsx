@@ -17,7 +17,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
     `navigator.clipboard.writeText('${text}').then(()=>{this.textContent='Copied!';this.disabled=true;setTimeout(()=>{this.textContent='Copy';this.disabled=false;},1200)})`;
 
   return (
-    <main class="layout-rss">
+    <div class="layout-rss">
       <h1>RSS Subscriptions</h1>
       <p>
         RSS lets you subscribe to updates using your favorite reader (Feedly,
@@ -27,7 +27,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
 
       <section>
         <h2>Main Blog Feed</h2>
-        <div class="feed-row">
+        <p class="feed-row">
           <a
             class="feed-link"
             href={mainFeed}
@@ -39,7 +39,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
           <button type="button" class="copy" onClick={copyJs(mainFeed)}>
             Copy
           </button>
-        </div>
+        </p>
       </section>
 
       <section>
@@ -47,9 +47,9 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
         {topics.map(({ topic, feedPath, count }) => {
           const url = `${baseUrl}${feedPath}`;
           return (
-            <div class="topic-feed">
+            <article class="topic-feed">
               <h3>{topic}</h3>
-              <div class="feed-row">
+              <p class="feed-row">
                 <a
                   class="feed-link"
                   href={url}
@@ -61,8 +61,8 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
                 <button type="button" class="copy" onClick={copyJs(url)}>
                   Copy
                 </button>
-              </div>
-            </div>
+              </p>
+            </article>
           );
         })}
       </section>
@@ -82,6 +82,6 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
           </li>
         </ul>
       </section>
-    </main>
+    </div>
   );
 };

@@ -1,6 +1,6 @@
 export const About = () => {
   return (
-    <main>
+    <>
       <h1>About This Blog</h1>
       <p>
         This is a minimal blog built with{" "}
@@ -9,7 +9,7 @@ export const About = () => {
         </a>{" "}
         and HTMX for seamless navigation.
       </p>
-      
+
       <h2>Features</h2>
       <ul>
         <li>Server-side rendering with mono-jsx</li>
@@ -33,6 +33,6 @@ export const About = () => {
       <nav>
         <a href="/">← Back to home</a>
       </nav>
-    </main>
+    </>
   );
 };

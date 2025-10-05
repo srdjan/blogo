@@ -1,13 +1,13 @@
 import type { Post } from "../lib/types.ts";
 
-export const SearchResults = (props: { 
-  readonly posts: readonly Post[]; 
+export const SearchResults = (props: {
+  readonly posts: readonly Post[];
   readonly query: string;
 }) => {
   const { posts, query } = props;
 
   return (
-    <main>
+    <>
       <h1>Search Results</h1>
       <p>
         {posts.length === 0
@@ -40,6 +40,6 @@ export const SearchResults = (props: {
       <nav>
         <a href="/">← Back to home</a>
       </nav>
-    </main>
+    </>
   );
 };
