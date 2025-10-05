@@ -8,7 +8,7 @@ export const SearchResults = (props: {
 
   return (
     <>
-      <h1>Search Results</h1>
+      <h2>Search Results</h2>
       <p>
         {posts.length === 0
           ? `No posts found for "${query}".`

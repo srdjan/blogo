@@ -156,7 +156,7 @@ export const createRouteHandlers = (
         path: createUrlPath(ctx.pathname),
         children: (
           <main>
-            <h1>Search</h1>
+            <h2>Search</h2>
             <p>Please provide a search query.</p>
             <a href="/">← Back to home</a>
           </main>

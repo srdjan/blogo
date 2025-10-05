@@ -18,7 +18,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
 
   return (
     <div class="rss-content">
-      <h1>RSS Subscriptions</h1>
+      <h2>RSS Subscriptions</h2>
       <p>
         RSS lets you subscribe to updates using your favorite reader (Feedly,
         Inoreader, NetNewsWire, Reeder, etc.). Copy a feed URL and add it to

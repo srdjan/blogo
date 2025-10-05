@@ -1,7 +1,7 @@
 export const About = () => {
   return (
     <div class="about-content">
-      <h1>About This Blog</h1>
+      <h2>About This Blog</h2>
       <p>
         This is a minimal blog built with{" "}
         <a

@@ -9,7 +9,7 @@ export const PostView = (props: { readonly post: Post }) => {
   return (
     <>
       <article class="post-content">
-          <h1>{post.title}</h1>
+          <h2>{post.title}</h2>
           {post.formattedDate && <time>{post.formattedDate}</time>}
           {/* Derived topics shown above tags for hierarchy */}
           {post.tags && post.tags.length > 0 && (() => {
