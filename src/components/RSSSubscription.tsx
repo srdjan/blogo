@@ -17,7 +17,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
     `navigator.clipboard.writeText('${text}').then(()=>{this.textContent='Copied!';this.disabled=true;setTimeout(()=>{this.textContent='Copy';this.disabled=false;},1200)})`;
 
   return (
-    <main class="rss-subscription">
+    <main class="layout-rss">
       <h1>RSS Subscriptions</h1>
       <p>
         RSS lets you subscribe to updates using your favorite reader (Feedly,
@@ -62,7 +62,6 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
                   Copy
                 </button>
               </div>
-              <small>{count} post{count === 1 ? "" : "s"} in this topic</small>
             </div>
           );
         })}

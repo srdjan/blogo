@@ -5,7 +5,7 @@
 /* Import Open Props */
 
 /* Cascade Layers for organized CSS architecture */
-@layer reset, tokens, utilities, components, overrides;
+@layer reset, tokens, utilities, layout, components, overrides;
 
 /* Reset Layer - Fundamental browser normalization */
 @layer reset {
@@ -81,6 +81,9 @@
     --font-sans:
       "Montserrat", "Inter", "Segoe UI", "Helvetica Neue", "Roboto",
       "Noto Sans", system-ui, -apple-system, sans-serif;
+
+    /* Consistent page content width */
+    --page-max-width: 72rem;
 
     /* Subtle SVG background patterns for visual interest */
     /* Dot grid pattern - technical/graph paper aesthetic */
@@ -215,43 +218,235 @@ body {
   container-type: inline-size;
 }
 
-/* ===== Section: Main content width and responsive constraints ===== */
+/* Layout Layer - Unified page layout system */
+@layer layout {
+  /* Layout spacing tokens */
+  :root {
+    --layout-inline-padding: var(--size-4);
+    --layout-block-spacing: var(--size-6);
+    --layout-max-width: var(--page-max-width);
+    --content-max-width: 100%;
+  }
 
-/* Main content area constraint - responsive width management */
-main {
-  width: 100%; /* Full width on mobile */
-  margin: 0 auto;
-}
+  /* Base layout for nav, footer - consistent width constraints and centering */
+  nav, footer {
+    width: 100%;
+    max-width: var(--layout-max-width);
+    margin-inline: auto;
+    padding-inline: var(--layout-inline-padding);
+    text-align: center;
+  }
 
-/* Progressive width reduction for larger screens - expanded for density */
-@media (min-width: 48rem) {
-  main {
-    width: 90%; /* Slightly narrower on tablet */
+  /* Outer main container (#content-main) - no padding, just container */
+  main#content-main {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Content area wrapper */
+  #content-area {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Inner main element (from components) - unified content layout */
+  #content-area > main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: var(--layout-max-width);
+    padding-inline: var(--layout-inline-padding);
+    text-align: center;
+
+  /* All direct children centered */
+  & > * {
+    text-align: center;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  /* Headings */
+  & > h1,
+  & > h2 {
+    text-align: center;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  /* Paragraphs */
+  & > p {
+    text-align: center;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  /* Lists - full width */
+  & > ul,
+  & > ol {
+    margin-inline: auto;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Articles - centered content */
+  & > article {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    margin-inline: auto;
+
+    /* Article content centered */
+    & > header {
+      text-align: center;
+      margin-inline: auto;
+    }
+
+    & .content {
+      text-align: center;
+      margin-inline: auto;
+      width: 100%;
+
+      /* Content paragraphs */
+      & > p {
+        text-align: center;
+        margin-inline: auto;
+        width: 100%;
+      }
+
+      /* Content headings centered */
+      & > h2,
+      & > h3,
+      & > h4,
+      & > h5,
+      & > h6 {
+        text-align: center;
+        margin-inline: auto;
+        width: 100%;
+      }
+
+      /* Lists in content */
+      & > ul,
+      & > ol {
+        margin-inline: auto;
+        display: inline-block;
+        text-align: left;
+        width: 100%;
+      }
+
+      /* Blockquotes */
+      & > blockquote {
+        margin-inline: auto;
+        width: 100%;
+      }
+
+      /* Code blocks */
+      & > pre {
+        margin-inline: auto;
+        width: 100%;
+      }
+    }
+  }
+
+  /* Sections - centered */
+  & > section {
+    margin-inline: auto;
+    text-align: center;
+    margin-block: var(--layout-block-spacing);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    & > h2,
+    & > h3 {
+      text-align: center;
+      margin-inline: auto;
+      width: 100%;
+    }
+
+    & > p {
+      text-align: center;
+      margin-inline: auto;
+      width: 100%;
+    }
+
+    & > ul,
+    & > ol {
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    & > .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--size-2);
+      justify-content: center;
+      align-items: center;
+      margin-inline: auto;
+    }
+  }
+
+  /* Navigation links */
+  & > nav {
+    text-align: center;
+    margin-block-start: var(--layout-block-spacing);
+    margin-inline: auto;
   }
 }
 
-@media (min-width: 64rem) {
-  main {
-    width: 85%; /* Less constrained on small desktop */
+  /* RSS-specific feed rows */
+  main.layout-rss .feed-row {
+    display: flex;
+    align-items: center;
+    gap: var(--size-3);
+    flex-wrap: wrap;
+    margin-block: var(--size-2);
+    justify-content: center;
   }
-}
 
-@media (min-width: 75rem) {
-  main {
-    width: 80%; /* Wider on large desktop */
+  main.layout-rss .topic-feed {
+    margin-block: var(--size-4);
   }
-}
 
-@media (min-width: 90rem) {
-  main {
-    width: 85%; /* Even wider on extra-large screens */
+  /* Progressive width reduction for larger screens */
+  @media (min-width: 48rem) {
+    nav, main, footer {
+      width: 100%;
+      max-width: var(--layout-max-width);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    nav, main, footer {
+      width: 100%;
+      max-width: var(--layout-max-width);
+    }
+  }
+
+  @media (min-width: 75rem) {
+    nav, main, footer {
+      width: 100%;
+      max-width: var(--layout-max-width);
+    }
+  }
+
+  @media (min-width: 90rem) {
+    nav, main, footer {
+      width: 100%;
+      max-width: var(--layout-max-width);
+    }
   }
 }
 
 /* Responsive container with fluid scaling - expanded max-width for density */
 @container (min-width: 30rem) {
   body {
-    max-width: clamp(30rem, 80vw, 70rem);
+    max-width: none;
     padding: clamp(0.75rem, 3vw, 2rem);
   }
 }
@@ -259,7 +454,7 @@ main {
 /* Extra-large screen container expansion */
 @container (min-width: 90rem) {
   body {
-    max-width: clamp(70rem, 85vw, 85rem);
+    max-width: none;
   }
 }
 
@@ -861,9 +1056,8 @@ pre {
 /* ===== Section: Navigation (monospace UI) ===== */
 
 nav {
-  padding-block: var(--size-4);
-  margin-block-end: var(--size-6);
   font-family: var(--font-mono);
+  margin-block-end: var(--layout-block-spacing);
 
   & ul {
     display: flex;
@@ -1049,6 +1243,30 @@ article {
       }
     }
   }
+
+  /* RSS subscription component styles */
+  .layout-rss .feed-link,
+  .layout-rss button.copy {
+    border: 1px solid var(--border-1, rgba(255, 255, 255, 0.12));
+    border-radius: var(--radius-2, 6px);
+  }
+
+  .layout-rss .feed-link {
+    font-family: var(--font-mono);
+    font-size: 0.95em;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface-2, rgba(255, 255, 255, 0.04));
+    padding: 0.25rem 0.5rem;
+    word-break: break-all;
+  }
+
+  .layout-rss button.copy {
+    padding: 0.35rem 0.65rem;
+    background: var(--surface-3, rgba(255, 255, 255, 0.06));
+    color: inherit;
+    cursor: pointer;
+  }
 } /* End components layer */
 
 /* Overrides Layer - Final escape hatch for consumers */
@@ -1063,53 +1281,19 @@ article {
   }
   */
 
-  /* ===== Section: RSS subscription page ===== */
+  /* Home/Listing pages: left-align the time meta under each post card */
+  #content-area > main > ul > li > article > time {
+    display: block;
+    text-align: left;
+    margin-inline: 0;
+  }
 
-  /* Ensure blog post list always uses full width - override any specificity conflicts */
+  /* Ensure blog post list always uses full width */
   main > ul {
     width: 100% !important;
     max-width: 100% !important;
     inline-size: 100% !important;
     max-inline-size: 100% !important;
-  }
-
-  /* RSS subscription page layout */
-  .rss-subscription {
-    max-width: 72ch;
-    margin-inline: auto;
-    padding-inline: var(--size-4);
-  }
-
-  .rss-subscription .feed-row {
-    display: flex;
-    align-items: center;
-    gap: var(--size-3);
-    flex-wrap: wrap;
-    margin-block: var(--size-2);
-  }
-
-  /* Shared RSS chip styles */
-  .rss-subscription .feed-link,
-  .rss-subscription button.copy {
-    border: 1px solid var(--border-1, rgba(255, 255, 255, 0.12));
-    border-radius: var(--radius-2, 6px);
-  }
-
-  .rss-subscription .feed-link {
-    font-family: var(--font-mono);
-    font-size: 0.95em;
-    text-decoration: none;
-    color: inherit;
-    background: var(--surface-2, rgba(255, 255, 255, 0.04));
-    padding: 0.25rem 0.5rem;
-    word-break: break-all;
-  }
-
-  .rss-subscription button.copy {
-    padding: 0.35rem 0.65rem;
-    background: var(--surface-3, rgba(255, 255, 255, 0.06));
-    color: inherit;
-    cursor: pointer;
   }
 
   main > ul > li {
@@ -1138,6 +1322,7 @@ small {
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-base);
   display: block;
+  margin-block-start: var(--size-2);
   margin-block-end: var(--size-2);
 }
 
@@ -1540,6 +1725,7 @@ blockquote cite {
   gap: var(--size-1);
   margin-block: var(--size-2) 0;
   align-items: center;
+  justify-content: center; /* center tag chips on their line */
 }
 
 .tag {
