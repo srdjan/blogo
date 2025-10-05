@@ -94,6 +94,7 @@ export const createLayout = (props: LayoutProps): Response => {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
         <link rel="stylesheet" href="/css/vendor/open-props.min.css" />
+        <link rel="stylesheet" href="/css/vendor/highlight.min.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
