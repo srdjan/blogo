@@ -307,7 +307,7 @@ ul, ol {
 }
 
 .post-card p {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-md);
     line-height: 1.8;
     color: var(--color-text-secondary);
     margin-top: var(--space-md);
@@ -645,18 +645,32 @@ dialog button:hover {
     margin-top: var(--space-3xl);
 }
 
-.site-footer p {
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-md);
+}
+
+.footer-separator {
+    color: var(--color-text-muted);
 }
 
 .site-footer a {
     color: var(--color-text-secondary);
+    display: inline-flex;
+    align-items: center;
 }
 
 .site-footer a:hover {
     color: var(--color-accent);
+}
+
+.github-link svg {
+    flex-shrink: 0;
 }
 
 /* ====================================
