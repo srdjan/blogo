@@ -12,17 +12,16 @@ This blog system is built around several key architectural principles:
 
 ## Features
 
-- **Markdown Content**: Posts written in markdown with proper HTML rendering
+- **Markdown Content**: Posts written in markdown with proper HTML rendering and syntax highlighting
 - **Tag System**: Posts can be tagged and filtered by tag
-- **Full-text Search**: Dual search experience with modal quick-search and full
-  results page
-- **Responsive Design**: Mobile-first styling that works seamlessly across all
-  devices
-- **Semantic Components**: Clean JSX components following semantic HTML and ARIA
-  principles
-- **Elegant Interactions**: Subtle hover effects and smooth animations
+- **Full-text Search**: Dual search experience with modal quick-search and full results page
+- **Light/Dark Theme Toggle**: Manual theme switcher with localStorage persistence
+- **Responsive Design**: Mobile-optimized styling with optimal readability on all devices
+- **Semantic Components**: Clean JSX components following semantic HTML and ARIA principles
+- **Code Syntax Highlighting**: Highlight.js integration with Atom One Dark theme
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
+- **AI-Powered Writing Assistant**: `/blog-writer` command for creating posts in the blog's voice
 
 ## Architecture
 
@@ -76,9 +75,16 @@ and maintainable.
 │   └── utils.ts                 # General utility functions
 ├── content/posts/               # Markdown blog posts
 ├── public/
-│   ├── css/main.css            # Modern CSS with nesting, @scope, container queries
-│   └── js/                     # HTMX and site JavaScript
-└── CLAUDE.md                   # Development guidance and architecture notes
+│   ├── css/
+│   │   ├── main.css            # Modern CSS with design tokens, responsive architecture
+│   │   └── vendor/             # Third-party CSS (normalize, highlight.js theme)
+│   └── js/
+│       ├── site.js             # Theme toggle, search, HTMX integration
+│       └── htmx.min.js         # HTMX for dynamic interactions
+├── .claude/commands/
+│   └── blog-writer.md          # AI writing assistant slash command
+├── CLAUDE.md                   # Development guidance and architecture notes
+└── WRITING_STYLE.md            # Blog writing style guide
 ```
 
 ## Getting Started
@@ -173,6 +179,59 @@ export const PostView = ({ post }: { post: Post }) => {
   );
 };
 ```
+
+### Using the Blog Writer Assistant
+
+The blog includes an AI-powered writing assistant that helps you create posts in the blog's established voice and style.
+
+#### Quick Start
+
+In your Claude Code conversation, use the `/blog-writer` slash command:
+
+```
+/blog-writer Write a post about microservices and organizational complexity
+```
+
+```
+/blog-writer Rewrite content/posts/hateoas.md to be more conversational
+```
+
+#### What It Does
+
+The `/blog-writer` command will:
+
+1. **Load the writing style guide** from `WRITING_STYLE.md` into context
+2. **Ask clarifying questions** (topic, length, experiences to include)
+3. **Write in the blog's voice**:
+   - Conversational, not corporate
+   - Mix of personal experience and objective facts
+   - Technical depth with business/cultural context
+   - Opinionated but humble
+4. **Follow the structure**: Hook → Context → Insights → Examples → Synthesis
+5. **Include proper frontmatter** (title, date, tags, excerpt)
+6. **Save to** `content/posts/your-post-slug.md`
+
+#### Example Prompts
+
+```
+/blog-writer Create a 2000-word post about Conway's Law with real team examples
+
+/blog-writer I want to write about choosing boring technology. Include pros/cons from both business and engineering perspectives
+
+/blog-writer Rewrite the Light FP guide to include more war stories and be less academic
+```
+
+#### Writing Style
+
+The blog writer follows these principles (defined in `WRITING_STYLE.md`):
+
+- **Conversational tone** - Like explaining to a colleague over coffee
+- **Personal + Objective** - Mix experience ("I spent 3 months debugging this...") with facts
+- **Technical + Human** - Connect code decisions to culture, incentives, and outcomes
+- **Concrete examples** - Real scenarios, not abstract theory
+- **Honest nuance** - "It depends" is valid if you explain what it depends on
+
+See `WRITING_STYLE.md` for the complete style guide.
 
 ## Deployment
 
@@ -434,23 +493,44 @@ import { html } from "mono-jsx/jsx-runtime";
 
 - **Runtime**: Deno v2.x
 - **Rendering**: mono-jsx v0.6.11+ (server-side JSX without React)
-- **Enhancement**: HTMX for dynamic interactions
-- **Styling**: Modern CSS with nesting, @scope, container queries
-- **Layout**: CSS logical properties and modern selectors
-- **Content**: Markdown with YAML frontmatter
+- **Enhancement**: HTMX v2.x for dynamic interactions
+- **Styling**: Modern CSS with design tokens, responsive architecture, light/dark themes
+- **Syntax Highlighting**: Highlight.js with Atom One Dark theme
+- **Content**: Markdown with YAML frontmatter, parsed by marked
 - **Diagrams**: @rendermaid/core for server-side Mermaid rendering
 - **Search**: Client-side modal search with server-side filtering
+- **Theme**: Manual light/dark toggle with localStorage persistence
 - **Hosting**: Deno Deploy (edge computing platform)
 - **Language**: TypeScript with strict type checking
+- **AI Assistant**: Claude Code slash command for blog writing
 
 ## Development Guidelines
 
-See `CLAUDE.md` for detailed development guidance including:
-- Clean architecture patterns
-- Light functional programming style
-- Component organization
-- Testing strategies
-- TypeScript best practices
+See these files for detailed guidance:
+
+- **`CLAUDE.md`** - Development patterns, architecture, Light FP style, testing strategies
+- **`WRITING_STYLE.md`** - Blog writing voice, structure, and content principles
+- **`.claude/commands/blog-writer.md`** - AI writing assistant configuration
+
+## Design System
+
+### Color Architecture
+- **Light theme**: Warm off-white backgrounds (#FEFDF8) with high-contrast text
+- **Dark theme**: Warm dark grey (#1C1B18) to reduce eye strain
+- **Accent**: Purple (#5B4FC6 / #9B8FE8) with WCAG AAA compliance
+- **Semantic colors**: Visited links, code backgrounds, borders with subtle hierarchy
+
+### Typography
+- **Sans**: Montserrat (400, 600, 700)
+- **Mono**: JetBrains Mono (400, 600)
+- **Fluid scaling**: clamp() for responsive font sizes
+- **Line height**: 1.75 for optimal readability
+
+### Layout
+- **Max width**: min(80vw, 72rem) - prevents excessive line length
+- **Mobile**: Full-width cards with minimal padding
+- **Desktop**: 95% width cards, centered in container
+- **Spacing**: 4rem scale for consistent vertical rhythm
 
 ---
 
