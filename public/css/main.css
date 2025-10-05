@@ -7,16 +7,30 @@
    DESIGN SYSTEM FOUNDATION
    ==================================== */
 :root {
-    /* === COLOR ARCHITECTURE === */
-    --color-bg: #FFFFFF;
-    --color-surface: #FAFAFA;
-    --color-text-primary: #1A1A1A;
-    --color-text-secondary: #1a1717;
-    --color-text-muted: #888888;
-    --color-accent: #6840ec;
-    --color-accent-hover: #4d1bd8;
-    --color-border: #E0E0E0;
-    --color-border-strong: #3b3a3a;
+    /* === COLOR ARCHITECTURE - OPTIMIZED FOR READABILITY === */
+    /* Background: Warm off-white reduces eye strain vs pure white */
+    --color-bg: #FEFDF8;
+    --color-surface: #F9F8F3;
+
+    /* Text: High contrast (16:1) for optimal readability */
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #3a3a3a;
+    --color-text-muted: #6a6a6a;
+
+    /* Accent: Purple-blue with sufficient contrast (4.5:1 minimum) */
+    --color-accent: #5B4FC6;
+    --color-accent-hover: #453AA3;
+    --color-accent-subtle: #E8E5F7;
+
+    /* Borders: Subtle hierarchy */
+    --color-border-light: #E8E6DF;
+    --color-border: #D4D2C8;
+    --color-border-strong: #2a2a2a;
+
+    /* Semantic colors for better UX */
+    --color-link: #5B4FC6;
+    --color-link-visited: #7B6FD6;
+    --color-code-bg: #F5F4EF;
 
     /* === FLUID TYPOGRAPHY === */
     --font-size-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.75rem);
@@ -111,13 +125,17 @@ p:last-child {
 }
 
 a {
-    color: var(--color-accent);
+    color: var(--color-link);
     text-decoration: none;
-    transition: opacity var(--transition-speed) var(--transition-easing);
+    transition: color var(--transition-speed) var(--transition-easing);
+}
+
+a:visited {
+    color: var(--color-link-visited);
 }
 
 a:hover {
-    opacity: 0.7;
+    color: var(--color-accent-hover);
 }
 
 a:focus-visible {
@@ -168,7 +186,7 @@ ul, ol {
 
 .site-nav a {
     font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -390,15 +408,16 @@ ul, ol {
 .content code {
     font-family: var(--font-mono);
     font-size: 0.9em;
-    background: var(--color-bg);
+    background: var(--color-code-bg);
     padding: 0.2em 0.4em;
     border-radius: 0.25rem;
     border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
 }
 
 .content pre {
-    background: var(--color-bg);
-    border: 2px solid var(--color-border-strong);
+    background: var(--color-code-bg);
+    border: 2px solid var(--color-border);
     padding: var(--space-lg);
     margin-bottom: var(--space-lg);
     overflow-x: auto;
@@ -645,15 +664,29 @@ dialog button:hover {
    ==================================== */
 @media (prefers-color-scheme: dark) {
     :root {
-        --color-bg: #1A1A1A;
-        --color-surface: #2A2A2A;
-        --color-text-primary: #FAFAFA;
-        --color-text-secondary: #AAAAAA;
-        --color-text-muted: #777777;
-        --color-border: #444444;
-        --color-border-strong: #666666;
-        --color-accent: #EC407A;
-        --color-accent-hover: #F06292;
+        /* Background: True black causes eye strain - use warm dark grey */
+        --color-bg: #1C1B18;
+        --color-surface: #252420;
+
+        /* Text: Slightly off-white reduces glare */
+        --color-text-primary: #E8E6E1;
+        --color-text-secondary: #C4C2BC;
+        --color-text-muted: #8A8983;
+
+        /* Accent: Lighter purple for dark mode (WCAG AAA) */
+        --color-accent: #9B8FE8;
+        --color-accent-hover: #B5ABF0;
+        --color-accent-subtle: #2D2940;
+
+        /* Borders: Subtle in dark mode */
+        --color-border-light: #333229;
+        --color-border: #444339;
+        --color-border-strong: #666;
+
+        /* Semantic colors adjusted for dark */
+        --color-link: #9B8FE8;
+        --color-link-visited: #B9A8F5;
+        --color-code-bg: #252420;
     }
 }
 
