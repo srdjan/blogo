@@ -13,8 +13,8 @@
     --color-text-primary: #1A1A1A;
     --color-text-secondary: #555555;
     --color-text-muted: #999999;
-    --color-accent: #EC407A;
-    --color-accent-hover: #D81B60;
+    --color-accent: #6840ec;
+    --color-accent-hover: #4d1bd8;
     --color-border: #E0E0E0;
     --color-border-strong: #3b3a3a;
 
@@ -213,8 +213,15 @@ ul, ol {
     list-style: none;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-3xl);
     padding: 0;
+    width: 100%;
+}
+
+.post-list > li {
+    width: 95%;
+    max-width: 95%;
 }
 
 .post-card {
@@ -222,6 +229,7 @@ ul, ol {
     border: 2px solid var(--color-border-strong);
     padding: var(--space-xl);
     text-align: left;
+    width: 100%;
     transition: transform var(--transition-speed) var(--transition-easing),
                 box-shadow var(--transition-speed) var(--transition-easing);
 }
