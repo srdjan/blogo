@@ -826,6 +826,52 @@ dialog button:hover {
 /* ====================================
    RESPONSIVE ARCHITECTURE
    ==================================== */
+/* Mobile optimizations */
+@media (max-width: 767px) {
+    :root {
+        /* Reduce font sizes on mobile */
+        --font-size-xs: 0.7rem;
+        --font-size-sm: 0.75rem;
+        --font-size-base: 0.85rem;
+        --font-size-lg: 1rem;
+        --font-size-xl: 1.3rem;
+        --font-size-2xl: 1.75rem;
+
+        /* Minimal padding on mobile */
+        --content-padding: 0.75rem;
+    }
+
+    /* Remove centering constraints on mobile */
+    .main-content {
+        max-width: 100%;
+        padding: var(--space-2xl) var(--content-padding);
+    }
+
+    /* Make post list and cards full width */
+    .post-list {
+        width: 100%;
+        align-items: stretch;
+        gap: var(--space-2xl);
+    }
+
+    .post-list > li {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .post-card {
+        width: 100%;
+        padding: var(--space-lg);
+    }
+
+    /* Full width content on individual posts */
+    .post-content,
+    .about-content,
+    .rss-content {
+        padding: var(--space-lg);
+    }
+}
+
 @media (min-width: 768px) {
     :root {
         --content-padding: 2rem;
