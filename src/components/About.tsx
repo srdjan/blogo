@@ -4,7 +4,7 @@ export const About = () => {
       <h2>Hi, I'm Srdjan</h2>
       <p>
         This is my personal, minimal blog built for experimenting with AI agents 
-        and ability to custom writing styles.
+        and ability to fine tune custom writing styles.
       </p>
 
       <h2>About me</h2>
