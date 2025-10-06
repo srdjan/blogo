@@ -30,7 +30,17 @@
     /* Semantic colors for better UX */
     --color-link: #5B4FC6;
     --color-link-visited: #7B6FD6;
-    --color-code-bg: #F5F4EF;
+    --color-code-bg: #FAFAF7;
+
+    /* Code syntax highlighting colors - optimized for readability */
+    --code-keyword: #D73A49;      /* Red for keywords (if, const, let, function) */
+    --code-string: #032F62;       /* Dark blue for strings */
+    --code-function: #6F42C1;     /* Purple for function names */
+    --code-comment: #6A737D;      /* Grey for comments */
+    --code-number: #005CC5;       /* Blue for numbers */
+    --code-property: #E36209;     /* Orange for properties */
+    --code-operator: #D73A49;     /* Red for operators */
+    --code-variable: #24292E;     /* Near-black for variables */
 
     /* === FLUID TYPOGRAPHY === */
     --font-size-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.75rem);
@@ -451,6 +461,68 @@ ul, ol {
     background: var(--color-code-bg) !important;
 }
 
+/* Syntax highlighting token colors */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+    color: var(--code-keyword);
+    font-weight: 600;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-name,
+.hljs-type,
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+    color: var(--code-string);
+}
+
+.hljs-function,
+.hljs-built_in,
+.hljs-builtin-name {
+    color: var(--code-function);
+    font-weight: 500;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion,
+.hljs-meta {
+    color: var(--code-comment);
+    font-style: italic;
+}
+
+.hljs-number,
+.hljs-regexp,
+.hljs-literal {
+    color: var(--code-number);
+}
+
+.hljs-attr,
+.hljs-property {
+    color: var(--code-property);
+}
+
+.hljs-operator {
+    color: var(--code-operator);
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: bold;
+}
+
 /* Dark mode adjustments for code highlighting */
 [data-theme="dark"] .content pre {
     background: var(--color-surface);
@@ -785,6 +857,16 @@ dialog button:hover {
         --color-link: #9B8FE8;
         --color-link-visited: #B9A8F5;
         --color-code-bg: #252420;
+
+        /* Code syntax highlighting colors for dark mode - brighter for contrast */
+        --code-keyword: #FF7B72;      /* Lighter red for keywords */
+        --code-string: #A5D6FF;       /* Light blue for strings */
+        --code-function: #D2A8FF;     /* Light purple for function names */
+        --code-comment: #8B949E;      /* Light grey for comments */
+        --code-number: #79C0FF;       /* Light blue for numbers */
+        --code-property: #FFA657;     /* Light orange for properties */
+        --code-operator: #FF7B72;     /* Lighter red for operators */
+        --code-variable: #E8E6E1;     /* Light text for variables */
     }
 }
 
@@ -804,6 +886,16 @@ dialog button:hover {
     --color-link: #9B8FE8;
     --color-link-visited: #B9A8F5;
     --color-code-bg: #252420;
+
+    /* Code syntax highlighting colors for dark mode - brighter for contrast */
+    --code-keyword: #FF7B72;
+    --code-string: #A5D6FF;
+    --code-function: #D2A8FF;
+    --code-comment: #8B949E;
+    --code-number: #79C0FF;
+    --code-property: #FFA657;
+    --code-operator: #FF7B72;
+    --code-variable: #E8E6E1;
 }
 
 [data-theme="light"] {
@@ -820,7 +912,17 @@ dialog button:hover {
     --color-border-strong: #2a2a2a;
     --color-link: #5B4FC6;
     --color-link-visited: #7B6FD6;
-    --color-code-bg: #F5F4EF;
+    --color-code-bg: #FAFAF7;
+
+    /* Code syntax highlighting colors - optimized for readability */
+    --code-keyword: #D73A49;
+    --code-string: #032F62;
+    --code-function: #6F42C1;
+    --code-comment: #6A737D;
+    --code-number: #005CC5;
+    --code-property: #E36209;
+    --code-operator: #D73A49;
+    --code-variable: #24292E;
 }
 
 /* ====================================
