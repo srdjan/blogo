@@ -1,237 +1,175 @@
 # Blog Writing Style Guide
 
-## Who We Are
+*Based on natural writing patterns extracted from published work*
 
-A technologist who bridges code and culture. We write for people who care about the _why_ behind the _how_ - the folks who understand that good software is as much about people and context as it is about algorithms and architecture.
+## Core Voice Characteristics
 
-## Voice & Tone
+This blog writes from a place of **clarity, directness, and principle-driven thinking**. The tone is:
 
-### The Core Feel
-- **Conversational, not corporate**: Write like you're explaining something to a sharp colleague over coffee
-- **Opinionated with humility**: Have a point of view, but acknowledge when things are complex or situational
-- **Technical depth meets human context**: Code matters, but so does culture, incentives, and real-world messiness
-- **Skeptical optimism**: We believe in better ways, but we've seen enough projects to know nothing is a silver bullet
+- **Clear and structured** - Ideas organized logically, building from foundations
+- **Principle-based** - Focus on underlying beliefs and philosophies, not just tactics
+- **Inclusive and collaborative** - "We" language, emphasis on team and collective effort
+- **Professionally conversational** - Approachable but not casual, thoughtful but not academic
+- **Process-oriented** - How things evolve and develop, not just end states
 
-### What This Sounds Like
+## Language Patterns
 
-**✅ Do this:**
-> "Here's the thing about microservices - everyone talks about the technical benefits, but nobody warns you about the organizational chaos. You're not just splitting your codebase; you're splitting your teams, your deployment pipelines, and your late-night debugging sessions."
+### Sentence Structure
+- **Active voice, present tense** - "Teams have wide latitude" not "Teams were given latitude"
+- **Declarative statements** - State things directly and clearly
+- **Moderate sentence length** - Not too short, not too long; clear and complete
+- **Occasional em-dashes** for emphasis and clarification
 
-**❌ Not this:**
-> "Microservices architecture offers several advantages including improved scalability and deployment flexibility. However, organizations should carefully consider the operational complexity."
+### Word Choice
+- **Specific, concrete terms** - "streamlined," "process-light," "transparent"
+- **Professional vocabulary** without jargon - "encapsulate," "distill," "demarcated"
+- **Action-oriented** - "evolve," "nurture," "enable," "guide"
+- **Avoid marketing speak** - No hyperbole, no buzzwords
 
-### Language Patterns
+### Framing
+- **"We" perspective** - Collective voice, not individual "I"
+- **Organizational context** - "At Lifion, we..." "Our company credos..."
+- **Process description** - How we arrived at decisions, not just what was decided
+- **Principle → Practice flow** - State the belief, then explain the application
 
-- **Use "you" and "we"** - We're in this together
-- **Ask questions** - "Ever wondered why...?" "What if we..."
-- **Share war stories** - "I've seen teams struggle with..." "In my experience..."
-- **Admit uncertainty** - "I could be wrong, but..." "This worked for us, YMMV..."
-- **Use metaphors from real life** - Not just technical analogies
+## Structure & Organization
 
-## Structure & Flow
+### Opening
+Start with **context and purpose**:
+> "Our company credos encapsulate our organization's beliefs. They serve as a focused set of reference points to guide actions..."
 
-### Standard Post Structure
+NOT with anecdotes or personal stories.
 
-1. **Hook (1-2 paragraphs)**
-   - Start with a problem, observation, or contrarian take
-   - Make it concrete and relatable
-   - Example: "The last three teams I worked with all made the same mistake..."
+### Body
+**Top-down, hierarchical organization**:
+1. State the principle or goal
+2. Break into areas of focus
+3. Describe each in detail
+4. Show how it works in practice
 
-2. **Context & Stakes (2-3 paragraphs)**
-   - Why does this matter?
-   - What's the business/human impact?
-   - Who's affected and how?
+Use clear section headers and visual diagrams where helpful.
 
-3. **The Meat (varies)**
-   - Your actual insights, patterns, or solutions
-   - Mix technical details with human/organizational implications
-   - Break into clear sections with descriptive headings
+### Closing
+End with **forward-looking statement** about journey and commitment:
+> "The Lifion journey has been an incredible experience so far, and we are taking all the necessary steps to make sure that it continues to be so."
 
-4. **Examples & Evidence**
-   - Code snippets that actually teach something
-   - Real scenarios (anonymized if needed)
-   - Data or research when available, experience when not
+## Content Principles
 
-5. **Synthesis (2-3 paragraphs)**
-   - What should readers take away?
-   - What are the trade-offs?
-   - When does this apply vs. when doesn't it?
+### Focus on Principles Over Tactics
+- Start with the "what" and "why" - beliefs and goals
+- Then explain "how" - implementation and practice
+- Connect practices back to principles
 
-### Pacing
+### Emphasize Process and Evolution
+- How decisions were made
+- How feedback was incorporated
+- How things evolve over time
+- "Recently, we undertook an effort to distill..."
+- "As the credos document was taking shape, we made the process open..."
 
-- **Vary paragraph length** - Mix 1-liners with 4-liners
-- **One idea per paragraph** - Each paragraph should make one clear point
-- **Break up text** - Use headings, lists, code blocks, quotes
-- **Rhythm matters** - Short sentences for impact. Longer ones for nuance and explanation.
+### Collective Perspective
+- Use "we," "our," "teams"
+- Minimal use of "I" - only when absolutely necessary for clarity
+- Focus on organizational culture and team dynamics
+- "Teams have from the very beginning been given wide latitude..."
 
-## Writing Rules
-
-### Clarity
-
-- **Explain jargon once** - First use: "Domain-Driven Design (DDD)". After: "DDD"
-- **No buzzword soup** - "Leverage synergies" → "Work together better"
-- **Active voice default** - "The team shipped" not "The feature was shipped"
-- **Concrete over abstract** - Examples > Theory
-
-### Personality
-
-- **Inject personal experience**:
-  - "I spent three months debugging this, so you don't have to"
-  - "This sounds great in theory. In practice, it's messier"
-
-- **Show your thinking**:
-  - "At first I thought X, but then Y happened..."
-  - "This bothered me for weeks until I realized..."
-
-- **Acknowledge complexity**:
-  - "It depends" is a valid answer
-  - "For certain contexts..." not "Always do this..."
-
-### Technical Content
-
-- **Code examples should**:
-  - Actually run
-  - Show the problem AND solution
-  - Include comments for the tricky bits
-  - Use realistic variable names (not `foo`, `bar`)
-
-- **Technical depth**:
-  - Assume smart readers who might not know this specific thing
-  - Don't skip steps in logic
-  - Link to deeper resources for the curious
-
-### Business & Culture Insights
-
-- **Connect tech to outcomes**:
-  - "This architecture doesn't just make deploys faster - it changes who can deploy"
-  - "The real cost isn't the database license, it's the three meetings per schema change"
-
-- **Talk about people**:
-  - "Developers will route around this if it's painful"
-  - "Management cares about different metrics than engineers"
-
-- **Acknowledge politics**:
-  - "Getting buy-in for this means..."
-  - "The org chart is the architecture"
+### Inclusive Language
+- "Open and transparent, welcoming input from all team members"
+- "That feedback loop was fundamental to ensuring that the content resonated with our people"
+- Emphasis on participation and collaboration
 
 ## Formatting Guidelines
 
 ### Headings
-- **H1**: Post title only
-- **H2**: Major sections
-- **H3**: Sub-sections
-- **Keep them descriptive**: "Why Your Tests Are Lying to You" not "Testing Issues"
+- **Clear, descriptive** - "'Team Autonomy' is the first top-level credo"
+- **Quoted concepts** for emphasis - 'Production Ready', 'Team Autonomy'
+- Use headings to create hierarchy and structure
 
-### Lists
-- Use when you have 3+ related items
-- Start each item with a verb when possible
-- Keep parallel structure
-- Bold the key term if it helps scanning
+### Visual Elements
+- **Diagrams and visual breakdowns** where they clarify concepts
+- **Italicized terms** for concepts being defined - *engineering philosophy*
+- **Structured lists** for stages, phases, or components
 
-### Code Blocks
-- Always specify the language: ` ```typescript`
-- Include context comments
-- Show before/after when teaching a transformation
-- Keep examples short enough to grasp quickly
+### Paragraph Length
+- **2-4 sentences typically**
+- Each paragraph develops one complete thought
+- Use white space to create breathing room
 
-### Emphasis
-- **Bold** for key terms and important points
-- _Italics_ for subtle emphasis or introducing a concept
-- `Code` for technical terms, commands, file names
-- Don't overdo it - emphasis loses power if everything is emphasized
+## Examples from Natural Writing
 
-### Quotes
-- Use blockquotes for important external sources
-- Use them sparingly - your voice should dominate
-- Always attribute
+### Opening (Context-Setting):
+> "A great company culture comes down to one thing: people. At Lifion, we recognize this and actively nurture an inclusive, open, and motivating company culture."
 
-## Content Principles
+### Process Description:
+> "As the credos document was taking shape, we made the process open and transparent, welcoming input from all team members on an ongoing basis. That feedback loop was fundamental to ensuring that the content resonated with our people while remaining relevant both to our values and to the desired end state of our product."
 
-### Mix Tactical and Strategic
-Every post should offer:
-- Something you can use Monday morning (tactical)
-- Something that changes how you think (strategic)
+### Principle Statement:
+> "A crucial part of our development process is that architecture is based on principles and not prescribed by a team of architects."
 
-### Embrace Nuance
-- "It depends" is fine if you explain what it depends on
-- Trade-offs are more interesting than "best practices"
-- Context matters more than rules
+### Application/Practice:
+> "Teams have from the very beginning been given wide latitude to solve their own problems, without waiting for external help. No detailed prescriptive practices are pushed down by a centralized group or management, just an emphasis on creating, delivering, and operating software in as streamlined and process-light a way as possible."
 
-### Be Useful, Not Just Right
-- Better to help someone solve their problem than prove your point
-- Practical beats theoretically pure
-- Reader's time is precious
+### Closing:
+> "The Lifion journey has been an incredible experience so far, and we are taking all the necessary steps to make sure that it continues to be so."
 
-### Show Your Work
-- How did you learn this?
-- What mistakes did you make?
-- What would you do differently?
+## Avoid
 
-## Things to Avoid
+❌ **Personal anecdotes** - "I remember when..." "Last year I..."
+❌ **Casual language** - "Here's the thing..." "Let me tell you..."
+❌ **War stories** - Specific debugging incidents, production failures
+❌ **Overly subjective** - "I think..." "In my experience..." "I believe..."
+❌ **Metrics without context** - Don't lead with numbers; lead with principles
+❌ **Conversational asides** - "You're probably thinking..." "Wait, what?"
 
-### ❌ Don't Do This
+## Do
 
-**Preachy tone**:
-- "You should always..." → "Consider..." or "I've found..."
-- "Best practices dictate..." → "This pattern works when..."
+✅ **State principles clearly** - "We believe X because Y"
+✅ **Describe processes** - "We undertook an effort to distill..."
+✅ **Use collective voice** - "We," "our teams," "at Lifion"
+✅ **Organize hierarchically** - Top-down, structured breakdown
+✅ **Connect practice to principle** - Show how beliefs manifest in action
+✅ **End with forward vision** - Journey continues, commitment to principles
 
-**Explaining the obvious**:
-- Skip the "What is TypeScript?" intro for a post about advanced TS patterns
-- Trust your audience's intelligence
+## Post Structure Template
 
-**Pure theory without application**:
-- Every concept needs a "so what?" and a "for example"
+1. **Opening (1-2 paragraphs)**
+   - Context: What is this about?
+   - Purpose: Why does it matter?
 
-**Hedging everything**:
-- Some opinions are worth stating directly
-- "Maybe, possibly, perhaps, might, could be, potentially" - pick one, not all
+2. **Foundation (2-3 paragraphs)**
+   - Core philosophy or approach
+   - How it was developed (process)
+   - Why this matters to people and outcomes
 
-**Corporate speak**:
-- "Facilitate" → "Help"
-- "Utilize" → "Use"
-- "Leverage" → "Use" (usually)
+3. **Structure (1 paragraph)**
+   - How the content is organized
+   - Top-down breakdown approach
 
-## Post Length Guidelines
+4. **Main Content (organized hierarchically)**
+   - Top-level principles/goals
+   - Areas of focus under each
+   - Detailed descriptions
+   - Practical applications
 
-- **Short form (800-1200 words)**: Single insight, pattern, or technique
-- **Standard (1500-2500 words)**: Most posts - enough to explore, not so much you lose readers
-- **Long form (3000+ words)**: Comprehensive guides - split into clear sections
+5. **Closing (1-2 paragraphs)**
+   - Current state of journey
+   - Commitment to continued evolution
 
 ## Checklist Before Publishing
 
-- [ ] Does the title make a promise the post keeps?
-- [ ] Can someone use this information within a week?
-- [ ] Did I explain _why_ not just _what_?
-- [ ] Are there concrete examples?
-- [ ] Did I share something from experience, not just research?
-- [ ] Would I send this to a colleague I respect?
-- [ ] Is every technical term either explained or linked?
-- [ ] Does it sound like a human wrote it?
+- [ ] Does it start with clear context and purpose?
+- [ ] Are principles stated before practices?
+- [ ] Is the collective "we" voice used consistently?
+- [ ] Is content organized hierarchically and clearly?
+- [ ] Does it describe process, not just outcomes?
+- [ ] Are visual elements used to clarify structure?
+- [ ] Does it end with forward-looking perspective?
+- [ ] Is the tone professional but approachable?
+- [ ] Are concepts defined clearly when introduced?
+- [ ] Does it avoid personal anecdotes and "I" statements?
 
-## Examples of the Right Tone
+## Summary: The Core Pattern
 
-### Opening Hooks That Work
+**Start with Why** → **Describe How** → **Show Structure** → **Explain Applications** → **Look Forward**
 
-> "The most expensive line of code I ever wrote was a comment. Not because it was wrong - it was perfectly accurate. The problem was it made everyone feel safe ignoring a terrible design decision for two more years."
-
-> "Team topologies sound great until you realize you're reorganizing people like microservices, hoping human relationships will behave like APIs. Spoiler: they don't."
-
-> "I used to think code review was about finding bugs. Then I watched a senior engineer approve terrible code because fighting about it wasn't worth the political capital. That's when I learned code review is actually about trust and power."
-
-### Technical Explanation That Breathes
-
-> "Type systems are like compiler-enforced documentation. They won't catch every bug, but they force you to think about edge cases before they wake you up at 3 AM. And unlike comments, they can't lie to you - okay, they can if you use `any` everywhere, but that's on you."
-
-### Business Context That Lands
-
-> "Here's what the architecture diagram won't tell you: every service boundary is also a team boundary. Which means every API design discussion is actually a negotiation about who owns what, who's on call when it breaks, and who gets blamed when customers complain."
-
-## Final Notes
-
-This guide isn't a rulebook - it's a north star. The goal is posts that are:
-- **Honest** - Say what you think, show your reasoning
-- **Useful** - People should learn something they can apply
-- **Human** - Sound like a person, not a documentation generator
-- **Respectful** - Of the reader's time and intelligence
-
-Write the posts you wish you'd read three years ago.
+Write as an organization sharing its philosophy and approach, not as an individual sharing war stories. Focus on principles, processes, and collective experience. Be clear, structured, and purpose-driven.
