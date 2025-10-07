@@ -5,9 +5,11 @@ tags: [Azure, Bicep, Infrastructure as Code, DevOps, Type Safety]
 excerpt: "How we use Bicep's type system to prevent configuration errors at compile time and create maintainable infrastructure templates through discriminated unions and type imports."
 ---
 
-Infrastructure as Code (IaC) tooling has evolved significantly, yet many teams still encounter runtime deployment failures that could have been caught earlier. We believe infrastructure definitions should leverage type systems the same way application code does—catching errors before deployment, not after.
+Infrastructure as Code (IaC) tooling has evolved significantly, yet many teams still encounter runtime deployment failures that could have been caught earlier. To prevent this, one of the tools to use is typed Bicep. Infrastructure definitions should leverage type systems the same way application code does—catching errors before deployment, not after.
 
 This tutorial demonstrates our approach to typed Bicep, showing how type safety transforms infrastructure development from error-prone scripting into predictable, maintainable engineering.
+
+> **Reference Implementation**: All patterns and practices described in this guide are implemented in the [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter) repository. The repo provides a complete, production-ready template with typed modules, helper functions, and deployment examples that you can use as a starting point for your own infrastructure projects.
 
 ## Our Philosophy: Types as Infrastructure Contracts
 
