@@ -33,7 +33,7 @@ export const PostView = (props: { readonly post: Post }) => {
           <nav class="tags" aria-label="Post tags">
             <ul>
               {post.tags.map((tag) => (
-                <li key={tag}>
+                <li>
                   <a
                     href={`/tags/${encodeURIComponent(tag)}`}
                     hx-get={`/tags/${encodeURIComponent(tag)}`}

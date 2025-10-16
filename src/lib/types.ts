@@ -63,7 +63,7 @@ export type LayoutProps = {
   readonly modifiedTime?: string;
   readonly tags?: readonly TagName[];
   readonly type?: "website" | "article";
-  readonly origin?: string;
+  readonly origin?: string; // Site origin URL
   readonly canonicalPath?: string;
   readonly robots?: string;
   readonly breadcrumbs?: readonly BreadcrumbItem[];

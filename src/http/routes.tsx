@@ -20,7 +20,7 @@ import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
 import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
 import { match } from "../lib/result.ts";
-import { generateSitemap, generateRobotsTxt } from "../sitemap.ts";
+import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 
 export type RouteHandlers = {

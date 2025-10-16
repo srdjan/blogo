@@ -118,9 +118,7 @@ export const createLayout = (props: LayoutProps): Response => {
     : undefined;
 
   const additionalJson = structuredData
-    ? Array.isArray(structuredData)
-      ? structuredData
-      : [structuredData]
+    ? Array.isArray(structuredData) ? structuredData : [structuredData]
     : [];
 
   const jsonLdItems = [
@@ -129,9 +127,7 @@ export const createLayout = (props: LayoutProps): Response => {
     ...additionalJson,
   ];
 
-  const jsonLdPayload = jsonLdItems.length === 1
-    ? jsonLdItems[0]
-    : jsonLdItems;
+  const jsonLdPayload = jsonLdItems.length === 1 ? jsonLdItems[0] : jsonLdItems;
 
   const html = (
     <html lang="en">
@@ -396,7 +392,6 @@ export const createLayout = (props: LayoutProps): Response => {
                     aria-labelledby="search-heading"
                   />
                   <button type="submit" aria-label="Submit search">
-                    
                   </button>
                 </form>
                 <section
