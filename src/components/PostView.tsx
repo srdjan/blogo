@@ -50,7 +50,7 @@ export const PostView = (props: { readonly post: Post }) => {
         </div>
       </article>
       <nav style="text-align: center; margin-top: var(--space-xl);">
-        <a href="/">← Back to home</a>
+        <a href="/">&lArr; Back to home</a>
       </nav>
     </>
   );

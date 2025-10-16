@@ -158,7 +158,7 @@ export const createRouteHandlers = (
           <main>
             <h2>Search</h2>
             <p>Please provide a search query.</p>
-            <a href="/">← Back to home</a>
+            <a href="/">&lArr; Back to home</a>
           </main>
         ),
         author: "Srdjan Strbanovic",

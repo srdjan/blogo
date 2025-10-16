@@ -38,7 +38,7 @@ export const SearchResults = (props: {
         </ul>
       )}
       <nav class="u-shell u-text-center">
-        <a href="/">← Back to home</a>
+        <a href="/">&lArr; Back to home</a>
       </nav>
     </>
   );
