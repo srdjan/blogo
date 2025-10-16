@@ -718,7 +718,7 @@ app.listen(3000, () => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Micro Frontends with mono-jsx Signals + HTMX</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@2"></script>
     <script src="https://unpkg.com/mono-jsx@latest"></script>
     <style>
         .app-layout { max-width: 1200px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
