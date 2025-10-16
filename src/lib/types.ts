@@ -7,6 +7,11 @@ export type PostId = Brand<string, "PostId">;
 export type TagName = Brand<string, "TagName">;
 export type UrlPath = Brand<string, "UrlPath">;
 
+export type BreadcrumbItem = {
+  readonly name: string;
+  readonly href: string;
+};
+
 export const createSlug = (value: string): Slug => {
   return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(
     /-+/g,
@@ -58,6 +63,11 @@ export type LayoutProps = {
   readonly modifiedTime?: string;
   readonly tags?: readonly TagName[];
   readonly type?: "website" | "article";
+  readonly origin?: string;
+  readonly canonicalPath?: string;
+  readonly robots?: string;
+  readonly breadcrumbs?: readonly BreadcrumbItem[];
+  readonly structuredData?: readonly unknown[] | Record<string, unknown>;
 };
 
 export type AppErrorKind =

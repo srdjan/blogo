@@ -7,19 +7,31 @@ export const PostList = (props: {
   const { posts, activeTag } = props;
 
   return (
-    <>
-      {activeTag && (
-        <p>
-          Posts tagged with <strong>{activeTag}</strong> -{" "}
-          <a href="/tags">View all tags</a>
-        </p>
-      )}
+    <section aria-label={activeTag ? `Posts tagged ${activeTag}` : "Latest posts"}>
+      <header class="post-list-header">
+        <h1>
+          {activeTag ? `Posts tagged with ${activeTag}` : "Latest Posts"}
+        </h1>
+        {activeTag && (
+          <p>
+            <a
+              href="/tags"
+              hx-get="/tags"
+              hx-target="#content-area"
+              hx-swap="innerHTML"
+              hx-push-url="true"
+            >
+              View all tags
+            </a>
+          </p>
+        )}
+      </header>
       {posts.length === 0 ? (
         <p>No posts found.</p>
       ) : (
         <ul class="post-list">
           {posts.map((post) => (
-            <li>
+            <li key={post.slug}>
               <article class="post-card">
                 <h2>
                   <a
@@ -32,25 +44,29 @@ export const PostList = (props: {
                     {post.title}
                   </a>
                 </h2>
-                {post.formattedDate && <time>{post.formattedDate}</time>}
+                {post.formattedDate && (
+                  <time dateTime={post.date}>{post.formattedDate}</time>
+                )}
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (
                   <nav class="tags" aria-label="Post tags">
-                    {post.tags.map((tag, index) => (
-                      <>
-                        <a
-                          href={`/tags/${encodeURIComponent(tag)}`}
-                          hx-get={`/tags/${encodeURIComponent(tag)}`}
-                          hx-target="#content-area"
-                          hx-swap="innerHTML"
-                          hx-push-url="true"
-                          class="tag"
-                        >
-                          {tag}
-                        </a>
-                        {index < (post.tags?.length ?? 0) - 1 && " "}
-                      </>
-                    ))}
+                    <ul>
+                      {post.tags.map((tag) => (
+                        <li key={`${post.slug}-${tag}`}>
+                          <a
+                            href={`/tags/${encodeURIComponent(tag)}`}
+                            hx-get={`/tags/${encodeURIComponent(tag)}`}
+                            hx-target="#content-area"
+                            hx-swap="innerHTML"
+                            hx-push-url="true"
+                            class="tag"
+                            rel="tag"
+                          >
+                            {tag}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
                   </nav>
                 )}
               </article>
@@ -58,6 +74,6 @@ export const PostList = (props: {
           ))}
         </ul>
       )}
-    </>
+    </section>
   );
 };

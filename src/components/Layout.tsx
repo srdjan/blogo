@@ -12,17 +12,126 @@ export const createLayout = (props: LayoutProps): Response => {
     modifiedTime,
     tags,
     type = "website",
+    origin,
+    canonicalPath,
+    robots,
+    breadcrumbs,
+    structuredData,
   } = props;
 
-  const baseUrl = "https://blogo.timok.deno.net";
-  const canonicalUrl = `${baseUrl}${path}`;
-  const defaultImage = `${baseUrl}/images/og-default.png`;
+  const fallbackOrigin = Deno.env.get("PUBLIC_URL") ||
+    "https://blogo.timok.deno.net";
+  const siteOrigin = origin || fallbackOrigin;
+  const siteName = "Blogo - Modern Development Blog";
+  const twitterHandle = Deno.env.get("TWITTER_HANDLE") || "@blogo_dev";
+
+  const canonicalTarget = canonicalPath ?? path;
+  const canonicalUrl = (() => {
+    try {
+      return new URL(canonicalTarget, siteOrigin).toString();
+    } catch (_error) {
+      return `${siteOrigin}${canonicalTarget}`;
+    }
+  })();
+
+  const defaultImage = `${siteOrigin}/images/og-default.svg`;
 
   const ogImage = image || (
     path.startsWith("/posts/")
-      ? `${baseUrl}/images/og/${path.replace("/posts/", "")}.png`
+      ? `${siteOrigin}/images/og/${path.replace("/posts/", "")}.svg`
       : defaultImage
   );
+
+  const ogImageType = ogImage.endsWith(".svg") ? "image/svg+xml" : "image/png";
+
+  const robotsMeta = robots ??
+    "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
+
+  const isArticle = type === "article";
+
+  const basePublisher = {
+    "@type": "Organization",
+    "name": siteName,
+    "url": siteOrigin,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${siteOrigin}/favicon.svg`,
+    },
+  } as const;
+
+  const primaryStructuredData = isArticle
+    ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting" as const,
+      "headline": title,
+      ...(description ? { "description": description } : {}),
+      "url": canonicalUrl,
+      "image": ogImage,
+      "author": {
+        "@type": "Person",
+        "name": author,
+      },
+      "publisher": basePublisher,
+      ...(publishedTime ? { "datePublished": publishedTime } : {}),
+      ...(modifiedTime ? { "dateModified": modifiedTime } : {}),
+      ...(tags && tags.length > 0
+        ? { "keywords": tags.join(", "), "articleSection": "Technology" }
+        : { "articleSection": "Technology" }),
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
+    }
+    : {
+      "@context": "https://schema.org",
+      "@type": "Blog" as const,
+      "name": siteName,
+      "headline": title,
+      ...(description ? { "description": description } : {}),
+      "url": canonicalUrl,
+      "image": ogImage,
+      "publisher": basePublisher,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${siteOrigin}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    };
+
+  const breadcrumbJson = breadcrumbs && breadcrumbs.length > 0
+    ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbs.map((crumb, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": crumb.name,
+        "item": (() => {
+          try {
+            return new URL(crumb.href, siteOrigin).toString();
+          } catch (_error) {
+            return `${siteOrigin}${crumb.href}`;
+          }
+        })(),
+      })),
+    }
+    : undefined;
+
+  const additionalJson = structuredData
+    ? Array.isArray(structuredData)
+      ? structuredData
+      : [structuredData]
+    : [];
+
+  const jsonLdItems = [
+    primaryStructuredData,
+    ...(breadcrumbJson ? [breadcrumbJson] : []),
+    ...additionalJson,
+  ];
+
+  const jsonLdPayload = jsonLdItems.length === 1
+    ? jsonLdItems[0]
+    : jsonLdItems;
 
   const html = (
     <html lang="en">
@@ -44,13 +153,14 @@ export const createLayout = (props: LayoutProps): Response => {
         )}
         <meta {...{ "property": "og:url" }} content={canonicalUrl} />
         <meta {...{ "property": "og:image" }} content={ogImage} />
+        <meta {...{ "property": "og:image:type" }} content={ogImageType} />
         <meta
           {...{ "property": "og:image:alt" }}
           content={`Cover image for: ${title}`}
         />
         <meta
           {...{ "property": "og:site_name" }}
-          content="Blogo - Modern Development Blog"
+          content={siteName}
         />
         <meta {...{ "property": "og:locale" }} content="en_US" />
         {publishedTime && (
@@ -82,14 +192,13 @@ export const createLayout = (props: LayoutProps): Response => {
           <meta name="twitter:description" content={description} />
         )}
         <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:type" content={ogImageType} />
         <meta name="twitter:image:alt" content={`Cover image for: ${title}`} />
-        <meta name="twitter:site" content="@your_twitter_handle" />
+        <meta name="twitter:site" content={twitterHandle} />
+        <meta name="twitter:creator" content={twitterHandle} />
 
         <meta name="author" content={author} />
-        <meta
-          name="robots"
-          content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
-        />
+        <meta name="robots" content={robotsMeta} />
         <meta name="theme-color" content="#000000" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
@@ -114,44 +223,42 @@ export const createLayout = (props: LayoutProps): Response => {
           title="Blogo RSS Feed"
           type="application/rss+xml"
         />
+        <link
+          rel="alternate"
+          href="/rss.xml"
+          title="Blogo Full RSS Feed"
+          type="application/rss+xml"
+        />
 
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": type === "article" ? "BlogPosting" : "WebSite",
-            "headline": title,
-            "description": description,
-            "url": canonicalUrl,
-            "image": ogImage,
-            "author": {
-              "@type": "Person",
-              "name": author,
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "Blog",
-              "logo": {
-                "@type": "ImageObject",
-                "url": `${baseUrl}/favicon.svg`,
-              },
-            },
-            ...(publishedTime && { "datePublished": publishedTime }),
-            ...(modifiedTime && { "dateModified": modifiedTime }),
-            ...(tags && { "keywords": tags.join(", ") }),
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": canonicalUrl,
-            },
-          })}
+          {JSON.stringify(jsonLdPayload)}
         </script>
 
         <script src="/js/htmx.min.js" defer></script>
         <script src="/js/site.js" defer></script>
       </head>
       <body>
+        <a class="skip-link" href="#content-area">Skip to main content</a>
         <div id="app-layout">
-          <header class="site-header">
-            <nav class="site-nav">
+          <header class="site-header" role="banner">
+            <div class="site-branding">
+              <h1 class="site-title">
+                <a
+                  href="/"
+                  hx-get="/"
+                  hx-target="#content-area"
+                  hx-swap="innerHTML"
+                  hx-push-url="true"
+                  rel="home"
+                >
+                  Blogo
+                </a>
+              </h1>
+              <p class="site-description">
+                Modern Development Blog
+              </p>
+            </div>
+            <nav class="site-nav" aria-label="Primary">
               <ul>
                 <li>
                   <a
@@ -304,6 +411,34 @@ export const createLayout = (props: LayoutProps): Response => {
           </header>
 
           <main id="content-area" class="main-content">
+            {breadcrumbs && breadcrumbs.length > 1 && (
+              <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <ol>
+                  {breadcrumbs.map((crumb, index) => (
+                    <li key={`${crumb.href}-${index}`}>
+                      {index < breadcrumbs.length - 1
+                        ? (
+                          <a
+                            href={crumb.href}
+                            hx-get={crumb.href}
+                            hx-target="#content-area"
+                            hx-swap="innerHTML"
+                            hx-push-url="true"
+                            rel={index === 0 ? "home" : undefined}
+                          >
+                            {crumb.name}
+                          </a>
+                        )
+                        : (
+                          <span aria-current="page">
+                            {crumb.name}
+                          </span>
+                        )}
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
             {children}
           </main>
 

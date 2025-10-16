@@ -56,8 +56,8 @@ function main() {
     .get("/rss.xml", routes.rss)
     .get("/sitemap.xml", routes.sitemap)
     .get("/robots.txt", routes.robots)
-    .get("/images/og-default.png", routes.ogImageDefault)
-    .get(/^\/images\/og\/(.+)\.png$/, routes.ogImagePost)
+    .get("/images/og-default.svg", routes.ogImageDefault)
+    .get(/^\/images\/og\/(.+)\.svg$/, routes.ogImagePost)
     .get("/health", routes.health);
 
   // Graceful shutdown setup

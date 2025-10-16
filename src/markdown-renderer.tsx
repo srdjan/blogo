@@ -131,7 +131,14 @@ const processImageAttributes = (html: string): string => {
         }
       }
     }
-    
+
+    if (!/loading=/i.test(imgAttributes)) {
+      htmlAttributes.push('loading="lazy"');
+    }
+    if (!/decoding=/i.test(imgAttributes)) {
+      htmlAttributes.push('decoding="async"');
+    }
+
     // Build the final img tag
     let finalImg = `<img${imgAttributes}`;
     
@@ -185,4 +192,3 @@ export const markdownToHtml = (markdown: string): AppResult<string> => {
     };
   }
 };
-

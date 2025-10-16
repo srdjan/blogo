@@ -2,10 +2,12 @@
 import type { Post } from "./lib/types.ts";
 
 export function generateSitemap(posts: Post[], baseUrl: string): string {
+  const now = new Date().toISOString();
   const staticPages = [
-    { url: '/', lastmod: new Date().toISOString(), priority: '1.0' },
-    { url: '/about', lastmod: new Date().toISOString(), priority: '0.8' },
-    { url: '/tags', lastmod: new Date().toISOString(), priority: '0.7' }
+    { url: '/', lastmod: now, priority: '1.0' },
+    { url: '/about', lastmod: now, priority: '0.8' },
+    { url: '/tags', lastmod: now, priority: '0.7' },
+    { url: '/rss', lastmod: now, priority: '0.6' },
   ];
 
   const postPages = posts.map(post => ({
@@ -18,7 +20,7 @@ export function generateSitemap(posts: Post[], baseUrl: string): string {
   const allTags = [...new Set(posts.flatMap(post => post.tags || []))];
   const tagPages = allTags.map(tag => ({
     url: `/tags/${encodeURIComponent(tag)}`,
-    lastmod: new Date().toISOString(),
+    lastmod: now,
     priority: '0.6'
   }));
 
@@ -50,6 +52,7 @@ Allow: /
 
 # Sitemaps
 Sitemap: ${baseUrl}/sitemap.xml
+Host: ${baseUrl}
 
 # Common crawl delays
 Crawl-delay: 1

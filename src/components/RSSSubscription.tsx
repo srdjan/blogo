@@ -18,7 +18,7 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
 
   return (
     <div class="rss-content">
-      <h2>RSS Subscriptions</h2>
+      <h1>RSS Subscriptions</h1>
       <p>
         RSS lets you subscribe to updates using your favorite reader (Feedly,
         Inoreader, NetNewsWire, Reeder, etc.). Copy a feed URL and add it to
@@ -49,6 +49,9 @@ export const RSSSubscription = (props: RSSSubscriptionProps) => {
           return (
             <article class="topic-feed">
               <h3>{topic}</h3>
+              <p class="topic-count">
+                {count} post{count === 1 ? "" : "s"}
+              </p>
               <div class="feed-row">
                 <a
                   class="feed-link"

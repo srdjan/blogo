@@ -99,6 +99,23 @@ body {
     min-height: 100vh;
 }
 
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0.5rem;
+    background-color: var(--color-accent);
+    color: #ffffff;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 4px;
+    z-index: 1000;
+    transition: left var(--transition-speed) var(--transition-easing);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+    left: 1rem;
+}
+
 /* ====================================
    TYPOGRAPHY HIERARCHY
    ==================================== */
@@ -165,6 +182,25 @@ ul, ol {
     padding: var(--space-2xl) var(--content-padding) var(--space-xl);
     text-align: center;
     border-bottom: 2px solid var(--color-border-strong);
+}
+
+.site-branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.site-branding .site-title {
+    margin-bottom: 0;
+}
+
+.site-branding .site-title a {
+    color: var(--color-text-primary);
+}
+
+.site-branding .site-title a:hover {
+    color: var(--color-accent-hover);
 }
 
 .site-title {
@@ -258,9 +294,58 @@ ul, ol {
     padding: var(--space-3xl) var(--content-padding);
 }
 
+.breadcrumbs {
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumbs li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumbs li + li::before {
+    content: "/";
+    margin: 0 var(--space-xs);
+    color: var(--color-text-muted);
+}
+
+.breadcrumbs a {
+    color: var(--color-link);
+}
+
+.breadcrumbs [aria-current="page"] {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
 /* ====================================
    POST LIST: HOME PAGE
    ==================================== */
+.post-list-header {
+    margin-bottom: var(--space-xl);
+    text-align: left;
+}
+
+.post-list-header h1 {
+    margin-bottom: var(--space-xs);
+}
+
+.post-list-header p {
+    margin: 0;
+    color: var(--color-text-muted);
+}
+
 .post-list {
     list-style: none;
     display: flex;
@@ -332,12 +417,20 @@ ul, ol {
    TAG SYSTEM
    ==================================== */
 .tags {
+    margin-top: var(--space-md);
+}
+
+.tags ul {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
-    margin-top: var(--space-md);
-    list-style: none;
+    margin: 0;
     padding: 0;
+    list-style: none;
+}
+
+.tags li {
+    margin: 0;
 }
 
 .tag {
@@ -361,6 +454,15 @@ ul, ol {
     opacity: 1;
 }
 
+.topics {
+    margin-top: var(--space-sm);
+    color: var(--color-text-muted);
+}
+
+.topics small {
+    font-size: var(--font-size-sm);
+}
+
 /* ====================================
    SINGLE POST VIEW
    ==================================== */
@@ -371,17 +473,24 @@ ul, ol {
     text-align: left;
 }
 
-.post-content > h1 {
+.post-header {
+    margin-bottom: var(--space-lg);
+}
+
+.post-header h1 {
     font-size: var(--font-size-2xl);
     margin-bottom: var(--space-sm);
     text-align: left;
 }
 
-.post-content > time {
-    display: block;
+.post-meta {
     font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-xl);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-sm);
+}
+
+.post-meta time {
+    display: inline-block;
 }
 
 /* Post content typography */
@@ -698,6 +807,12 @@ button.copy:hover {
 
 .topic-feed h3 {
     margin-bottom: var(--space-md);
+}
+
+.topic-feed .topic-count {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
 }
 
 /* ====================================

@@ -8,7 +8,7 @@ export const SearchResults = (props: {
 
   return (
     <>
-      <h2>Search Results</h2>
+      <h1>Search Results</h1>
       <p>
         {posts.length === 0
           ? `No posts found for "${query}".`
@@ -30,7 +30,9 @@ export const SearchResults = (props: {
                     {post.title}
                   </a>
                 </h2>
-                {post.formattedDate && <time>{post.formattedDate}</time>}
+                {post.formattedDate && (
+                  <time dateTime={post.date}>{post.formattedDate}</time>
+                )}
                 {post.excerpt && <p>{post.excerpt}</p>}
               </article>
             </li>
@@ -38,7 +40,15 @@ export const SearchResults = (props: {
         </ul>
       )}
       <nav class="u-shell u-text-center">
-        <a href="/">&lArr; Back to home</a>
+        <a
+          href="/"
+          hx-get="/"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+        >
+          &lArr; Back to home
+        </a>
       </nav>
     </>
   );

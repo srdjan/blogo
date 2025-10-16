@@ -7,6 +7,7 @@ import { PostView } from "../components/PostView.tsx";
 // // import { TagIndex } from "../components/TagIndex.tsx";
 import { TopicsIndex } from "../components/TopicsIndex.tsx";
 import { RSSSubscription } from "../components/RSSSubscription.tsx";
+import { generateBreadcrumbs } from "../components/Breadcrumbs.tsx";
 import {
   ALL_TOPICS,
   deriveTopicsFromTags,
@@ -14,11 +15,13 @@ import {
   slugToTopic,
   topicToSlug,
 } from "../config/topics.ts";
-import { generateTopicRssFeed } from "../rss.ts";
+import { generateRSS, generateTopicRssFeed } from "../rss.ts";
 import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
 import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
 import { match } from "../lib/result.ts";
+import { generateSitemap, generateRobotsTxt } from "../sitemap.ts";
+import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 
 export type RouteHandlers = {
   readonly home: RouteHandler;
@@ -51,6 +54,8 @@ export const createRouteHandlers = (
           title: "Blog - Home",
           description: "A minimal blog built with mono-jsx",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <PostList posts={posts} />,
           author: "Srdjan Strbanovic",
         }),
@@ -59,6 +64,8 @@ export const createRouteHandlers = (
           title: "Error - Blog",
           description: "Failed to load posts",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load posts</div>,
         }),
     });
@@ -69,6 +76,8 @@ export const createRouteHandlers = (
       title: "About - Blog",
       description: "About this blog and its features",
       path: createUrlPath(ctx.pathname),
+      origin: ctx.url.origin,
+      breadcrumbs: generateBreadcrumbs(ctx.pathname),
       children: <About />,
     });
   };
@@ -82,6 +91,8 @@ export const createRouteHandlers = (
           title: "Tags - Blog",
           description: "Browse posts by tags",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <TopicsIndex groups={groupTagsByTopic(tags)} />,
           author: "Srdjan Strbanovic",
         }),
@@ -90,6 +101,8 @@ export const createRouteHandlers = (
           title: "Error - Blog",
           description: "Failed to load tags",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load tags</div>,
         }),
     });
@@ -107,6 +120,8 @@ export const createRouteHandlers = (
           title: `Posts tagged "${tagName}" - Blog`,
           description: `All posts tagged with ${tagName}`,
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <PostList posts={posts} activeTag={tagName} />,
           author: "Srdjan Strbanovic",
         }),
@@ -115,6 +130,8 @@ export const createRouteHandlers = (
           title: "Error - Blog",
           description: "Failed to load posts for tag",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load posts for tag</div>,
         }),
     });
@@ -134,6 +151,8 @@ export const createRouteHandlers = (
           title: `${post.title} - Blog`,
           description: post.excerpt || `Read ${post.title}`,
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname, post.title),
           children: <PostView post={post} />,
           type: "article",
           publishedTime: post.date,
@@ -154,12 +173,26 @@ export const createRouteHandlers = (
         title: "Search - Blog",
         description: "Search blog posts",
         path: createUrlPath(ctx.pathname),
+        origin: ctx.url.origin,
+        robots: "noindex, nofollow",
+        canonicalPath: ctx.searchParams.toString()
+          ? `${ctx.pathname}?${ctx.searchParams.toString()}`
+          : ctx.pathname,
+        breadcrumbs: generateBreadcrumbs(ctx.pathname),
         children: (
-          <main>
+          <section aria-label="Search">
             <h2>Search</h2>
             <p>Please provide a search query.</p>
-            <a href="/">&lArr; Back to home</a>
-          </main>
+            <a
+              href="/"
+              hx-get="/"
+              hx-target="#content-area"
+              hx-swap="innerHTML"
+              hx-push-url="true"
+            >
+              &lArr; Back to home
+            </a>
+          </section>
         ),
         author: "Srdjan Strbanovic",
       });
@@ -173,6 +206,10 @@ export const createRouteHandlers = (
           title: `Search: "${query}" - Blog`,
           description: `Search results for ${query}`,
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          robots: "noindex, nofollow",
+          canonicalPath: `${ctx.pathname}?${ctx.searchParams.toString()}`,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <SearchResults posts={posts} query={query} />,
         }),
       error: () =>
@@ -180,6 +217,9 @@ export const createRouteHandlers = (
           title: "Error - Blog",
           description: "Failed to search posts",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          robots: "noindex, nofollow",
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to search posts</div>,
         }),
     });
@@ -226,14 +266,14 @@ export const createRouteHandlers = (
     });
   };
 
-  const rss: RouteHandler = async () => {
+  const rss: RouteHandler = async (ctx) => {
     const postsResult = await contentService.loadPosts();
 
     return match(postsResult, {
       ok: (posts) => {
-        const baseUrl = "https://blogo.timok.deno.net";
+        const baseUrl = ctx.url.origin;
         const rssContent = generateRSS(
-          posts,
+          Array.from(posts),
           "Blog",
           baseUrl,
           "A minimal blog built with mono-jsx",
@@ -264,16 +304,18 @@ export const createRouteHandlers = (
             topicCounts.set(t, (topicCounts.get(t) ?? 0) + 1);
           }
         }
-        const baseUrl = `${ctx.url.protocol}//${ctx.url.host}`;
-        const list = (ALL_TOPICS as readonly string[]).map((t) => ({
-          topic: t as any,
-          feedPath: `/rss/topic/${topicToSlug(t as any)}`,
-          count: topicCounts.get(t) ?? 0,
+        const baseUrl = ctx.url.origin;
+        const list = ALL_TOPICS.map((topicName) => ({
+          topic: topicName,
+          feedPath: `/rss/topic/${topicToSlug(topicName)}`,
+          count: topicCounts.get(topicName) ?? 0,
         }));
         return createLayout({
           title: "RSS Subscriptions - Blog",
           description: "Subscribe to the full feed or topic-specific feeds",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <RSSSubscription baseUrl={baseUrl} topics={list} />,
         });
       },
@@ -282,6 +324,8 @@ export const createRouteHandlers = (
           title: "Error - Blog",
           description: "Failed to load RSS data",
           path: createUrlPath(ctx.pathname),
+          origin: ctx.url.origin,
+          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load RSS data</div>,
         }),
     });
@@ -301,9 +345,9 @@ export const createRouteHandlers = (
             topic,
           )
         );
-        const baseUrl = `${ctx.url.protocol}//${ctx.url.host}`;
+        const baseUrl = ctx.url.origin;
         const xml = generateTopicRssFeed(
-          filtered as any,
+          Array.from(filtered),
           String(topic),
           baseUrl,
           `/rss/topic/${slug}`,
@@ -319,12 +363,12 @@ export const createRouteHandlers = (
     });
   };
 
-  const sitemap: RouteHandler = async () => {
+  const sitemap: RouteHandler = async (ctx) => {
     const postsResult = await contentService.loadPosts();
     return match(postsResult, {
       ok: (posts) => {
-        const baseUrl = "https://blogo.timok.deno.net";
-        const sitemapContent = generateSitemap(posts, baseUrl);
+        const baseUrl = ctx.url.origin;
+        const sitemapContent = generateSitemap(Array.from(posts), baseUrl);
         return new Response(sitemapContent, {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
@@ -336,8 +380,8 @@ export const createRouteHandlers = (
     });
   };
 
-  const robots: RouteHandler = () => {
-    const baseUrl = "https://blogo.timok.deno.net";
+  const robots: RouteHandler = (ctx) => {
+    const baseUrl = ctx.url.origin;
     const robotsContent = generateRobotsTxt(baseUrl);
 
     return new Response(robotsContent, {
@@ -361,7 +405,7 @@ export const createRouteHandlers = (
 
   const ogImagePost: RouteHandler = async (ctx) => {
     const slug = createSlug(
-      ctx.pathname.replace("/images/og/", "").replace(".png", ""),
+      ctx.pathname.replace("/images/og/", "").replace(".svg", ""),
     );
     const postResult = await contentService.getPostBySlug(slug);
 
@@ -453,119 +497,3 @@ export const createRouteHandlers = (
     health,
   };
 };
-
-// Helper functions (temporary - should be moved to dedicated modules)
-function generateRSS(
-  posts: readonly import("../lib/types.ts").Post[],
-  title: string,
-  baseUrl: string,
-  description: string,
-): string {
-  // Simplified RSS generation - in real implementation, move to separate module
-  const items = posts.slice(0, 20).map((post) => `
-    <item>
-      <title>${escapeXml(post.title)}</title>
-      <link>${baseUrl}/posts/${post.slug}</link>
-      <description>${escapeXml(post.excerpt || "")}</description>
-      <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      <guid>${baseUrl}/posts/${post.slug}</guid>
-    </item>
-  `).join("");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-  <channel>
-    <title>${escapeXml(title)}</title>
-    <link>${baseUrl}</link>
-    <description>${escapeXml(description)}</description>
-    <language>en-us</language>
-    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    ${items}
-  </channel>
-</rss>`;
-}
-
-function generateSitemap(
-  posts: readonly import("../lib/types.ts").Post[],
-  baseUrl: string,
-): string {
-  const postUrls = posts.map((post) => `
-  <url>
-    <loc>${baseUrl}/posts/${post.slug}</loc>
-    <lastmod>${post.modified || post.date}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>`).join("");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl}</loc>
-    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/tags</loc>
-    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/about</loc>
-    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  ${postUrls}
-</urlset>`;
-}
-
-function generateRobotsTxt(baseUrl: string): string {
-  return `User-agent: *
-Allow: /
-
-Sitemap: ${baseUrl}/sitemap.xml`;
-}
-
-function generateDefaultOGImage(): string {
-  return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#1a1a1a"/>
-    <text x="600" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" fill="#ffffff">
-      Blog
-    </text>
-  </svg>`;
-}
-
-function generateOGImage(
-  title: string,
-  excerpt?: string,
-  _tags?: readonly string[],
-): string {
-  return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#1a1a1a"/>
-    <text x="600" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="#ffffff">
-      ${escapeXml(title.length > 50 ? title.substring(0, 50) + "..." : title)}
-    </text>
-    ${
-    excerpt
-      ? `<text x="600" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#cccccc">
-      ${
-        escapeXml(
-          excerpt.length > 80 ? excerpt.substring(0, 80) + "..." : excerpt,
-        )
-      }
-    </text>`
-      : ""
-  }
-  </svg>`;
-}
-
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}

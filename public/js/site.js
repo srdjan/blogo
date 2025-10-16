@@ -107,11 +107,11 @@ const Core = {
       if (e.key === "Escape") {
         const searchModal = document.getElementById("search-modal");
         if (
-          searchModal &&
-          (searchModal.style.display === "flex" ||
-            searchModal.style.display === "block")
+          searchModal instanceof HTMLDialogElement &&
+          searchModal.open
         ) {
-          searchModal.style.display = "none";
+          searchModal.close();
+          updateSearchToggleState(false);
         }
       }
     });
@@ -209,6 +209,7 @@ const Search = {
             const searchModal = document.getElementById("search-modal");
             if (searchModal) {
               searchModal.close();
+              updateSearchToggleState(false);
             }
           });
         });
@@ -219,6 +220,13 @@ const Search = {
   },
 };
 
+const updateSearchToggleState = (expanded) => {
+  const toggle = document.querySelector(".search-toggle");
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+  }
+};
+
 // Simple function to ensure search functionality works
 function ensureSearchToggleWorks() {
   const searchToggle = document.querySelector(".search-toggle");
@@ -226,6 +234,8 @@ function ensureSearchToggleWorks() {
     'button[aria-label="Close search"]',
   );
   const searchModal = document.getElementById("search-modal");
+
+  updateSearchToggleState(false);
 
 
   // Search toggle
@@ -238,6 +248,7 @@ function ensureSearchToggleWorks() {
       const input = document.getElementById("search-input");
       if (modal) {
         modal.showModal();
+        updateSearchToggleState(true);
         setTimeout(() => {
           if (input) {
             input.focus();
@@ -258,6 +269,7 @@ function ensureSearchToggleWorks() {
       const modal = document.getElementById("search-modal");
       if (modal) {
         modal.close();
+        updateSearchToggleState(false);
       }
     });
   }
@@ -269,6 +281,7 @@ function ensureSearchToggleWorks() {
     searchModal.addEventListener("click", (e) => {
       if (e.target === searchModal) {
         searchModal.close();
+        updateSearchToggleState(false);
       }
     });
   }
@@ -288,6 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const searchModal = document.getElementById("search-modal");
       if (searchModal && searchModal.open) {
         searchModal.close();
+        updateSearchToggleState(false);
       }
     }
   });

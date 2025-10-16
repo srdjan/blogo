@@ -1,13 +1,23 @@
 export const About = () => {
   return (
-    <div class="about-content">
-      <h2>Hi, I'm Srdjan...</h2>
+    <div class="about-content" role="presentation">
+      <h1>Hi, I'm Srdjan...</h1>
       <p>
         This is my personal, minimal blog built for experimenting with AI agents 
         and ability to fine tune custom writing styles.
       </p>
 
-      <h2>About me <a href="https://srdjan.github.io/">&rArr;</a></h2>
+      <h2>
+        About me{" "}
+        <a
+          href="https://srdjan.github.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Learn more about Srdjan (opens in a new tab)"
+        >
+          &rArr;
+        </a>
+      </h2>
       <p>
         I have extensive experience in leadership roles within various companies in the 
         technology industry. As an SVP of Architecture at First Advantage, currently, I lead 
@@ -16,7 +26,15 @@ export const About = () => {
         background in software development and agile culture advisory. 
       </p>
       <nav style="text-align: center; margin-top: var(--space-xl);">
-        <a href="/">&lArr; Back to home</a>
+        <a
+          href="/"
+          hx-get="/"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+        >
+          &lArr; Back to home
+        </a>
       </nav>
     </div>
   );

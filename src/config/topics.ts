@@ -1,6 +1,6 @@
 // Topic-tag mapping and utilities for hierarchical tags
 // Light FP style: data as types, pure functions, no side effects
-import type { TagInfo, TagName } from "../lib/types.ts";
+import type { TagInfo } from "../lib/types.ts";
 
 export type Topic = string & { readonly __brand: "Topic" };
 
@@ -66,10 +66,6 @@ export const TOPICS: Readonly<Record<Topic, readonly string[]>> = {
 
 // Case-insensitive helpers
 const normalize = (s: string): string => s.trim().toLowerCase();
-
-const topicMapCI: Readonly<Record<string, Topic>> = Object.fromEntries(
-  Object.keys(TOPICS).map((k) => [normalize(k), k as Topic]),
-);
 
 const tagToTopicsIndexCI: Readonly<Record<string, readonly Topic[]>> = (() => {
   const idx = new Map<string, Topic[]>();

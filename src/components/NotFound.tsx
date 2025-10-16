@@ -1,11 +1,19 @@
 export const NotFound = () => {
   return (
-    <main>
-      <h1>404 - Page Not Found</h1>
+    <section aria-labelledby="not-found-heading">
+      <h1 id="not-found-heading">404 - Page Not Found</h1>
       <p>The page you're looking for doesn't exist.</p>
       <nav class="u-shell u-text-center">
-        <a href="/">&lArr; Back to home</a>
+        <a
+          href="/"
+          hx-get="/"
+          hx-target="#content-area"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+        >
+          &lArr; Back to home
+        </a>
       </nav>
-    </main>
+    </section>
   );
 };
