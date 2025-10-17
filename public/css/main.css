@@ -10,7 +10,7 @@
     /* === COLOR ARCHITECTURE - OPTIMIZED FOR READABILITY === */
     /* Background: Warm off-white reduces eye strain vs pure white */
     --color-bg: #FEFDF8;
-    --color-surface: #F9F8F3;
+    --color-surface: #f3f5f9;
 
     /* Text: High contrast (16:1) for optimal readability */
     --color-text-primary: #1a1a1a;
@@ -30,17 +30,20 @@
     /* Semantic colors for better UX */
     --color-link: #5B4FC6;
     --color-link-visited: #7B6FD6;
-    --color-code-bg: #FAFAF7;
+    --color-code-bg: #10131b;
+    --color-code-inline-bg: #7d7676;;
+    --color-code-border: rgba(12, 18, 28, 0.85);
+    --color-code-shadow: 0 24px 45px -18px rgba(7, 10, 18, 0.55);
 
-    /* Code syntax highlighting colors - optimized for readability */
-    --code-keyword: #D73A49;      /* Red for keywords (if, const, let, function) */
-    --code-string: #032F62;       /* Dark blue for strings */
-    --code-function: #6F42C1;     /* Purple for function names */
-    --code-comment: #6A737D;      /* Grey for comments */
-    --code-number: #005CC5;       /* Blue for numbers */
-    --code-property: #E36209;     /* Orange for properties */
-    --code-operator: #D73A49;     /* Red for operators */
-    --code-variable: #24292E;     /* Near-black for variables */
+    /* Code syntax highlighting colors - vibrant for dark canvas */
+    --code-keyword: #f7768e;      /* Bright pink for keywords */
+    --code-string: #9ece6a;       /* Vivid green for strings */
+    --code-function: #7aa2f7;     /* Electric blue for function names */
+    --code-comment: #7b82a3;      /* Muted slate for comments */
+    --code-number: #ff9e64;       /* Warm orange for numbers */
+    --code-property: #c0caf5;     /* Soft blue for properties */
+    --code-operator: #89ddff;     /* Cyan for operators */
+    --code-variable: #e3ecff;     /* Pale blue-white for variables */
 
     /* === FLUID TYPOGRAPHY === */
     --font-size-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.75rem);
@@ -528,21 +531,24 @@ ul, ol {
 .content code {
     font-family: var(--font-mono);
     font-size: 0.9em;
-    background: var(--color-code-bg);
-    padding: 0.2em 0.4em;
-    border-radius: 0.25rem;
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
+    background: var(--color-code-inline-bg);
+    color: var(--code-variable);
+    padding: 0.2em 0.5em;
+    border-radius: 0.35rem;
+    border: 1px solid var(--color-code-border);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 /* Code blocks with syntax highlighting */
 .content pre {
     background: var(--color-code-bg);
-    border: 2px solid var(--color-border);
-    padding: var(--space-lg);
+    color: var(--code-variable);
+    border: 1px solid var(--color-code-border);
+    box-shadow: var(--color-code-shadow);
+    padding: calc(var(--space-lg) + 0.25rem);
     margin-bottom: var(--space-lg);
     overflow-x: auto;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     line-height: 1.5;
 }
 
@@ -550,7 +556,8 @@ ul, ol {
     background: none;
     border: none;
     padding: 0;
-    font-size: 0.85em;
+    font-size: 0.9em;
+    color: inherit;
 }
 
 /* Highlight.js theme integration with our color system */
@@ -634,32 +641,36 @@ ul, ol {
 
 /* Dark mode adjustments for code highlighting */
 [data-theme="dark"] .content pre {
-    background: var(--color-surface);
-    border-color: var(--color-border);
+    background: var(--color-code-bg);
+    border-color: var(--color-code-border);
+    box-shadow: var(--color-code-shadow);
 }
 
 [data-theme="dark"] .content code {
-    background: var(--color-surface);
-    border-color: var(--color-border);
+    /* background: var(--color-code-bg); */
+    border-color: var(--color-code-border);
+    color: var(--code-variable);
 }
 
 [data-theme="dark"] .hljs {
-    background: var(--color-surface) !important;
+    background: var(--color-code-bg) !important;
 }
 
 @media (prefers-color-scheme: dark) {
     .content pre {
-        background: var(--color-surface);
-        border-color: var(--color-border);
+        background: var(--color-code-bg);
+        border-color: var(--color-code-border);
+        box-shadow: var(--color-code-shadow);
     }
 
     .content code {
-        background: var(--color-surface);
-        border-color: var(--color-border);
+        background: var(--color-code-bg);
+        border-color: var(--color-code-border);
+        color: var(--code-variable);
     }
 
     .hljs {
-        background: var(--color-surface) !important;
+        background: var(--color-code-bg) !important;
     }
 }
 
@@ -971,17 +982,19 @@ dialog button:hover {
         /* Semantic colors adjusted for dark */
         --color-link: #9B8FE8;
         --color-link-visited: #B9A8F5;
-        --color-code-bg: #252420;
+        --color-code-bg: #0d1117;
+        --color-code-border: rgba(4, 10, 20, 0.8);
+        --color-code-shadow: 0 24px 52px -18px rgba(0, 0, 0, 0.6);
 
         /* Code syntax highlighting colors for dark mode - brighter for contrast */
-        --code-keyword: #FF7B72;      /* Lighter red for keywords */
-        --code-string: #A5D6FF;       /* Light blue for strings */
-        --code-function: #D2A8FF;     /* Light purple for function names */
-        --code-comment: #8B949E;      /* Light grey for comments */
-        --code-number: #79C0FF;       /* Light blue for numbers */
-        --code-property: #FFA657;     /* Light orange for properties */
-        --code-operator: #FF7B72;     /* Lighter red for operators */
-        --code-variable: #E8E6E1;     /* Light text for variables */
+        --code-keyword: #ff7b95;
+        --code-string: #8ddc8a;
+        --code-function: #7aa2f7;
+        --code-comment: #7f8aa9;
+        --code-number: #ffb86c;
+        --code-property: #bdd0ff;
+        --code-operator: #7ce6ff;
+        --code-variable: #f4f7ff;
     }
 }
 
@@ -1000,17 +1013,19 @@ dialog button:hover {
     --color-border-strong: #666;
     --color-link: #9B8FE8;
     --color-link-visited: #B9A8F5;
-    --color-code-bg: #252420;
+    --color-code-bg: #0d1117;
+    --color-code-border: rgba(4, 10, 20, 0.8);
+    --color-code-shadow: 0 24px 52px -18px rgba(0, 0, 0, 0.6);
 
     /* Code syntax highlighting colors for dark mode - brighter for contrast */
-    --code-keyword: #FF7B72;
-    --code-string: #A5D6FF;
-    --code-function: #D2A8FF;
-    --code-comment: #8B949E;
-    --code-number: #79C0FF;
-    --code-property: #FFA657;
-    --code-operator: #FF7B72;
-    --code-variable: #E8E6E1;
+    --code-keyword: #ff7b95;
+    --code-string: #8ddc8a;
+    --code-function: #7aa2f7;
+    --code-comment: #7f8aa9;
+    --code-number: #ffb86c;
+    --code-property: #bdd0ff;
+    --code-operator: #7ce6ff;
+    --code-variable: #f4f7ff;
 }
 
 [data-theme="light"] {
@@ -1027,17 +1042,19 @@ dialog button:hover {
     --color-border-strong: #2a2a2a;
     --color-link: #5B4FC6;
     --color-link-visited: #7B6FD6;
-    --color-code-bg: #FAFAF7;
+    --color-code-bg: #10131b;
+    --color-code-border: rgba(12, 18, 28, 0.85);
+    --color-code-shadow: 0 24px 45px -18px rgba(7, 10, 18, 0.55);
 
-    /* Code syntax highlighting colors - optimized for readability */
-    --code-keyword: #D73A49;
-    --code-string: #032F62;
-    --code-function: #6F42C1;
-    --code-comment: #6A737D;
-    --code-number: #005CC5;
-    --code-property: #E36209;
-    --code-operator: #D73A49;
-    --code-variable: #24292E;
+    /* Code syntax highlighting colors - optimized for high contrast */
+    --code-keyword: #f7768e;
+    --code-string: #9ece6a;
+    --code-function: #7aa2f7;
+    --code-comment: #7b82a3;
+    --code-number: #ff9e64;
+    --code-property: #c0caf5;
+    --code-operator: #89ddff;
+    --code-variable: #e3ecff;
 }
 
 /* ====================================
