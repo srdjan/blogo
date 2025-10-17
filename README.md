@@ -125,6 +125,20 @@ The blog will be available at `http://localhost:8000`
 - `deno task check` - Type check the application
 - `deno task fmt` - Format TypeScript/JSX files
 - `deno task lint` - Lint source files
+- `deno task smoke` - Run the fast smoke-test suite used by the git hook
+- `deno task hooks:install` - Point git at the bundled hook scripts
+
+### Git Hooks & Smoke Tests
+
+Run the following once per clone to enable the pre-commit hook that executes the
+smoke test suite (`deno task smoke`) before every commit:
+
+```bash
+deno task hooks:install
+```
+
+If the smoke tests fail, the commit is aborted so you can address the issue
+before pushing.
 
 ## Content Management
 

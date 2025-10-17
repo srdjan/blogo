@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf "\n\u001b[36m[git-hook]\u001b[0m Running smoke tests...\n"
+if deno task smoke; then
+  printf "\u001b[32m[git-hook]\u001b[0m Smoke tests passed.\n\n"
+else
+  status=$?
+  printf "\u001b[31m[git-hook]\u001b[0m Smoke tests failed. Commit aborted.\n"
+  exit "$status"
+fi
