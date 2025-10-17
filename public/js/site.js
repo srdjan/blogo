@@ -2,6 +2,7 @@ const Core = {
   init() {
     this.setupEventListeners();
     this.initTheme();
+    this.initPalette();
 
     // Initialize home link to have correct behavior on first page load
     const homeLink = document.querySelector('a[href="/"].link');
@@ -16,40 +17,65 @@ const Core = {
 
   initTheme() {
     // Get saved theme or default to system preference
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark =
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
 
     // Apply theme
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
     this.updateThemeIcon(theme);
 
     // Listen for theme toggle button clicks
-    const themeToggle = document.querySelector('.theme-toggle');
+    const themeToggle = document.querySelector(".theme-toggle");
     if (themeToggle) {
-      themeToggle.addEventListener('click', () => this.toggleTheme());
+      themeToggle.addEventListener("click", () => this.toggleTheme());
     }
   },
 
-  toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  initPalette() {
+    // Get saved palette or default to 'automerge'
+    const savedPalette = localStorage.getItem("palette");
+    const palette = savedPalette || "automerge";
 
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    // Apply palette
+    document.documentElement.setAttribute("data-palette", palette);
+
+    // Listen for palette toggle button clicks
+    const paletteToggle = document.querySelector(".palette-toggle");
+    if (paletteToggle) {
+      paletteToggle.addEventListener("click", () => this.togglePalette());
+    }
+  },
+
+  togglePalette() {
+    const current = document.documentElement.getAttribute("data-palette") ||
+      "automerge";
+    const next = current === "automerge" ? "default" : "automerge";
+    document.documentElement.setAttribute("data-palette", next);
+    localStorage.setItem("palette", next);
+  },
+
+  toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute("data-theme") ||
+      "light";
+    const newTheme = currentTheme === "light" ? "dark" : "light";
+
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
     this.updateThemeIcon(newTheme);
   },
 
   updateThemeIcon(theme) {
-    const sunIcon = document.querySelector('.sun-icon');
-    const moonIcon = document.querySelector('.moon-icon');
+    const sunIcon = document.querySelector(".sun-icon");
+    const moonIcon = document.querySelector(".moon-icon");
 
-    if (theme === 'dark') {
-      sunIcon?.style.setProperty('display', 'block');
-      moonIcon?.style.setProperty('display', 'none');
+    if (theme === "dark") {
+      sunIcon?.style.setProperty("display", "block");
+      moonIcon?.style.setProperty("display", "none");
     } else {
-      sunIcon?.style.setProperty('display', 'none');
-      moonIcon?.style.setProperty('display', 'block');
+      sunIcon?.style.setProperty("display", "none");
+      moonIcon?.style.setProperty("display", "block");
     }
   },
 
@@ -66,7 +92,6 @@ const Core = {
         if (contentAreaInResponse) {
           // Extract only the content from within #content-area
           event.detail.serverResponse = contentAreaInResponse.innerHTML;
-
         }
       }
     });
@@ -98,7 +123,6 @@ const Core = {
 
         // Ensure search toggle still works after HTMX swap
         ensureSearchToggleWorks();
-
       }
     });
 
@@ -236,7 +260,6 @@ function ensureSearchToggleWorks() {
   const searchModal = document.getElementById("search-modal");
 
   updateSearchToggleState(false);
-
 
   // Search toggle
   if (searchToggle && !searchToggle.hasAttribute("data-listener-attached")) {

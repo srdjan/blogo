@@ -130,7 +130,7 @@ export const createLayout = (props: LayoutProps): Response => {
   const jsonLdPayload = jsonLdItems.length === 1 ? jsonLdItems[0] : jsonLdItems;
 
   const html = (
-    <html lang="en">
+    <html lang="en" data-palette="automerge">
       <head>
         <meta charSet="UTF-8" />
         <meta
@@ -304,6 +304,34 @@ export const createLayout = (props: LayoutProps): Response => {
                   >
                     About
                   </a>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="palette-toggle"
+                    aria-label="Switch color palette"
+                    title="Switch color palette (Default/Automerge)"
+                  >
+                    {/* Simple dotted grid icon */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <circle cx="4" cy="4" r="1"></circle>
+                      <circle cx="10" cy="4" r="1"></circle>
+                      <circle cx="16" cy="4" r="1"></circle>
+                      <circle cx="4" cy="10" r="1"></circle>
+                      <circle cx="10" cy="10" r="1"></circle>
+                      <circle cx="16" cy="10" r="1"></circle>
+                      <circle cx="4" cy="16" r="1"></circle>
+                      <circle cx="10" cy="16" r="1"></circle>
+                      <circle cx="16" cy="16" r="1"></circle>
+                    </svg>
+                  </button>
                 </li>
                 <li>
                   <button

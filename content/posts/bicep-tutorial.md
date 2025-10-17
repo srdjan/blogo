@@ -1,7 +1,7 @@
 ---
-title: "Type-Safe Infrastructure as Code: A Practical Guide to Typed Bicep"
+title: "A Deep Dive into Typed Bicep"
 date: 2025-10-06
-tags: [Azure, Bicep, Infrastructure as Code, DevOps, Type Safety]
+tags: [Azure, Bicep, IaaC, DevOps]
 excerpt: "How we use Bicep's type system to prevent configuration errors at compile time and create maintainable infrastructure templates through discriminated unions and type imports."
 ---
 
