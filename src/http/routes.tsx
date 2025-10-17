@@ -421,7 +421,11 @@ export const createRouteHandlers = (
           });
         }
 
-        const svgContent = generateOGImage(post.title, post.excerpt, post.tags);
+        const svgContent = generateOGImage(
+          post.title,
+          post.excerpt,
+          post.tags?.map((tag) => tag as string),
+        );
 
         return new Response(svgContent, {
           headers: {
