@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-printf "\n\u001b[36m[git-hook]\u001b[0m Running smoke tests...\n"
+printf "\n\u001b[36m[git-hook]\u001b[0m Validating blog post frontmatter...\n"
+if deno task frontmatter:check; then
+  printf "\u001b[32m[git-hook]\u001b[0m Frontmatter validation passed.\n\n"
+else
+  status=$?
+  printf "\u001b[31m[git-hook]\u001b[0m Frontmatter validation failed. Commit aborted.\n"
+  exit "$status"
+fi
+
+printf "\u001b[36m[git-hook]\u001b[0m Running smoke tests...\n"
 if deno task smoke; then
   printf "\u001b[32m[git-hook]\u001b[0m Smoke tests passed.\n\n"
 else

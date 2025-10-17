@@ -9,6 +9,7 @@
     "fmt": "deno fmt",
     "check": "deno check src/app/main.ts",
     "smoke": "deno test --allow-read --allow-write tests/result_test.ts tests/types_test.ts",
+    "frontmatter:check": "deno run --allow-read scripts/check_frontmatter.ts",
     "hooks:install": "git config core.hooksPath .githooks",
     "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
   },

@@ -1,8 +1,8 @@
 ---
-title: TypeLang > Algebraic TypeScript with Explicit Effects
+title: "TypeLang: Algebraic TypeScript with Explicit Effects"
 date: 2025-10-15
 tags: [TypeScript, Functional Programming, Algebraic Effects, Language Design]
-excerpt: How we designed typelang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
+excerpt: How we designed typelang to enforce functional programming principles as a pure subset of TypeScript, and why explicit effect tracking changes how teams reason about code.
 ---
 
 ### Continuing exploration of the possibilities of a strictly functional TypeScript subset with algebraic effects.
