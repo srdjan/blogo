@@ -27,9 +27,9 @@ code we can**.
 GitHub repo:
 [https://github.com/srdjan/typelang](https://github.com/srdjan/typelang)
 
-**ℕ I like thinkering around... For production, though, use
-[<img src="../../public/images/effect-logo.png" width="32" alt="Effect Logo">](https://github.com/Effect-TS/effect) or
-[<img src="../../public/images/effection-logo.png" width="32" alt="Effection Logo">](https://github.com/thefrontside/effection) **
+🔹 I like learning by thinkering around, and that is the purpose of this project... For production, though, use
+[Effect-TS](https://github.com/Effect-TS/effect) or
+[Effection](https://github.com/thefrontside/effection) 
 
 This article describes the principles behind **typelang**, how the constraint
 system works, and what we've learned from building software this way.
