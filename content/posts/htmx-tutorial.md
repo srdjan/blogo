@@ -1,7 +1,7 @@
 ---
 title: HTMX Patterns for Modern Web Development
 date: 2025-07-02
-tags: [WebDev, Typescript, HTMX]
+tags: [Web, Development, Typescript, HTMX]
 excerpt: Exploring the shift from complex JavaScript frameworks to HTMX's hypermedia-driven simplicity, and practical patterns that emerge from this approach.
 ---
 

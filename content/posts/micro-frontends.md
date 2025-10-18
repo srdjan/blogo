@@ -1,7 +1,7 @@
 ---
 title: Building Micro Frontends with mono-jsx Signals
 date: 2025-06-16
-tags: [Frontend, Architecture, Signals, HTMX]
+tags: [Web, Development, Architecture, HTMX]
 excerpt: Reactive signals and HTMX create a powerful micro frontend architecture that keeps components independent while maintaining seamless communication.
 ---
 

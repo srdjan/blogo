@@ -1,7 +1,7 @@
 ---
 title: Rethinking Component Architecture with ui-lib
 date: 2025-09-22
-tags: [WebDev, HTMX, Typescript, SSR]
+tags: [Web, Development, HTMX, Typescript, SSR]
 excerpt: Server-side rendered pages with progressive enhancement, colocated API endpoints and simplified shared components patterns.
 ---
 

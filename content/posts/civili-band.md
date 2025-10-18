@@ -1,7 +1,7 @@
 ---
 title: "CIVILI Reveal New LP: A Call From The Past"
 date: 2025-06-18
-tags: ["music", "yugoslavia", "punk", "new-wave"]
+tags: [Music, Yugoslavia, Punk, New-wave, 80s]
 excerpt: "Discover CIVILI and why their revival captures the authentic spirit of the 80s Yugoslavia's music scene"
 ---
 

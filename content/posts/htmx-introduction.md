@@ -1,7 +1,7 @@
 ---
 title: Simple Web Development with HTMX
 date: 2025-04-05
-tags: [WebDev, HTMX]
+tags: [Web, Development, HTMX]
 excerpt: HTMX transforms interactive web development by extending HTML's capabilities rather than requiring complex JavaScript frameworks.
 ---
 

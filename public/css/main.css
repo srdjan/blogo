@@ -31,7 +31,7 @@
   --color-link: #5b4fc6;
   --color-link-visited: #7b6fd6;
   --color-code-bg: #10131b;
-  --color-code-inline-bg: #7d7676;
+  --color-code-inline-bg: #d7c2c2;
   --color-code-border: rgba(12, 18, 28, 0.85);
   --color-code-shadow: 0 24px 45px -18px rgba(7, 10, 18, 0.55);
 
@@ -535,12 +535,12 @@ ul, ol {
 /* Inline code */
 .content code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 0.7em;
   background: var(--color-code-inline-bg);
-  color: var(--code-variable);
+  color: var(--color-code-bg);
   padding: 0.2em 0.5em;
   border-radius: 0.35rem;
-  border: 1px solid var(--color-code-border);
+  /* border: 1px solid var(--color-code-border); */
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
@@ -561,7 +561,7 @@ ul, ol {
   background: none;
   border: none;
   padding: 0;
-  font-size: 0.9em;
+  font-size: 1em;
   color: inherit;
 }
 
@@ -670,7 +670,7 @@ ul, ol {
 
   .content code {
     background: var(--color-code-bg);
-    border-color: var(--color-code-border);
+    /* border-color: var(--color-code-border); */
     color: var(--code-variable);
   }
 
