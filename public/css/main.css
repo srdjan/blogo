@@ -700,6 +700,9 @@ ul, ol {
    ==================================== */
 .topic-section {
   margin-bottom: var(--space-3xl);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .topic-section h2 {
@@ -708,21 +711,30 @@ ul, ol {
   text-align: center;
 }
 
+.topics-title {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto var(--space-xl);
+}
+
 .tag-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
   list-style: none;
   padding: 0;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .tag-grid .tag {
   text-align: center;
-  padding: 0.35rem 0.75rem;
-  display: flex;
+  padding: 0.3rem 0.6rem;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
 }
 
 /* ====================================

@@ -5,10 +5,12 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
 
   return (
     <>
-      <h1 style="text-align: center;">Topics & Tags</h1>
+      <h1 class="topics-title">Topics & Tags</h1>
       {groups.length === 0 ? <p>No tags found.</p> : (
         groups.map(({ topic, tags }) => {
-          const headingId = `topic-${topic.toLowerCase().replace(/[^a-z0-9]+/gi, "-")}`;
+          const headingId = `topic-${
+            topic.toLowerCase().replace(/[^a-z0-9]+/gi, "-")
+          }`;
           return (
             <section
               class="topic-section"
