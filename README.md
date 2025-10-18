@@ -545,7 +545,7 @@ See these files for detailed guidance:
 
 ---
 
-Built with ❤️ using modern web standards and the power of Deno + mono-jsx
+Built with ❤️ by Clodey, Gipity & Srdjan
 
 ---
 
