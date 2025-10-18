@@ -18,6 +18,7 @@ import {
   validateImageReferences,
   validateMarkdownContent,
 } from "./validation.ts";
+import { TOPICS } from "../config/topics.ts";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
@@ -166,14 +167,28 @@ export const createContentService = (
     return ok(post);
   };
 
+  // Case-insensitive tag normalization helpers (kept pure)
+  const normalizeTag = (s: string): string => s.trim().toLowerCase();
+  const canonicalCaseFromTopics = (lower: string): string | null => {
+    for (const tags of Object.values(TOPICS)) {
+      for (const t of tags) {
+        if (t.trim().toLowerCase() === lower) return t;
+      }
+    }
+    return null;
+  };
+
   const getPostsByTag = async (
     tagName: TagName,
   ): Promise<AppResult<readonly Post[]>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
 
+    const needle = normalizeTag(String(tagName));
     const filteredPosts = postsResult.value.filter((post) =>
-      post.tags?.includes(tagName) ?? false
+      post.tags
+        ? post.tags.some((t) => normalizeTag(String(t)) === needle)
+        : false
     );
 
     return ok(filteredPosts);
@@ -183,26 +198,29 @@ export const createContentService = (
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
 
-    const tagMap = new Map<TagName, TagInfo>();
+    // Aggregate tags case-insensitively, preserving a canonical display casing.
+    const tagMap = new Map<string, TagInfo>(); // key: lowercased tag
 
     for (const post of postsResult.value) {
-      if (post.tags) {
-        for (const tagName of post.tags) {
-          const existing = tagMap.get(tagName);
-          if (existing) {
-            tagMap.set(tagName, {
-              ...existing,
-              count: existing.count + 1,
-              posts: [...existing.posts, post],
-            });
-          } else {
-            tagMap.set(tagName, {
-              name: tagName,
-              count: 1,
-              posts: [post],
-            });
-          }
-        }
+      if (!post.tags || post.tags.length === 0) continue;
+      const seenInThisPost = new Set<string>();
+      for (const raw of post.tags) {
+        const key = normalizeTag(String(raw));
+        if (seenInThisPost.has(key)) continue; // avoid double-counting same tag variant within one post
+        seenInThisPost.add(key);
+
+        const canonical = canonicalCaseFromTopics(key) ?? String(raw);
+        const existing = tagMap.get(key);
+        const displayName = existing?.name ?? (canonical as TagName);
+
+        const postsArr = existing?.posts ?? [];
+        const alreadyIncluded = postsArr.includes(post);
+        const updated: TagInfo = {
+          name: displayName,
+          count: (existing?.count ?? 0) + (alreadyIncluded ? 0 : 1),
+          posts: alreadyIncluded ? postsArr : [...postsArr, post],
+        };
+        tagMap.set(key, updated);
       }
     }
 
