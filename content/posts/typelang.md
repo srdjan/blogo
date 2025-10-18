@@ -1,7 +1,7 @@
 ---
 title: Building Reliable Software with Functional Constraints and Algebraic Effects
 date: 2025-10-15
-tags: [TypeScript, Functional Programming, Algebraic Effects, Language Design]
+tags: [TypeScript, Functional, Algebraic Effects, Language Design]
 excerpt: How we designed typelang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
 ---
 

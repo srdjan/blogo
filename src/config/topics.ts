@@ -119,8 +119,12 @@ export const groupTagsByTopic = (
   const buckets = new Map<Topic, TagInfo[]>();
   for (const tag of tags) {
     const topics = tagToTopicsIndexCI[normalize(tag.name as string)] ?? [];
+    // Deduplicate topics to avoid double-inserting the same tag when TOPICS lists synonyms
+    const uniqueTargets = [...new Set(topics)];
     // Put into each matching topic; if none match, bucket under "Web Development" as a sensible default
-    const targets = topics.length > 0 ? topics : ["Web Development" as Topic];
+    const targets = uniqueTargets.length > 0
+      ? uniqueTargets
+      : ["Web Development" as Topic];
     for (const topic of targets) {
       const arr = buckets.get(topic) ?? [];
       arr.push(tag);

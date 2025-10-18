@@ -150,12 +150,9 @@ Create markdown files in `content/posts/` with YAML frontmatter:
 ---
 title: Your Post Title
 date: 2025-01-15
-slug: your-post-slug
+tags: [Technology, Tutorial]
 excerpt: A brief description of your post
-tags:
-  - Technology
-  - Tutorial
-modified: 2025-01-16  # Optional: last modified date
+modified: 2025-01-16  # Optional
 ---
 
 # Your Post Content
