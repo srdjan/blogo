@@ -1,8 +1,8 @@
 ---
-title: Building Reliable Software with Functional Constraints and Algebraic Effects
+title: "TypeLang: A subset of TypeScript with algebraic effects"
 date: 2025-10-15
 tags: [TypeScript, Functional, Algebraic Effects, Language Design]
-excerpt: How we designed typelang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
+excerpt: How we designed TypeLang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
 ---
 
 ### Continuing exploration of the possibilities of a strictly functional TypeScript subset with algebraic effects.
@@ -10,30 +10,34 @@ excerpt: How we designed typelang to enforce functional programming principles w
 Software systems grow complex not just from the problems they solve, but from the flexibility
 languages afford us. When teams can express same ideas in countless ways—mixing paradigms, hiding
 effects, and mutating state freely—codebases become difficult to understand and maintain.
-**typelang** seeks to explore ways of cutting down this complexity by **constraining how code can be
+**TypeLang** seeks to explore ways of cutting down this complexity by **constraining how code can be
 written**.
 
 So, what happens when we constrain how code can be written, making effects explicit and enforcing
 functional purity?
 
-**typelang** is a disciplined subset of TypeScript that combines three core ideas: a strict
+**TypeLang** is a disciplined subset of TypeScript that combines three core ideas: a strict
 functional programming subset enforced by tooling, an algebraic effects system that makes side
 effects visible in type signatures, and zero new syntax—it's 100% valid TypeScript that runs on
 Deno. These constraints emerged from a fundamental belief: **the code we cannot write is as
 important as the code we can**.
 
-GitHub repo: [https://github.com/srdjan/typelang](https://github.com/srdjan/typelang)
+**See it Live! ↓**
+
+[![See it Live!](/images/TypeLang.jpg){width=400}](https://typelang.timok.deno.net/)
+
+GitHub repo: [https://github.com/srdjan/TypeLang](https://github.com/srdjan/TypeLang)
 
 🔹 I like learning by thinkering around, and that is the purpose of this project... For production,
 though, use [Effect-TS](https://github.com/Effect-TS/effect) or
 [Effection](https://github.com/thefrontside/effection)
 
-This article describes the principles behind **typelang**, how the constraint system works, and what
+This article describes the principles behind **TypeLang**, how the constraint system works, and what
 we've learned from building software this way.
 
 ## Foundation: Constraints as Design Philosophy
 
-The central principle driving **typelang** is that **constraints enable clarity**. When we remove
+The central principle driving **TypeLang** is that **constraints enable clarity**. When we remove
 language features that obscure intent—classes with hidden state, control flow that jumps
 unpredictably, mutations that ripple through systems—what remains is code where data flows and
 effects are explicit.
@@ -59,7 +63,7 @@ ReScript)
 
 ## The Functional Subset: What We Removed and Why
 
-The subset rules in **typelang** forbid several mainstream TypeScript features. Each prohibition
+The subset rules in **TypeLang** forbid several mainstream TypeScript features. Each prohibition
 addresses a specific source of complexity:
 
 ### No Classes or Object-Oriented Constructs
@@ -113,11 +117,11 @@ not style compliance.
 
 ## Algebraic Effects: Making Side Effects Visible
 
-The second pillar of **typelang** is its effect system. In traditional TypeScript, a function like
+The second pillar of **TypeLang** is its effect system. In traditional TypeScript, a function like
 `getUserById(id: string): User` tells you nothing about what happens when you call it. Does it read
 from a database? Make an HTTP request? Throw exceptions? The type signature is silent about effects.
 
-**typelang** makes effects explicit through the `Eff<A, E>` type. A function that returns
+**TypeLang** makes effects explicit through the `Eff<A, E>` type. A function that returns
 `Eff<User, HttpCapability>` declares that it produces a `User` value and requires HTTP capabilities.
 Effects are tracked at the type level, visible in every signature.
 
@@ -207,7 +211,7 @@ const result = await stack(
 ## Sequential and Parallel Composition
 
 Pure functional code needs ways to sequence operations and express concurrency without mutation or
-loops. **typelang** provides two abstractions: `seq()` for sequential composition and `par` for
+loops. **TypeLang** provides two abstractions: `seq()` for sequential composition and `par` for
 parallel execution.
 
 ### Sequential Composition with Auto-Named Bindings
@@ -293,7 +297,7 @@ guarantees.
 
 ## Practical Application: HTTP Server Architecture
 
-To demonstrate these principles in practice, **typelang** includes a lightweight HTTP server that
+To demonstrate these principles in practice, **TypeLang** includes a lightweight HTTP server that
 separates pure application logic from HTTP concerns. The architecture has three layers:
 
 **Server layer** - Handles HTTP protocol details, middleware composition, and routing. This layer
@@ -329,7 +333,7 @@ requires only data—no imperative setup code.
 
 ## Lessons from Constraint-Based Development
 
-Building and using **typelang** has surfaced insights about how constraints shape development:
+Building and using **TypeLang** has surfaced insights about how constraints shape development:
 
 **Constraints shift mental models** - When teams can't reach for classes or mutations, they model
 problems differently. Domain logic becomes transformations on immutable data. State changes become
@@ -353,7 +357,7 @@ than production. The separation is clean.
 
 ## Current State and Evolution
 
-**typelang** exists as a working system: a complete runtime, subset linter, HTTP server
+**TypeLang** exists as a working system: a complete runtime, subset linter, HTTP server
 implementation, and example applications. It runs on Deno with zero external dependencies beyond the
 standard library.
 
@@ -369,7 +373,7 @@ syntax—guide decisions, but specifics evolve as we learn what works in practic
 
 ## Principles for Constraint-Based Design
 
-The lessons from **typelang** generalize beyond this specific system:
+The lessons from **TypeLang** generalize beyond this specific system:
 
 **Make guarantees enforceable** - Conventions that depend on discipline will eventually break down.
 Constraints that tooling enforces become reliable foundations.
@@ -384,7 +388,7 @@ might happen to reading what will happen.
 **Separate core from shell** - Not all code needs the same constraints. Application logic benefits
 from purity. Infrastructure code can be pragmatic. Clear boundaries make both easier to maintain.
 
-**typelang** demonstrates that meaningful constraints, enforced consistently, create clarity. When
+**TypeLang** demonstrates that meaningful constraints, enforced consistently, create clarity. When
 we limit how code can be written—making effects visible, removing mutation, enforcing functional
 purity—what emerges are systems easier to understand, test, and maintain.
 

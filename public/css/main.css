@@ -381,7 +381,7 @@ ul, ol {
 
 .post-card:hover {
   transform: translateY(-4px);
-  box-shadow: 8px 8px 0 var(--color-accent);
+  box-shadow: 8px 8px 0 var(--color-text-muted);
   will-change: transform;
 }
 
