@@ -1,11 +1,11 @@
 ---
 title: "TypeLang: A subset of TypeScript with algebraic effects"
-date: 2025-10-15
+date: 2025-10-19
 tags: [TypeScript, Functional, Algebraic Effects, Language Design]
 excerpt: How we designed TypeLang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
 ---
 
-### Continuing exploration of the possibilities of a strictly functional TypeScript subset with algebraic effects.
+### Continuing exploration into the world of possibilities when building a strictly functional TypeScript subset with algebraic effects.
 
 Software systems grow complex not just from the problems they solve, but from the flexibility
 languages afford us. When teams can express same ideas in countless ways—mixing paradigms, hiding
