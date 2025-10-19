@@ -114,8 +114,8 @@ The second pillar of **TypeLang** is its effect system. In traditional TypeScrip
 `getUserById(id: string): User` tells you nothing about what happens when you call it. Does it read
 from a database? Make an HTTP request? Throw exceptions? The type signature is silent about effects.
 
-**TypeLang** makes effects explicit through the `Eff<A, E>` type. A function that returns
-`Eff<User, HttpCapability>` declares that it produces a `User` value and requires HTTP capabilities.
+**TypeLang** makes effects explicit through the `Eff<A, Caps>` type. A function that returns
+`Eff<User, { http: Http }>` declares that it produces a `User` value and requires HTTP capabilities.
 Effects are tracked at the type level, visible in every signature.
 
 ### Effect Declaration and Usage
@@ -128,12 +128,77 @@ const Http = defineEffect<"Http", {
   post: (url: string, body: unknown) => Response;
 }>("Http");
 
-// Usage returns Eff<Response, HttpCapability>
+// Usage returns Eff<Response, { http: Http }>
 const fetchUser = (id: string) => Http.op.get(`/users/${id}`);
 ```
 
 The type system tracks that `fetchUser` requires HTTP capabilities. Functions that call `fetchUser`
 inherit this requirement. Effect dependencies flow through the call graph, visible at every level.
+
+### Ergonomic Improvements: Record-Based Capabilities
+
+The record-based capability syntax `{ http: Http; db: Db }` offers significant ergonomic and type-safety advantages over alternative approaches. This design makes multi-capability functions crystal clear:
+
+**Single capability** - wraps cleanly:
+```typescript
+const getTime: Eff<Date, { clock: Clock }> = ({ clock }) => clock.now();
+```
+
+**Multiple capabilities** - explicit and composable:
+```typescript
+const registerUser: Eff<Result<User, string>, {
+  http: Http;
+  db: Db;
+  logger: Logger
+}> = async ({ http, db, logger }) => {
+  logger.log("Starting registration");
+  const userData = await http.get("/api/user");
+  await db.set(["user", userData.id], userData);
+  return ok(userData);
+};
+```
+
+The record syntax provides several benefits:
+
+**Order-independent destructuring** - Named properties prevent parameter order mistakes:
+```typescript
+// Both work identically - order doesn't matter
+async ({ http, db, logger }) => { ... }
+async ({ logger, db, http }) => { ... }
+```
+
+**Self-documenting signatures** - The type signature reads like documentation:
+```typescript
+// Immediately obvious: needs HTTP, database, and logging
+Eff<Order, { http: Http; db: Db; logger: Logger }>
+```
+
+**No combinatorial type explosion** - No need to define composite capability types for every combination:
+```typescript
+// Old approach required defining unions for each combination:
+// type HttpAndDb = HttpCapability | DbCapability;
+// type HttpDbAndLogger = HttpCapability | DbCapability | LoggerCapability;
+
+// New approach: just declare what you need inline
+Eff<User, { http: Http; db: Db }>
+Eff<Order, { http: Http; db: Db; logger: Logger }>
+```
+
+**Type-safe capability threading** - The type system ensures all required capabilities are provided:
+```typescript
+// Function requiring subset of capabilities
+const logMessage = ({ logger }: { logger: Logger }) =>
+  logger.log("Processing...");
+
+// Function with full capabilities can call it
+const processOrder: Eff<void, { http: Http; db: Db; logger: Logger }> =
+  async (caps) => {
+    logMessage(caps);  // Type-safe: logger is present
+    // Use all capabilities
+  };
+```
+
+This approach aligns perfectly with the ports pattern - each capability is an injected dependency with a clear interface, making testing straightforward by swapping implementations.
 
 ### Effect Handlers: Interpreting Operations
 
@@ -157,14 +222,15 @@ const httpHandler: Handler = {
 };
 
 // Compose effects in a program
+// Type signature shows required capabilities: { http: Http; console: Console }
 const buildUserProfile = (userId: string) =>
   seq()
-    .let("user", () => fetchUser(userId))
-    .let("posts", (user) => Http.op.get(`/users/${user.id}/posts`))
+    .let(() => fetchUser(userId))
+    .let((user) => Http.op.get(`/users/${user.id}/posts`))
     .do((posts, ctx) => Console.op.log(`${ctx!.user.name} has ${posts.length} posts`))
     .return((posts, ctx) => ({ user: ctx!.user, posts }));
 
-// Run program with handler stack
+// Run program with handler stack - provides all required capabilities
 const result = await stack(httpHandler, handlers.Console.live()).run(
   () => buildUserProfile("123"),
 );
@@ -200,6 +266,101 @@ const result = await stack(
     .value()
 );
 ```
+
+### Practical Example: Multi-Capability Workflow
+
+The record-based approach shines when building realistic workflows that need multiple capabilities. Here's a complete user registration flow that demonstrates capability composition and testing:
+
+```typescript
+// Define capabilities as port interfaces
+type HttpPort = {
+  get: (url: string) => Promise<Response>;
+  post: (url: string, body: unknown) => Promise<Response>;
+};
+
+type DbPort = {
+  get: <T>(key: readonly string[]) => Promise<T | null>;
+  set: <T>(key: readonly string[], value: T) => Promise<void>;
+};
+
+type LoggerPort = {
+  log: (msg: string) => void;
+  error: (msg: string) => void;
+};
+
+// Core domain function with explicit capability requirements
+type RegisterUserEffect = Eff<Result<User, string>, {
+  http: HttpPort;
+  db: DbPort;
+  logger: LoggerPort;
+}>;
+
+const registerUser = (email: string): RegisterUserEffect =>
+  async ({ http, db, logger }) => {
+    logger.log(`Starting registration for ${email}`);
+
+    // Check if user already exists
+    const existing = await db.get<User>(["userByEmail", email]);
+    if (existing) {
+      logger.error(`User ${email} already exists`);
+      return err("USER_EXISTS");
+    }
+
+    // Validate email with external service
+    logger.log(`Validating email ${email}`);
+    const validation = await http.post("/api/validate", { email });
+    if (!validation.ok) {
+      return err("VALIDATION_FAILED");
+    }
+
+    // Create user
+    const user = { id: crypto.randomUUID(), email, createdAt: new Date() };
+    await db.set(["user", user.id], user);
+    await db.set(["userByEmail", email], user);
+
+    logger.log(`User ${email} registered successfully`);
+    return ok(user);
+  };
+
+// Production capabilities
+const prodCapabilities = {
+  http: {
+    get: (url: string) => fetch(url),
+    post: (url: string, body: unknown) =>
+      fetch(url, { method: "POST", body: JSON.stringify(body) })
+  },
+  db: {
+    get: async (key) => (await Deno.openKv()).get(key).then(r => r.value),
+    set: async (key, value) => (await Deno.openKv()).set(key, value)
+  },
+  logger: {
+    log: (msg) => console.log(msg),
+    error: (msg) => console.error(msg)
+  }
+};
+
+// Test capabilities (no I/O, fully controlled)
+const testCapabilities = {
+  http: {
+    get: async (_url) => new Response(JSON.stringify({ valid: true })),
+    post: async (_url, _body) => new Response(JSON.stringify({ valid: true }))
+  },
+  db: {
+    get: async (_key) => null, // No existing users
+    set: async (_key, _value) => {}
+  },
+  logger: {
+    log: (_msg) => {}, // Silent in tests
+    error: (_msg) => {}
+  }
+};
+
+// Same code, different capabilities
+await registerUser("test@example.com")(prodCapabilities); // Production
+await registerUser("test@example.com")(testCapabilities);  // Test
+```
+
+The type signature `Eff<Result<User, string>, { http: HttpPort; db: DbPort; logger: LoggerPort }>` makes the function's dependencies explicit. Testing becomes trivial - swap production implementations for test doubles. The domain logic never changes, yet it works in any context.
 
 ## Sequential and Parallel Composition
 
@@ -332,9 +493,7 @@ Building and using **TypeLang** has surfaced insights about how constraints shap
 problems differently. Domain logic becomes transformations on immutable data. State changes become
 explicit events. This shift in thinking often reveals simpler architectures.
 
-**Explicit effects change conversations** - When a function's type signature shows it needs HTTP,
-database, and logging capabilities, discussions about dependencies are concrete. Teams see coupling
-directly and can reason about it deliberately.
+**Explicit effects change conversations** - When a function's type signature shows it needs `{ http: Http; db: Db; logger: Logger }`, discussions about dependencies are concrete. The record-based approach makes capability requirements immediately visible—no need to look up what a composite type contains. Teams see coupling directly in function signatures and can reason about it deliberately.
 
 **Tooling enables consistency** - Enforcing subset rules through linting means consistency doesn't
 depend on vigilance. Code review focuses on whether the logic is correct and clear, not whether it
@@ -345,8 +504,7 @@ signatures before implementations. The signature declares capabilities needed, a
 implementation proves it can satisfy them with those capabilities. Design happens at the type level.
 
 **Testing becomes more focused** - Pure functions are trivial to test—call them with inputs, check
-outputs. Effects are tested by swapping handlers. Integration tests compose handlers differently
-than production. The separation is clean.
+outputs. Effectful functions with record-based capabilities make testing equally straightforward: pass test implementations of the required ports. The type signature `Eff<T, { http: Http; db: Db }>` explicitly declares dependencies, so tests provide controlled fakes without mocking frameworks. Integration tests simply compose different capability implementations than production—same code, different context. The separation is clean and type-safe.
 
 ## Current State and Evolution
 
