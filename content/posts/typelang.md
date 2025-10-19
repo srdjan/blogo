@@ -2,24 +2,20 @@
 title: "TypeLang: A subset of TypeScript with algebraic effects"
 date: 2025-10-19
 tags: [TypeScript, Functional, Algebraic Effects, Language Design]
-excerpt: How we designed TypeLang to enforce functional programming principles while maintaining TypeScript compatibility, and why explicit effect tracking changes how teams reason about code.
+excerpt: TypeLang is deigned to enforce functional programming principles, as a strict TypeScript subset, and with explicit effect tracking to simplify how teams reason about code.
 ---
 
 ### Continuing exploration into the world of possibilities when building a language that is a TypeScript subset, supports Light FP programming style and has built-in Algebraic Effects.
 
 Software systems grow complex not just from the problems they solve, but from the flexibility
-languages afford us. When teams can express same ideas in countless ways—mixing paradigms, hiding
-effects, and mutating state freely—codebases become difficult to understand and maintain.
-**TypeLang** seeks to explore ways of cutting down this complexity by **constraining how code can be
-written**.
+languages afford us. When teams can express the same ideas in countless ways, mixing paradigms, hiding
+effects, and mutating state freely,codebases become difficult to understand and maintain.
 
 So, what happens when we constrain how code can be written, making effects explicit and enforcing
-functional purity?
+functional purity? **TypeLang** seeks to explore ways of cutting down this complexity by **constraining how code can be
+written**.
 
-**TypeLang** is a disciplined subset of TypeScript that combines three core ideas: a strict
-functional programming subset enforced by tooling, an algebraic effects system that makes side
-effects visible in type signatures, and zero new syntax—it's 100% valid TypeScript that runs on
-Deno. These constraints emerged from a fundamental belief: **the code we cannot write is as
+Enforced by tooling, **TypeLang** is a strict subset of TypeScript that combines three core ideas: a Ligh FP, an algebraic effects system that makes side effects visible in type signatures, and zero new syntax. Teams write 100% valid TypeScript that runs on Deno. These constraints emerged from a fundamental belief: **the code we cannot write is as
 important as the code we can**.
 
 **See it Live! ↓**
@@ -99,7 +95,7 @@ reasoning about program behavior requires tracking all possible execution paths.
 
 This doesn't mean programs can't have state—it means state changes are **explicit effects** handled
 by the runtime. Functions don't mutate variables; they return new values or declare state effects
-that handlers manage.
+that are executed by runtime handlers.
 
 ### Enforcement Through Tooling
 
