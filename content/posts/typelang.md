@@ -24,7 +24,7 @@ important as the code we can**.
 
 **See it Live! ↓**
 
-[![See it Live!](../../public/images/typelang.jpg){width=400}](https://typelang.timok.deno.net/)
+[![See it Live!](/images/typelang.jpg){width=400}](https://typelang.timok.deno.net/)
 
 GitHub repo: [https://github.com/srdjan/TypeLang](https://github.com/srdjan/TypeLang)
 
