@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+# Check if deno is available
+if ! command -v deno >/dev/null 2>&1; then
+  echo "deno not found; skipping Bluesky post" >&2
+  exit 0
+fi
+
+# Run the bot from JSR
+exec deno run --allow-env --allow-net --allow-run --allow-read --allow-write jsr:@srdjan/bluesky-bot
