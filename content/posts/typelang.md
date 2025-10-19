@@ -24,16 +24,13 @@ important as the code we can**.
 
 **See it Live! ↓**
 
-[![See it Live!](/images/TypeLang.jpg){width=400}](https://typelang.timok.deno.net/)
+[![See it Live!](../../public/images/TypeLang.jpg){width=400}](https://typelang.timok.deno.net/)
 
 GitHub repo: [https://github.com/srdjan/TypeLang](https://github.com/srdjan/TypeLang)
 
 🔹 I like learning by thinkering around, and that is the purpose of this project... For production,
 though, use [Effect-TS](https://github.com/Effect-TS/effect) or
 [Effection](https://github.com/thefrontside/effection)
-
-This article describes the principles behind **TypeLang**, how the constraint system works, and what
-we've learned from building software this way.
 
 ## Foundation: Constraints as Design Philosophy
 
