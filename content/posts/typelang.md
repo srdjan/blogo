@@ -51,8 +51,8 @@ through handlers. Any TypeScript tooling works unchanged.
 
 These constraints emerged from observing how teams struggle with codebases where anything is
 possible. When there are no guardrails, consistency depends entirely on discipline and review
-processes. By encoding constraints in tooling, we shift enforcement from humans to machines. ( ❤️
-ReScript)
+processes. By encoding constraints in tooling, we shift enforcement from humans to machines. (Inspired by
+ ReScript ❤️)
 
 ## The Functional Subset: What We Removed and Why
 
