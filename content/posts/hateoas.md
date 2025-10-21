@@ -1,6 +1,6 @@
 ---
 title: HATEOAS and Hypermedia-Driven Development
-date: 2025-04-05
+date: 2025-02-05
 tags: [WebDev, HATEOAS, HTMX, HAL]
 excerpt: HATEOAS transforms API design and frontend development by creating self-describing systems that adapt dynamically to changing requirements.
 ---

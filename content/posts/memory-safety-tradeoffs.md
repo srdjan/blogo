@@ -5,15 +5,15 @@ tags: [Systems Programming, Compiler Design, Research]
 excerpt: Investigating the theoretical limits of static verification and exploring opportunities for hybrid approaches to memory safety.
 ---
 
-I've been exploring memory safety across different language ecosystems, and there's a fascinating question that keeps surfacing: can full memory safety be achieved purely at compile time, with no runtime checks and zero overhead? This question persists across diverse language communities—each with thoughtfully designed approaches in Rust, Zig, and C with safety extensions—which suggests there's something fundamental worth investigating.
+I explored memory safety across different language ecosystems, and there's a fascinating question that keeps surfacing: can full memory safety be achieved purely at compile time, with no runtime checks and zero overhead? This question persists across diverse language communities—each with thoughtfully designed approaches in Rust, Zig, and C with safety extensions—which suggests there's something fundamental worth investigating.
 
-What I've found leads to interesting insights about what computation theory permits and where opportunities might exist.
+What I found leads to interesting insights about what computation theory permits and where opportunities might exist.
 
 ## Discovering the Theoretical Boundary
 
 As I've investigated this question, I've come to understand there's a fundamental information gap between compile-time analysis and runtime execution. Compilers work with program structure: control flow graphs, type systems, static data layouts. What they cannot access are runtime values—user inputs, API response sizes, which branches of complex conditionals will actually execute.
 
-What I found particularly interesting is that this turns out to be more than an engineering challenge. Computational theory, specifically the Halting Problem, demonstrates that proving arbitrary code never performs invalid memory access is undecidable in the general case. Not computationally expensive or requiring more sophisticated analysis—fundamentally impossible for general-purpose programs.
+To me is particularly interesting that this turns out to be more than an engineering challenge. Computational theory, specifically the Halting Problem, demonstrates that proving arbitrary code never performs invalid memory access is undecidable in the general case. Not computationally expensive or requiring more sophisticated analysis—fundamentally impossible for general-purpose programs.
 
 Understanding this boundary helped me make sense of why different language communities have chosen such distinct approaches.
 
@@ -73,7 +73,7 @@ What I find particularly intriguing: language semantics could remain unchanged w
 
 What I've come to realize is that the framing "compile-time or runtime?" may be presenting a false choice. Computation theory shows that complete compile-time verification of memory safety for general programs isn't achievable—not due to current technology limitations, but as a fundamental property of computation.
 
-Understanding this has opened up what I think is interesting design space. Rather than a binary choice, I'm seeing memory safety as existing along a spectrum:
+Understanding this has opened up what I think is interesting design space. This means rather than a binary choice, memory safety might exist along a spectrum:
 
 - **What can be proven statically?** Opportunities to eliminate runtime checks through analysis
 - **What requires runtime verification?** Cases where instrumentation is necessary
