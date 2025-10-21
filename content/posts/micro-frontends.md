@@ -2,28 +2,28 @@
 title: Building Micro Frontends with mono-jsx Signals
 date: 2025-06-16
 tags: [Web, Development, Architecture, HTMX]
-excerpt: Reactive signals and HTMX create a powerful micro frontend architecture that keeps components independent while maintaining seamless communication.
+excerpt: Reactive signals combined with HTMX enable micro frontend architectures maintaining component independence while providing seamless communication—without complex state management or virtual DOM overhead.
 ---
 
-Modern frontend development has grown increasingly complex, with applications requiring hundreds of dependencies to render simple dashboards. This raises questions about whether current approaches solve the right problems.
+Frontend application complexity has grown substantially, with simple dashboard applications requiring hundreds of dependencies for basic rendering. This accumulated complexity raises fundamental questions about whether current architectural approaches optimize for actual problems or framework ecosystems.
 
-Building modular dashboards where different teams can deploy components independently presents significant challenges. Traditional approaches require complex state management libraries, build coordination, and elaborate communication patterns between micro frontends.
+Building modular dashboards where independent teams deploy components autonomously presents coordination challenges. Traditional micro frontend approaches require complex state management libraries, build process coordination, and elaborate inter-component communication patterns creating tight coupling despite architectural intentions toward independence.
 
-## Signals and HTMX Solution
+## Alternative Architecture: Signals and HTMX
 
-mono-jsx signals combined with HTMX provide reactive components that communicate effortlessly without virtual DOM diffing overhead or complex state management.
+mono-jsx signals combined with HTMX enable reactive component development without virtual DOM diffing overhead or complex state management frameworks. This approach separates concerns cleanly: signals handle immediate local reactivity while HTMX manages server communication.
 
-Signals provide immediate reactivity while HTMX handles server communication, creating clean separation between local state and server state that traditional SPAs often blur together.
+The architectural pattern creates clear boundaries between local state requiring immediate UI response and server state requiring persistence—a distinction traditional SPAs frequently blur through unified state management systems.
 
-## Core Architecture Concepts
+## Architectural Foundations
 
-This architecture centers around three core concepts that work together seamlessly:
+The architecture organizes around three interconnected concepts enabling micro frontend independence with coordinated behavior:
 
-1. **Shared Signal Store**: Central reactive state that any component can read or modify
-2. **Independent Components**: Self-contained modules that use signals for local communication and HTMX for server sync
-3. **Duplex Communication**: Immediate local updates through signals, persistent changes through HTMX
+1. **Shared Signal Store**: Centralized reactive state accessible to all components without prop drilling
+2. **Independent Components**: Self-contained modules utilizing signals for local communication and HTMX for server synchronization
+3. **Duplex Communication**: Immediate local updates through signal reactivity, persistent changes through HTMX server requests
 
-This approach eliminates complexity common in traditional micro frontend architectures.
+This pattern eliminates coordination complexity characteristic of traditional micro frontend architectures while maintaining the independence benefits micro frontends promise.
 
 ### Centralized Signal Store
 

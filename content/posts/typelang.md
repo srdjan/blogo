@@ -1,22 +1,17 @@
 ---
-title: "TypeLang: A subset of TypeScript with algebraic effects"
+title: "Exploring TypeLang: A TypeScript Subset with Algebraic Effects"
 date: 2025-10-19
-tags: [TypeScript, Functional, Algebraic Effects, Language Design]
-excerpt: TypeLang is deigned to enforce functional programming principles, as a strict TypeScript subset, and with explicit effect tracking to simplify how teams reason about code.
+tags: [TypeScript, Functional, Algebraic Effects, Language Design, Research]
+excerpt: Investigating TypeLang—a strict TypeScript subset with explicit effect tracking—and exploring whether enforcing functional programming principles through constraints could simplify how we reason about code.
 ---
 
-### Continuing exploration into the world of possibilities when building a language that is a TypeScript subset, supports Light FP programming style and has built-in Algebraic Effects.
+I've been exploring what happens when you build a language that's a TypeScript subset, supports Light FP programming style, and has built-in algebraic effects. What strikes me is a recurring question across different projects.
 
-Software systems grow complex not just from the problems they solve, but from the flexibility
-languages afford us. When teams can express the same ideas in countless ways, mixing paradigms, hiding
-effects, and mutating state freely,codebases become difficult to understand and maintain.
+As I've investigated software systems, I've noticed how they grow complex not just from the problems they solve, but from the flexibility languages afford us. When code can express the same ideas in countless ways—mixing paradigms, hiding effects, mutating state freely—codebases become difficult to understand and maintain.
 
-So, what happens when we constrain how code can be written, making effects explicit and enforcing
-functional purity? **TypeLang** seeks to explore ways of cutting down this complexity by **constraining how code can be
-written**.
+This led me to wonder: what happens when we constrain how code can be written, making effects explicit and enforcing functional purity? **TypeLang** is my exploration of cutting down this complexity by **constraining how code can be written**.
 
-Enforced by tooling, **TypeLang** is a strict subset of TypeScript that combines three core ideas: a Ligh FP, an algebraic effects system that makes side effects visible in type signatures, and zero new syntax. Teams write 100% valid TypeScript that runs on Deno. These constraints emerged from a fundamental belief: **the code we cannot write is as
-important as the code we can**.
+What I find interesting is that **TypeLang**, enforced by tooling, is a strict subset of TypeScript that combines three core ideas: Light FP principles, an algebraic effects system that makes side effects visible in type signatures, and zero new syntax. You write 100% valid TypeScript that runs on Deno. These constraints emerged from what I believe: **the code we cannot write is as important as the code we can**.
 
 **See it Live! ↓**
 
@@ -24,58 +19,35 @@ important as the code we can**.
 
 GitHub repo: [https://github.com/srdjan/TypeLang](https://github.com/srdjan/TypeLang)
 
-🔹 I like learning by thinkering around, and that is the purpose of this project... For production,
-though, use [Effect-TS](https://github.com/Effect-TS/effect) or
-[Effection](https://github.com/thefrontside/effection)
+🔹 I like learning by tinkering around, and that's the purpose of this project. For production, though, I'd recommend using the thoughtful implementations in [Effect-TS](https://github.com/Effect-TS/effect) or [Effection](https://github.com/thefrontside/effection), which have pioneered many of these ideas.
 
-## Foundation: Constraints as Design Philosophy
+## Discovering the Foundation: Constraints as Design Philosophy
 
-The central principle driving **TypeLang** is that **constraints enable clarity**. When we remove
-language features that obscure intent—classes with hidden state, control flow that jumps
-unpredictably, mutations that ripple through systems—what remains is code where data flows and
-effects are explicit.
+The central principle driving my exploration of **TypeLang** is that **constraints enable clarity**. What I've discovered is that when we remove language features that obscure intent—classes with hidden state, control flow that jumps unpredictably, mutations that ripple through systems—what remains is code where data flows and effects are explicit.
 
-This philosophy manifests in three areas:
+As I investigated this, I found this philosophy manifests in three areas:
 
-**Subset enforcement** - We prohibit classes, mutations, loops, and conditional statements
-(`if`/`else`). Application code uses only `const` declarations, pure functions, and
-expression-oriented control flow through pattern matching.
+**Subset enforcement** - I'm exploring what happens when we prohibit classes, mutations, loops, and conditional statements (`if`/`else`). Application code uses only `const` declarations, pure functions, and expression-oriented control flow through pattern matching.
 
-**Effect visibility** - Side effects—I/O, state changes, exceptions—are tracked in type signatures.
-A function that reads a file has a different type than one that performs pure computation. We see at
-the type level what capabilities a function requires.
+**Effect visibility** - Side effects—I/O, state changes, exceptions—are tracked in type signatures. What I find compelling is that a function that reads a file has a different type than one that performs pure computation. You can see at the type level what capabilities a function requires.
 
-**TypeScript compatibility** - Rather than inventing new syntax, we work within TypeScript's type
-system. The effect tracking uses phantom types, and the runtime interprets effect instructions
-through handlers. Any TypeScript tooling works unchanged.
+**TypeScript compatibility** - What I discovered is that rather than inventing new syntax, we can work within TypeScript's type system. The effect tracking uses phantom types, and the runtime interprets effect instructions through handlers. Any TypeScript tooling works unchanged.
 
-These constraints emerged from observing how teams struggle with codebases where anything is
-possible. When there are no guardrails, consistency depends entirely on discipline and review
-processes. By encoding constraints in tooling, we shift enforcement from humans to machines. (Inspired by
- ReScript ❤️)
+What I observed is how these constraints emerged from watching teams struggle with codebases where anything is possible. When there are no guardrails, consistency depends entirely on discipline and review processes. By encoding constraints in tooling, we shift enforcement from humans to machines. (Inspired by ReScript ❤️, which has demonstrated thoughtful approaches to this problem)
 
-## The Functional Subset: What We Removed and Why
+## Exploring the Functional Subset: What I Removed and Why
 
-The subset rules in **TypeLang** forbid several mainstream TypeScript features. Each prohibition
-addresses a specific source of complexity:
+As I investigated the subset rules in **TypeLang**, I found myself forbidding several mainstream TypeScript features. Each prohibition addresses a specific source of complexity I've observed:
 
 ### No Classes or Object-Oriented Constructs
 
-Classes in TypeScript encourage encapsulating mutable state and hiding effects behind method calls.
-A method might trigger network requests, mutate internal state, or throw exceptions—none of which
-appears in its type signature. We removed classes, `this`, and `new` (except for `new Proxy`, which
-the runtime needs internally) to eliminate hidden state and behavior.
+What I've noticed is how classes in TypeScript encourage encapsulating mutable state and hiding effects behind method calls. A method might trigger network requests, mutate internal state, or throw exceptions—none of which appears in its type signature. I removed classes, `this`, and `new` (except for `new Proxy`, which the runtime needs internally) to eliminate hidden state and behavior.
 
-Instead, application code models domains with **algebraic data types**—discriminated unions and type
-aliases. Data structures are readonly records. Functions that operate on these types are pure
-transformations. State, when needed, is handled explicitly through the effect system.
+What I found is that instead, application code can model domains with **algebraic data types**—discriminated unions and type aliases. Data structures are readonly records. Functions that operate on these types are pure transformations. State, when needed, is handled explicitly through the effect system.
 
 ### No Control Flow That Obscures Intent
 
-Traditional `if`/`else` statements and ternary operators encourage imperative thinking—"do this,
-then do that." This style hides the structure of decisions within statement sequences. We replaced
-conditional statements with **pattern matching** via the `match()` function, making decisions
-explicit and exhaustive:
+What strikes me is how traditional `if`/`else` statements and ternary operators encourage imperative thinking—"do this, then do that." This style hides the structure of decisions within statement sequences. I replaced conditional statements with **pattern matching** via the `match()` function, making decisions explicit and exhaustive:
 
 ```typescript
 match(result, {
@@ -84,39 +56,25 @@ match(result, {
 });
 ```
 
-Pattern matching forces teams to handle all cases. The type system ensures exhaustiveness. Control
-flow becomes data transformation.
+What I discovered is that pattern matching forces handling all cases. The type system ensures exhaustiveness. Control flow becomes data transformation.
 
 ### No Mutation or Mutable Bindings
 
-Mutation is the primary source of complexity in concurrent systems. When state can change anywhere,
-reasoning about program behavior requires tracking all possible execution paths. We prohibit `let`,
-`var`, `++`, `--`, and assignment expressions. Application code uses only `const` declarations.
+As I investigated concurrent systems, I found that mutation is a primary source of complexity. When state can change anywhere, reasoning about program behavior requires tracking all possible execution paths. I prohibit `let`, `var`, `++`, `--`, and assignment expressions. Application code uses only `const` declarations.
 
-This doesn't mean programs can't have state—it means state changes are **explicit effects** handled
-by the runtime. Functions don't mutate variables; they return new values or declare state effects
-that are executed by runtime handlers.
+What this means to me is not that programs can't have state—it means state changes are **explicit effects** handled by the runtime. Functions don't mutate variables; they return new values or declare state effects that are executed by runtime handlers.
 
 ### Enforcement Through Tooling
 
-These rules aren't suggestions—they're enforced. The project includes a custom lexical linter
-(`scripts/lint_subset.ts`) that scans source files and rejects forbidden syntax. Running
-`deno task lint` checks both standard Deno rules and the functional subset. Continuous integration
-fails on violations.
+What I found critical is that these rules aren't suggestions—they're enforced. The project includes a custom lexical linter (`scripts/lint_subset.ts`) that scans source files and rejects forbidden syntax. Running `deno task lint` checks both standard Deno rules and the functional subset. Continuous integration fails on violations.
 
-This approach makes the subset **tool-enforced, not documentation-enforced**. Teams don't debate
-whether to use classes or mutation—the tooling prevents it. Code review focuses on logic and design,
-not style compliance.
+What I appreciate about this approach is that it makes the subset **tool-enforced, not documentation-enforced**. You don't debate whether to use classes or mutation—the tooling prevents it. Code review can focus on logic and design, not style compliance.
 
-## Algebraic Effects: Making Side Effects Visible
+## Examining Algebraic Effects: Making Side Effects Visible
 
-The second pillar of **TypeLang** is its effect system. In traditional TypeScript, a function like
-`getUserById(id: string): User` tells you nothing about what happens when you call it. Does it read
-from a database? Make an HTTP request? Throw exceptions? The type signature is silent about effects.
+The second pillar of my **TypeLang** exploration is its effect system. What I've noticed in traditional TypeScript is that a function like `getUserById(id: string): User` tells you nothing about what happens when you call it. Does it read from a database? Make an HTTP request? Throw exceptions? The type signature is silent about effects.
 
-**TypeLang** makes effects explicit through the `Eff<A, Caps>` type. A function that returns
-`Eff<User, { http: Http }>` declares that it produces a `User` value and requires HTTP capabilities.
-Effects are tracked at the type level, visible in every signature.
+What I'm investigating with **TypeLang** is making effects explicit through the `Eff<A, Caps>` type. A function that returns `Eff<User, { http: Http }>` declares that it produces a `User` value and requires HTTP capabilities. Effects are tracked at the type level, visible in every signature.
 
 ### Effect Declaration and Usage
 
@@ -539,10 +497,20 @@ might happen to reading what will happen.
 **Separate core from shell** - Not all code needs the same constraints. Application logic benefits
 from purity. Infrastructure code can be pragmatic. Clear boundaries make both easier to maintain.
 
-**TypeLang** demonstrates that meaningful constraints, enforced consistently, create clarity. When
-we limit how code can be written—making effects visible, removing mutation, enforcing functional
-purity—what emerges are systems easier to understand, test, and maintain.
+## Questions Worth Exploring
 
-The code we cannot write protects us from complexity we cannot manage.
+As I continue investigating this space, I'm curious about several possibilities:
+
+- Could constraint-based language design enable more teams to adopt functional programming benefits?
+- Might explicit effect tracking reveal patterns in how applications use side effects?
+- Would this approach scale to larger codebases and more complex domains?
+- How might algebraic effects evolve as TypeScript's type system continues advancing?
+- Could similar constraint patterns apply to other programming paradigms?
+
+What I've discovered through exploring **TypeLang** is that meaningful constraints, enforced consistently, create clarity. When we limit how code can be written—making effects visible, removing mutation, enforcing functional purity—what emerges are systems that might be easier to understand, test, and maintain.
+
+What I believe is that the code we cannot write protects us from complexity we cannot manage.
+
+The space for language design exploration remains largely open, and I find it exciting that there's significant potential for continued experimentation with different constraint models and effect systems.
 
 <sub>Made with the help of my two favorite devs: Clody & Gipity. Enjoy!</sub>

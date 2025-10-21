@@ -767,6 +767,51 @@ ul, ol {
   margin-bottom: var(--space-sm);
 }
 
+.about-content .social-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-xl) auto 0;
+}
+
+
+.about-content .social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  background: var(--color-bg);
+  letter-spacing: 0.02em;
+  transition:
+    background-color var(--transition-speed) var(--transition-easing),
+    border-color var(--transition-speed) var(--transition-easing),
+    transform var(--transition-speed) var(--transition-easing);
+}
+
+.about-content .social-links svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.about-content .social-links span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.about-content .social-links a:hover {
+  background: var(--color-accent-subtle);
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.about-content .social-links a:focus-visible {
+  outline-offset: 4px;
+}
+
 /* ====================================
    RSS SUBSCRIPTION PAGE
    ==================================== */
