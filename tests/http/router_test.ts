@@ -229,7 +229,7 @@ Deno.test("Router - supports chaining multiple routes", async () => {
 
 Deno.test("Router - handles empty path", async () => {
   const router = createRouter()
-    .get("", async () => new Response("Empty path"));
+    .get("/", async () => new Response("Empty path"));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000");

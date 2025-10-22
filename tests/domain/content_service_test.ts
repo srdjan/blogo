@@ -134,7 +134,8 @@ This post has invalid frontmatter.`,
 
   assertEquals(result.ok, false);
   if (!result.ok) {
-    assertEquals(result.error.kind, "ValidationError");
+    // Malformed YAML causes ParseError, not ValidationError
+    assertEquals(result.error.kind, "ParseError");
   }
 });
 
