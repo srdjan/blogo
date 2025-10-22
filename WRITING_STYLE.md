@@ -1,82 +1,81 @@
 # Blog Writing Style Guide
 
-*Based on natural writing patterns extracted from published work*
+*Personal technical blog with a relaxed, thoughtful tone*
 
 ## Core Voice Characteristics
 
-This blog writes from a place of **clarity, directness, and principle-driven thinking**. The tone is:
+This blog writes from a place of **curiosity, clarity, and hands-on experience**. The tone is:
 
-- **Clear and structured** - Ideas organized logically, building from foundations
-- **Principle-based** - Focus on underlying beliefs and philosophies, not just tactics
-- **Inclusive and collaborative** - "We" language, emphasis on team and collective effort
-- **Professionally conversational** - Approachable but not casual, thoughtful but not academic
-- **Process-oriented** - How things evolve and develop, not just end states
+- **Conversational and approachable** - Like explaining something interesting to a friend
+- **Technically grounded** - Focus on concrete examples and real code/patterns
+- **Balanced perspective** - Show different angles without being overly careful or formal
+- **Natural and unpretentious** - Write like a person, not an academic paper
+- **Practice-oriented** - What actually works, what doesn't, and why
 
 ## Language Patterns
 
 ### Sentence Structure
-- **Active voice, present tense** - "Teams have wide latitude" not "Teams were given latitude"
-- **Declarative statements** - State things directly and clearly
-- **Moderate sentence length** - Not too short, not too long; clear and complete
-- **Occasional em-dashes** for emphasis and clarification
+- **Direct and clear** - Get to the point without ceremony
+- **Mix it up** - Some short sentences. Some longer ones with nuance.
+- **Active voice mostly** - But passive is fine when it reads better
+- **Natural flow** - Write how you'd actually explain it
 
 ### Word Choice
-- **Specific, concrete terms** - "streamlined," "process-light," "transparent"
-- **Professional vocabulary** without jargon - "encapsulate," "distill," "demarcated"
-- **Action-oriented** - "evolve," "nurture," "enable," "guide"
-- **Avoid marketing speak** - No hyperbole, no buzzwords
+- **Plain language** - "simple," "works well," "tricky part"
+- **Specific when it matters** - Concrete examples over abstract concepts
+- **Technical terms naturally** - Use them when needed, explain when helpful
+- **Avoid pretense** - No "one might consider" or "it is worth noting"
 
 ### Framing
-- **"We" perspective** - Collective voice, not individual "I"
-- **Organizational context** - "At Lifion, we..." "Our company credos..."
-- **Process description** - How we arrived at decisions, not just what was decided
-- **Principle → Practice flow** - State the belief, then explain the application
+- **Sparse first-person** - Minimize "I found," "I noticed," "I discovered"
+- **State things directly** - "This works because..." not "I found this works because..."
+- **Focus on the topic** - Not on your journey through it
+- **Show, don't narrate** - Code and examples over exploration stories
 
 ## Structure & Organization
 
 ### Opening
-Start with **context and purpose**:
-> "Our company credos encapsulate our organization's beliefs. They serve as a focused set of reference points to guide actions..."
+Start with **what this is about** and **why it's interesting**:
+> "HTMX lets you build interactive UIs without writing JavaScript. Sounds too good to be true, but here's what makes it work..."
 
-NOT with anecdotes or personal stories.
+Get to the point in 1-2 paragraphs.
 
 ### Body
-**Top-down, hierarchical organization**:
-1. State the principle or goal
-2. Break into areas of focus
-3. Describe each in detail
-4. Show how it works in practice
+**Logical flow based on the topic**:
+1. Start with the core concept or problem
+2. Show how it works (code examples)
+3. Cover the important details
+4. Mention tradeoffs or limitations
 
-Use clear section headers and visual diagrams where helpful.
+Organize for clarity, not for ceremony.
 
 ### Closing
-End with **forward-looking statement** about journey and commitment:
-> "The Lifion journey has been an incredible experience so far, and we are taking all the necessary steps to make sure that it continues to be so."
+End with **takeaways or implications**:
+> "This approach won't replace React everywhere, but for server-rendered apps with some interactivity, it's surprisingly capable."
+
+No grand conclusions about journeys or commitments needed.
 
 ## Content Principles
 
-### Focus on Principles Over Tactics
-- Start with the "what" and "why" - beliefs and goals
-- Then explain "how" - implementation and practice
-- Connect practices back to principles
+### Show, Don't Narrate
+- Lead with examples and code, not with "I was exploring..."
+- Let the topic be interesting, not your journey to it
+- Skip the exploration narrative - just explain the thing
 
-### Emphasize Process and Evolution
-- How decisions were made
-- How feedback was incorporated
-- How things evolve over time
-- "Recently, we undertook an effort to distill..."
-- "As the credos document was taking shape, we made the process open..."
+### Be Direct About Tradeoffs
+- "This works great for X, but falls apart with Y"
+- No need to say "one might consider" - just state it
+- Acknowledge limitations without hedging everything
 
-### Collective Perspective
-- Use "we," "our," "teams"
-- Minimal use of "I" - only when absolutely necessary for clarity
-- Focus on organizational culture and team dynamics
-- "Teams have from the very beginning been given wide latitude..."
+### Minimal Personal Commentary
+- Cut most "I noticed," "I found," "I think"
+- Just state the observation: "This has an interesting property..."
+- Occasional personal note is fine, but don't narrate the whole journey
 
-### Inclusive Language
-- "Open and transparent, welcoming input from all team members"
-- "That feedback loop was fundamental to ensuring that the content resonated with our people"
-- Emphasis on participation and collaboration
+### Natural Technical Writing
+- Use "you" when walking through something: "You can configure this..."
+- State facts directly: "This approach has two benefits..."
+- Ask rhetorical questions if they help: "Why does this work?"
 
 ## Formatting Guidelines
 
@@ -95,81 +94,80 @@ End with **forward-looking statement** about journey and commitment:
 - Each paragraph develops one complete thought
 - Use white space to create breathing room
 
-## Examples from Natural Writing
+## Examples of the Style
 
-### Opening (Context-Setting):
-> "A great company culture comes down to one thing: people. At Lifion, we recognize this and actively nurture an inclusive, open, and motivating company culture."
+### Opening (Get to the point):
+> "Deno's built-in testing is surprisingly capable. No dependencies, no configuration, just write tests. Here's what makes it work."
 
-### Process Description:
-> "As the credos document was taking shape, we made the process open and transparent, welcoming input from all team members on an ongoing basis. That feedback loop was fundamental to ensuring that the content resonated with our people while remaining relevant both to our values and to the desired end state of our product."
+### Explaining Something:
+> "The key is how HTMX handles partial updates. Instead of replacing the whole page, it swaps just the piece that changed. This means you can keep your server-side rendering but add interactivity where you need it."
 
-### Principle Statement:
-> "A crucial part of our development process is that architecture is based on principles and not prescribed by a team of architects."
+### Showing Tradeoffs:
+> "This works well for CRUD apps and content-driven sites. It breaks down when you need complex client-side state or real-time collaboration. Pick the right tool for the job."
 
-### Application/Practice:
-> "Teams have from the very beginning been given wide latitude to solve their own problems, without waiting for external help. No detailed prescriptive practices are pushed down by a centralized group or management, just an emphasis on creating, delivering, and operating software in as streamlined and process-light a way as possible."
+### Code Example Lead-in:
+> "Here's the basic pattern. The server returns HTML fragments, and HTMX swaps them in:"
 
 ### Closing:
-> "The Lifion journey has been an incredible experience so far, and we are taking all the necessary steps to make sure that it continues to be so."
+> "The best part? You're writing plain HTML on the server. No build step, no hydration, no bundle size to worry about."
 
 ## Avoid
 
-❌ **Personal anecdotes** - "I remember when..." "Last year I..."
-❌ **Casual language** - "Here's the thing..." "Let me tell you..."
-❌ **War stories** - Specific debugging incidents, production failures
-❌ **Overly subjective** - "I think..." "In my experience..." "I believe..."
-❌ **Metrics without context** - Don't lead with numbers; lead with principles
-❌ **Conversational asides** - "You're probably thinking..." "Wait, what?"
+❌ **Exploration narratives** - "I've been investigating..." "I discovered..." "I explored..."
+❌ **Excessive "I" statements** - "I found that..." "I think..." "I noticed..."
+❌ **Formal hedging** - "One might consider..." "It is worth noting..." "This suggests that..."
+❌ **Research speak** - "investigating," "exploring," "examining," "worth exploring"
+❌ **Process descriptions** - Skip how you learned it; just explain it
+❌ **War stories** - Production incidents, debugging sagas
 
 ## Do
 
-✅ **State principles clearly** - "We believe X because Y"
-✅ **Describe processes** - "We undertook an effort to distill..."
-✅ **Use collective voice** - "We," "our teams," "at Lifion"
-✅ **Organize hierarchically** - Top-down, structured breakdown
-✅ **Connect practice to principle** - Show how beliefs manifest in action
-✅ **End with forward vision** - Journey continues, commitment to principles
+✅ **State things directly** - "This works because..." not "I found this works..."
+✅ **Show with code** - Examples over abstract descriptions
+✅ **Be practical** - "This approach has two benefits..."
+✅ **Natural tone** - Write like you're explaining to a friend
+✅ **Acknowledge limits** - "This breaks down when..."
+✅ **Focus on the topic** - Not your journey through it
 
 ## Post Structure Template
 
 1. **Opening (1-2 paragraphs)**
-   - Context: What is this about?
-   - Purpose: Why does it matter?
+   - What this is about
+   - Why it's interesting or useful
 
-2. **Foundation (2-3 paragraphs)**
-   - Core philosophy or approach
-   - How it was developed (process)
-   - Why this matters to people and outcomes
+2. **Core Explanation**
+   - How it works (with code examples)
+   - Key concepts or patterns
+   - Concrete details
 
-3. **Structure (1 paragraph)**
-   - How the content is organized
-   - Top-down breakdown approach
+3. **Important Bits**
+   - Things that matter in practice
+   - Common patterns or gotchas
+   - More examples if needed
 
-4. **Main Content (organized hierarchically)**
-   - Top-level principles/goals
-   - Areas of focus under each
-   - Detailed descriptions
-   - Practical applications
+4. **Tradeoffs or Limitations**
+   - Where this works well
+   - Where it doesn't
+   - Honest assessment
 
-5. **Closing (1-2 paragraphs)**
-   - Current state of journey
-   - Commitment to continued evolution
+5. **Closing (1 paragraph)**
+   - Practical takeaway
+   - When to consider this approach
 
 ## Checklist Before Publishing
 
-- [ ] Does it start with clear context and purpose?
-- [ ] Are principles stated before practices?
-- [ ] Is the collective "we" voice used consistently?
-- [ ] Is content organized hierarchically and clearly?
-- [ ] Does it describe process, not just outcomes?
-- [ ] Are visual elements used to clarify structure?
-- [ ] Does it end with forward-looking perspective?
-- [ ] Is the tone professional but approachable?
-- [ ] Are concepts defined clearly when introduced?
-- [ ] Does it avoid personal anecdotes and "I" statements?
+- [ ] Gets to the point quickly (no long exploration intro)?
+- [ ] Minimal "I found/noticed/discovered" statements?
+- [ ] Shows concrete examples and code?
+- [ ] States things directly without formal hedging?
+- [ ] Acknowledges tradeoffs honestly?
+- [ ] Avoids "investigating/exploring/examining" language?
+- [ ] Feels like explaining to a friend, not writing a research paper?
+- [ ] Technical concepts explained clearly?
+- [ ] No unnecessary process descriptions?
 
 ## Summary: The Core Pattern
 
-**Start with Why** → **Describe How** → **Show Structure** → **Explain Applications** → **Look Forward**
+**State what it is** → **Show how it works** → **Explain the interesting parts** → **Acknowledge limits** → **Practical takeaway**
 
-Write as an organization sharing its philosophy and approach, not as an individual sharing war stories. Focus on principles, processes, and collective experience. Be clear, structured, and purpose-driven.
+Write like a person sharing something useful they learned. Be direct, clear, and unpretentious. Focus on the topic, not your journey to understanding it. Show with code and examples.

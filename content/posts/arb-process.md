@@ -1,5 +1,5 @@
 ---
-title: Exploring How Architecture Review Boards Could Enable Rather Than Block
+title: Architecture Review Boards Could Enable Rather Than Block
 date: 2025-04-06
 tags: [Architecture, Enterprise, Product, Agile, Research]
 excerpt: Investigating whether Architecture Review Boards might accelerate product development rather than control it—exploring transformations from approval bottlenecks to enablement mechanisms.

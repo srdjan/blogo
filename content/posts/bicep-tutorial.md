@@ -1,21 +1,21 @@
 ---
-title: "Exploring Typed Bicep for Infrastructure as Code"
+title: "Typed Bicep for Infrastructure as Code"
 date: 2025-10-06
 tags: [Azure, Bicep, IaaC, DevOps, Research]
 excerpt: "Investigating whether infrastructure definitions could benefit from the same type safety principles that guide application development—exploring Bicep's type system, discriminated unions, and compile-time validation for infrastructure code."
 ---
 
-I've been exploring how Infrastructure as Code represents infrastructure as engineered artifacts rather than manual procedures. This shift brings software engineering practices to infrastructure management—version control, code review, automated testing. What interests me is how type systems might extend this progression further, applying compile-time validation to infrastructure definitions the same way they protect application code.
+Infrastructure as Code represents a progression from manual, error-prone processes to automated, repeatable deployments. This shift brings software engineering practices to infrastructure management—version control, code review, automated testing. What interests me is how type systems might extend this progression further, applying compile-time validation to infrastructure definitions the same way they protect application code.
 
-As I investigated Typed Bicep, I discovered the possibility of catching configuration errors during development rather than at deployment time. This led me to wonder: could this approach transform infrastructure development from error-prone scripting into predictable, maintainable engineering through type safety, discriminated unions, and modular type libraries?
+As @work we use Azure and Bicep, we love the possibility of catching configuration errors during development rather than at deployment time. This led me to wonder: could this approach transform infrastructure development from error-prone scripting into predictable, maintainable engineering through type safety, discriminated unions, and modular type libraries?
 
 > **Reference Implementation**: All patterns and practices described in this guide are implemented in the [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter) repository. The repo provides a complete, production-ready template with typed modules, helper functions, and deployment examples that you can use as a starting point for your own infrastructure projects.
 
 ## Discovering a Philosophy: Types as Infrastructure Contracts
 
-As I investigated this space, I discovered that infrastructure code defines contracts between components—agreements about what resources exist, how they connect, and which configurations remain valid. What struck me is how traditional Infrastructure as Code approaches leave these contracts implicit, documented in comments or external wikis that drift from actual implementations. Type systems offer what I find to be a compelling alternative: encoding contracts directly in infrastructure definitions where the compiler verifies them.
+The central insight that to exploration of typed Bicep is that infrastructure code defines contracts between components—agreements about what resources exist, how they connect, and which configurations remain valid. Traditional Infrastructure as Code approaches leave these contracts implicit, documented in comments or external wikis that drift from actual implementations. Type systems offer a compelling alternative: encoding contracts directly in infrastructure definitions where the compiler verifies them.
 
-This philosophy emerged for me from analyzing deployment failures across infrastructure projects. Configuration mismatches, invalid property combinations, and missing required parameters share a common root cause—the infrastructure definition language allowed invalid states to be expressed. What I discovered is that when type systems make illegal states unrepresentable, validation shifts from deployment time to development time.
+In the legacy world deployment failures across infrastructure projects are common, almost expected. Configuration mismatches, invalid property combinations, and missing required parameters share a common root cause—the infrastructure definition language allowed invalid states to be expressed. What I discovered is that when type systems make illegal states unrepresentable, validation shifts from deployment time to development time.
 
 The benefits I observed compound: faster feedback loops during development, clearer interfaces between modules, and infrastructure definitions that document themselves through types. This means less time debugging deployment failures and more time building features.
 
