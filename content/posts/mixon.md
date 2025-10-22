@@ -1,26 +1,19 @@
 ---
-title: Mixon - A Type-Safe Microframework for Deno
+title: Mixon - Type-Safe Web Framework for Deno with Built-In Workflows
 date: 2025-04-05
-tags: [Web, Development, Deno, HTMX, Research]
-excerpt: Investigating a type-safe microframework for Deno, exploring whether comprehensive type safety and built-in workflow management could simplify web application development.
+tags: [Web, Development, Deno, HTMX, TypeScript]
+excerpt: Building web apps means juggling type safety, state management, and server-side rendering across multiple libraries. Mixon combines end-to-end TypeScript safety, workflow engine, and HTMX support in one lightweight package for Deno.
 ---
 
-I've been building web applications with existing frameworks, and I keep noticing persistent challenges: lack of end-to-end type safety, complex configuration, and frameworks that feel either too heavy for simple projects or too limited for complex ones.
+Building web applications with Deno means choosing between frameworks. Express-style routers lack type safety. Heavy frameworks bring Node.js baggage. Type-safe options don't integrate with HTMX naturally. Workflow management? Separate library with different API patterns.
 
-What struck me while working on Deno projects is how requiring workflow management, HTMX integration, and strong typing often means juggling multiple libraries with inconsistent APIs—creating maintenance overhead and type safety gaps. This led me to investigate: what if there was a different approach?
+I kept building the same infrastructure across projects: request validation with types, state machine logic for business workflows, server-side rendering with HTMX. Repetitive. Error-prone. Maintenance overhead.
 
-## Discovering Design Goals
+So I built Mixon. Type-safe microframework for Deno that handles the repetitive parts—validation, workflows, HTMX patterns—with zero dependencies and consistent APIs. Not trying to replace Express or Oak. Solving specific problems I hit repeatedly.
 
-As I explored this question, I found myself wondering what a microframework might provide:
-- End-to-end type safety without configuration overhead
-- Built-in workflow management for stateful applications
-- First-class HTMX support for server-driven UIs
-- Zero dependencies and minimal footprint
-- Pattern matching for cleaner conditional logic
+## End-to-End Type Safety
 
-## Investigating Comprehensive Type Safety
-
-As I dug deeper into this, I discovered that Mixon's foundation could provide comprehensive type safety throughout the entire request lifecycle—offering compile-time guarantees that catch errors before production:
+Type safety shouldn't stop at function boundaries. Request validation, response handling, state transitions—all of it should be typed. Mixon provides compile-time guarantees throughout the request lifecycle:
 
 ```typescript
 import { App, type } from "jsr:@srdjan/mixon";
@@ -28,47 +21,59 @@ import { App, type } from "jsr:@srdjan/mixon";
 const app = App();
 const { utils } = app;
 
-// Define a type-safe schema
+// Define schema with runtime validation
 const userSchema = type({
   name: "string",
   email: "string",
   age: "number",
 });
 
-// Type-safe route with validated parameters
+// Type-safe route handler
 app.post("/users", (ctx) => {
   if (!ctx.validated.body.ok) {
     utils.handleError(ctx, 400, "Invalid user data", ctx.validated.body.error);
     return;
   }
 
-  // ctx.validated.body.value is fully typed!
+  // ctx.validated.body.value is fully typed as { name: string; email: string; age: number }
   const user = ctx.validated.body.value;
-  // ...
+  console.log(`Creating user: ${user.name}, ${user.email}, ${user.age}`);
+
+  ctx.response = utils.createResponse(ctx, { id: crypto.randomUUID(), ...user });
 });
 ```
 
-What I found compelling is how this approach could eliminate runtime errors common in production environments.
+The `type()` function creates schemas that validate at runtime and provide TypeScript types. No separate type definitions. No keeping schemas and types in sync manually. One source of truth.
 
-## Exploring Pattern Matching for Cleaner Logic
+Invalid data? You get a Result type with explicit error information. No exceptions. No `try/catch` blocks for validation. Handle errors explicitly or TypeScript complains.
 
-I've been exploring how pattern matching inspired by functional programming languages might make complex conditional logic more readable:
+## Pattern Matching for Conditional Logic
+
+Nested `if/else` chains are hard to read. Switch statements with fallthrough are error-prone. Pattern matching makes conditional logic declarative:
 
 ```typescript
 import { App, match } from "jsr:@srdjan/mixon";
 
-const result = match(response.status)
-  .with(200, () => "Success")
-  .with(404, () => "Not Found")
-  .with(500, () => "Server Error")
-  .otherwise(() => "Unknown Status");
+app.get("/status/:code", (ctx) => {
+  const code = parseInt(ctx.params.code);
+
+  const message = match(code)
+    .with(200, () => "Success")
+    .with(404, () => "Not Found")
+    .with(500, () => "Server Error")
+    .otherwise(() => "Unknown Status");
+
+  ctx.response = utils.createResponse(ctx, { code, message });
+});
 ```
 
-What I discovered is how this could replace nested if-else chains with declarative, exhaustive pattern matching.
+Exhaustive matching catches missing cases at compile time. Add a new status code? The type system tells you where to update patterns. No silent fallthrough bugs.
 
-## Examining the Built-in Workflow Engine
+## Built-In Workflow Engine
 
-What I find particularly interesting is Mixon's built-in workflow engine—providing type-safe state transition management for business applications:
+E-commerce orders. Support tickets. Content approval processes. Business applications need state machines. Usually means reaching for separate workflow library with different API patterns and no type integration.
+
+Mixon includes workflow engine with full type safety:
 
 ```typescript
 // Define workflow types
@@ -79,12 +84,12 @@ type OrderState =
   | "Shipped"
   | "Delivered"
   | "Cancelled";
+
 type OrderEvent = "Submit" | "Confirm" | "Ship" | "Deliver" | "Cancel";
 
-// Create workflow engine with type parameters
+// Create typed workflow
 const orderWorkflow = app.workflow<OrderState, OrderEvent>();
 
-// Define the workflow
 orderWorkflow.load({
   states: ["Draft", "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"],
   events: ["Submit", "Confirm", "Ship", "Deliver", "Cancel"],
@@ -98,17 +103,71 @@ orderWorkflow.load({
         message: "New order received: {orderNumber}",
       },
     },
-    // Additional transitions...
+    {
+      from: "Pending",
+      to: "Confirmed",
+      on: "Confirm",
+      task: {
+        assign: "warehouse@example.com",
+        message: "Order confirmed, prepare shipment: {orderNumber}",
+      },
+    },
+    {
+      from: "Confirmed",
+      to: "Shipped",
+      on: "Ship",
+      task: {
+        assign: "customer@example.com",
+        message: "Order shipped with tracking: {trackingNumber}",
+      },
+    },
+    {
+      from: "Shipped",
+      to: "Delivered",
+      on: "Deliver",
+    },
+    {
+      from: ["Draft", "Pending", "Confirmed"],
+      to: "Cancelled",
+      on: "Cancel",
+    },
   ],
   initial: "Draft",
 });
+
+// Use in routes
+app.post("/orders/:id/transition", (ctx) => {
+  const orderId = ctx.params.id;
+  const { event } = ctx.validated.body.value;
+
+  const result = orderWorkflow.transition(orderId, event);
+
+  if (!result.ok) {
+    utils.handleError(ctx, 400, "Invalid transition", result.error);
+    return;
+  }
+
+  ctx.response = utils.createResponse(ctx, result.value);
+});
 ```
 
-What I've come to appreciate is how the workflow engine could automatically maintain audit trails and prevent invalid state transitions—addressing common challenges in e-commerce and business applications.
+Look at the benefits:
 
-## Investigating First-Class HTMX Integration
+**Type safety**: Try to transition from "Shipped" to "Pending"? Compile error. Invalid states don't exist in your type system.
 
-As I explored further, I discovered that first-class HTMX support could feel natural rather than bolted-on, with server-side rendering as a core feature:
+**Automatic audit trail**: Every state transition gets logged with timestamp, event, previous state, new state. Built in.
+
+**Task management**: Define tasks that trigger on transitions. Send emails, update databases, call APIs. Declarative configuration.
+
+**Validation**: Workflow engine validates transitions before executing them. Invalid state changes fail cleanly with error messages.
+
+To me is interesting that business logic becomes data. Define allowed transitions as configuration. Enforce rules through type system and workflow engine. Less imperative code, fewer bugs.
+
+## First-Class HTMX Support
+
+HTMX enables rich interactivity through HTML attributes. Server sends HTML fragments. Browser swaps them in. Simple architecture that scales.
+
+Mixon treats HTMX as first-class citizen, not afterthought:
 
 ```typescript
 /** @jsx h */
@@ -117,25 +176,71 @@ import { App } from "jsr:@srdjan/mixon";
 
 const app = App();
 
-// Product list route
+const products = [
+  { id: 1, name: "Product A", price: 29.99, description: "First product" },
+  { id: 2, name: "Product B", price: 49.99, description: "Second product" },
+];
+
+// Full page route
 app.get("/products", (ctx) => {
   const html = renderSSR(
-    <section>
-      {products.map((product) => (
-        <article>
-          <h3>{product.name}</h3>
-          <div>${product.price}</div>
-          <p>{product.description}</p>
-          <button
-            type="button"
-            hx-get={`/api/fragments/product-detail/${product.id}`}
-            hx-target="#content"
-          >
-            View Details
-          </button>
-        </article>
-      ))}
-    </section>,
+    <html>
+      <head>
+        <title>Products</title>
+        <script src="https://unpkg.com/htmx.org@2.0.7"></script>
+      </head>
+      <body>
+        <h1>Our Products</h1>
+        <section id="content">
+          {products.map((product) => (
+            <article>
+              <h3>{product.name}</h3>
+              <div>${product.price}</div>
+              <p>{product.description}</p>
+              <button
+                type="button"
+                hx-get={`/api/products/${product.id}/detail`}
+                hx-target="#content"
+                hx-swap="innerHTML"
+              >
+                View Details
+              </button>
+            </article>
+          ))}
+        </section>
+      </body>
+    </html>
+  );
+
+  ctx.response = new Response(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+});
+
+// Fragment route for HTMX
+app.get("/api/products/:id/detail", (ctx) => {
+  const id = parseInt(ctx.params.id);
+  const product = products.find(p => p.id === id);
+
+  if (!product) {
+    ctx.response = new Response("Product not found", { status: 404 });
+    return;
+  }
+
+  const html = renderSSR(
+    <div>
+      <h2>{product.name}</h2>
+      <p>Price: ${product.price}</p>
+      <p>{product.description}</p>
+      <button
+        type="button"
+        hx-get="/products"
+        hx-target="body"
+        hx-swap="innerHTML"
+      >
+        Back to List
+      </button>
+    </div>
   );
 
   ctx.response = new Response(html, {
@@ -144,39 +249,62 @@ app.get("/products", (ctx) => {
 });
 ```
 
-What interests me about this approach is how it keeps most logic on the server while providing rich interactivity with minimal client-side JavaScript.
+Server-side rendering with JSX (using nano library). Type-safe templating. HTMX attributes integrated naturally. No build step needed—Deno handles JSX transform natively.
 
-## Examining Performance Through Thoughtful Design
+Pattern works beautifully for admin interfaces, e-commerce features, content-driven sites. Most logic stays server-side where you have database access, session management, business rules. Client gets clean HTML and simple HTMX attributes.
 
-As I investigated the implementation, I found that balancing functional programming principles with strategic optimization could deliver real-world performance:
+## Performance Through Simplicity
 
-- Fast-path dispatch with O(1) middleware lookup
-- Static route matching with Map-based lookup
-- In-place context updates to minimize allocations
-- Controlled garbage collection pressure during request processing
+Zero dependencies means small footprint. Entire framework is ~15KB. No transitive dependency tree. Fast cold starts on Deno Deploy.
 
-What I discovered is the possibility of a framework that feels lightweight while performing well under load.
+Fast-path optimizations for common cases:
 
-## Discovering Explicit Error Handling
+**O(1) middleware lookup**: Map-based dispatch instead of array iteration.
 
-I've been exploring how a Result type inspired by Rust could provide explicit error handling throughout the framework:
+**Static route matching**: Pre-compiled route patterns. No regex evaluation for simple routes.
+
+**Minimal allocations**: Context objects reused where possible. In-place updates reduce garbage collection pressure.
+
+Not claiming this is fastest framework in benchmarks. But fast enough for real applications while keeping codebase maintainable.
+
+## Result-Based Error Handling
+
+Exceptions hide control flow. You don't know which functions throw what errors. `try/catch` blocks scatter throughout code.
+
+Mixon uses Result types inspired by Rust. Errors are values:
 
 ```typescript
-// Type-safe error handling
+// Validation returns Result
 if (!ctx.validated.body.ok) {
-  utils.handleError(ctx, 400, "Invalid user data", ctx.validated.body.error);
+  // ctx.validated.body.error contains detailed information
+  utils.handleError(ctx, 400, "Invalid data", ctx.validated.body.error);
   return;
 }
 
-// Safe access to validated data
-const user = ctx.validated.body.value;
+// Safe to access validated data
+const data = ctx.validated.body.value;
 ```
 
-What I find compelling is how this approach could eliminate the possibility of accessing invalid data and make error states explicit in the type system.
+Workflow transitions return Results:
 
-## Exploring Getting Started Simplicity
+```typescript
+const result = orderWorkflow.transition(orderId, event);
 
-What I discovered is how Mixon could work seamlessly with Deno's import system:
+if (!result.ok) {
+  // Handle error explicitly
+  utils.handleError(ctx, 400, "Invalid transition", result.error);
+  return;
+}
+
+// Safe to access transition result
+const newState = result.value;
+```
+
+Errors become explicit in function signatures. TypeScript enforces checking. No silent failures. No uncaught exceptions.
+
+## Getting Started
+
+Works with Deno's import system. No package manager needed:
 
 ```typescript
 import { App } from "jsr:@srdjan/mixon";
@@ -192,20 +320,54 @@ console.log("Server running at http://localhost:3000");
 app.listen(3000);
 ```
 
-What I appreciate about this is the simplicity—no package managers, no complex configuration, just import and start building.
+Run it: `deno run --allow-net server.ts`
 
-## Questions Worth Exploring
+That's it. No `npm install`. No config files. Import and build.
 
-As I continue investigating this space, I'm curious about several possibilities:
+## Who This Is For
 
-- Could integrating workflow engines at the framework level enable more maintainable stateful applications?
-- Might combining type safety with HTMX support create interesting opportunities for server-driven UIs?
-- Would this approach scale to larger teams and more complex application domains?
-- How might pattern matching evolve as TypeScript's type system continues advancing?
-- Could similar patterns apply to other runtimes beyond Deno?
+Mixon works well when you need:
 
-What I've come to appreciate through exploring Mixon is how the best abstractions might solve multiple problems with unified APIs. By combining type safety, workflow management, and HTMX support in a single, lightweight package, there's potential to address complexity common across different projects.
+**Type safety throughout**: Request validation, workflow states, response handling—all typed.
 
-What I find interesting is focusing on Deno's strengths—security, TypeScript-first development, and modern JavaScript—to create something that feels native to the ecosystem rather than ported from Node.js patterns.
+**Business workflows**: E-commerce orders, approval processes, support tickets—anything with state transitions.
 
-The space for exploring type-safe microframeworks remains largely open, and I find it exciting that there's significant potential for experimentation with different combinations of these techniques—powerful enough for complex applications, simple enough for quick prototypes, and type-safe enough to prevent runtime errors.
+**Server-side rendering**: HTMX-driven UIs where most logic stays on server.
+
+**Deno-native development**: Using Deno's security model, TypeScript support, modern JavaScript.
+
+**Lightweight deployments**: Small footprint for Deno Deploy or edge computing.
+
+Not trying to replace Express, Hono, Oak. Different goals. Mixon optimizes for type safety, workflow integration, and HTMX patterns in Deno environment.
+
+## Real Talk: Tradeoffs
+
+Mixon is young. API will evolve. Breaking changes likely as I learn what works.
+
+**Limited ecosystem**: No vast plugin library. No middleware marketplace. Build custom solutions or use vanilla Deno libraries.
+
+**Opinionated architecture**: Built-in workflow engine and pattern matching might not fit your mental model. If you prefer traditional state management? Probably not for you.
+
+**Deno-specific**: Uses Deno APIs. Won't run on Node.js without significant changes. Choosing Mixon means choosing Deno.
+
+**Documentation is minimal**: Code examples exist. Comprehensive docs? Still working on it.
+
+**Small community**: You're not getting Stack Overflow answers or tutorial videos. Early adopter territory.
+
+But. If you're building Deno applications with workflow needs, HTMX patterns, and strong type safety requirements? Mixon addresses those specifically. I built this solving my own problems. Maybe it solves yours too.
+
+I've been using Mixon for side projects—band website with content workflows, small e-commerce experiments. The workflow engine eliminated state management bugs. Type safety caught issues at compile time. HTMX integration felt natural.
+
+## Bottom Line
+
+Web frameworks make tradeoffs. Express prioritizes flexibility. Rails emphasizes convention. React focuses on client-side state. Each solves different problems.
+
+Mixon prioritizes: type safety, workflow management, HTMX patterns, Deno ecosystem. Specific problems. Specific solutions.
+
+Not saying this is better than other frameworks. Saying if these priorities match your needs, Mixon might fit. Type-safe request handling, built-in state machines, first-class server-side rendering—combined in lightweight package.
+
+This means choosing framework depends of your constraints. Building complex SPAs? React or Vue. Large enterprise systems? Spring or Rails. But Deno applications with business workflows and server-driven UIs? Mixon addresses that combination specifically.
+
+The framework landscape has room for specialized tools. Mixon targets narrow use case deliberately: type-safe Deno web applications with workflow requirements and HTMX rendering. If that describes your project, give it a try.
+
+Available at `jsr:@srdjan/mixon`. MIT licensed. Issues and contributions welcome. Still evolving, still learning, still improving.
