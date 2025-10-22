@@ -1,5 +1,5 @@
 ---
-title: Exploring Mixon - A Type-Safe Microframework for Deno
+title: Mixon - A Type-Safe Microframework for Deno
 date: 2025-04-05
 tags: [Web, Development, Deno, HTMX, Research]
 excerpt: Investigating a type-safe microframework for Deno, exploring whether comprehensive type safety and built-in workflow management could simplify web application development.

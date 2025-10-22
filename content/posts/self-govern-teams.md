@@ -1,5 +1,5 @@
 ---
-title: Exploring What Self-Governing Teams Actually Need
+title: About Self-Governing Teams
 date: 2025-05-12
 tags: [Architecture, Product, Agile, Leadership, Research]
 excerpt: Investigating what happens when teams gain real autonomy—exploring the patterns I've observed when people closest to the work get to make decisions, and what this reveals about hierarchy versus enablement.

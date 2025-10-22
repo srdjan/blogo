@@ -1,5 +1,5 @@
 ---
-title: Exploring Effect-TS and Functional Abstractions in TypeScript
+title: Effect-TS and Functional Abstractions in TypeScript
 date: 2025-06-09
 tags: [Functional, TypeScript, Effect, Research]
 excerpt: Investigating how Effect-TS separates business logic from technical concerns, exploring whether functional abstractions could make TypeScript applications clearer and more maintainable.

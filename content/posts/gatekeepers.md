@@ -1,5 +1,5 @@
 ---
-title: Exploring Legacy Gatekeeping Patterns in Software Delivery
+title: Legacy Gatekeeping Patterns in Software Delivery
 date: 2025-05-12
 tags: [Architecture, Enterprise, Product, Agile, Legacy, Research]
 excerpt: Investigating common gatekeeping antipatterns that create bottlenecks in software delivery and exploring proven approaches to transform them into enablement practices.

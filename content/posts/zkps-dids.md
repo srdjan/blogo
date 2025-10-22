@@ -1,7 +1,7 @@
 ---
-title: Exploring Zero-Knowledge Credential Verification
+title: "Verifiable Credentials: Zero-Knowledge Credential Verification"
 date: 2025-05-06
-tags: [VCs, DIDs, ZKPs, Research]
+tags: [VCs, DIDs, ZKPs]
 excerpt: Investigating whether multi-key zero-knowledge systems could enable private credential verification without blockchain—exploring possibilities for proving employment without exposing sensitive details.
 ---
 

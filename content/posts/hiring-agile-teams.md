@@ -1,5 +1,5 @@
 ---
-title: Exploring What Hiring Actually Determines in Agile Teams
+title: How Hiring Actually Determines Success in Agile Teams
 date: 2025-09-05
 tags: [Hiring, Agile, Teams, Culture, Research]
 excerpt: Investigating whether recruitment approaches that prioritize mindset over credentials might be more critical to agile success than the frameworks themselves—and what this reveals about transformation failures.

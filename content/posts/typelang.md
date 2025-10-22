@@ -1,5 +1,5 @@
 ---
-title: "Exploring TypeLang: A TypeScript Subset with Algebraic Effects"
+title: "TypeLang: A Strict TypeScript Subset with Algebraic Effects"
 date: 2025-10-19
 tags: [TypeScript, Functional, Algebraic Effects, Language Design, Research]
 excerpt: Investigating TypeLang—a strict TypeScript subset with explicit effect tracking—and exploring whether enforcing functional programming principles through constraints could simplify how we reason about code.

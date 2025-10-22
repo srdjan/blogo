@@ -1,5 +1,5 @@
 ---
-title: Exploring What Sustaining Velocity Actually Requires
+title: "Modern Agile: What Sustaining Velocity Actually Requires"
 date: 2025-05-12
 tags: [Architecture, Agile, Product, Leadership, Research]
 excerpt: Investigating the patterns that emerge when teams shift from ceremony compliance to sustained delivery—exploring how velocity, culture, and technical discipline intertwine in ways that might challenge conventional agile thinking.

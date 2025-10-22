@@ -1,5 +1,5 @@
 ---
-title: Exploring Gleam's Elegant Approach to Resource Management
+title: About Gleam's Elegant Approach to Resource Management
 date: 2025-06-06
 tags: [Functional, TypeScript, Gleam, Research]
 excerpt: Investigating how Gleam's `use` syntax offers an elegant solution to callback hell and what it might teach us about functional programming ergonomics.

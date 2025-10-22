@@ -1,5 +1,5 @@
 ---
-title: Exploring How Equity Ownership Shapes Behavior
+title: Equity Ownership Shapes Behavior & Outcomes
 date: 2025-09-04
 tags: [Performance, Workplace, Leadership, Research]
 excerpt: Investigating how compensation structures—particularly equity ownership—shape behavior and exploring whether skin in the game might fundamentally change how people make decisions.

@@ -1,5 +1,5 @@
 ---
-title: Exploring Whether Matrix Organizations Enable Agility
+title: Matrix Organizations Enable Agility
 date: 2025-09-03
 tags: [Organization, Agile, Leadership, Teams, Research]
 excerpt: Investigating whether organizational structure might matter more than methodology—exploring how matrix architectures could enable behaviors that hierarchies prevent, regardless of process maturity.

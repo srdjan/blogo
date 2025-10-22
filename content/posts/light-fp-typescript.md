@@ -1,5 +1,5 @@
 ---
-title: Exploring Functional TypeScript Without Framework Overhead
+title: Functional TypeScript Without Framework Overhead
 date: 2025-10-03
 tags: [TypeScript, Functional, Architecture, Research]
 excerpt: Investigating functional patterns for TypeScript applications, exploring whether FP benefits can be achieved without full frameworks or complex abstractions.

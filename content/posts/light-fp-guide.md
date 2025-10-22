@@ -1,5 +1,5 @@
 ---
-title: Exploring Light Functional Programming in TypeScript
+title: Light Functional Programming using TypeScript
 date: 2025-01-15
 tags: [TypeScript, Functional, Architecture, Patterns, Research]
 excerpt: Investigating a principled approach to TypeScript that emphasizes immutability and explicit error handling, exploring whether simpler patterns might offer benefits without framework complexity.

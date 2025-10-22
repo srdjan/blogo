@@ -1,5 +1,5 @@
 ---
-title: Exploring Component Architecture with ui-lib
+title: Component Architecture with ui-lib
 date: 2025-09-22
 tags: [Web, Development, HTMX, Typescript, SSR, Research]
 excerpt: Investigating server-side rendered pages with progressive enhancement, exploring whether DOM-native state management and token-based components could simplify web application architecture.

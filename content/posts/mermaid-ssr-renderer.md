@@ -1,5 +1,5 @@
 ---
-title: Exploring Mermaid SSR Rendering with TypeScript
+title: Mermaid SSR Rendering with TypeScript
 date: 2025-06-16
 tags: [TypeScript, Functional, Parsing, SSR, Research]
 excerpt: Investigating server-side Mermaid diagram rendering with @rendermaid/core v0.6.0, exploring functional TypeScript patterns for parsing and examining opportunities for improved SSR rendering approaches.

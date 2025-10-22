@@ -1,7 +1,7 @@
 ---
-title: Exploring the Boundaries of Compile-Time Memory Safety
+title:  Zig and the Boundaries of Compile-Time Memory Safety
 date: 2025-10-21
-tags: [Systems Programming, Compiler Design, Research]
+tags: [Zig, Compilers, Fil-C, Rust]
 excerpt: Investigating the theoretical limits of static verification and exploring opportunities for hybrid approaches to memory safety.
 ---
 
