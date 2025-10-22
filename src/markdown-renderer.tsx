@@ -3,6 +3,7 @@ import hljs from "highlight.js";
 import type { AppResult } from "./lib/types.ts";
 import { createError } from "./lib/error.ts";
 import { renderMermaidToSVG } from "./mermaid-renderer.ts";
+import { escapeHtml } from "./utils.ts";
 
 // Custom renderer for mermaid blocks
 const renderer = new marked.Renderer();
@@ -57,18 +58,6 @@ const getAudioMimeType = (filePath: string): string => {
     case 'aac': return 'audio/aac';
     default: return 'audio/mpeg';
   }
-};
-
-/**
- * Escape HTML characters in text
- */
-const escapeHtml = (text: string): string => {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 };
 
 /**

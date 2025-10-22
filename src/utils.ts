@@ -36,4 +36,12 @@ export const stripHtml = (html: string): string => {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 };
 
+/**
+ * Generate a unique request ID for tracing
+ * Format: req_<timestamp>_<random>
+ */
+export const generateRequestId = (): string => {
+  return `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+};
+
 // Logger is now injected via dependency injection pattern - see ports/logger.ts

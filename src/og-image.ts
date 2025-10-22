@@ -1,3 +1,5 @@
+import { escapeXml } from "./utils.ts";
+
 // SVG-based Open Graph image generation
 export function generateOGImage(
   title: string,
@@ -98,15 +100,6 @@ export function generateOGImage(
 </svg>`;
 
   return svg;
-}
-
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 // Generate default homepage OG image

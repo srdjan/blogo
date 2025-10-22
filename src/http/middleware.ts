@@ -1,14 +1,10 @@
 import type { Middleware } from "./types.ts";
 import { updateRequestMetrics } from "../domain/health.ts";
-
-// Generate correlation ID for request tracing
-function generateCorrelationId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-}
+import { generateRequestId } from "../utils.ts";
 
 // Enhanced access logging with correlation IDs and structured data
 export const accessLog: Middleware = (next) => async (req) => {
-  const correlationId = generateCorrelationId();
+  const correlationId = generateRequestId();
   const start = performance.now();
   const url = new URL(req.url);
 
@@ -268,7 +264,7 @@ export const performanceMonitoring: Middleware = (next) => async (req) => {
       level: "WARN",
       type: "SLOW_REQUEST",
     };
-
+    console.warn(JSON.stringify(perfLog));
   }
 
   return response;

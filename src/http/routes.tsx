@@ -4,7 +4,6 @@ import type { HealthService } from "../domain/health.ts";
 import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
-// // import { TagIndex } from "../components/TagIndex.tsx";
 import { TopicsIndex } from "../components/TopicsIndex.tsx";
 import { RSSSubscription } from "../components/RSSSubscription.tsx";
 import { generateBreadcrumbs } from "../components/Breadcrumbs.tsx";

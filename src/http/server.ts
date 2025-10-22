@@ -1,5 +1,6 @@
 import type { Handler, Middleware, ServerOptions } from "./types.ts";
 import { errorBoundary, performanceMonitoring } from "./middleware.ts";
+import { generateRequestId } from "../utils.ts";
 
 const compose = (
   handler: Handler,
@@ -9,7 +10,7 @@ const compose = (
 
 // Generate request ID for tracing
 const requestId = (): Middleware => (next) => async (req) => {
-  const id = `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const id = generateRequestId();
   const enhancedReq = new Request(req, {
     headers: {
       ...Object.fromEntries(req.headers.entries()),
