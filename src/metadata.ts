@@ -1,5 +1,5 @@
 import type { Post } from "./lib/types.ts";
-import { escapeHtml, stripHtml } from "./utils.ts";
+import { stripHtml } from "./utils.ts";
 
 /**
  * Generate JSON-LD schema for the blog
@@ -57,40 +57,7 @@ export const generateBlogPostSchema = (
   return JSON.stringify(schema);
 };
 
-/**
- * Generate OpenGraph metadata tags for the blog
- */
-export const generateOpenGraphTags = (
-  title: string,
-  url: string,
-  description: string,
-  type: "website" | "article" = "website",
-  imageUrl?: string,
-): string => {
-  return `
-  <meta property="og:title" content="${escapeHtml(title)}">
-  <meta property="og:type" content="${type}">
-  <meta property="og:url" content="${url}">
-  <meta property="og:description" content="${escapeHtml(description)}">
-  ${imageUrl ? `<meta property="og:image" content="${imageUrl}">` : ""}
-  `;
-};
-
-/**
- * Generate Twitter Card metadata tags
- */
-export const generateTwitterCardTags = (
-  title: string,
-  description: string,
-  cardType: "summary" | "summary_large_image" = "summary",
-  imageUrl?: string,
-): string => {
-  return `
-  <meta name="twitter:card" content="${cardType}">
-  <meta name="twitter:title" content="${escapeHtml(title)}">
-  <meta name="twitter:description" content="${escapeHtml(description)}">
-  ${imageUrl ? `<meta name="twitter:image" content="${imageUrl}">` : ""}
-  `;
-};
-
-// Using escapeHtml from utils.ts
+// NOTE: OpenGraph and Twitter Card tags are generated inline in Layout.tsx
+// The generateOpenGraphTags() and generateTwitterCardTags() functions were removed
+// as they were unused. If needed in the future, they can be recreated or tags
+// can continue to be generated inline in the Layout component.
