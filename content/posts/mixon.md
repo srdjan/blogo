@@ -1,5 +1,5 @@
 ---
-title: Mixon - Type-Safe Web Framework for Deno with Built-In Workflows
+title: "Mixon - Type-Safe Web Framework for Deno with Built-In Workflows"
 date: 2025-04-05
 tags: [Web, Development, Deno, HTMX, TypeScript]
 excerpt: Building web apps means juggling type safety, state management, and server-side rendering across multiple libraries. Mixon combines end-to-end TypeScript safety, workflow engine, and HTMX support in one lightweight package for Deno.

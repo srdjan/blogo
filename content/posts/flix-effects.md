@@ -1,5 +1,5 @@
 ---
-title: Effect-Oriented Programming in Flix
+title: "Effect-Oriented Programming in Flix"
 date: 2025-08-15
 tags: [Flix, Functional, TypeSystems]
 excerpt: Side effects scattered everywhere make code hard to test and reason about. Flix's algebraic effect system brings discipline—declare what functions can do, verify at compile time, handle effects in one place.

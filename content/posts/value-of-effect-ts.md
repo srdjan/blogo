@@ -1,5 +1,5 @@
 ---
-title: Effect-TS Makes TypeScript Read Like Business Logic
+title: "Effect-TS Makes TypeScript Read Like Business Logic"
 date: 2025-06-09
 tags: [Functional, TypeScript, Effect, Architecture]
 excerpt: How Effect-TS separates business logic from technical plumbing - error handling, async operations, and dependency management that doesn't obscure what your code actually does.

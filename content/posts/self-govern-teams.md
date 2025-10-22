@@ -1,5 +1,5 @@
 ---
-title: What Self-Governing Teams Actually Look Like
+title: "What Self-Governing Teams Actually Look Like"
 date: 2025-05-12
 tags: [Architecture, Product, Agile, Leadership]
 excerpt: Real patterns from teams that make their own decisions - what works, what falls apart, and why giving autonomy without the right support structure creates chaos instead of speed.

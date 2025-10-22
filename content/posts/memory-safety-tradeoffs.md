@@ -1,5 +1,5 @@
 ---
-title: Memory Safety's Impossible Dream (And What We Can Actually Build)
+title: "Memory Safety's Impossible Dream (And What We Can Actually Build)"
 date: 2025-10-21
 tags: [Zig, Compilers, Fil-C, Rust]
 excerpt: Can you get complete memory safety at compile time with zero runtime cost? Turns out computation theory says no—but the hybrid approaches we can build are surprisingly interesting.

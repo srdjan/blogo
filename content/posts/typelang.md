@@ -1,5 +1,5 @@
 ---
-title: "TypeLang: Strict TypeScript Subset with Algebraic Effects"
+title: "TypeLang - Strict TypeScript Subset with Algebraic Effects"
 date: 2025-10-19
 tags: [TypeScript, Functional, Algebraic Effects, Language Design]
 excerpt: Software complexity grows not just from problems we solve, but from flexibility languages give us. TypeLang explores enforcing functional principles and explicit effects through constraints—making illegal states unrepresentable and side effects visible in type signatures.

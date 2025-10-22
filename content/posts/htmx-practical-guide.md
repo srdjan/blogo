@@ -1,5 +1,5 @@
 ---
-title: HTMX - Build Interactive Web Apps Without the JavaScript Framework Tax
+title: "HTMX - Build Interactive Web Apps Without the JavaScript Framework Tax"
 date: 2025-04-10
 tags: [Web, Development, HTMX, TypeScript]
 excerpt: Frontend complexity exploded over two decades—build tools, state management, framework-specific patterns. HTMX flips this by extending HTML with AJAX, WebSockets, and real-time updates through simple attributes. No build step, no virtual DOM, just HTML doing what it should have done all along.

@@ -1,5 +1,5 @@
 ---
-title: DOM-Native Components That Actually Work
+title: "DOM-Native Components That Actually Work"
 date: 2025-09-22
 tags: [Web, Development, HTMX, Typescript, SSR]
 excerpt: What if the DOM itself managed your app state? No hydration, no megabyte bundles, instant interactivity. Here's what happens when you treat the browser as a platform instead of a rendering target.

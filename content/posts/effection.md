@@ -1,5 +1,5 @@
 ---
-title: Structured Concurrency in TypeScript with Effection
+title: "Structured Concurrency in TypeScript with Effection"
 date: 2025-07-02
 tags: [TypeScript, Concurrency, Effection]
 excerpt: Async/await solved callback hell but introduced coordination nightmares. Structured concurrency fixes this—hierarchical operations with automatic cancellation and cleanup. Here's how Effection brings it to TypeScript.

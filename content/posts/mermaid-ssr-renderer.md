@@ -1,5 +1,5 @@
 ---
-title: Server-Side Mermaid Rendering Without the Browser
+title: "Server-Side Mermaid Rendering Without the Browser"
 date: 2025-06-16
 tags: [TypeScript, Functional, Parsing, SSR]
 excerpt: Building a pure TypeScript Mermaid renderer that works server-side - no browser, no DOM simulation, just functional patterns and smart type system usage.

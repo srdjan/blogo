@@ -1,5 +1,5 @@
 ---
-title: "Modern Agile: What Sustaining Velocity Actually Requires"
+title: "Modern Agile - What Sustaining Velocity Actually Requires"
 date: 2025-05-12
 tags: [Architecture, Agile, Product, Leadership]
 excerpt: Moving fast is easy. Sustaining velocity over months and years? That requires something deeper than ceremonies and story points. Here's what actually makes teams ship consistently.
