@@ -1,5 +1,5 @@
 ---
-title: Architecture Review Boards as Enablers, Not Gatekeepers
+title: "Architecture Review Boards as Enablers, Not Gatekeepers"
 date: 2025-04-06
 tags: [Architecture, Enterprise, Product, Agile]
 excerpt: Most Architecture Review Boards slow teams down with approval gates. But they don't have to. Here's how ARBs can accelerate product development instead of blocking it.
