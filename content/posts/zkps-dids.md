@@ -1,5 +1,5 @@
 ---
-title: "Proving Employment Without Exposing Your Salary"
+title: "Emplyment Background Checking Wthout Exposing Sensitive Details"
 date: 2025-05-06
 tags: [VCs, DIDs, ZKPs]
 excerpt: W3C Verifiable Credentials with BBS+ signatures let you prove employment without revealing salary or position. Here's how the standard works, and how multi-party attestations could make it even stronger.
