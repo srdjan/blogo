@@ -1,3 +1,8 @@
+if (window.htmx) {
+  window.htmx.config.scrollBehavior = "auto";
+  window.htmx.config.scrollIntoViewOnBoost = false;
+}
+
 const Core = {
   init() {
     this.setupEventListeners();
@@ -100,7 +105,7 @@ const Core = {
     document.addEventListener("htmx:afterSwap", (event) => {
       // Scroll to top after content swap
       if (event.detail.target.id === "content-area") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo(0, 0);
 
         // Prevent duplicate rendering for home page
         if (event.detail.pathInfo.path === "/") {
