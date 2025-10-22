@@ -7,17 +7,7 @@ export const About = () => {
         and ability to fine tune custom writing styles.
       </p>
 
-      <h2>
-        About me{" "}
-        <a
-          href="https://srdjan.github.io/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Learn more about Srdjan (opens in a new tab)"
-        >
-          &rArr;
-        </a>
-      </h2>
+      <h2>About me</h2>
       <p>
         I have extensive experience in leadership roles within various companies in the 
         technology industry. As an SVP of Architecture at First Advantage, currently, I lead 
@@ -94,9 +84,10 @@ export const About = () => {
           <span>X (Twitter)</span>
         </a>
         <a
-          href="https://blogo.timok.deno.net"
+          href="https://srdjan.github.io/"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Learn more about Srdjan (opens in a new tab)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +105,7 @@ export const About = () => {
             <path d="M2 12h20" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" />
           </svg>
-          <span>Blogo</span>
+          <span>Home</span>
         </a>
       </nav>
       <nav style="text-align: center; margin-top: var(--space-xl);">
