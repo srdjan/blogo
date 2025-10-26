@@ -1,4 +1,5 @@
 import type { Post, TagName } from "../lib/types.ts";
+import { ViewCount } from "./ViewCount.tsx";
 
 export const PostList = (props: {
   readonly posts: readonly Post[];
@@ -44,9 +45,12 @@ export const PostList = (props: {
                     {post.title}
                   </a>
                 </h2>
-                {post.formattedDate && (
-                  <time dateTime={post.date}>{post.formattedDate}</time>
-                )}
+                <div class="post-card-meta">
+                  {post.formattedDate && (
+                    <time dateTime={post.date}>{post.formattedDate}</time>
+                  )}
+                  <ViewCount count={post.viewCount} />
+                </div>
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (
                   <nav class="tags" aria-label="Post tags">

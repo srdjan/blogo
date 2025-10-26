@@ -35,6 +35,7 @@ export type PostMeta = {
 export type Post = PostMeta & {
   readonly content: string;
   readonly formattedDate?: string;
+  readonly viewCount?: number | undefined;
 };
 
 export type TagInfo = {

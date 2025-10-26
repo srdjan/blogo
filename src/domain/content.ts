@@ -22,6 +22,7 @@ import { TOPICS } from "../config/topics.ts";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
+  readonly loadPostsWithViews: () => Promise<AppResult<readonly Post[]>>;
   readonly getPostBySlug: (slug: Slug) => Promise<AppResult<Post | null>>;
   readonly getPostsByTag: (
     tagName: TagName,
@@ -35,12 +36,15 @@ export type ContentDependencies = {
   readonly logger: Logger;
   readonly cache: Cache<readonly Post[]>;
   readonly postsDir: string;
+  readonly analyticsService?: {
+    readonly getAllViewCounts: () => Promise<AppResult<Record<string, number>>>;
+  };
 };
 
 export const createContentService = (
   deps: ContentDependencies,
 ): ContentService => {
-  const { fileSystem, logger, cache, postsDir } = deps;
+  const { fileSystem, logger, cache, postsDir, analyticsService } = deps;
 
   const parseMarkdown = async (
     filePath: string,
@@ -159,6 +163,30 @@ export const createContentService = (
     return result;
   };
 
+  const loadPostsWithViews = async (): Promise<AppResult<readonly Post[]>> => {
+    const postsResult = await loadPosts();
+    if (!postsResult.ok) return postsResult;
+
+    if (!analyticsService) {
+      // If no analytics service, return posts without view counts
+      return postsResult;
+    }
+
+    const viewCountsResult = await analyticsService.getAllViewCounts();
+    if (!viewCountsResult.ok) {
+      logger.warn("Failed to load view counts, returning posts without views");
+      return postsResult;
+    }
+
+    const viewCounts = viewCountsResult.value;
+    const postsWithViews = postsResult.value.map((post) => ({
+      ...post,
+      viewCount: viewCounts[post.slug] || 0,
+    }));
+
+    return ok(postsWithViews);
+  };
+
   const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
@@ -249,6 +277,7 @@ export const createContentService = (
 
   return {
     loadPosts,
+    loadPostsWithViews,
     getPostBySlug,
     getPostsByTag,
     getTags,

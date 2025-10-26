@@ -1,6 +1,7 @@
 import type { RouteHandler } from "./types.ts";
 import type { ContentService } from "../domain/content.ts";
 import type { HealthService } from "../domain/health.ts";
+import type { AnalyticsService } from "../domain/analytics.ts";
 import { createLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
@@ -43,9 +44,10 @@ export type RouteHandlers = {
 export const createRouteHandlers = (
   contentService: ContentService,
   healthService: HealthService,
+  analyticsService: AnalyticsService,
 ): RouteHandlers => {
   const home: RouteHandler = async (ctx) => {
-    const postsResult = await contentService.loadPosts();
+    const postsResult = await contentService.loadPostsWithViews();
 
     return match(postsResult, {
       ok: (posts) =>
@@ -140,27 +142,35 @@ export const createRouteHandlers = (
     const slug = createSlug(ctx.pathname.replace("/posts/", ""));
     const postResult = await contentService.getPostBySlug(slug);
 
-    return match(postResult, {
-      ok: (post) => {
-        if (!post) {
-          return new Response("Post not found", { status: 404 });
-        }
+    if (!postResult.ok) {
+      return new Response("Failed to load post", { status: 500 });
+    }
 
-        return createLayout({
-          title: `${post.title} - Blog`,
-          description: post.excerpt || `Read ${post.title}`,
-          path: createUrlPath(ctx.pathname),
-          origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname, post.title),
-          children: <PostView post={post} />,
-          type: "article",
-          publishedTime: post.date,
-          ...(post.modified && { modifiedTime: post.modified }),
-          ...(post.tags && { tags: post.tags }),
-          author: "Srdjan Strbanovic",
-        });
-      },
-      error: () => new Response("Failed to load post", { status: 500 }),
+    const post = postResult.value;
+
+    if (!post) {
+      return new Response("Post not found", { status: 404 });
+    }
+
+    // Increment view count
+    const viewCountResult = await analyticsService.incrementViewCount(slug);
+    const viewCount = viewCountResult.ok ? viewCountResult.value : undefined;
+
+    // Add view count to post
+    const postWithViews: typeof post = { ...post, viewCount };
+
+    return createLayout({
+      title: `${post.title} - Blog`,
+      description: post.excerpt || `Read ${post.title}`,
+      path: createUrlPath(ctx.pathname),
+      origin: ctx.url.origin,
+      breadcrumbs: generateBreadcrumbs(ctx.pathname, post.title),
+      children: <PostView post={postWithViews} />,
+      type: "article",
+      publishedTime: post.date,
+      ...(post.modified && { modifiedTime: post.modified }),
+      ...(post.tags && { tags: post.tags }),
+      author: "Srdjan Strbanovic",
     });
   };
 

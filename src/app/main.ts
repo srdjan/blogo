@@ -5,6 +5,7 @@ import { createRouteHandlers } from "../http/routes.tsx";
 import { createContentService } from "../domain/content.ts";
 import { createConfig } from "../domain/config.ts";
 import { createHealthService } from "../domain/health.ts";
+import { createAnalyticsService } from "../domain/analytics.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
@@ -24,11 +25,14 @@ function main() {
   const cache = createInMemoryCache<readonly Post[]>();
   const healthCache = createInMemoryCache<unknown>();
 
+  const analyticsService = createAnalyticsService();
+
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     postsDir: config.blog.postsDir,
+    analyticsService,
   });
 
   const healthService = createHealthService({
@@ -38,7 +42,7 @@ function main() {
     startTime,
   });
 
-  const routes = createRouteHandlers(contentService, healthService);
+  const routes = createRouteHandlers(contentService, healthService, analyticsService);
 
   const router = createRouter()
     .get("/", routes.home)

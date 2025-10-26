@@ -2,6 +2,7 @@
 import type { Post } from "../lib/types.ts";
 import { html } from "mono-jsx/jsx-runtime";
 import { deriveTopicsFromTags } from "../config/topics.ts";
+import { ViewCount } from "./ViewCount.tsx";
 
 export const PostView = (props: { readonly post: Post }) => {
   const { post } = props;
@@ -11,11 +12,12 @@ export const PostView = (props: { readonly post: Post }) => {
       <article class="post-content">
         <header class="post-header">
           <h1>{post.title}</h1>
-          {post.formattedDate && (
-            <p class="post-meta">
+          <div class="post-meta">
+            {post.formattedDate && (
               <time dateTime={post.date}>{post.formattedDate}</time>
-            </p>
-          )}
+            )}
+            <ViewCount count={post.viewCount} />
+          </div>
           {/* Derived topics shown above tags for hierarchy */}
           {post.tags && post.tags.length > 0 && (() => {
             const topics = deriveTopicsFromTags(post.tags as readonly string[]);
