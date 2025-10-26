@@ -62,4 +62,6 @@ The Lifion journey has been an incredible experience so far, and we are taking a
 
 ---
 
-*This post was originally published on the [Lifion Engineering blog on Medium](https://medium.com/lifion-engineering/slide-deck-e3321768ea6e) on August 28, 2018.*
+* This post was originally published on the [Lifion Engineering blog on Medium](https://medium.com/lifion-engineering/slide-deck-e3321768ea6e) on August 28, 2018.  
+
+* Lifion is now out of development and is now part of ADP product line,  branded [Lyric](https://joshbersin.com/2024/09/adp-lyric-hcm-the-next-gen-hr-platform-many-have-waited-for/).
