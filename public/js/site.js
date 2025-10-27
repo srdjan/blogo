@@ -87,6 +87,12 @@ const Core = {
   },
 
   setupEventListeners() {
+    // Handle browser back/forward button - refresh to get latest data
+    document.addEventListener("htmx:historyRestore", (event) => {
+      // When user navigates back, force a fresh load of the page
+      window.location.reload();
+    });
+
     // Handle HTMX before swaps to filter content
     document.addEventListener("htmx:beforeSwap", (event) => {
       if (event.detail.target.id === "content-area") {
