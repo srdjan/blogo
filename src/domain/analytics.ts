@@ -2,85 +2,98 @@ import type { Slug } from "../lib/types.ts";
 import type { AppResult } from "../lib/types.ts";
 import { ok, err } from "../lib/result.ts";
 
-const VIEWS_FILE = "data/views.json";
-
 type ViewsData = Record<string, number>;
 
 export type AnalyticsService = {
   readonly getViewCount: (slug: Slug) => Promise<AppResult<number>>;
   readonly incrementViewCount: (slug: Slug) => Promise<AppResult<number>>;
   readonly getAllViewCounts: () => Promise<AppResult<ViewsData>>;
+  readonly close: () => void;
 };
 
-const readViewsData = async (): Promise<AppResult<ViewsData>> => {
+export const createAnalyticsService = async (): Promise<AnalyticsService> => {
+  let kv: Deno.Kv;
+
   try {
-    const content = await Deno.readTextFile(VIEWS_FILE);
-    const data = JSON.parse(content) as ViewsData;
-    return ok(data);
+    kv = await Deno.openKv();
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      // If file doesn't exist, return empty object
-      return ok({});
-    }
-    return err({
-      kind: "IOError",
-      message: "Failed to read views data",
-      cause: error,
-    });
+    throw new Error(`Failed to open Deno KV: ${error}`);
   }
-};
 
-const writeViewsData = async (data: ViewsData): Promise<AppResult<void>> => {
-  try {
-    // Ensure data directory exists
-    await Deno.mkdir("data", { recursive: true });
-    await Deno.writeTextFile(VIEWS_FILE, JSON.stringify(data, null, 2));
-    return ok(undefined);
-  } catch (error) {
-    return err({
-      kind: "IOError",
-      message: "Failed to write views data",
-      cause: error,
-    });
-  }
-};
-
-export const createAnalyticsService = (): AnalyticsService => {
   const getViewCount = async (slug: Slug): Promise<AppResult<number>> => {
-    const dataResult = await readViewsData();
-    if (!dataResult.ok) {
-      return dataResult;
+    try {
+      const key = ["views", slug];
+      const result = await kv.get<number>(key);
+      return ok(result.value ?? 0);
+    } catch (error) {
+      return err({
+        kind: "IOError",
+        message: `Failed to get view count for ${slug}`,
+        cause: error,
+      });
     }
-    const count = dataResult.value[slug] || 0;
-    return ok(count);
   };
 
   const incrementViewCount = async (slug: Slug): Promise<AppResult<number>> => {
-    const dataResult = await readViewsData();
-    if (!dataResult.ok) {
-      return dataResult;
+    try {
+      const key = ["views", slug];
+
+      // Use atomic operation to safely increment
+      let newCount = 0;
+      let success = false;
+
+      while (!success) {
+        const current = await kv.get<number>(key);
+        const currentCount = current.value ?? 0;
+        newCount = currentCount + 1;
+
+        const atomic = kv.atomic();
+        atomic.check(current);
+        atomic.set(key, newCount);
+
+        const result = await atomic.commit();
+        success = result.ok;
+      }
+
+      return ok(newCount);
+    } catch (error) {
+      return err({
+        kind: "IOError",
+        message: `Failed to increment view count for ${slug}`,
+        cause: error,
+      });
     }
-
-    const data = dataResult.value;
-    const currentCount = data[slug] || 0;
-    const newCount = currentCount + 1;
-    data[slug] = newCount;
-
-    const writeResult = await writeViewsData(data);
-    if (!writeResult.ok) {
-      return writeResult;
-    }
-
-    return ok(newCount);
   };
 
   const getAllViewCounts = async (): Promise<AppResult<ViewsData>> => {
-    return await readViewsData();
+    try {
+      const viewsData: ViewsData = {};
+      const entries = kv.list<number>({ prefix: ["views"] });
+
+      for await (const entry of entries) {
+        // Extract slug from key: ["views", slug]
+        const slug = entry.key[1] as string;
+        viewsData[slug] = entry.value;
+      }
+
+      return ok(viewsData);
+    } catch (error) {
+      return err({
+        kind: "IOError",
+        message: "Failed to get all view counts",
+        cause: error,
+      });
+    }
+  };
+
+  const close = () => {
+    kv.close();
   };
 
   return {
     getViewCount,
     incrementViewCount,
     getAllViewCounts,
+    close,
   };
 };

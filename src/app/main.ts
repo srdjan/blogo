@@ -11,7 +11,7 @@ import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
 import type { Post } from "../lib/types.ts";
 
-function main() {
+async function main() {
   const config = createConfig();
   const startTime = Date.now();
 
@@ -25,7 +25,7 @@ function main() {
   const cache = createInMemoryCache<readonly Post[]>();
   const healthCache = createInMemoryCache<unknown>();
 
-  const analyticsService = createAnalyticsService();
+  const analyticsService = await createAnalyticsService();
 
   const contentService = createContentService({
     fileSystem,
@@ -87,6 +87,7 @@ function main() {
 
   const shutdown = () => {
     logger.info("Shutting down server...");
+    analyticsService.close();
     abortController.abort();
     Deno.exit(0);
   };
