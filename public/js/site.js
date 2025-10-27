@@ -1,6 +1,8 @@
 if (window.htmx) {
   window.htmx.config.scrollBehavior = "auto";
   window.htmx.config.scrollIntoViewOnBoost = false;
+  window.htmx.config.getCacheBusterParam = true; // Disable GET request caching
+  window.htmx.config.refreshOnHistoryMiss = true; // Refresh on back/forward
 }
 
 const Core = {
