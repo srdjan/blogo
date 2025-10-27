@@ -46,6 +46,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "mono-jsx"
   },
+  "unstable": ["kv"],
   "deploy": {
     "exclude": [
       "**/node_modules",
