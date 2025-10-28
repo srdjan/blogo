@@ -7,7 +7,6 @@ import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
 import { TopicsIndex } from "../components/TopicsIndex.tsx";
 import { RSSSubscription } from "../components/RSSSubscription.tsx";
-import { generateBreadcrumbs } from "../components/Breadcrumbs.tsx";
 import {
   ALL_TOPICS,
   deriveTopicsFromTags,
@@ -56,7 +55,6 @@ export const createRouteHandlers = (
           description: "A minimal blog built with mono-jsx",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <PostList posts={posts} />,
           author: "Srdjan Strbanovic",
         }),
@@ -66,7 +64,6 @@ export const createRouteHandlers = (
           description: "Failed to load posts",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load posts</div>,
         }),
     });
@@ -78,7 +75,6 @@ export const createRouteHandlers = (
       description: "About this blog and its features",
       path: createUrlPath(ctx.pathname),
       origin: ctx.url.origin,
-      breadcrumbs: generateBreadcrumbs(ctx.pathname),
       children: <About />,
     });
   };
@@ -93,7 +89,6 @@ export const createRouteHandlers = (
           description: "Browse posts by tags",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <TopicsIndex groups={groupTagsByTopic(tags)} />,
           author: "Srdjan Strbanovic",
         }),
@@ -103,7 +98,6 @@ export const createRouteHandlers = (
           description: "Failed to load tags",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load tags</div>,
         }),
     });
@@ -122,7 +116,6 @@ export const createRouteHandlers = (
           description: `All posts tagged with ${tagName}`,
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <PostList posts={posts} activeTag={tagName} />,
           author: "Srdjan Strbanovic",
         }),
@@ -132,7 +125,6 @@ export const createRouteHandlers = (
           description: "Failed to load posts for tag",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load posts for tag</div>,
         }),
     });
@@ -164,7 +156,6 @@ export const createRouteHandlers = (
       description: post.excerpt || `Read ${post.title}`,
       path: createUrlPath(ctx.pathname),
       origin: ctx.url.origin,
-      breadcrumbs: generateBreadcrumbs(ctx.pathname, post.title),
       children: <PostView post={postWithViews} />,
       type: "article",
       publishedTime: post.date,
@@ -187,7 +178,6 @@ export const createRouteHandlers = (
         canonicalPath: ctx.searchParams.toString()
           ? `${ctx.pathname}?${ctx.searchParams.toString()}`
           : ctx.pathname,
-        breadcrumbs: generateBreadcrumbs(ctx.pathname),
         children: (
           <section aria-label="Search">
             <h2>Search</h2>
@@ -218,7 +208,6 @@ export const createRouteHandlers = (
           origin: ctx.url.origin,
           robots: "noindex, nofollow",
           canonicalPath: `${ctx.pathname}?${ctx.searchParams.toString()}`,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <SearchResults posts={posts} query={query} />,
         }),
       error: () =>
@@ -228,7 +217,6 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           robots: "noindex, nofollow",
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to search posts</div>,
         }),
     });
@@ -324,7 +312,6 @@ export const createRouteHandlers = (
           description: "Subscribe to the full feed or topic-specific feeds",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <RSSSubscription baseUrl={baseUrl} topics={list} />,
         });
       },
@@ -334,7 +321,6 @@ export const createRouteHandlers = (
           description: "Failed to load RSS data",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
-          breadcrumbs: generateBreadcrumbs(ctx.pathname),
           children: <div>Failed to load RSS data</div>,
         }),
     });

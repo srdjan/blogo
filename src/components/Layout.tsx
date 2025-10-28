@@ -15,7 +15,6 @@ export const createLayout = (props: LayoutProps): Response => {
     origin,
     canonicalPath,
     robots,
-    breadcrumbs,
     structuredData,
   } = props;
 
@@ -98,32 +97,12 @@ export const createLayout = (props: LayoutProps): Response => {
       },
     };
 
-  const breadcrumbJson = breadcrumbs && breadcrumbs.length > 0
-    ? {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": breadcrumbs.map((crumb, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "name": crumb.name,
-        "item": (() => {
-          try {
-            return new URL(crumb.href, siteOrigin).toString();
-          } catch (_error) {
-            return `${siteOrigin}${crumb.href}`;
-          }
-        })(),
-      })),
-    }
-    : undefined;
-
   const additionalJson = structuredData
     ? Array.isArray(structuredData) ? structuredData : [structuredData]
     : [];
 
   const jsonLdItems = [
     primaryStructuredData,
-    ...(breadcrumbJson ? [breadcrumbJson] : []),
     ...additionalJson,
   ];
 
@@ -434,34 +413,6 @@ export const createLayout = (props: LayoutProps): Response => {
           </header>
 
           <main id="content-area" class="main-content">
-            {breadcrumbs && breadcrumbs.length > 1 && (
-              <nav class="breadcrumbs" aria-label="Breadcrumb">
-                <ol>
-                  {breadcrumbs.map((crumb, index) => (
-                    <li key={`${crumb.href}-${index}`}>
-                      {index < breadcrumbs.length - 1
-                        ? (
-                          <a
-                            href={crumb.href}
-                            hx-get={crumb.href}
-                            hx-target="#content-area"
-                            hx-swap="innerHTML"
-                            hx-push-url="true"
-                            rel={index === 0 ? "home" : undefined}
-                          >
-                            {crumb.name}
-                          </a>
-                        )
-                        : (
-                          <span aria-current="page">
-                            {crumb.name}
-                          </span>
-                        )}
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            )}
             {children}
           </main>
 

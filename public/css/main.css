@@ -301,41 +301,6 @@ ul, ol {
   padding: var(--space-3xl) var(--content-padding);
 }
 
-.breadcrumbs {
-  margin-bottom: var(--space-lg);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
-.breadcrumbs ol {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.breadcrumbs li {
-  display: flex;
-  align-items: center;
-}
-
-.breadcrumbs li + li::before {
-  content: "/";
-  margin: 0 var(--space-xs);
-  color: var(--color-text-muted);
-}
-
-.breadcrumbs a {
-  color: var(--color-link);
-}
-
-.breadcrumbs [aria-current="page"] {
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
 /* ====================================
    POST LIST: HOME PAGE
    ==================================== */
