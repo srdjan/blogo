@@ -47,7 +47,7 @@ export const SearchResults = (props: {
           hx-swap="innerHTML"
           hx-push-url="true"
         >
-          &lArr; Back to home
+          &lArr; Back
         </a>
       </nav>
     </>

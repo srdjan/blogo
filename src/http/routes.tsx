@@ -199,7 +199,7 @@ export const createRouteHandlers = (
               hx-swap="innerHTML"
               hx-push-url="true"
             >
-              &lArr; Back to home
+              &lArr; Back
             </a>
           </section>
         ),

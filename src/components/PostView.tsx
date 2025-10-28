@@ -67,7 +67,7 @@ export const PostView = (props: { readonly post: Post }) => {
           hx-swap="innerHTML"
           hx-push-url="true"
         >
-          &lArr; Back to home
+          &lArr; Back
         </a>
       </nav>
     </>

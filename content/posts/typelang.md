@@ -9,7 +9,7 @@ Codebases grow complex. Not just from business logic complexity, but from langua
 
 TypeScript gives you classes, functions, mutations, exceptions, async/await. Freedom to solve problems however you want. Great flexibility. But. This freedom creates consistency problems. Different developers write similar code differently. Side effects hide in function bodies. State mutations ripple unpredictably.
 
-I built **TypeLang** to explore constraint-based development. Strict TypeScript subset that enforces Light FP principles, tracks effects in type signatures, adds zero new syntax. You write 100% valid TypeScript that runs on Deno. The constraints make effects visible and prevent entire categories of bugs.
+I built **TypeLang** to explore constraint-based development. Strict TypeScript subset that enforces particular programming style. And, it adds zero new syntax: you write 100% valid TypeScript that runs on Deno. The constraints are baseed on two ideas: light functional programming principles, and tracking effects in type signatures.
 
 Core principle: **the code you cannot write is as important as the code you can**.
 

@@ -11,7 +11,7 @@ export const NotFound = () => {
           hx-swap="innerHTML"
           hx-push-url="true"
         >
-          &lArr; Back to home
+          &lArr; Back
         </a>
       </nav>
     </section>
