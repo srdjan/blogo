@@ -10,9 +10,9 @@ export const About = () => {
       <h2>About me</h2>
       <p>
         I have extensive experience in leadership roles within various companies in the 
-        technology industry. As an SVP of Architecture at First Advantage, currently, I lead 
+        technology industry. Currently, as an SVP of Architecture at First Advantage, currently, I lead 
         Cloud migration efforts and product platform modernization. With previous roles 
-        such as Chief Architect at Lifion by ADP and CTO at Cignium Technologies, I have a strong 
+        such as Technical Principal at ThoughtWorks, Chief Architect at Lifion by ADP and CTO at Cignium Technologies, I have a strong 
         background in software development and agile culture advisory. 
       </p>
       <nav class="social-links" aria-label="Social media links">
