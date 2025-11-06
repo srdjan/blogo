@@ -12,7 +12,9 @@ export const SearchResults = (props: {
       <p>
         {posts.length === 0
           ? `No posts found for "${query}".`
-          : `Found ${posts.length} post${posts.length === 1 ? "" : "s"} for "${query}".`}
+          : `Found ${posts.length} post${
+            posts.length === 1 ? "" : "s"
+          } for "${query}".`}
       </p>
       {posts.length > 0 && (
         <ul class="post-list u-flow-lg">

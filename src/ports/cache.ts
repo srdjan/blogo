@@ -2,7 +2,11 @@ import type { Result } from "../lib/result.ts";
 
 export interface Cache<T> {
   readonly get: (key: string) => Result<T | null, CacheError>;
-  readonly set: (key: string, value: T, ttlMs?: number) => Result<void, CacheError>;
+  readonly set: (
+    key: string,
+    value: T,
+    ttlMs?: number,
+  ) => Result<void, CacheError>;
   readonly delete: (key: string) => Result<void, CacheError>;
   readonly clear: () => Result<void, CacheError>;
 }
@@ -28,12 +32,12 @@ export const createInMemoryCache = <T>(): Cache<T> => {
         if (!entry) {
           return { ok: true, value: null };
         }
-        
+
         if (isExpired(entry)) {
           store.delete(key);
           return { ok: true, value: null };
         }
-        
+
         return { ok: true, value: entry.value };
       } catch {
         return { ok: false, error: "CACHE_ERROR" };

@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert";
-import { generateOGImage, generateDefaultOGImage } from "../src/og-image.ts";
+import { generateDefaultOGImage, generateOGImage } from "../src/og-image.ts";
 
 Deno.test("generateOGImage - generates valid SVG with basic inputs", () => {
   const svg = generateOGImage("Test Title");
@@ -17,11 +17,15 @@ Deno.test("generateOGImage - generates valid SVG with basic inputs", () => {
 });
 
 Deno.test("generateOGImage - truncates long title", () => {
-  const longTitle = "This is a very long title that should be truncated because it exceeds fifty characters";
+  const longTitle =
+    "This is a very long title that should be truncated because it exceeds fifty characters";
   const svg = generateOGImage(longTitle);
 
   // Should be truncated at 47 characters with ellipsis
-  assertStringIncludes(svg, "This is a very long title that should be trunca...");
+  assertStringIncludes(
+    svg,
+    "This is a very long title that should be trunca...",
+  );
 });
 
 Deno.test("generateOGImage - removes '- Blog' suffix from title", () => {
@@ -40,11 +44,15 @@ Deno.test("generateOGImage - includes subtitle when provided", () => {
 });
 
 Deno.test("generateOGImage - truncates long subtitle", () => {
-  const longSubtitle = "This is a very long subtitle that exceeds the eighty character limit and should be truncated with ellipsis";
+  const longSubtitle =
+    "This is a very long subtitle that exceeds the eighty character limit and should be truncated with ellipsis";
   const svg = generateOGImage("Title", longSubtitle);
 
   // Should be truncated at 77 characters + "..."
-  assertStringIncludes(svg, "This is a very long subtitle that exceeds the eighty character limit and shou...");
+  assertStringIncludes(
+    svg,
+    "This is a very long subtitle that exceeds the eighty character limit and shou...",
+  );
 });
 
 Deno.test("generateOGImage - includes tags when provided", () => {
@@ -55,7 +63,13 @@ Deno.test("generateOGImage - includes tags when provided", () => {
 });
 
 Deno.test("generateOGImage - limits tags to 3", () => {
-  const svg = generateOGImage("Title", undefined, ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]);
+  const svg = generateOGImage("Title", undefined, [
+    "Tag1",
+    "Tag2",
+    "Tag3",
+    "Tag4",
+    "Tag5",
+  ]);
 
   // Should include first 3 tags
   assertStringIncludes(svg, "#Tag1");
@@ -68,7 +82,7 @@ Deno.test("generateOGImage - limits tags to 3", () => {
 });
 
 Deno.test("generateOGImage - escapes special XML characters in title", () => {
-  const svg = generateOGImage("Title with <special> & \"characters\"");
+  const svg = generateOGImage('Title with <special> & "characters"');
 
   // Should escape XML entities
   assertStringIncludes(svg, "&lt;special&gt;");
@@ -76,7 +90,7 @@ Deno.test("generateOGImage - escapes special XML characters in title", () => {
   assertStringIncludes(svg, "&quot;");
 
   // Should not include unescaped characters
-  assertEquals(svg.includes("Title with <special> & \"characters\""), false);
+  assertEquals(svg.includes('Title with <special> & "characters"'), false);
 });
 
 Deno.test("generateOGImage - escapes special XML characters in subtitle", () => {
@@ -87,7 +101,11 @@ Deno.test("generateOGImage - escapes special XML characters in subtitle", () => 
 });
 
 Deno.test("generateOGImage - escapes special XML characters in tags", () => {
-  const svg = generateOGImage("Title", undefined, ["React&Redux", "C++", "<Script>"]);
+  const svg = generateOGImage("Title", undefined, [
+    "React&Redux",
+    "C++",
+    "<Script>",
+  ]);
 
   assertStringIncludes(svg, "#React&amp;Redux");
   assertStringIncludes(svg, "#C++");
@@ -138,7 +156,10 @@ Deno.test("generateDefaultOGImage - generates valid default image", () => {
   assertStringIncludes(svg, "Blog");
 
   // Should include default subtitle
-  assertStringIncludes(svg, "A minimal blog built with mono-jsx, Deno &amp; TypeScript");
+  assertStringIncludes(
+    svg,
+    "A minimal blog built with mono-jsx, Deno &amp; TypeScript",
+  );
 
   // Should include default tags
   assertStringIncludes(svg, "#WebDev");

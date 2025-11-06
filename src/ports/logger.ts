@@ -22,12 +22,15 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 
 export const createLogger = (config: LoggerConfig): Logger => {
   const shouldLog = (level: LogLevel): boolean => {
-    return config.enableLogs && LOG_LEVELS[level] <= LOG_LEVELS[config.minLevel];
+    return config.enableLogs &&
+      LOG_LEVELS[level] <= LOG_LEVELS[config.minLevel];
   };
 
   const formatMessage = (level: LogLevel, message: string): string => {
     const timestamp = config.verboseLogs ? new Date().toISOString() : "";
-    const prefix = config.verboseLogs ? `[${level.toUpperCase()}] ${timestamp}: ` : "";
+    const prefix = config.verboseLogs
+      ? `[${level.toUpperCase()}] ${timestamp}: `
+      : "";
     return `${prefix}${message}`;
   };
 
@@ -35,10 +38,13 @@ export const createLogger = (config: LoggerConfig): Logger => {
     if (!shouldLog(level)) return;
 
     const formattedMessage = formatMessage(level, message);
-    const logFn = level === "error" ? console.error : 
-                  level === "warn" ? console.warn :
-                  level === "info" ? console.info : 
-                  console.log;
+    const logFn = level === "error"
+      ? console.error
+      : level === "warn"
+      ? console.warn
+      : level === "info"
+      ? console.info
+      : console.log;
 
     if (config.verboseLogs && data !== undefined) {
       logFn(formattedMessage, data);

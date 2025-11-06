@@ -22,6 +22,10 @@ import { TOPICS } from "../config/topics.ts";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
+  readonly loadPostsMetadata: () => Promise<AppResult<readonly PostMeta[]>>;
+  readonly loadPostsMetadataWithViews: () => Promise<
+    AppResult<readonly Post[]>
+  >;
   readonly loadPostsWithViews: () => Promise<AppResult<readonly Post[]>>;
   readonly getPostBySlug: (slug: Slug) => Promise<AppResult<Post | null>>;
   readonly getPostsByTag: (
@@ -35,7 +39,9 @@ export type ContentDependencies = {
   readonly fileSystem: FileSystem;
   readonly logger: Logger;
   readonly cache: Cache<readonly Post[]>;
+  readonly metadataCache: Cache<readonly PostMeta[]>;
   readonly postsDir: string;
+  readonly enableValidation?: boolean;
   readonly analyticsService?: {
     readonly getAllViewCounts: () => Promise<AppResult<Record<string, number>>>;
   };
@@ -44,7 +50,15 @@ export type ContentDependencies = {
 export const createContentService = (
   deps: ContentDependencies,
 ): ContentService => {
-  const { fileSystem, logger, cache, postsDir, analyticsService } = deps;
+  const {
+    fileSystem,
+    logger,
+    cache,
+    metadataCache,
+    postsDir,
+    enableValidation = true,
+    analyticsService,
+  } = deps;
 
   const parseMarkdown = async (
     filePath: string,
@@ -58,24 +72,26 @@ export const createContentService = (
 
       const { frontmatter, markdown } = result.value;
 
-      // Validate markdown content
-      const contentValidation = validateMarkdownContent(markdown);
-      if (!contentValidation.ok) {
-        logger.warn(
-          `Content validation issues for ${filePath}`,
-          contentValidation.error,
-        );
-        // Continue processing despite content warnings
-      }
+      // Validate markdown content (skip in production for performance)
+      if (enableValidation) {
+        const contentValidation = validateMarkdownContent(markdown);
+        if (!contentValidation.ok) {
+          logger.warn(
+            `Content validation issues for ${filePath}`,
+            contentValidation.error,
+          );
+          // Continue processing despite content warnings
+        }
 
-      // Validate image references
-      const imageValidation = validateImageReferences(markdown);
-      if (!imageValidation.ok) {
-        logger.warn(
-          `Image validation issues for ${filePath}`,
-          imageValidation.error,
-        );
-        // Continue processing despite image warnings
+        // Validate image references
+        const imageValidation = validateImageReferences(markdown);
+        if (!imageValidation.ok) {
+          logger.warn(
+            `Image validation issues for ${filePath}`,
+            imageValidation.error,
+          );
+          // Continue processing despite image warnings
+        }
       }
 
       const metaResult = await parseFrontmatter(frontmatter, slug);
@@ -98,6 +114,31 @@ export const createContentService = (
       return err(createError(
         "IOError",
         `Failed to parse markdown file: ${filePath}`,
+        error,
+        { path: filePath },
+      ));
+    }
+  };
+
+  // Metadata-only parsing: extracts frontmatter without markdown→HTML conversion
+  const parseMetadata = async (
+    filePath: string,
+    slug: Slug,
+  ): Promise<AppResult<PostMeta>> => {
+    try {
+      const content = await fileSystem.readFile(filePath);
+      const result = extractFrontmatter(content);
+
+      if (!result.ok) return result;
+
+      const { frontmatter } = result.value;
+      const metaResult = await parseFrontmatter(frontmatter, slug);
+
+      return metaResult;
+    } catch (error) {
+      return err(createError(
+        "IOError",
+        `Failed to parse metadata from file: ${filePath}`,
         error,
         { path: filePath },
       ));
@@ -145,6 +186,50 @@ export const createContentService = (
     }
   };
 
+  const loadPostsMetadataFromDisk = async (): Promise<
+    AppResult<readonly PostMeta[]>
+  > => {
+    try {
+      const entries = await fileSystem.readDir(postsDir);
+      const markdownFiles = entries.filter((name) => name.endsWith(".md"));
+
+      if (markdownFiles.length === 0) {
+        logger.warn(`No markdown files found in ${postsDir}`);
+        return ok([]);
+      }
+
+      const metaResults = await Promise.all(
+        markdownFiles.map(async (filename) => {
+          const slug = filename.replace(/\.md$/, "") as Slug;
+          const filePath = `${postsDir}/${filename}`;
+          return await parseMetadata(filePath, slug);
+        }),
+      );
+
+      const combinedResult = combine(metaResults);
+
+      if (!combinedResult.ok) {
+        logger.error("Failed to load some post metadata", combinedResult.error);
+        return combinedResult;
+      }
+
+      const sortedMeta = [...combinedResult.value].sort((
+        a: PostMeta,
+        b: PostMeta,
+      ) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      logger.info(`Loaded metadata for ${sortedMeta.length} posts`);
+      return ok(sortedMeta);
+    } catch (error) {
+      return err(createError(
+        "IOError",
+        `Failed to load post metadata from ${postsDir}`,
+        error,
+        { path: postsDir },
+      ));
+    }
+  };
+
   const loadPosts = async (): Promise<AppResult<readonly Post[]>> => {
     const cached = cache.get("posts");
 
@@ -157,10 +242,70 @@ export const createContentService = (
     const result = await loadPostsFromDisk();
 
     if (result.ok) {
-      cache.set("posts", result.value, 5 * 60 * 1000); // 5 minutes TTL
+      cache.set("posts", result.value, 30 * 60 * 1000); // 30 minutes TTL
     }
 
     return result;
+  };
+
+  const loadPostsMetadata = async (): Promise<
+    AppResult<readonly PostMeta[]>
+  > => {
+    const cached = metadataCache.get("metadata");
+
+    if (cached.ok && cached.value) {
+      logger.debug("Using cached post metadata");
+      return ok(cached.value);
+    }
+
+    logger.info("Loading post metadata from disk");
+    const result = await loadPostsMetadataFromDisk();
+
+    if (result.ok) {
+      metadataCache.set("metadata", result.value, 30 * 60 * 1000); // 30 minutes TTL
+    }
+
+    return result;
+  };
+
+  const loadPostsMetadataWithViews = async (): Promise<
+    AppResult<readonly Post[]>
+  > => {
+    const metadataResult = await loadPostsMetadata();
+    if (!metadataResult.ok) return metadataResult;
+
+    if (!analyticsService) {
+      // Convert metadata to Post format without view counts
+      const postsWithoutContent = metadataResult.value.map((meta) => ({
+        ...meta,
+        content: "", // Empty content for metadata-only posts
+        formattedDate: formatDate(meta.date),
+        viewCount: 0,
+      }));
+      return ok(postsWithoutContent);
+    }
+
+    const viewCountsResult = await analyticsService.getAllViewCounts();
+    if (!viewCountsResult.ok) {
+      logger.warn("Failed to load view counts, returning posts without views");
+      const postsWithoutViews = metadataResult.value.map((meta) => ({
+        ...meta,
+        content: "", // Empty content for metadata-only posts
+        formattedDate: formatDate(meta.date),
+        viewCount: 0,
+      }));
+      return ok(postsWithoutViews);
+    }
+
+    const viewCounts = viewCountsResult.value;
+    const postsWithViews = metadataResult.value.map((meta) => ({
+      ...meta,
+      content: "", // Empty content for metadata-only posts
+      formattedDate: formatDate(meta.date),
+      viewCount: viewCounts[meta.slug] || 0,
+    }));
+
+    return ok(postsWithViews);
   };
 
   const loadPostsWithViews = async (): Promise<AppResult<readonly Post[]>> => {
@@ -277,6 +422,8 @@ export const createContentService = (
 
   return {
     loadPosts,
+    loadPostsMetadata,
+    loadPostsMetadataWithViews,
     loadPostsWithViews,
     getPostBySlug,
     getPostsByTag,

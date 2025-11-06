@@ -48,15 +48,22 @@ marked.use({ renderer });
  * Get MIME type for audio files
  */
 const getAudioMimeType = (filePath: string): string => {
-  const ext = filePath.split('.').pop()?.toLowerCase();
+  const ext = filePath.split(".").pop()?.toLowerCase();
   switch (ext) {
-    case 'wav': return 'audio/wav';
-    case 'mp3': return 'audio/mpeg';
-    case 'ogg': return 'audio/ogg';
-    case 'flac': return 'audio/flac';
-    case 'm4a': return 'audio/mp4';
-    case 'aac': return 'audio/aac';
-    default: return 'audio/mpeg';
+    case "wav":
+      return "audio/wav";
+    case "mp3":
+      return "audio/mpeg";
+    case "ogg":
+      return "audio/ogg";
+    case "flac":
+      return "audio/flac";
+    case "m4a":
+      return "audio/mp4";
+    case "aac":
+      return "audio/aac";
+    default:
+      return "audio/mpeg";
   }
 };
 
@@ -66,23 +73,23 @@ const getAudioMimeType = (filePath: string): string => {
 const processImageAttributes = (html: string): string => {
   // Match img tags followed by {attribute=value} patterns
   const imgAttributeRegex = /<img([^>]+)>\{([^}]+)\}/g;
-  
+
   return html.replace(imgAttributeRegex, (match, imgAttributes, attributes) => {
     // Parse the attributes from {width=400} format
-    const attrPairs = attributes.split(',').map((attr: string) => attr.trim());
+    const attrPairs = attributes.split(",").map((attr: string) => attr.trim());
     const styleAttributes: string[] = [];
     const htmlAttributes: string[] = [];
     let isAudio = false;
-    
+
     // Check if this should be converted to audio
     for (const pair of attrPairs) {
-      const [key, value] = pair.split('=').map((s: string) => s.trim());
-      if (key === 'media' && value === 'audio') {
+      const [key, value] = pair.split("=").map((s: string) => s.trim());
+      if (key === "media" && value === "audio") {
         isAudio = true;
         break;
       }
     }
-    
+
     // If it's audio, convert img tag to audio element
     if (isAudio) {
       // Extract src from img attributes
@@ -90,11 +97,11 @@ const processImageAttributes = (html: string): string => {
       if (srcMatch) {
         const audioSrc = srcMatch[1];
         const mimeType = getAudioMimeType(audioSrc);
-        
+
         // Extract alt text for audio description
         const altMatch = imgAttributes.match(/alt="([^"]+)"/);
-        const altText = altMatch ? escapeHtml(altMatch[1]) : 'Audio file';
-        
+        const altText = altMatch ? escapeHtml(altMatch[1]) : "Audio file";
+
         return `<audio controls>
   <source src="${audioSrc}" type="${mimeType}">
   Your browser does not support the audio element.
@@ -104,14 +111,16 @@ const processImageAttributes = (html: string): string => {
       // Fallback if no src found
       return match;
     }
-    
+
     // Handle regular image attributes
     for (const pair of attrPairs) {
-      const [key, value] = pair.split('=').map((s: string) => s.trim());
-      if (key && value && key !== 'media') {
-        if (key === 'width' || key === 'height') {
+      const [key, value] = pair.split("=").map((s: string) => s.trim());
+      if (key && value && key !== "media") {
+        if (key === "width" || key === "height") {
           // Add as CSS style and HTML attribute
-          const cssValue = value.includes('px') || value.includes('%') ? value : `${value}px`;
+          const cssValue = value.includes("px") || value.includes("%")
+            ? value
+            : `${value}px`;
           styleAttributes.push(`${key}: ${cssValue}`);
           htmlAttributes.push(`${key}="${value}"`);
         } else {
@@ -130,19 +139,19 @@ const processImageAttributes = (html: string): string => {
 
     // Build the final img tag
     let finalImg = `<img${imgAttributes}`;
-    
+
     // Add HTML attributes
     if (htmlAttributes.length > 0) {
-      finalImg += ` ${htmlAttributes.join(' ')}`;
+      finalImg += ` ${htmlAttributes.join(" ")}`;
     }
-    
+
     // Add style attribute if we have style properties
     if (styleAttributes.length > 0) {
-      finalImg += ` style="${styleAttributes.join('; ')}"`;
+      finalImg += ` style="${styleAttributes.join("; ")}"`;
     }
-    
-    finalImg += '>';
-    
+
+    finalImg += ">";
+
     return finalImg;
   });
 };
@@ -154,7 +163,7 @@ const cleanupAudioHTML = (html: string): string => {
   // Fix cases where audio + caption are wrapped in <p> tags
   return html.replace(
     /<p>(<audio[^>]*>[\s\S]*?<\/audio>\s*<p class="audio-caption">[^<]*<\/p>)<\/p>/g,
-    '$1'
+    "$1",
   );
 };
 
@@ -162,10 +171,10 @@ export const markdownToHtml = (markdown: string): AppResult<string> => {
   try {
     // Parse markdown to HTML
     let html = marked.parse(markdown) as string;
-    
+
     // Post-process to handle image attributes
     html = processImageAttributes(html);
-    
+
     // Clean up any nested paragraph issues with audio elements
     html = cleanupAudioHTML(html);
 

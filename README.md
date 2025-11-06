@@ -12,16 +12,23 @@ This blog system is built around several key architectural principles:
 
 ## Features
 
-- **Markdown Content**: Posts written in markdown with proper HTML rendering and syntax highlighting
+- **Markdown Content**: Posts written in markdown with proper HTML rendering and
+  syntax highlighting
 - **Tag System**: Posts can be tagged and filtered by tag
-- **Full-text Search**: Dual search experience with modal quick-search and full results page
-- **Light/Dark Theme Toggle**: Manual theme switcher with localStorage persistence
-- **Responsive Design**: Mobile-optimized styling with optimal readability on all devices
-- **Semantic Components**: Clean JSX components following semantic HTML and ARIA principles
-- **Code Syntax Highlighting**: Highlight.js integration with Atom One Dark theme
+- **Full-text Search**: Dual search experience with modal quick-search and full
+  results page
+- **Light/Dark Theme Toggle**: Manual theme switcher with localStorage
+  persistence
+- **Responsive Design**: Mobile-optimized styling with optimal readability on
+  all devices
+- **Semantic Components**: Clean JSX components following semantic HTML and ARIA
+  principles
+- **Code Syntax Highlighting**: Highlight.js integration with Atom One Dark
+  theme
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
-- **AI-Powered Writing Assistant**: `/blog-writer` command for creating posts in the blog's voice
+- **AI-Powered Writing Assistant**: `/blog-writer` command for creating posts in
+  the blog's voice
 
 ## Architecture
 
@@ -92,7 +99,8 @@ and maintainable.
 ### Prerequisites
 
 - [Deno](https://deno.land/) v2.x or higher
-- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.11 (automatically installed via npm)
+- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.11 (automatically installed
+  via npm)
 - [HTMX](https://htmx.org/) v2.x (automatically downloaded via setup task)
 
 ### Installation
@@ -152,12 +160,13 @@ title: Your Post Title
 date: 2025-01-15
 tags: [Technology, Tutorial]
 excerpt: A brief description of your post
-modified: 2025-01-16  # Optional
+modified: 2025-01-16 # Optional
 ---
 
 # Your Post Content
 
-Write your post content in markdown here. The blog automatically converts markdown to HTML and renders it properly using mono-jsx's `html()` function.
+Write your post content in markdown here. The blog automatically converts
+markdown to HTML and renders it properly using mono-jsx's `html()` function.
 
 Supports:
 
@@ -176,7 +185,8 @@ flowchart TD
 
 ### HTML Rendering
 
-The blog uses mono-jsx's `html()` function to properly render markdown-converted HTML content:
+The blog uses mono-jsx's `html()` function to properly render markdown-converted
+HTML content:
 
 ```tsx
 // In PostView component
@@ -193,7 +203,8 @@ export const PostView = ({ post }: { post: Post }) => {
 
 ### Using the Blog Writer Assistant
 
-The blog includes an AI-powered writing assistant that helps you create posts in the blog's established voice and style.
+The blog includes an AI-powered writing assistant that helps you create posts in
+the blog's established voice and style.
 
 #### Quick Start
 
@@ -237,8 +248,10 @@ The `/blog-writer` command will:
 The blog writer follows these principles (defined in `WRITING_STYLE.md`):
 
 - **Conversational tone** - Like explaining to a colleague over coffee
-- **Personal + Objective** - Mix experience ("I spent 3 months debugging this...") with facts
-- **Technical + Human** - Connect code decisions to culture, incentives, and outcomes
+- **Personal + Objective** - Mix experience ("I spent 3 months debugging
+  this...") with facts
+- **Technical + Human** - Connect code decisions to culture, incentives, and
+  outcomes
 - **Concrete examples** - Real scenarios, not abstract theory
 - **Honest nuance** - "It depends" is valid if you explain what it depends on
 
@@ -261,7 +274,8 @@ Deno's edge computing platform.
    - Connect your GitHub repository
    - Set the entry point to `src/app/main.ts`
 
-3. **Environment Configuration** (optional): Configure through environment variables:
+3. **Environment Configuration** (optional): Configure through environment
+   variables:
 
    ```bash
    BLOG_TITLE=Your Blog Name
@@ -485,10 +499,16 @@ The blog properly renders markdown-converted HTML using mono-jsx:
 import { html } from "mono-jsx/jsx-runtime";
 
 // ✅ Correct: renders HTML properly
-{html(post.content)}
+{
+  html(post.content);
+}
 
 // ❌ Incorrect: would escape HTML
-{html`${post.content}`}
+{
+  html`
+    ${post.content}
+  `;
+}
 ```
 
 ## Performance
@@ -505,7 +525,8 @@ import { html } from "mono-jsx/jsx-runtime";
 - **Runtime**: Deno v2.x
 - **Rendering**: mono-jsx v0.6.11+ (server-side JSX without React)
 - **Enhancement**: HTMX v2.x for dynamic interactions
-- **Styling**: Modern CSS with design tokens, responsive architecture, light/dark themes
+- **Styling**: Modern CSS with design tokens, responsive architecture,
+  light/dark themes
 - **Syntax Highlighting**: Highlight.js with Atom One Dark theme
 - **Content**: Markdown with YAML frontmatter, parsed by marked
 - **Diagrams**: @rendermaid/core for server-side Mermaid rendering
@@ -519,25 +540,30 @@ import { html } from "mono-jsx/jsx-runtime";
 
 See these files for detailed guidance:
 
-- **`CLAUDE.md`** - Development patterns, architecture, Light FP style, testing strategies
+- **`CLAUDE.md`** - Development patterns, architecture, Light FP style, testing
+  strategies
 - **`WRITING_STYLE.md`** - Blog writing voice, structure, and content principles
 - **`.claude/commands/blog-writer.md`** - AI writing assistant configuration
 
 ## Design System
 
 ### Color Architecture
+
 - **Light theme**: Warm off-white backgrounds (#FEFDF8) with high-contrast text
 - **Dark theme**: Warm dark grey (#1C1B18) to reduce eye strain
 - **Accent**: Purple (#5B4FC6 / #9B8FE8) with WCAG AAA compliance
-- **Semantic colors**: Visited links, code backgrounds, borders with subtle hierarchy
+- **Semantic colors**: Visited links, code backgrounds, borders with subtle
+  hierarchy
 
 ### Typography
+
 - **Sans**: Montserrat (400, 600, 700)
 - **Mono**: JetBrains Mono (400, 600)
 - **Fluid scaling**: clamp() for responsive font sizes
 - **Line height**: 1.75 for optimal readability
 
 ### Layout
+
 - **Max width**: min(80vw, 72rem) - prevents excessive line length
 - **Mobile**: Full-width cards with minimal padding
 - **Desktop**: 95% width cards, centered in container

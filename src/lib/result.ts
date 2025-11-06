@@ -80,7 +80,9 @@ export function tryCatchSync<T, E = Error>(
   }
 }
 
-export function combine<T, E>(results: readonly Result<T, E>[]): Result<readonly T[], E> {
+export function combine<T, E>(
+  results: readonly Result<T, E>[],
+): Result<readonly T[], E> {
   const values: T[] = [];
   for (const result of results) {
     if (result.ok) {

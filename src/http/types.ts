@@ -26,7 +26,14 @@ export type Route = {
   readonly handler: RouteHandler;
 };
 
-export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS";
+export type HttpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"
+  | "HEAD"
+  | "OPTIONS";
 
 export type RouteMatch = {
   readonly route: Route;

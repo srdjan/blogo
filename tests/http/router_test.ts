@@ -36,7 +36,10 @@ Deno.test("Router - handles PUT route", async () => {
     .put("/api/data/123", async () => new Response("Updated"));
 
   const handler = router.handler();
-  const request = createTestRequest("http://localhost:8000/api/data/123", "PUT");
+  const request = createTestRequest(
+    "http://localhost:8000/api/data/123",
+    "PUT",
+  );
   const response = await handler(request);
 
   assertEquals(response.status, 200);
@@ -48,7 +51,10 @@ Deno.test("Router - handles DELETE route", async () => {
     .delete("/api/data/123", async () => new Response("Deleted"));
 
   const handler = router.handler();
-  const request = createTestRequest("http://localhost:8000/api/data/123", "DELETE");
+  const request = createTestRequest(
+    "http://localhost:8000/api/data/123",
+    "DELETE",
+  );
   const response = await handler(request);
 
   assertEquals(response.status, 200);
@@ -59,7 +65,7 @@ Deno.test("Router - handles route parameters", async () => {
   const router = createRouter()
     .get("/posts/:slug", async (ctx: RouteContext) => {
       const url = new URL(ctx.req.url);
-      const pathParts = url.pathname.split('/');
+      const pathParts = url.pathname.split("/");
       const slug = pathParts[pathParts.length - 1];
       return new Response(`Post: ${slug}`);
     });
@@ -76,14 +82,16 @@ Deno.test("Router - handles multiple route parameters", async () => {
   const router = createRouter()
     .get("/users/:userId/posts/:postId", async (ctx: RouteContext) => {
       const url = new URL(ctx.req.url);
-      const pathParts = url.pathname.split('/');
+      const pathParts = url.pathname.split("/");
       const userId = pathParts[2];
       const postId = pathParts[4];
       return new Response(`User: ${userId}, Post: ${postId}`);
     });
 
   const handler = router.handler();
-  const request = createTestRequest("http://localhost:8000/users/123/posts/456");
+  const request = createTestRequest(
+    "http://localhost:8000/users/123/posts/456",
+  );
   const response = await handler(request);
 
   assertEquals(response.status, 200);
@@ -100,7 +108,9 @@ Deno.test("Router - handles regex routes", async () => {
     });
 
   const handler = router.handler();
-  const request = createTestRequest("http://localhost:8000/images/og/my-post.png");
+  const request = createTestRequest(
+    "http://localhost:8000/images/og/my-post.png",
+  );
   const response = await handler(request);
 
   assertEquals(response.status, 200);
@@ -125,12 +135,16 @@ Deno.test("Router - matches exact paths", async () => {
     .get("/test/sub", async () => new Response("Sub path"));
 
   const handler = router.handler();
-  
-  const response1 = await handler(createTestRequest("http://localhost:8000/test"));
+
+  const response1 = await handler(
+    createTestRequest("http://localhost:8000/test"),
+  );
   assertEquals(response1.status, 200);
   assertEquals(await response1.text(), "Exact match");
-  
-  const response2 = await handler(createTestRequest("http://localhost:8000/test/sub"));
+
+  const response2 = await handler(
+    createTestRequest("http://localhost:8000/test/sub"),
+  );
   assertEquals(response2.status, 200);
   assertEquals(await response2.text(), "Sub path");
 });
@@ -164,7 +178,9 @@ Deno.test("Router - provides correct context", async () => {
     });
 
   const handler = router.handler();
-  const request = createTestRequest("http://localhost:8000/context-test?param=value");
+  const request = createTestRequest(
+    "http://localhost:8000/context-test?param=value",
+  );
   const response = await handler(request);
 
   assertEquals(response.status, 200);
@@ -220,7 +236,10 @@ Deno.test("Router - supports chaining multiple routes", async () => {
   ];
 
   for (const test of tests) {
-    const request = createTestRequest(`http://localhost:8000${test.url}`, test.method);
+    const request = createTestRequest(
+      `http://localhost:8000${test.url}`,
+      test.method,
+    );
     const response = await handler(request);
     assertEquals(response.status, 200);
     assertEquals(await response.text(), test.expected);

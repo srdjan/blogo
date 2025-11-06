@@ -5,9 +5,15 @@ tags: [TypeScript, Functional, Architecture, Patterns]
 excerpt: Real functional programming benefits in TypeScript without fp-ts or complex abstractions - just pure functions, explicit errors, and smart use of the type system.
 ---
 
-I've been working with TypeScript codebases for years, and I keep seeing the same pain points. Class hierarchies that are hell to test. Exceptions thrown from three layers deep with no warning. Objects mutating when you least expect it. Testing requires elaborate mock setups just to verify simple logic.
+I've been working with TypeScript codebases for years, and I keep seeing the
+same pain points. Class hierarchies that are hell to test. Exceptions thrown
+from three layers deep with no warning. Objects mutating when you least expect
+it. Testing requires elaborate mock setups just to verify simple logic.
 
-So I started exploring functional programming as a solution. Libraries like fp-ts show thoughtful approaches to FP in TypeScript, but here's what got me thinking: can you get the core benefits without framework overhead? Just using TypeScript's type system and simple patterns?
+So I started exploring functional programming as a solution. Libraries like
+fp-ts show thoughtful approaches to FP in TypeScript, but here's what got me
+thinking: can you get the core benefits without framework overhead? Just using
+TypeScript's type system and simple patterns?
 
 Turns out you can. Here's what I've learned.
 
@@ -15,16 +21,19 @@ Turns out you can. Here's what I've learned.
 
 Functional programming in TypeScript boils down to straightforward ideas:
 
-1. **Pure functions** - Same input always produces same output, no hidden surprises
+1. **Pure functions** - Same input always produces same output, no hidden
+   surprises
 2. **Explicit errors** - Function signatures tell you exactly what can fail
 3. **Immutable data** - Values never change, making code predictable
 4. **Clear dependencies** - No hidden coupling to databases or services
 
-What I find interesting is that these work beautifully in TypeScript without any libraries. Let's dig in.
+What I find interesting is that these work beautifully in TypeScript without any
+libraries. Let's dig in.
 
 ## Pure Functions: The Foundation
 
-Pure functions are simple - they don't depend on external state and don't cause side effects. This makes them trivial to test:
+Pure functions are simple - they don't depend on external state and don't cause
+side effects. This makes them trivial to test:
 
 ```typescript
 // Pure: Always returns same result for same input
@@ -43,17 +52,20 @@ Here's the cool part - testing pure functions requires zero setup:
 Deno.test("calculateTotal - sums item prices", () => {
   const items = [
     { price: 10, quantity: 2 },
-    { price: 5, quantity: 3 }
+    { price: 5, quantity: 3 },
   ];
   assertEquals(calculateTotal(items), 35);
 });
 ```
 
-No mocking. No database fixtures. No shared state management. Call function, verify output, done.
+No mocking. No database fixtures. No shared state management. Call function,
+verify output, done.
 
 ## Types vs Interfaces: Modeling Data Right
 
-TypeScript gives you two ways to define structure: `type` aliases and `interface` declarations. To me is interesting that the choice actually matters for architectural clarity.
+TypeScript gives you two ways to define structure: `type` aliases and
+`interface` declarations. To me is interesting that the choice actually matters
+for architectural clarity.
 
 ### Types for Data
 
@@ -75,7 +87,9 @@ export type PaymentStatus =
   | "failed";
 ```
 
-The `readonly` modifier prevents accidental mutations. Discriminated unions like `PaymentStatus` make invalid states impossible to represent - you can't have a payment that's both pending and completed.
+The `readonly` modifier prevents accidental mutations. Discriminated unions like
+`PaymentStatus` make invalid states impossible to represent - you can't have a
+payment that's both pending and completed.
 
 ### Interfaces for Capabilities
 
@@ -84,7 +98,9 @@ Use `interface` to define what your code needs from its dependencies:
 ```typescript
 export interface Database {
   readonly save: (user: User) => Promise<Result<User, DatabaseError>>;
-  readonly findById: (id: string) => Promise<Result<User | null, DatabaseError>>;
+  readonly findById: (
+    id: string,
+  ) => Promise<Result<User | null, DatabaseError>>;
 }
 
 export interface Clock {
@@ -93,11 +109,13 @@ export interface Clock {
 }
 ```
 
-This separation - types for data, interfaces for behavior - creates clear boundaries in your architecture.
+This separation - types for data, interfaces for behavior - creates clear
+boundaries in your architecture.
 
 ## Result Types: Errors as Values
 
-TypeScript's type system can tell you exactly what errors to expect. But exceptions? They're invisible until they blow up at runtime:
+TypeScript's type system can tell you exactly what errors to expect. But
+exceptions? They're invisible until they blow up at runtime:
 
 ```typescript
 // Throws exception without type-level warning
@@ -145,11 +163,14 @@ if (result.ok) {
 }
 ```
 
-Look at this - the function signature tells you exactly what can go wrong. No hidden exceptions. No forgotten try/catch blocks. The compiler forces you to handle both cases.
+Look at this - the function signature tells you exactly what can go wrong. No
+hidden exceptions. No forgotten try/catch blocks. The compiler forces you to
+handle both cases.
 
 ## The Ports Pattern: Keeping Logic Pure
 
-What if your business logic didn't need to know about databases, file systems, or HTTP clients? What if you could keep the core pure and inject capabilities?
+What if your business logic didn't need to know about databases, file systems,
+or HTTP clients? What if you could keep the core pure and inject capabilities?
 
 ```typescript
 // Port: What your code needs, not how it works
@@ -162,7 +183,10 @@ interface Crypto {
 }
 
 interface Database {
-  readonly save: <T>(key: string, value: T) => Promise<Result<T, DatabaseError>>;
+  readonly save: <T>(
+    key: string,
+    value: T,
+  ) => Promise<Result<T, DatabaseError>>;
 }
 
 // Pure business logic with injected dependencies
@@ -197,7 +221,7 @@ Deno.test("createUser - assigns correct timestamp", async () => {
 
   const result = await createUser(mockClock, mockCrypto, mockDb)({
     name: "Alice",
-    email: "alice@example.com"
+    email: "alice@example.com",
   });
 
   assertEquals(result.ok && result.value.createdAt, fixedDate);
@@ -226,11 +250,13 @@ src/
     middleware.ts
 ```
 
-This organization separates pure logic from effects. Domain code imports only port interfaces, never concrete implementations.
+This organization separates pure logic from effects. Domain code imports only
+port interfaces, never concrete implementations.
 
 ## Branded Types: Preventing ID Mix-ups
 
-TypeScript's structural typing has a subtle problem - any two values with the same shape are interchangeable:
+TypeScript's structural typing has a subtle problem - any two values with the
+same shape are interchangeable:
 
 ```typescript
 // Dangerous: Both are just numbers
@@ -268,7 +294,9 @@ const accountId = createAccountId(456);
 const correctBalance = getUserBalance(accountId); // Safe!
 ```
 
-Use branded types for domain IDs (`UserId`, `ProductId`, `OrderId`), units (`Meters`, `Usd`), and validated values (`PositiveInteger`, `ValidEmail`). They prevent entire classes of bugs at compile time.
+Use branded types for domain IDs (`UserId`, `ProductId`, `OrderId`), units
+(`Meters`, `Usd`), and validated values (`PositiveInteger`, `ValidEmail`). They
+prevent entire classes of bugs at compile time.
 
 ## Immutability: Safety Through Types
 
@@ -299,7 +327,9 @@ user.roles.push("admin"); // Compile error!
 const adminUser = { ...user, roles: [...user.roles, "admin"] };
 ```
 
-The pattern is simple - `readonly` everywhere in your type definitions. Updates use spread operators to create new objects. This depends of TypeScript's type system to enforce immutability at compile time.
+The pattern is simple - `readonly` everywhere in your type definitions. Updates
+use spread operators to create new objects. This depends of TypeScript's type
+system to enforce immutability at compile time.
 
 ## Composition: Chaining Operations
 
@@ -309,32 +339,34 @@ Utility functions make it clean to chain operations:
 // Transform successful results
 const map = <T, U, E>(
   result: Result<T, E>,
-  fn: (value: T) => U
-): Result<U, E> =>
-  result.ok ? ok(fn(result.value)) : result;
+  fn: (value: T) => U,
+): Result<U, E> => result.ok ? ok(fn(result.value)) : result;
 
 // Chain operations that can fail
 const flatMap = <T, U, E>(
   result: Result<T, E>,
-  fn: (value: T) => Result<U, E>
-): Result<U, E> =>
-  result.ok ? fn(result.value) : result;
+  fn: (value: T) => Result<U, E>,
+): Result<U, E> => result.ok ? fn(result.value) : result;
 
 // Compose validation pipeline
 const processUserInput = (input: unknown): Result<User, ValidationError> =>
   flatMap(
     parseUserData(input),
-    data => flatMap(
-      validateEmail(data.email),
-      email => flatMap(
-        validateName(data.name),
-        name => ok({ ...data, email, name })
-      )
-    )
+    (data) =>
+      flatMap(
+        validateEmail(data.email),
+        (email) =>
+          flatMap(
+            validateName(data.name),
+            (name) => ok({ ...data, email, name }),
+          ),
+      ),
   );
 ```
 
-This gets verbose with deep nesting, but for simple cases it works well. The benefit is that errors short-circuit automatically - if any step fails, the rest skip.
+This gets verbose with deep nesting, but for simple cases it works well. The
+benefit is that errors short-circuit automatically - if any step fails, the rest
+skip.
 
 ## Migration Strategy
 
@@ -342,13 +374,14 @@ Don't rewrite everything. Apply these patterns gradually:
 
 ### Phase 1: New Code First
 
-Start with new features. This establishes patterns without disrupting existing functionality:
+Start with new features. This establishes patterns without disrupting existing
+functionality:
 
 ```typescript
 // New feature: pure function with Result type
 export const calculateDiscount = (
   order: Order,
-  promoCode: string
+  promoCode: string,
 ): Result<number, DiscountError> => {
   // Pure validation and calculation
 };
@@ -421,31 +454,42 @@ const sendWelcomeEmail = (emailService: EmailService) =>
 
 ## Real Talk: What Works and What Doesn't
 
-I've used these patterns in production for months now. Here's the honest assessment.
+I've used these patterns in production for months now. Here's the honest
+assessment.
 
 ### Where It Shines
 
-**Testing is dramatically easier.** Pure functions need no setup. Port interfaces become simple object implementations in tests. No mocking libraries, no elaborate fixtures.
+**Testing is dramatically easier.** Pure functions need no setup. Port
+interfaces become simple object implementations in tests. No mocking libraries,
+no elaborate fixtures.
 
-**Fewer runtime surprises.** Result types force error handling at compile time. No forgotten try/catch blocks. No exceptions from deep in the call stack.
+**Fewer runtime surprises.** Result types force error handling at compile time.
+No forgotten try/catch blocks. No exceptions from deep in the call stack.
 
-**Code review gets better.** Function signatures reveal exactly what can happen - inputs, outputs, possible errors. No hidden side effects.
+**Code review gets better.** Function signatures reveal exactly what can
+happen - inputs, outputs, possible errors. No hidden side effects.
 
-**Debugging is faster.** Immutable data and pure functions eliminate entire classes of bugs. When something breaks, the problem is isolated and obvious.
+**Debugging is faster.** Immutable data and pure functions eliminate entire
+classes of bugs. When something breaks, the problem is isolated and obvious.
 
 ### Where It Falls Short
 
-**Learning curve for teams.** If your team is deep in OOP patterns, this shift takes time. The concepts are simple but feel different.
+**Learning curve for teams.** If your team is deep in OOP patterns, this shift
+takes time. The concepts are simple but feel different.
 
-**Integration with class-based libraries.** Some TypeScript ecosystems are built around classes. Adapting them to this style adds boilerplate.
+**Integration with class-based libraries.** Some TypeScript ecosystems are built
+around classes. Adapting them to this style adds boilerplate.
 
-**Verbosity in some cases.** Result type handling can get verbose with deep nesting. Helper functions help, but it's still more code than try/catch.
+**Verbosity in some cases.** Result type handling can get verbose with deep
+nesting. Helper functions help, but it's still more code than try/catch.
 
-**Not ideal for stateful UIs.** Complex client-side state machines and real-time updates work better with frameworks designed for that.
+**Not ideal for stateful UIs.** Complex client-side state machines and real-time
+updates work better with frameworks designed for that.
 
 ### When to Use This
 
 This approach works best for:
+
 - Backend services and APIs
 - Data processing pipelines
 - Teams of 3-15 developers
@@ -453,6 +497,7 @@ This approach works best for:
 - TypeScript with strict mode enabled
 
 Skip it for:
+
 - Highly stateful UIs with complex client state
 - Teams with tight deadlines and strong OOP conventions
 - Heavy integration with class-based Java/C# systems
@@ -470,12 +515,21 @@ Skip it for:
 
 ## What I've Learned
 
-Functional TypeScript isn't about exotic abstractions or academic theory. It's about writing code that's easier to test, safer to change, and simpler to understand.
+Functional TypeScript isn't about exotic abstractions or academic theory. It's
+about writing code that's easier to test, safer to change, and simpler to
+understand.
 
-The patterns are straightforward - pure functions, explicit errors, immutable data, clear dependencies. What makes them effective is applying them consistently. I started with one new feature, measured the outcomes, and expanded based on what actually worked.
+The patterns are straightforward - pure functions, explicit errors, immutable
+data, clear dependencies. What makes them effective is applying them
+consistently. I started with one new feature, measured the outcomes, and
+expanded based on what actually worked.
 
-The best part? You don't need frameworks or libraries. Just TypeScript's type system and discipline.
+The best part? You don't need frameworks or libraries. Just TypeScript's type
+system and discipline.
 
-I've been building my band's website and a small blog engine using these patterns. Testing feels effortless compared to class-based code. Error handling is explicit everywhere. Changes that used to scare me now feel safe.
+I've been building my band's website and a small blog engine using these
+patterns. Testing feels effortless compared to class-based code. Error handling
+is explicit everywhere. Changes that used to scare me now feel safe.
 
-This won't replace every pattern everywhere. But for backend services and data processing? Surprisingly capable. Worth exploring.
+This won't replace every pattern everywhere. But for backend services and data
+processing? Surprisingly capable. Worth exploring.

@@ -1,5 +1,14 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { ok, err, map, chain, combine, match, isOk, isErr } from "../src/lib/result.ts";
+import {
+  chain,
+  combine,
+  err,
+  isErr,
+  isOk,
+  map,
+  match,
+  ok,
+} from "../src/lib/result.ts";
 
 Deno.test("Result - ok creates success result", () => {
   const result = ok(42);

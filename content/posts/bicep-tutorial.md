@@ -5,25 +5,51 @@ tags: [Azure, Bicep, IaaC, DevOps]
 excerpt: "Bicep's type system brings compile-time safety to infrastructure code. Here's how discriminated unions, user-defined types, and helper functions turn error-prone YAML wrangling into predictable, maintainable infrastructure engineering."
 ---
 
-Infrastructure as Code moved us from clicking through Azure Portal to automated, repeatable deployments. Good progress. But here's what caught my attention: Bicep's type system can catch configuration errors *before* deployment, the same way TypeScript catches bugs before runtime.
+Infrastructure as Code moved us from clicking through Azure Portal to automated,
+repeatable deployments. Good progress. But here's what caught my attention:
+Bicep's type system can catch configuration errors _before_ deployment, the same
+way TypeScript catches bugs before runtime.
 
-At work we use Azure and Bicep heavily. Catching a missing required parameter in your editor beats discovering it 10 minutes into a failed deployment. This got me thinking - what if infrastructure code could be as type-safe as application code? Turns out, with modern Bicep (0.30+), it absolutely can be.
+At work we use Azure and Bicep heavily. Catching a missing required parameter in
+your editor beats discovering it 10 minutes into a failed deployment. This got
+me thinking - what if infrastructure code could be as type-safe as application
+code? Turns out, with modern Bicep (0.30+), it absolutely can be.
 
-> **Reference Implementation**: All patterns and practices described in this guide are implemented in the [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter) repository. The repo provides a complete, production-ready template with typed modules, helper functions, and deployment examples that you can use as a starting point for your own infrastructure projects.
+> **Reference Implementation**: All patterns and practices described in this
+> guide are implemented in the
+> [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter)
+> repository. The repo provides a complete, production-ready template with typed
+> modules, helper functions, and deployment examples that you can use as a
+> starting point for your own infrastructure projects.
 
 ## Types as Infrastructure Contracts
 
-Here's the core idea: infrastructure code defines contracts between components. What resources exist, how they connect, which configurations are valid. Traditional IaC leaves these contracts implicit - buried in comments or wikis that drift from reality. Bicep's type system makes them explicit and compiler-verified.
+Here's the core idea: infrastructure code defines contracts between components.
+What resources exist, how they connect, which configurations are valid.
+Traditional IaC leaves these contracts implicit - buried in comments or wikis
+that drift from reality. Bicep's type system makes them explicit and
+compiler-verified.
 
-Think about deployment failures you've seen. Configuration mismatches, invalid property combinations, missing required parameters. These all share a root cause: the language allowed you to express invalid states. When type systems make illegal states unrepresentable, validation happens in your editor instead of during deployment.
+Think about deployment failures you've seen. Configuration mismatches, invalid
+property combinations, missing required parameters. These all share a root
+cause: the language allowed you to express invalid states. When type systems
+make illegal states unrepresentable, validation happens in your editor instead
+of during deployment.
 
-The benefits compound surprisingly fast. Faster feedback during development. Clearer interfaces between modules. Infrastructure that documents itself through types. Less time fixing broken deployments, more time building features.
+The benefits compound surprisingly fast. Faster feedback during development.
+Clearer interfaces between modules. Infrastructure that documents itself through
+types. Less time fixing broken deployments, more time building features.
 
-This guide covers three areas: Bicep's type system foundations, building typed modules with discriminated unions, and composing everything into complete deployments. Let's start with the basics.
+This guide covers three areas: Bicep's type system foundations, building typed
+modules with discriminated unions, and composing everything into complete
+deployments. Let's start with the basics.
 
 ## Bicep's Type System Foundation
 
-Modern Bicep (0.30+) includes user-defined types as an experimental feature. These unlock serious type safety: `@export/@import` for sharing types across files, discriminated unions for polymorphic configs, and parameter validation decorators. All the good stuff.
+Modern Bicep (0.30+) includes user-defined types as an experimental feature.
+These unlock serious type safety: `@export/@import` for sharing types across
+files, discriminated unions for polymorphic configs, and parameter validation
+decorators. All the good stuff.
 
 ### Enabling Type Features
 
@@ -38,11 +64,14 @@ Type safety starts with configuration. Create a `bicepconfig.json` file:
 }
 ```
 
-These settings unlock everything: user-defined types, imports/exports, function definitions. The building blocks of type-safe infrastructure.
+These settings unlock everything: user-defined types, imports/exports, function
+definitions. The building blocks of type-safe infrastructure.
 
 ### Creating a Type Library
 
-Organize types in a central library (`types/common.bicep`) instead of duplicating them across modules. Single source of truth makes refactoring painless.
+Organize types in a central library (`types/common.bicep`) instead of
+duplicating them across modules. Single source of truth makes refactoring
+painless.
 
 ```bicep
 // types/common.bicep
@@ -59,7 +88,9 @@ type Region = 'eastus' | 'westeurope' | 'westus'
 type AppTier = 'basic' | 'standard' | 'premium'
 ```
 
-The `@export()` decorator makes types importable. Literal unions (`'dev' | 'test' | 'prod'`) create enumerations - you get autocomplete and can't use invalid values. Simple, effective.
+The `@export()` decorator makes types importable. Literal unions
+(`'dev' | 'test' | 'prod'`) create enumerations - you get autocomplete and can't
+use invalid values. Simple, effective.
 
 ### Type Imports in Modules
 
@@ -81,13 +112,17 @@ This creates clear contracts between modules and eliminates type drift. Love it.
 
 ## Discriminated Unions: The Cool Part
 
-Here's where it gets interesting. Different deployment scenarios need different parameters. Public-facing apps need DNS labels. Private apps need VNet IDs. App Gateway integration needs listener names.
+Here's where it gets interesting. Different deployment scenarios need different
+parameters. Public-facing apps need DNS labels. Private apps need VNet IDs. App
+Gateway integration needs listener names.
 
-Discriminated unions solve this beautifully. The type system enforces that each variant provides exactly what it needs - no more, no less.
+Discriminated unions solve this beautifully. The type system enforces that each
+variant provides exactly what it needs - no more, no less.
 
 ### The Problem: Polymorphic Configuration
 
-Application ingress shows the challenge clearly. Apps connect to networks through different mechanisms:
+Application ingress shows the challenge clearly. Apps connect to networks
+through different mechanisms:
 
 - Public IP access requires DNS labels and SKU selection
 - Private endpoint access requires VNet IDs and subnet names
@@ -104,11 +139,13 @@ param subnetName string?      // Only for privateLink
 param appGatewayId string?    // Only for appGateway
 ```
 
-This allows invalid combinations. `ingressType='publicIp'` with `vnetId` but no `dnsLabel`? Sure, why not. You'll find out during deployment. 10 minutes later.
+This allows invalid combinations. `ingressType='publicIp'` with `vnetId` but no
+`dnsLabel`? Sure, why not. You'll find out during deployment. 10 minutes later.
 
 ### The Solution: Discriminated Unions
 
-Discriminated unions encode each valid configuration as an explicit type variant:
+Discriminated unions encode each valid configuration as an explicit type
+variant:
 
 ```bicep
 @export()
@@ -120,7 +157,9 @@ type Ingress =
   | { kind: 'appGateway', appGatewayId: string, listenerName: string }
 ```
 
-Look at this. The `@discriminator('kind')` decorator marks `kind` as the distinguishing field. Each variant defines its own properties. Invalid combinations? Unrepresentable. The compiler simply won't let you express them.
+Look at this. The `@discriminator('kind')` decorator marks `kind` as the
+distinguishing field. Each variant defines its own properties. Invalid
+combinations? Unrepresentable. The compiler simply won't let you express them.
 
 ### Using It in Modules
 
@@ -144,11 +183,14 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = if (i
 }
 ```
 
-Type safety ensures you can only access `ingress.vnetId` and `ingress.subnetName` when `ingress.kind == 'privateLink'`. Try accessing them in the wrong context? Compiler error. This is beautiful.
+Type safety ensures you can only access `ingress.vnetId` and
+`ingress.subnetName` when `ingress.kind == 'privateLink'`. Try accessing them in
+the wrong context? Compiler error. This is beautiful.
 
 ## Structural Types: Building Complex Configs
 
-Beyond unions, structural types compose complex configurations from simpler pieces.
+Beyond unions, structural types compose complex configurations from simpler
+pieces.
 
 ### Nested Composition
 
@@ -202,7 +244,10 @@ type AppConfig = {
 }
 ```
 
-`AppConfig` composes multiple levels: primitives (`name`, `location`), enumerations (`tier`), discriminated unions (`ingress`), nested structures (`diagnostics`, `autoScale`). Each level adds validation. Parameter decorators enforce constraints. Optional properties (`?`) handle nullables.
+`AppConfig` composes multiple levels: primitives (`name`, `location`),
+enumerations (`tier`), discriminated unions (`ingress`), nested structures
+(`diagnostics`, `autoScale`). Each level adds validation. Parameter decorators
+enforce constraints. Optional properties (`?`) handle nullables.
 
 ### Parameter Validation
 
@@ -212,11 +257,14 @@ Decorators encode business rules in types:
 - `@minValue(1) @maxValue(30)` on capacity prevents invalid instance counts
 - `@minValue(1) @maxValue(365)` on retention matches Log Analytics limits
 
-These validate at parse time, not deployment time. Errors appear in your editor immediately.
+These validate at parse time, not deployment time. Errors appear in your editor
+immediately.
 
 ## Helper Functions: Reusable Logic
 
-Besides types, we need reusable functions. The helper library (`lib/helpers.bicep`) handles naming, tagging, SKU mapping, and environment-specific defaults.
+Besides types, we need reusable functions. The helper library
+(`lib/helpers.bicep`) handles naming, tagging, SKU mapping, and
+environment-specific defaults.
 
 ### Defining Functions
 
@@ -253,7 +301,9 @@ func getCapacityForEnv(env Env, tier AppTier) int =>
       : 1
 ```
 
-These encapsulate organizational conventions. `buildTags()` ensures consistent tagging. `getSkuForTier()` abstracts Azure SKU details. `getCapacityForEnv()` applies environment-specific defaults. One place to change, everywhere updated.
+These encapsulate organizational conventions. `buildTags()` ensures consistent
+tagging. `getSkuForTier()` abstracts Azure SKU details. `getCapacityForEnv()`
+applies environment-specific defaults. One place to change, everywhere updated.
 
 ### Using Helpers
 
@@ -282,7 +332,8 @@ Centralized logic. No duplication. Consistency across modules. Clean.
 
 ## Composing Complete Deployments
 
-Individual modules compose into complete deployments through a main orchestrator template.
+Individual modules compose into complete deployments through a main orchestrator
+template.
 
 ### Root Template
 
@@ -340,7 +391,8 @@ output appId string = web.outputs.appId
 output appPrincipalId string = web.outputs.principalId
 ```
 
-The root template imports types and functions, defines typed parameters, composes modules, exposes outputs. All contracts explicit and compiler-verified.
+The root template imports types and functions, defines typed parameters,
+composes modules, exposes outputs. All contracts explicit and compiler-verified.
 
 ### Parameter Files
 
@@ -396,7 +448,9 @@ param vnet = {
 }
 ```
 
-The `using` directive creates a typed relationship between parameter file and template. IntelliSense gives you autocomplete and validation. Invalid configs get highlighted before you even try to deploy.
+The `using` directive creates a typed relationship between parameter file and
+template. IntelliSense gives you autocomplete and validation. Invalid configs
+get highlighted before you even try to deploy.
 
 ## Deployment Workflow
 
@@ -440,7 +494,8 @@ az deployment group create \
   --parameters env/prod.bicepparam
 ```
 
-Type validation catches most errors at build time. What-if catches resource-specific issues. By deployment, you're confident it'll work.
+Type validation catches most errors at build time. What-if catches
+resource-specific issues. By deployment, you're confident it'll work.
 
 ## Practical Examples
 
@@ -474,7 +529,9 @@ param app = {
 }
 ```
 
-Type system ensures `ingress.kind = 'publicIp'` allows `dnsLabel` and `sku`. Required fields present. Auto-scale capacities valid (1-30). Environment value valid. Compiler checks everything.
+Type system ensures `ingress.kind = 'publicIp'` allows `dnsLabel` and `sku`.
+Required fields present. Auto-scale capacities valid (1-30). Environment value
+valid. Compiler checks everything.
 
 ### Example 2: Private Internal Service
 
@@ -501,7 +558,9 @@ param app = {
 }
 ```
 
-Type system ensures `ingress.kind = 'privateLink'` requires `vnetId` and `subnetName`. Can't specify `dnsLabel` (wrong variant). `enableDeleteLock` for production safety. `diagnostics` optional - defaults when omitted.
+Type system ensures `ingress.kind = 'privateLink'` requires `vnetId` and
+`subnetName`. Can't specify `dnsLabel` (wrong variant). `enableDeleteLock` for
+production safety. `diagnostics` optional - defaults when omitted.
 
 ### Example 3: Development Environment
 
@@ -532,23 +591,31 @@ Some patterns from real projects that work well:
 
 ### Pattern 1: Central Type Library
 
-Define types once, import everywhere. Single `types/common.bicep` file for shared types. Module-specific types stay in modules. This prevents type drift and makes refactoring easy.
+Define types once, import everywhere. Single `types/common.bicep` file for
+shared types. Module-specific types stay in modules. This prevents type drift
+and makes refactoring easy.
 
 ### Pattern 2: Discriminated Unions for Polymorphism
 
-When config has distinct variants, model them explicitly. No optional parameters with runtime validation. Each variant declares its requirements. Type system prevents invalid combinations.
+When config has distinct variants, model them explicitly. No optional parameters
+with runtime validation. Each variant declares its requirements. Type system
+prevents invalid combinations.
 
 ### Pattern 3: Hierarchical Type Composition
 
-Build complex types from simple building blocks. Start with primitives and enums. Compose into structural types. Compose those into higher-level configs. Makes everything easier to understand.
+Build complex types from simple building blocks. Start with primitives and
+enums. Compose into structural types. Compose those into higher-level configs.
+Makes everything easier to understand.
 
 ### Pattern 4: Validate at Type Level
 
-Encode constraints in decorators, not comments. Use `@minLength`, `@maxLength`, `@minValue`, `@maxValue`. Type system enforces automatically.
+Encode constraints in decorators, not comments. Use `@minLength`, `@maxLength`,
+`@minValue`, `@maxValue`. Type system enforces automatically.
 
 ### Pattern 5: Extract Common Logic
 
-Centralize conventions in helper functions. Naming, tagging, SKU mappings, environment defaults. Modules import and use them. Consistency everywhere.
+Centralize conventions in helper functions. Naming, tagging, SKU mappings,
+environment defaults. Modules import and use them. Consistency everywhere.
 
 ### Pattern 6: Conditional Resources
 
@@ -562,59 +629,83 @@ Deployment logic stays close to type definitions. Conditions explicit.
 
 ## Error Prevention
 
-Type safety shifts errors from deployment to development. Common config mistakes that used to fail during deployment now show up in your editor.
+Type safety shifts errors from deployment to development. Common config mistakes
+that used to fail during deployment now show up in your editor.
 
 ### Configuration Mismatches
 
-Discriminated unions prevent incompatible properties. `ingress.kind = 'privateLink'` ensures correct `publicNetworkAccess` automatically. Invalid combinations? Unrepresentable.
+Discriminated unions prevent incompatible properties.
+`ingress.kind = 'privateLink'` ensures correct `publicNetworkAccess`
+automatically. Invalid combinations? Unrepresentable.
 
 ### Missing Required Parameters
 
-Required parameters surface immediately. Select `kind = 'privateLink'` without `vnetId`? Type error before deployment. No runtime surprises.
+Required parameters surface immediately. Select `kind = 'privateLink'` without
+`vnetId`? Type error before deployment. No runtime surprises.
 
 ### Invalid Parameter Values
 
-Decorators enforce Azure limits during development. Retention over 365 days? Editor error. Instance count out of range? Editor error. Not deployment failures.
+Decorators enforce Azure limits during development. Retention over 365 days?
+Editor error. Instance count out of range? Editor error. Not deployment
+failures.
 
 ### Type Consistency
 
-Type imports create contracts between modules. Module declares parameter as `Region` type? Arbitrary strings rejected at build time. No surprise deployment failures.
+Type imports create contracts between modules. Module declares parameter as
+`Region` type? Arbitrary strings rejected at build time. No surprise deployment
+failures.
 
 ## Real-World Impact
 
 Type-safe infrastructure keeps evolving. Here's what it means in practice:
 
-**Onboarding**: New team members understand infrastructure contracts through types, not documentation. Types serve as always-current specs.
+**Onboarding**: New team members understand infrastructure contracts through
+types, not documentation. Types serve as always-current specs.
 
-**Refactoring**: Change type definitions, compiler finds every location needing updates. Confidence through compile-time verification.
+**Refactoring**: Change type definitions, compiler finds every location needing
+updates. Confidence through compile-time verification.
 
-**Code Review**: Focus on architecture and logic, not parameter validation. Types enforce correctness automatically.
+**Code Review**: Focus on architecture and logic, not parameter validation.
+Types enforce correctness automatically.
 
-**Deployment Reliability**: Early error detection means fewer deployment failures. Faster feedback, shorter cycle time.
+**Deployment Reliability**: Early error detection means fewer deployment
+failures. Faster feedback, shorter cycle time.
 
 ### Where This Goes Next
 
 Several directions to expand typed infrastructure:
 
-**Service Coverage**: Start with App Service, networking, storage, databases. Expand to Container Apps, Service Bus, Cosmos DB as needed.
+**Service Coverage**: Start with App Service, networking, storage, databases.
+Expand to Container Apps, Service Bus, Cosmos DB as needed.
 
-**Policy Integration**: Combine type safety with policy-as-code. Types catch structural errors, PSRule verifies policy compliance. Comprehensive testing.
+**Policy Integration**: Combine type safety with policy-as-code. Types catch
+structural errors, PSRule verifies policy compliance. Comprehensive testing.
 
-**Composition Patterns**: Reusable stacks. "Web application stack" (Front Door + App Gateway + App Service + Storage) as typed modules. Teams instantiate, not rebuild.
+**Composition Patterns**: Reusable stacks. "Web application stack" (Front Door +
+App Gateway + App Service + Storage) as typed modules. Teams instantiate, not
+rebuild.
 
-**CI/CD Integration**: Type validation in pipelines. All changes pass type checking before deployment.
+**CI/CD Integration**: Type validation in pipelines. All changes pass type
+checking before deployment.
 
 ## Real Talk: Tradeoffs
 
-This approach isn't free. Initial setup takes time. Learning curve for discriminated unions. More upfront thinking about type design.
+This approach isn't free. Initial setup takes time. Learning curve for
+discriminated unions. More upfront thinking about type design.
 
-Worth it? Absolutely. The payoff comes fast - fewer failed deployments, faster development, better collaboration. To me is interesting that this investment pays dividends every single day after.
+Worth it? Absolutely. The payoff comes fast - fewer failed deployments, faster
+development, better collaboration. To me is interesting that this investment
+pays dividends every single day after.
 
 ## The Core Idea
 
-Infrastructure deserves same engineering discipline as application code. Type systems provide early error detection, confident refactoring, self-documenting code. These benefits work equally well for infrastructure.
+Infrastructure deserves same engineering discipline as application code. Type
+systems provide early error detection, confident refactoring, self-documenting
+code. These benefits work equally well for infrastructure.
 
-The principle: **make invalid infrastructure unrepresentable**. When illegal states can't be expressed, the entire deployment lifecycle becomes more reliable and predictable.
+The principle: **make invalid infrastructure unrepresentable**. When illegal
+states can't be expressed, the entire deployment lifecycle becomes more reliable
+and predictable.
 
 ---
 
@@ -660,7 +751,8 @@ Each phase builds on previous. Incremental adoption, no rewrites.
 
 ### Project Repository
 
-The [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter) template has everything:
+The [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter)
+template has everything:
 
 - Type definitions in `types/common.bicep`
 - Helper functions in `lib/helpers.bicep`
@@ -670,15 +762,19 @@ The [bicep-typed-starter](https://github.com/srdjan/bicep-typed-starter) templat
 
 ### Key Documentation
 
-- [Bicep User-Defined Types](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/user-defined-data-types) - Official docs
-- [Discriminated Unions](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/data-types#discriminated-unions) - Type variant patterns
+- [Bicep User-Defined Types](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/user-defined-data-types) -
+  Official docs
+- [Discriminated Unions](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/data-types#discriminated-unions) -
+  Type variant patterns
 - Project docs in repo for best practices and guides
 
 ### Community
 
-Bicep community actively develops type system patterns. GitHub issues and discussions share knowledge. Contribute, learn, build together.
+Bicep community actively develops type system patterns. GitHub issues and
+discussions share knowledge. Contribute, learn, build together.
 
 ---
 
-These patterns represent current state of typed infrastructure - evolving as experience grows and Bicep capabilities expand. Infrastructure deserves same engineering rigor as application code. Type safety makes that possible.
-
+These patterns represent current state of typed infrastructure - evolving as
+experience grows and Bicep capabilities expand. Infrastructure deserves same
+engineering rigor as application code. Type safety makes that possible.

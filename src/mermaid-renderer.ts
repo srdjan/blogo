@@ -1,11 +1,11 @@
 import {
+  analyzeAST,
+  enhanceAST,
   parseMermaid,
   renderSvg,
-  analyzeAST,
+  type SvgConfig,
   validateAST,
-  enhanceAST,
   withPerformanceMonitoring,
-  type SvgConfig
 } from "@rendermaid/core";
 import { match } from "ts-pattern";
 
@@ -49,7 +49,8 @@ const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
   const bottomPadding = 120; // Generous bottom padding to prevent overflow
   const edgeLabelPadding = 40; // Additional space for edge labels
 
-  const calculatedHeight = topPadding + (depth * layerSpacing) + nodeHeight + bottomPadding + edgeLabelPadding;
+  const calculatedHeight = topPadding + (depth * layerSpacing) + nodeHeight +
+    bottomPadding + edgeLabelPadding;
 
   // Use the larger of default height or calculated height
   const dynamicHeight = Math.max(baseConfig.height, calculatedHeight);
@@ -72,8 +73,14 @@ const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
 /**
  * Enhanced rendering function with custom configuration override
  */
-export const renderMermaidWithConfig = (mermaidText: string, customConfig?: Partial<SvgConfig>): string => {
-  const renderResult = renderMermaidDiagramWithConfig(mermaidText, customConfig);
+export const renderMermaidWithConfig = (
+  mermaidText: string,
+  customConfig?: Partial<SvgConfig>,
+): string => {
+  const renderResult = renderMermaidDiagramWithConfig(
+    mermaidText,
+    customConfig,
+  );
 
   return match(renderResult)
     .with({ success: true }, ({ content }) => content)
@@ -90,7 +97,10 @@ export const renderMermaidWithConfig = (mermaidText: string, customConfig?: Part
 /**
  * Core rendering function with custom configuration support
  */
-const renderMermaidDiagramWithConfig = (mermaidText: string, customConfig?: Partial<SvgConfig>): RenderResult => {
+const renderMermaidDiagramWithConfig = (
+  mermaidText: string,
+  customConfig?: Partial<SvgConfig>,
+): RenderResult => {
   try {
     const trimmedText = mermaidText.trim();
 
@@ -98,14 +108,16 @@ const renderMermaidDiagramWithConfig = (mermaidText: string, customConfig?: Part
     if (trimmedText.startsWith("graph ")) {
       return {
         success: false,
-        error: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+        error:
+          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
       };
     }
 
     if (trimmedText.startsWith("sequenceDiagram")) {
       return {
         success: false,
-        error: "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+        error:
+          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
       };
     }
 
@@ -204,14 +216,16 @@ const renderMermaidDiagram = (mermaidText: string): RenderResult => {
     if (trimmedText.startsWith("graph ")) {
       return {
         success: false,
-        error: "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+        error:
+          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
       };
     }
 
     if (trimmedText.startsWith("sequenceDiagram")) {
       return {
         success: false,
-        error: "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+        error:
+          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
       };
     }
 
@@ -405,7 +419,10 @@ export const renderWithMetrics = (mermaidText: string): {
     const dynamicConfig = calculateDynamicConfig(analysis);
 
     // Use performance monitoring for rendering
-    const monitoredRender = withPerformanceMonitoring(renderSvg, "Mermaid Rendering");
+    const monitoredRender = withPerformanceMonitoring(
+      renderSvg,
+      "Mermaid Rendering",
+    );
     const svgResult = monitoredRender(ast, dynamicConfig);
 
     const endTime = performance.now();

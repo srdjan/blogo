@@ -28,7 +28,11 @@ export type Config = {
 
 const getEnvironment = (): Environment => {
   const env = Deno.env.get("DENO_ENV") || "development";
-  const validEnvs: readonly Environment[] = ["development", "production", "test"];
+  const validEnvs: readonly Environment[] = [
+    "development",
+    "production",
+    "test",
+  ];
 
   if (!validEnvs.includes(env as Environment)) {
     console.warn(`Invalid environment "${env}", defaulting to "development"`);

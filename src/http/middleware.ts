@@ -32,7 +32,6 @@ export const accessLog: Middleware = (next) => async (req) => {
       timestamp: new Date().toISOString(),
     };
 
-
     // Update request metrics
     updateRequestMetrics(parseFloat(duration), res.status >= 400);
 

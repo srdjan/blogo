@@ -1,79 +1,100 @@
-<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+<svg
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+  width="200"
+  height="200"
+>
   <!-- Background circle for contrast -->
-  <circle cx="100" cy="100" r="95" fill="#f5f5f5" stroke="none"/>
-  
+  <circle cx="100" cy="100" r="95" fill="#f5f5f5" stroke="none" />
+
   <!-- Main geometric mandala center -->
   <g transform="translate(100,100)">
     <!-- Outer ring with decorative elements -->
-    <circle r="80" fill="none" stroke="#2a2a2a" stroke-width="2.5"/>
-    <circle r="75" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
-    
+    <circle r="80" fill="none" stroke="#2a2a2a" stroke-width="2.5" />
+    <circle r="75" fill="none" stroke="#2a2a2a" stroke-width="1.5" />
+
     <!-- Petal-like shapes -->
     <g id="petal">
-      <path d="M 0,-70 Q -15,-50 -10,-30 Q 0,-25 10,-30 Q 15,-50 0,-70" 
-            fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
-      <path d="M 0,-65 Q -8,-50 -5,-35 Q 0,-32 5,-35 Q 8,-50 0,-65" 
-            fill="#2a2a2a" opacity="0.15"/>
+      <path
+        d="M 0,-70 Q -15,-50 -10,-30 Q 0,-25 10,-30 Q 15,-50 0,-70"
+        fill="none"
+        stroke="#2a2a2a"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      <path
+        d="M 0,-65 Q -8,-50 -5,-35 Q 0,-32 5,-35 Q 8,-50 0,-65"
+        fill="#2a2a2a"
+        opacity="0.15"
+      />
     </g>
-    <use href="#petal" transform="rotate(45)"/>
-    <use href="#petal" transform="rotate(90)"/>
-    <use href="#petal" transform="rotate(135)"/>
-    <use href="#petal" transform="rotate(180)"/>
-    <use href="#petal" transform="rotate(225)"/>
-    <use href="#petal" transform="rotate(270)"/>
-    <use href="#petal" transform="rotate(315)"/>
-    
+    <use href="#petal" transform="rotate(45)" />
+    <use href="#petal" transform="rotate(90)" />
+    <use href="#petal" transform="rotate(135)" />
+    <use href="#petal" transform="rotate(180)" />
+    <use href="#petal" transform="rotate(225)" />
+    <use href="#petal" transform="rotate(270)" />
+    <use href="#petal" transform="rotate(315)" />
+
     <!-- Inner geometric pattern -->
-    <polygon points="0,-50 43.3,-25 43.3,25 0,50 -43.3,25 -43.3,-25" 
-             fill="none" stroke="#2a2a2a" stroke-width="2"/>
-    <polygon points="0,-35 30.3,-17.5 30.3,17.5 0,35 -30.3,17.5 -30.3,-17.5" 
-             fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
-    
+    <polygon
+      points="0,-50 43.3,-25 43.3,25 0,50 -43.3,25 -43.3,-25"
+      fill="none"
+      stroke="#2a2a2a"
+      stroke-width="2"
+    />
+    <polygon
+      points="0,-35 30.3,-17.5 30.3,17.5 0,35 -30.3,17.5 -30.3,-17.5"
+      fill="none"
+      stroke="#2a2a2a"
+      stroke-width="1.5"
+    />
+
     <!-- Center circle with dot pattern -->
-    <circle r="20" fill="none" stroke="#2a2a2a" stroke-width="2"/>
-    <circle r="15" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
-    
+    <circle r="20" fill="none" stroke="#2a2a2a" stroke-width="2" />
+    <circle r="15" fill="none" stroke="#2a2a2a" stroke-width="1.5" />
+
     <!-- Center decorative dots -->
-    <circle cx="0" cy="-8" r="2" fill="#2a2a2a"/>
-    <circle cx="7" cy="4" r="2" fill="#2a2a2a"/>
-    <circle cx="-7" cy="4" r="2" fill="#2a2a2a"/>
-    <circle cx="0" cy="0" r="3" fill="#2a2a2a"/>
-    
+    <circle cx="0" cy="-8" r="2" fill="#2a2a2a" />
+    <circle cx="7" cy="4" r="2" fill="#2a2a2a" />
+    <circle cx="-7" cy="4" r="2" fill="#2a2a2a" />
+    <circle cx="0" cy="0" r="3" fill="#2a2a2a" />
+
     <!-- Connecting lines for detail -->
     <g stroke="#2a2a2a" stroke-width="1" fill="none">
-      <line x1="0" y1="-20" x2="0" y2="-35"/>
-      <line x1="17.3" y1="-10" x2="30.3" y2="-17.5"/>
-      <line x1="17.3" y1="10" x2="30.3" y2="17.5"/>
-      <line x1="0" y1="20" x2="0" y2="35"/>
-      <line x1="-17.3" y1="10" x2="-30.3" y2="17.5"/>
-      <line x1="-17.3" y1="-10" x2="-30.3" y2="-17.5"/>
+      <line x1="0" y1="-20" x2="0" y2="-35" />
+      <line x1="17.3" y1="-10" x2="30.3" y2="-17.5" />
+      <line x1="17.3" y1="10" x2="30.3" y2="17.5" />
+      <line x1="0" y1="20" x2="0" y2="35" />
+      <line x1="-17.3" y1="10" x2="-30.3" y2="17.5" />
+      <line x1="-17.3" y1="-10" x2="-30.3" y2="-17.5" />
     </g>
-    
+
     <!-- Small decorative elements between petals -->
     <g id="dot-group">
-      <circle cx="0" cy="-60" r="1.5" fill="#2a2a2a"/>
-      <circle cx="4" cy="-58" r="1" fill="#2a2a2a"/>
-      <circle cx="-4" cy="-58" r="1" fill="#2a2a2a"/>
+      <circle cx="0" cy="-60" r="1.5" fill="#2a2a2a" />
+      <circle cx="4" cy="-58" r="1" fill="#2a2a2a" />
+      <circle cx="-4" cy="-58" r="1" fill="#2a2a2a" />
     </g>
-    <use href="#dot-group" transform="rotate(45)"/>
-    <use href="#dot-group" transform="rotate(90)"/>
-    <use href="#dot-group" transform="rotate(135)"/>
-    <use href="#dot-group" transform="rotate(180)"/>
-    <use href="#dot-group" transform="rotate(225)"/>
-    <use href="#dot-group" transform="rotate(270)"/>
-    <use href="#dot-group" transform="rotate(315)"/>
+    <use href="#dot-group" transform="rotate(45)" />
+    <use href="#dot-group" transform="rotate(90)" />
+    <use href="#dot-group" transform="rotate(135)" />
+    <use href="#dot-group" transform="rotate(180)" />
+    <use href="#dot-group" transform="rotate(225)" />
+    <use href="#dot-group" transform="rotate(270)" />
+    <use href="#dot-group" transform="rotate(315)" />
   </g>
-  
+
   <!-- Subtle shadow effect for depth -->
   <defs>
     <filter id="shadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-      <feOffset dx="1" dy="1" result="offsetblur"/>
-      <feFlood flood-color="#000000" flood-opacity="0.1"/>
-      <feComposite in2="offsetblur" operator="in"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+      <feOffset dx="1" dy="1" result="offsetblur" />
+      <feFlood flood-color="#000000" flood-opacity="0.1" />
+      <feComposite in2="offsetblur" operator="in" />
       <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
   </defs>

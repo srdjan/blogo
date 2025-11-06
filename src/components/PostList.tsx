@@ -8,7 +8,9 @@ export const PostList = (props: {
   const { posts, activeTag } = props;
 
   return (
-    <section aria-label={activeTag ? `Posts tagged ${activeTag}` : "Latest posts"}>
+    <section
+      aria-label={activeTag ? `Posts tagged ${activeTag}` : "Latest posts"}
+    >
       <header class="post-list-header">
         <h1>
           {activeTag ? `Posts tagged with ${activeTag}` : "Latest Posts"}
@@ -27,9 +29,7 @@ export const PostList = (props: {
           </p>
         )}
       </header>
-      {posts.length === 0 ? (
-        <p>No posts found.</p>
-      ) : (
+      {posts.length === 0 ? <p>No posts found.</p> : (
         <ul class="post-list">
           {posts.map((post) => (
             <li key={post.slug}>

@@ -1,9 +1,9 @@
 # Blogo Admin Panel Design Document
-**Version:** 1.0
-**Date:** 2025-10-16
-**Status:** Design Phase
+
+**Version:** 1.0 **Date:** 2025-10-16 **Status:** Design Phase
 
 ## Table of Contents
+
 1. [Executive Summary](#executive-summary)
 2. [Architecture Design](#architecture-design)
 3. [Storage Layer (Deno KV)](#storage-layer-deno-kv)
@@ -19,9 +19,13 @@
 
 ## Executive Summary
 
-This document outlines the design for adding content editing capabilities to the Blogo application using the Tiptap rich text editor and a minimal authentication system. The design maintains Blogo's existing Light Functional Programming architecture while adding administrative functionality through Deno KV storage.
+This document outlines the design for adding content editing capabilities to the
+Blogo application using the Tiptap rich text editor and a minimal authentication
+system. The design maintains Blogo's existing Light Functional Programming
+architecture while adding administrative functionality through Deno KV storage.
 
 **Key Design Principles:**
+
 - Preserve existing public-facing blog functionality and architecture
 - Maintain Light FP patterns (no classes, Result types, ports for dependencies)
 - Keep admin interface minimal and functional
@@ -82,18 +86,21 @@ This document outlines the design for adding content editing capabilities to the
 ### Separation of Concerns
 
 **Public Blog (Unchanged):**
+
 - Continues to serve posts from filesystem (`content/posts/*.md`)
 - Read-only ContentService with caching
 - No authentication required
 - Existing routes and components work as-is
 
 **Admin Panel (New):**
+
 - Authenticated section at `/admin/*`
 - CRUD operations stored in Deno KV
 - Tiptap editor for content creation/editing
 - Server-rendered mono-jsx components
 
 **Hybrid Approach:**
+
 - Admin can edit posts in KV; these override file-based posts
 - Posts without KV entries fall back to filesystem
 - Migration tool to move posts from files to KV
@@ -108,13 +115,13 @@ Deno KV uses hierarchical keys. Our schema follows these patterns:
 
 ```typescript
 // Key Patterns
-["posts", slug]                    // Post content and metadata
-["posts_by_date", date, slug]      // Date-based index
-["posts_by_tag", tag, slug]        // Tag-based index
-["post_slugs"]                     // Set of all post slugs
-["sessions", sessionId]            // User sessions
-["users", username]                // User credentials
-["admin", "metadata", key]         // Admin metadata (topics, etc.)
+["posts", slug] // Post content and metadata
+  ["posts_by_date", date, slug] // Date-based index
+  ["posts_by_tag", tag, slug] // Tag-based index
+  ["post_slugs"] // Set of all post slugs
+  ["sessions", sessionId] // User sessions
+  ["users", username] // User credentials
+  ["admin", "metadata", key]; // Admin metadata (topics, etc.)
 ```
 
 ### Type Definitions
@@ -125,8 +132,8 @@ Deno KV uses hierarchical keys. Our schema follows these patterns:
 export type PostStatus = "draft" | "published" | "archived";
 
 export type KvPost = PostMeta & {
-  readonly content: string;        // Markdown content
-  readonly tiptapJson?: unknown;   // Optional Tiptap JSON format
+  readonly content: string; // Markdown content
+  readonly tiptapJson?: unknown; // Optional Tiptap JSON format
   readonly status: PostStatus;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -143,7 +150,7 @@ export type User = {
 export type Session = {
   readonly sessionId: string;
   readonly username: string;
-  readonly expiresAt: number;      // Unix timestamp
+  readonly expiresAt: number; // Unix timestamp
   readonly createdAt: number;
 };
 ```
@@ -159,11 +166,13 @@ export interface KvStore {
   readonly savePost: (post: KvPost) => Promise<AppResult<void>>;
   readonly deletePost: (slug: Slug) => Promise<AppResult<void>>;
   readonly listPosts: (
-    options?: { status?: PostStatus; limit?: number }
+    options?: { status?: PostStatus; limit?: number },
   ) => Promise<AppResult<readonly KvPost[]>>;
 
   // Session operations
-  readonly getSession: (sessionId: string) => Promise<AppResult<Session | null>>;
+  readonly getSession: (
+    sessionId: string,
+  ) => Promise<AppResult<Session | null>>;
   readonly saveSession: (session: Session) => Promise<AppResult<void>>;
   readonly deleteSession: (sessionId: string) => Promise<AppResult<void>>;
 
@@ -178,12 +187,13 @@ export interface KvStore {
 **Primary Index:** `["posts", slug]` - Fast single-post lookups
 
 **Secondary Indexes:**
+
 - `["posts_by_date", date, slug]` - Date-ordered listing
 - `["posts_by_tag", tag, slug]` - Tag filtering
 - `["posts_by_status", status, slug]` - Draft vs published
 
-**Atomic Operations:**
-When saving a post, use atomic operations to update all indexes:
+**Atomic Operations:** When saving a post, use atomic operations to update all
+indexes:
 
 ```typescript
 const atomic = kv.atomic()
@@ -201,16 +211,19 @@ await atomic.commit();
 ### Migration Strategy
 
 **Phase 1: Dual Read (backward compatible)**
+
 - AdminContentService reads from KV first, falls back to filesystem
 - Public ContentService remains file-based
 - No breaking changes
 
 **Phase 2: Gradual Migration**
+
 - CLI tool to import markdown files into KV: `deno task migrate:posts`
 - Posts in KV override file-based posts
 - Can import individual posts or all at once
 
 **Phase 3: KV Primary (future)**
+
 - Both public and admin read from KV
 - Filesystem posts become backup/archive
 - Optional: export KV posts to markdown files
@@ -222,7 +235,7 @@ await atomic.commit();
 export const migratePosts = async (
   contentService: ContentService,
   kvStore: KvStore,
-  options: { dryRun?: boolean } = {}
+  options: { dryRun?: boolean } = {},
 ): Promise<AppResult<{ imported: number; failed: string[] }>> => {
   const postsResult = await contentService.loadPosts();
   if (!postsResult.ok) return postsResult;
@@ -264,6 +277,7 @@ export const migratePosts = async (
 **Chosen Method:** Session-based authentication with HTTP-only cookies
 
 **Rationale:**
+
 - Simple to implement and reason about
 - Secure by default (HTTP-only, Secure, SameSite flags)
 - No need for JWT complexity (single-server deployment)
@@ -271,6 +285,7 @@ export const migratePosts = async (
 - Suitable for server-rendered admin UI
 
 **Alternative Considered:** Basic Auth
+
 - Simpler but less user-friendly (browser password dialogs)
 - No logout functionality
 - Harder to extend (e.g., multiple users)
@@ -332,12 +347,15 @@ export const migratePosts = async (
 ### Security Considerations
 
 **Password Hashing:**
+
 - Use bcrypt (via `jsr:@felix/bcrypt@0.4.1`) for local development
-- Use argon2id (via `jsr:@rabbit-company/argon2id`) for Deno Deploy (WASM-compatible)
+- Use argon2id (via `jsr:@rabbit-company/argon2id`) for Deno Deploy
+  (WASM-compatible)
 - Salt rounds: 12 for bcrypt
 - Never store plaintext passwords
 
 **Session Management:**
+
 - Session ID: Crypto-random UUID (crypto.randomUUID())
 - Session expiry: 24 hours default, configurable
 - HTTP-only cookies (JavaScript cannot access)
@@ -366,6 +384,7 @@ const createSessionCookie = (sessionId: string): string => {
 ```
 
 **Rate Limiting (Future Enhancement):**
+
 - Track failed login attempts per IP in KV
 - Implement exponential backoff after 3 failures
 - Clear counter after successful login
@@ -378,19 +397,19 @@ const createSessionCookie = (sessionId: string): string => {
 export interface AuthService {
   readonly login: (
     username: string,
-    password: string
+    password: string,
   ) => Promise<AppResult<Session>>;
 
   readonly logout: (sessionId: string) => Promise<AppResult<void>>;
 
   readonly validateSession: (
-    sessionId: string
+    sessionId: string,
   ) => Promise<AppResult<Session | null>>;
 
   readonly createUser: (
     username: string,
     password: string,
-    role: "admin" | "editor"
+    role: "admin" | "editor",
   ) => Promise<AppResult<User>>;
 }
 ```
@@ -400,8 +419,8 @@ export interface AuthService {
 ```typescript
 // src/http/middleware.ts (addition)
 
-export const requireAuth = (kvStore: KvStore): Middleware =>
-  (next) => async (req) => {
+export const requireAuth =
+  (kvStore: KvStore): Middleware => (next) => async (req) => {
     const url = new URL(req.url);
 
     // Allow login/logout routes without auth
@@ -429,7 +448,7 @@ export const requireAuth = (kvStore: KvStore): Middleware =>
         status: 302,
         headers: {
           "Location": "/login",
-          "Set-Cookie": `${SESSION_COOKIE_NAME}=; Max-Age=0; Path=/`
+          "Set-Cookie": `${SESSION_COOKIE_NAME}=; Max-Age=0; Path=/`,
         },
       });
     }
@@ -443,7 +462,7 @@ export const requireAuth = (kvStore: KvStore): Middleware =>
         status: 302,
         headers: {
           "Location": "/login",
-          "Set-Cookie": `${SESSION_COOKIE_NAME}=; Max-Age=0; Path=/`
+          "Set-Cookie": `${SESSION_COOKIE_NAME}=; Max-Age=0; Path=/`,
         },
       });
     }
@@ -508,6 +527,7 @@ await kv.close();
 **Approach:** ESM CDN imports via esm.sh
 
 **Rationale:**
+
 - No build step required (aligns with Deno philosophy)
 - Fast development iteration
 - Minimal bundle size (tree-shaking via ESM)
@@ -527,6 +547,7 @@ const TIPTAP_IMPORTS = {
 ### Required Extensions
 
 From StarterKit (included):
+
 - **Bold**, **Italic**, **Strike** - Text styling
 - **Heading** - H1-H6 headings
 - **Paragraph** - Body text
@@ -537,6 +558,7 @@ From StarterKit (included):
 - **HardBreak** - Line breaks
 
 Additional extensions needed:
+
 - **Link** - Hyperlinks (included in StarterKit v3+)
 - **prosemirror-markdown** - Bidirectional markdown conversion
 
@@ -694,7 +716,8 @@ export const PostEditor = (props: {
             id="markdown-content"
             name="content"
             style="display: none;"
-          ></textarea>
+          >
+          </textarea>
         </div>
 
         <div class="actions">
@@ -795,7 +818,7 @@ export const handlePreview = async (req: Request): Promise<Response> => {
     }),
     {
       headers: { "Content-Type": "text/html; charset=utf-8" },
-    }
+    },
   );
 };
 ```
@@ -811,23 +834,26 @@ export const handlePreview = async (req: Request): Promise<Response> => {
 
 export const adminRoutes = [
   // Authentication
-  { method: "GET",  path: "/login",  handler: renderLoginPage },
-  { method: "POST", path: "/login",  handler: handleLogin },
+  { method: "GET", path: "/login", handler: renderLoginPage },
+  { method: "POST", path: "/login", handler: handleLogin },
   { method: "POST", path: "/logout", handler: handleLogout },
 
   // Admin Dashboard
-  { method: "GET",  path: "/admin",  handler: renderAdminDashboard },
+  { method: "GET", path: "/admin", handler: renderAdminDashboard },
 
   // Post Management
-  { method: "GET",  path: "/admin/posts",         handler: listPosts },
-  { method: "GET",  path: "/admin/posts/new",     handler: renderNewPost },
-  { method: "GET",  path: "/admin/posts/:slug",   handler: renderEditPost },
-  { method: "POST", path: "/admin/posts/save",    handler: handleSavePost },
-  { method: "POST", path: "/admin/posts/:slug/delete", handler: handleDeletePost },
+  { method: "GET", path: "/admin/posts", handler: listPosts },
+  { method: "GET", path: "/admin/posts/new", handler: renderNewPost },
+  { method: "GET", path: "/admin/posts/:slug", handler: renderEditPost },
+  { method: "POST", path: "/admin/posts/save", handler: handleSavePost },
+  {
+    method: "POST",
+    path: "/admin/posts/:slug/delete",
+    handler: handleDeletePost,
+  },
 
   // Preview
   { method: "POST", path: "/admin/preview", handler: handlePreview },
-
   // Media Management (Future)
   // { method: "GET",  path: "/admin/media",  handler: listMedia },
   // { method: "POST", path: "/admin/media/upload", handler: handleUpload },
@@ -886,9 +912,7 @@ export const LoginForm = (props: {
     <form method="POST" action="/login" class="login-form">
       <h1>Blogo Admin</h1>
 
-      {props.error && (
-        <div class="error-message">{props.error}</div>
-      )}
+      {props.error && <div class="error-message">{props.error}</div>}
 
       <label>
         Username
@@ -1108,8 +1132,8 @@ src/components/
 
 ### Phase 1: Authentication System (Week 1)
 
-**Priority:** HIGH (Foundation for everything else)
-**Risk:** MEDIUM (Security-critical)
+**Priority:** HIGH (Foundation for everything else) **Risk:** MEDIUM
+(Security-critical)
 
 **Tasks:**
 
@@ -1153,14 +1177,15 @@ src/components/
    - Add `admin:setup` task to deno.json
    - Document setup process in README
 
-**Dependencies:** None
-**Deliverables:**
+**Dependencies:** None **Deliverables:**
+
 - Working login/logout flow
 - Session management in KV
 - Admin user creation tool
 - Authentication middleware ready for use
 
 **Testing Strategy:**
+
 - Unit tests for AuthService (mock KV)
 - Integration tests for login flow
 - Manual testing of cookie security flags
@@ -1169,8 +1194,8 @@ src/components/
 
 ### Phase 2: Deno KV Storage Layer (Week 2)
 
-**Priority:** HIGH (Required for content management)
-**Risk:** MEDIUM (Data migration complexity)
+**Priority:** HIGH (Required for content management) **Risk:** MEDIUM (Data
+migration complexity)
 
 **Tasks:**
 
@@ -1216,14 +1241,15 @@ src/components/
    - Script to clear KV data (for testing)
    - Add tasks to deno.json
 
-**Dependencies:** Phase 1 (Auth system for user tracking)
-**Deliverables:**
+**Dependencies:** Phase 1 (Auth system for user tracking) **Deliverables:**
+
 - Complete KV storage layer
 - AdminContentService with CRUD
 - Migration tool
 - Backward-compatible read strategy
 
 **Testing Strategy:**
+
 - Unit tests for all KV operations
 - Integration tests with real KV instance
 - Migration tests with sample posts
@@ -1233,8 +1259,8 @@ src/components/
 
 ### Phase 3: Admin Routes & UI (Week 3)
 
-**Priority:** MEDIUM (UI for existing backend)
-**Risk:** LOW (Server-rendered components)
+**Priority:** MEDIUM (UI for existing backend) **Risk:** LOW (Server-rendered
+components)
 
 **Tasks:**
 
@@ -1277,14 +1303,15 @@ src/components/
    - Display session expiry warning
    - Test full auth flow
 
-**Dependencies:** Phase 1 (Auth), Phase 2 (KV storage)
-**Deliverables:**
+**Dependencies:** Phase 1 (Auth), Phase 2 (KV storage) **Deliverables:**
+
 - Admin dashboard with stats
 - Post list with filtering
 - Delete functionality
 - Full navigation between admin pages
 
 **Testing Strategy:**
+
 - Visual testing of all admin pages
 - Test authentication flow
 - Test all CRUD operations via UI
@@ -1294,8 +1321,8 @@ src/components/
 
 ### Phase 4: Tiptap Editor Integration (Week 4)
 
-**Priority:** HIGH (Core feature)
-**Risk:** MEDIUM (Markdown conversion complexity)
+**Priority:** HIGH (Core feature) **Risk:** MEDIUM (Markdown conversion
+complexity)
 
 **Tasks:**
 
@@ -1366,8 +1393,8 @@ src/components/
    - Add loading states
    - Test on mobile devices
 
-**Dependencies:** Phase 2 (KV storage), Phase 3 (Admin UI)
-**Deliverables:**
+**Dependencies:** Phase 2 (KV storage), Phase 3 (Admin UI) **Deliverables:**
+
 - Working Tiptap editor
 - Create/edit post functionality
 - Preview feature
@@ -1375,6 +1402,7 @@ src/components/
 - Styled editor interface
 
 **Testing Strategy:**
+
 - Test markdown round-trip fidelity
 - Test all StarterKit extensions
 - Test frontmatter validation
@@ -1386,18 +1414,19 @@ src/components/
 
 ### Summary Timeline
 
-| Phase | Duration | Dependencies | Risk |
-|-------|----------|--------------|------|
-| Phase 1: Authentication | Week 1 | None | Medium |
-| Phase 2: KV Storage | Week 2 | Phase 1 | Medium |
-| Phase 3: Admin UI | Week 3 | Phase 1, 2 | Low |
-| Phase 4: Tiptap Editor | Week 4 | Phase 2, 3 | Medium |
+| Phase                   | Duration | Dependencies | Risk   |
+| ----------------------- | -------- | ------------ | ------ |
+| Phase 1: Authentication | Week 1   | None         | Medium |
+| Phase 2: KV Storage     | Week 2   | Phase 1      | Medium |
+| Phase 3: Admin UI       | Week 3   | Phase 1, 2   | Low    |
+| Phase 4: Tiptap Editor  | Week 4   | Phase 2, 3   | Medium |
 
 **Total Estimated Time:** 4 weeks (full-time) or 8-10 weeks (part-time)
 
 **Critical Path:** Phase 1 → Phase 2 → Phase 4
 
 **Parallelization Opportunities:**
+
 - Phase 3 can start once Phase 2 is partially complete
 - UI styling can happen throughout all phases
 
@@ -1535,7 +1564,8 @@ const editor = new Editor({
   content: initialMarkdown,
   editorProps: {
     attributes: {
-      class: "prose prose-sm sm:prose lg:prose-lg focus:outline-none min-h-[400px] p-4 border rounded",
+      class:
+        "prose prose-sm sm:prose lg:prose-lg focus:outline-none min-h-[400px] p-4 border rounded",
     },
   },
   onUpdate: ({ editor }) => {
@@ -1560,7 +1590,10 @@ window.editor = editor;
 ```typescript
 // public/js/admin/markdown-converter.js
 
-import { defaultMarkdownParser, defaultMarkdownSerializer } from "https://esm.sh/prosemirror-markdown@1.13.2";
+import {
+  defaultMarkdownParser,
+  defaultMarkdownSerializer,
+} from "https://esm.sh/prosemirror-markdown@1.13.2";
 import { DOMParser as ProseMirrorDOMParser } from "https://esm.sh/prosemirror-model@1.19.0";
 
 /**
@@ -1635,8 +1668,7 @@ const getMarkdown = () => {
 
     // Password hashing (choose one based on deployment target)
     "@felix/bcrypt": "jsr:@felix/bcrypt@0.4.1",
-    "@rabbit-company/argon2id": "jsr:@rabbit-company/argon2id@^1.0.0",
-
+    "@rabbit-company/argon2id": "jsr:@rabbit-company/argon2id@^1.0.0"
     // Note: Tiptap will be loaded via CDN, not as Deno dependencies
   }
 }
@@ -1655,6 +1687,7 @@ These are loaded via ESM imports in the browser:
 **CDN Service:** esm.sh (recommended for Deno compatibility)
 
 **Example Import:**
+
 ```javascript
 import { Editor } from "https://esm.sh/@tiptap/core@2.8.0";
 ```
@@ -1662,6 +1695,7 @@ import { Editor } from "https://esm.sh/@tiptap/core@2.8.0";
 ### No Build Step Required
 
 All dependencies are either:
+
 1. Deno imports (loaded at runtime)
 2. ESM CDN imports (loaded by browser)
 
@@ -1675,24 +1709,30 @@ No webpack, rollup, or esbuild needed!
 
 #### 1. Markdown Conversion Fidelity (MEDIUM RISK)
 
-**Problem:** Markdown → Tiptap → Markdown conversion may not be perfectly lossless. Certain markdown features (e.g., HTML comments, custom HTML, specific formatting) might be lost or altered.
+**Problem:** Markdown → Tiptap → Markdown conversion may not be perfectly
+lossless. Certain markdown features (e.g., HTML comments, custom HTML, specific
+formatting) might be lost or altered.
 
 **Mitigation:**
+
 - Test conversion with existing blog posts early
 - Document unsupported markdown features
 - Consider storing both markdown and Tiptap JSON in KV
 - Provide a "source mode" toggle to edit raw markdown
 - Add validation warnings when conversion changes content
 
-**Trade-off:** Accept minor formatting differences vs. building custom markdown parser
+**Trade-off:** Accept minor formatting differences vs. building custom markdown
+parser
 
 ---
 
 #### 2. Concurrent Edit Conflicts (MEDIUM RISK)
 
-**Problem:** If two admins edit the same post simultaneously, one will overwrite the other's changes.
+**Problem:** If two admins edit the same post simultaneously, one will overwrite
+the other's changes.
 
 **Mitigation:**
+
 - Use Deno KV's `versionstamp` for optimistic concurrency control
 - Detect conflicts on save and warn user
 - Show "last edited by X at Y" timestamp
@@ -1706,9 +1746,11 @@ No webpack, rollup, or esbuild needed!
 
 #### 3. Session Security & Expiry (MEDIUM RISK)
 
-**Problem:** Sessions stored in KV could be compromised if session ID is exposed; expired sessions might not clean up properly.
+**Problem:** Sessions stored in KV could be compromised if session ID is
+exposed; expired sessions might not clean up properly.
 
 **Mitigation:**
+
 - Use crypto-random session IDs (UUID v4)
 - Set short TTL on session entries (24 hours)
 - Implement automatic cleanup task (Deno.cron)
@@ -1722,9 +1764,11 @@ No webpack, rollup, or esbuild needed!
 
 #### 4. Migration Data Integrity (LOW RISK)
 
-**Problem:** Migrating 25 existing posts to KV could introduce errors (corrupted content, lost metadata).
+**Problem:** Migrating 25 existing posts to KV could introduce errors (corrupted
+content, lost metadata).
 
 **Mitigation:**
+
 - Implement dry-run mode first
 - Validate all data before saving to KV
 - Keep filesystem posts as source of truth initially
@@ -1738,9 +1782,11 @@ No webpack, rollup, or esbuild needed!
 
 #### 5. CDN Dependency Reliability (LOW RISK)
 
-**Problem:** Using esm.sh CDN for Tiptap means reliance on external service; could fail or change.
+**Problem:** Using esm.sh CDN for Tiptap means reliance on external service;
+could fail or change.
 
 **Mitigation:**
+
 - Pin specific versions in imports
 - Consider self-hosting Tiptap bundles if CDN is unreliable
 - Add fallback mechanism (detect load failure, show error)
@@ -1753,9 +1799,11 @@ No webpack, rollup, or esbuild needed!
 
 #### 6. Editor Styling & Customization (LOW RISK)
 
-**Problem:** Tiptap's default styles might conflict with blog's brutalist design; customization could be time-consuming.
+**Problem:** Tiptap's default styles might conflict with blog's brutalist
+design; customization could be time-consuming.
 
 **Mitigation:**
+
 - Start with minimal Tiptap styling
 - Use CSS scoping to avoid conflicts
 - Accept editor looking different from public blog
@@ -1773,6 +1821,7 @@ No webpack, rollup, or esbuild needed!
 **Decision:** Use Deno KV for admin, keep filesystem as fallback
 
 **Pros:**
+
 - Atomic operations for concurrency safety
 - Fast queries without file I/O
 - Built-in TTL for sessions
@@ -1780,12 +1829,14 @@ No webpack, rollup, or esbuild needed!
 - Structured data easier to query/filter
 
 **Cons:**
+
 - Adds complexity (dual storage system)
 - KV data not visible in git (can't track changes)
 - Requires migration effort
 - Need to implement backup strategy
 
-**Why Chosen:** KV is the Deno-native solution for dynamic data; filesystem is great for static content but poor for CRUD operations.
+**Why Chosen:** KV is the Deno-native solution for dynamic data; filesystem is
+great for static content but poor for CRUD operations.
 
 ---
 
@@ -1794,17 +1845,20 @@ No webpack, rollup, or esbuild needed!
 **Decision:** Use session cookies with HTTP-only flag
 
 **Pros:**
+
 - Simpler implementation (no token signing/verification)
 - Server controls session validity (can revoke instantly)
 - More secure (HTTP-only, no XSS risk)
 - Better for single-server deployment
 
 **Cons:**
+
 - Requires server-side session storage (KV)
 - Doesn't scale to multi-server without shared KV
 - Each request requires KV lookup
 
-**Why Chosen:** Simplicity and security for single-admin use case; Deno KV makes session storage trivial.
+**Why Chosen:** Simplicity and security for single-admin use case; Deno KV makes
+session storage trivial.
 
 ---
 
@@ -1813,6 +1867,7 @@ No webpack, rollup, or esbuild needed!
 **Decision:** Use Tiptap via ESM CDN imports
 
 **Pros:**
+
 - No build step (aligns with Deno philosophy)
 - Fast development iteration
 - Automatic tree-shaking via ESM
@@ -1820,12 +1875,14 @@ No webpack, rollup, or esbuild needed!
 - Smaller repo size (no node_modules)
 
 **Cons:**
+
 - Relies on external service (esm.sh)
 - Slightly slower first load (no local bundle)
 - Must be online to develop
 - Version pinning required
 
-**Why Chosen:** Deno's strength is avoiding build tooling; CDN approach is most aligned with project philosophy.
+**Why Chosen:** Deno's strength is avoiding build tooling; CDN approach is most
+aligned with project philosophy.
 
 ---
 
@@ -1834,6 +1891,7 @@ No webpack, rollup, or esbuild needed!
 **Decision:** Server-rendered mono-jsx for admin UI
 
 **Pros:**
+
 - Consistent with existing architecture
 - No additional framework/library needed
 - Smaller client-side bundle
@@ -1841,12 +1899,14 @@ No webpack, rollup, or esbuild needed!
 - Better accessibility (works without JS)
 
 **Cons:**
+
 - Full page reloads on navigation
 - Harder to implement rich interactions
 - Can't easily add real-time features
 - Less "app-like" feel
 
-**Why Chosen:** Keep architecture consistent; admin UI doesn't need SPA complexity; can enhance with HTMX later if needed.
+**Why Chosen:** Keep architecture consistent; admin UI doesn't need SPA
+complexity; can enhance with HTMX later if needed.
 
 ---
 
@@ -1855,15 +1915,18 @@ No webpack, rollup, or esbuild needed!
 **Decision:** Start with single admin, design for multi-user
 
 **Pros:**
+
 - Simpler initial implementation
 - No role/permission system needed yet
 - Faster to ship MVP
 
 **Cons:**
+
 - Will need refactoring if multiple admins needed
 - No audit trail of who edited what
 
-**Why Chosen:** Ship faster with single user; schema already supports multiple users, so future expansion is easy.
+**Why Chosen:** Ship faster with single user; schema already supports multiple
+users, so future expansion is easy.
 
 ---
 
@@ -1871,17 +1934,21 @@ No webpack, rollup, or esbuild needed!
 
 #### Q1: Storage Strategy
 
-**Question:** Should we store both markdown and Tiptap JSON in KV, or just markdown?
+**Question:** Should we store both markdown and Tiptap JSON in KV, or just
+markdown?
 
 **Option A:** Store only markdown
+
 - Pros: Single source of truth, smaller storage
 - Cons: Re-parse markdown to JSON on every edit
 
 **Option B:** Store both markdown and Tiptap JSON
+
 - Pros: Faster editor loading, no re-parsing
 - Cons: Potential inconsistency, larger storage
 
-**Recommendation:** Start with Option A (markdown only); add JSON caching if editor load is slow.
+**Recommendation:** Start with Option A (markdown only); add JSON caching if
+editor load is slow.
 
 ---
 
@@ -1890,14 +1957,17 @@ No webpack, rollup, or esbuild needed!
 **Question:** Should we migrate all posts to KV immediately, or do it gradually?
 
 **Option A:** Migrate all 25 posts at once
+
 - Pros: Clean cut-over, simpler logic
 - Cons: Higher risk if migration fails
 
 **Option B:** Migrate posts on-demand (when first edited)
+
 - Pros: Lower risk, incremental approach
 - Cons: Hybrid state persists longer
 
-**Recommendation:** Option B (on-demand migration) for safety; provide bulk migration tool for convenience.
+**Recommendation:** Option B (on-demand migration) for safety; provide bulk
+migration tool for convenience.
 
 ---
 
@@ -1906,14 +1976,17 @@ No webpack, rollup, or esbuild needed!
 **Question:** Should draft posts be visible on the public blog?
 
 **Option A:** Drafts are admin-only
+
 - Pros: Clean separation, no accidental publication
 - Cons: Can't preview on live site
 
 **Option B:** Drafts visible at secret URL
+
 - Pros: Easy to share for feedback
 - Cons: Security by obscurity, might leak
 
-**Recommendation:** Option A (admin-only drafts); add preview functionality that renders public view within admin.
+**Recommendation:** Option A (admin-only drafts); add preview functionality that
+renders public view within admin.
 
 ---
 
@@ -1922,30 +1995,37 @@ No webpack, rollup, or esbuild needed!
 **Question:** Should we implement image upload, or rely on external hosting?
 
 **Option A:** Implement image upload to filesystem or KV
+
 - Pros: Self-contained, no external dependencies
 - Cons: Storage management, file size limits
 
 **Option B:** Use external image hosting (Cloudinary, Imgur, etc.)
+
 - Pros: Offload storage/optimization
 - Cons: External dependency, possible costs
 
-**Recommendation:** Phase 1: External hosting (paste URLs); Phase 2: Implement upload if needed.
+**Recommendation:** Phase 1: External hosting (paste URLs); Phase 2: Implement
+upload if needed.
 
 ---
 
 #### Q5: Markdown Extensions
 
-**Question:** Should we support extended markdown (e.g., footnotes, definition lists, custom components)?
+**Question:** Should we support extended markdown (e.g., footnotes, definition
+lists, custom components)?
 
 **Option A:** Stick to CommonMark (what prosemirror-markdown supports)
+
 - Pros: Simpler, more compatible
 - Cons: Limits content expressiveness
 
 **Option B:** Add custom markdown extensions
+
 - Pros: More powerful content
 - Cons: Custom parser/serializer, breaks compatibility
 
-**Recommendation:** Option A (CommonMark only) for MVP; evaluate extensions based on actual needs.
+**Recommendation:** Option A (CommonMark only) for MVP; evaluate extensions
+based on actual needs.
 
 ---
 

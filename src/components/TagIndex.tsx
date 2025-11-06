@@ -6,9 +6,7 @@ export const TagIndex = (props: { readonly tags: readonly TagInfo[] }) => {
   return (
     <main>
       <h2>Tags</h2>
-      {tags.length === 0 ? (
-        <p>No tags found.</p>
-      ) : (
+      {tags.length === 0 ? <p>No tags found.</p> : (
         <div class="tags">
           {tags.map((tag, index) => (
             <>

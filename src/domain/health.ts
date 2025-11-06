@@ -170,10 +170,9 @@ export const createHealthService = (
   };
 
   const getMemoryMetrics = () => {
-    const memoryUsage =
-      (performance as unknown as {
-        memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
-      }).memory;
+    const memoryUsage = (performance as unknown as {
+      memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+    }).memory;
 
     if (memoryUsage) {
       return {

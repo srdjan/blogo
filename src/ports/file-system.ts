@@ -17,7 +17,7 @@ export const createFileSystem = (): FileSystem => ({
   readFile: async (path: string): Promise<string> => {
     return await Deno.readTextFile(path);
   },
-  
+
   readDir: async (path: string): Promise<readonly string[]> => {
     const entries: string[] = [];
     for await (const entry of Deno.readDir(path)) {
@@ -25,7 +25,7 @@ export const createFileSystem = (): FileSystem => ({
     }
     return entries;
   },
-  
+
   exists: async (path: string): Promise<boolean> => {
     try {
       await Deno.stat(path);
@@ -34,12 +34,12 @@ export const createFileSystem = (): FileSystem => ({
       return false;
     }
   },
-  
+
   stat: async (path: string): Promise<FileInfo | null> => {
     try {
       const stat = await Deno.stat(path);
       return {
-        name: path.split('/').pop() ?? path,
+        name: path.split("/").pop() ?? path,
         isFile: stat.isFile,
         isDirectory: stat.isDirectory,
         size: stat.size,

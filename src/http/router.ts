@@ -1,4 +1,11 @@
-import type { Handler, Route, RouteContext, RouteHandler, RouteMatch, HttpMethod } from "./types.ts";
+import type {
+  Handler,
+  HttpMethod,
+  Route,
+  RouteContext,
+  RouteHandler,
+  RouteMatch,
+} from "./types.ts";
 
 export class Router {
   private readonly routes: Route[] = [];
@@ -19,7 +26,11 @@ export class Router {
     return this.add("DELETE", pattern, handler);
   }
 
-  add(method: HttpMethod, pattern: string | RegExp, handler: RouteHandler): this {
+  add(
+    method: HttpMethod,
+    pattern: string | RegExp,
+    handler: RouteHandler,
+  ): this {
     this.routes.push({ method, pattern, handler });
     return this;
   }
@@ -34,13 +45,15 @@ export class Router {
         if (route.pattern === pathname) {
           return { route, params };
         }
-        
+
         const paramPattern = route.pattern.replace(/:([^/]+)/g, "([^/]+)");
         const regex = new RegExp(`^${paramPattern}$`);
         const match = pathname.match(regex);
-        
+
         if (match) {
-          const paramNames = [...route.pattern.matchAll(/:([^/]+)/g)].map(m => m[1]).filter((name): name is string => name !== undefined);
+          const paramNames = [...route.pattern.matchAll(/:([^/]+)/g)].map((m) =>
+            m[1]
+          ).filter((name): name is string => name !== undefined);
           paramNames.forEach((name, index) => {
             const value = match[index + 1];
             if (value !== undefined) {

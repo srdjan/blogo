@@ -11,7 +11,9 @@ const generateRssItem = (post: Post, baseUrl: string): string => {
     post.content.replace(/<[^>]*>/g, "").substring(0, 200) + "...";
 
   const categories = post.tags && post.tags.length > 0
-    ? post.tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join("\n      ")
+    ? post.tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join(
+      "\n      ",
+    )
     : "";
 
   return `    <item>

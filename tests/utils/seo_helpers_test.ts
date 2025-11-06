@@ -19,7 +19,11 @@ Some more content here with additional details.
 
 And even more content to reach a reasonable word count.`;
 
-  const analysis = analyzeSEO("Test Post Title", "A test description for the post", markdown);
+  const analysis = analyzeSEO(
+    "Test Post Title",
+    "A test description for the post",
+    markdown,
+  );
 
   // Should return analysis object with expected properties
   assertEquals(typeof analysis.readingTime, "object");
@@ -38,7 +42,10 @@ Deno.test("analyzeSEO - calculates correct title and description lengths", () =>
   );
 
   assertEquals(analysis.titleLength, "This is a test title".length);
-  assertEquals(analysis.descriptionLength, "This is a test description with some words".length);
+  assertEquals(
+    analysis.descriptionLength,
+    "This is a test description with some words".length,
+  );
 });
 
 Deno.test("analyzeSEO - extracts headings correctly", () => {
@@ -71,7 +78,11 @@ Deno.test("analyzeSEO - generates slugs from headings", () => {
 });
 
 Deno.test("analyzeSEO - recommends longer title for short titles", () => {
-  const analysis = analyzeSEO("Short", "Description with enough length here", "Content");
+  const analysis = analyzeSEO(
+    "Short",
+    "Description with enough length here",
+    "Content",
+  );
 
   const hasRecommendation = analysis.recommendations.some((r) =>
     r.includes("Title is quite short")
@@ -80,7 +91,8 @@ Deno.test("analyzeSEO - recommends longer title for short titles", () => {
 });
 
 Deno.test("analyzeSEO - recommends shorter title for long titles", () => {
-  const longTitle = "This is a very long title that exceeds the recommended sixty character limit for SEO";
+  const longTitle =
+    "This is a very long title that exceeds the recommended sixty character limit for SEO";
   const analysis = analyzeSEO(longTitle, "Description", "Content");
 
   const hasRecommendation = analysis.recommendations.some((r) =>
@@ -90,7 +102,11 @@ Deno.test("analyzeSEO - recommends shorter title for long titles", () => {
 });
 
 Deno.test("analyzeSEO - recommends longer description for short descriptions", () => {
-  const analysis = analyzeSEO("Good Title Length Here", "Short desc", "Content");
+  const analysis = analyzeSEO(
+    "Good Title Length Here",
+    "Short desc",
+    "Content",
+  );
 
   const hasRecommendation = analysis.recommendations.some((r) =>
     r.includes("Meta description is short")
@@ -99,7 +115,8 @@ Deno.test("analyzeSEO - recommends longer description for short descriptions", (
 });
 
 Deno.test("analyzeSEO - recommends shorter description for long descriptions", () => {
-  const longDesc = "This is a very long meta description that far exceeds the recommended maximum of one hundred and sixty characters which is the typical cutoff for search engine results";
+  const longDesc =
+    "This is a very long meta description that far exceeds the recommended maximum of one hundred and sixty characters which is the typical cutoff for search engine results";
   const analysis = analyzeSEO("Title", longDesc, "Content");
 
   const hasRecommendation = analysis.recommendations.some((r) =>
@@ -110,7 +127,11 @@ Deno.test("analyzeSEO - recommends shorter description for long descriptions", (
 
 Deno.test("analyzeSEO - recommends longer content for short posts", () => {
   const shortContent = "This is very short content with just a few words.";
-  const analysis = analyzeSEO("Title", "Description that is long enough", shortContent);
+  const analysis = analyzeSEO(
+    "Title",
+    "Description that is long enough",
+    shortContent,
+  );
 
   const hasRecommendation = analysis.recommendations.some((r) =>
     r.includes("Content is quite short")
@@ -156,7 +177,11 @@ Deno.test("analyzeSEO - detects heading hierarchy issues", () => {
 
 Deno.test("analyzeSEO - recommends depth for very short posts", () => {
   const veryShortContent = "Short post.";
-  const analysis = analyzeSEO("Title", "Description that is adequately sized for this analysis", veryShortContent);
+  const analysis = analyzeSEO(
+    "Title",
+    "Description that is adequately sized for this analysis",
+    veryShortContent,
+  );
 
   const hasRecommendation = analysis.recommendations.some((r) =>
     r.includes("Very short read time")
@@ -166,7 +191,11 @@ Deno.test("analyzeSEO - recommends depth for very short posts", () => {
 
 Deno.test("analyzeSEO - recommends breaking up very long posts", () => {
   const longContent = "word ".repeat(4000); // Very long content (>15 min read at ~200 wpm)
-  const analysis = analyzeSEO("Title", "Description that works well", longContent);
+  const analysis = analyzeSEO(
+    "Title",
+    "Description that works well",
+    longContent,
+  );
 
   const hasRecommendation = analysis.recommendations.some((r) =>
     r.includes("Long read time")
@@ -199,8 +228,14 @@ ${"And even more content. ".repeat(20)}`;
 
 Deno.test("generateFAQSchema - generates valid FAQ schema", () => {
   const faqs = [
-    { question: "What is Deno?", answer: "Deno is a modern JavaScript runtime." },
-    { question: "Why use TypeScript?", answer: "TypeScript adds static typing to JavaScript." },
+    {
+      question: "What is Deno?",
+      answer: "Deno is a modern JavaScript runtime.",
+    },
+    {
+      question: "Why use TypeScript?",
+      answer: "TypeScript adds static typing to JavaScript.",
+    },
   ];
 
   const schema = generateFAQSchema(faqs);
@@ -213,7 +248,10 @@ Deno.test("generateFAQSchema - generates valid FAQ schema", () => {
 
 Deno.test("generateFAQSchema - includes all FAQ data", () => {
   const faqs = [
-    { question: "What is Deno?", answer: "Deno is a modern JavaScript runtime." },
+    {
+      question: "What is Deno?",
+      answer: "Deno is a modern JavaScript runtime.",
+    },
   ];
 
   const schema = generateFAQSchema(faqs);
@@ -222,7 +260,10 @@ Deno.test("generateFAQSchema - includes all FAQ data", () => {
   assertEquals(entity["@type"], "Question");
   assertEquals(entity.name, "What is Deno?");
   assertEquals(entity.acceptedAnswer["@type"], "Answer");
-  assertEquals(entity.acceptedAnswer.text, "Deno is a modern JavaScript runtime.");
+  assertEquals(
+    entity.acceptedAnswer.text,
+    "Deno is a modern JavaScript runtime.",
+  );
 });
 
 Deno.test("generateFAQSchema - handles empty FAQ array", () => {

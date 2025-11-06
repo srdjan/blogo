@@ -7,43 +7,61 @@ excerpt: "Discover CIVILI and why their revival captures the authentic spirit of
 
 ## Yugoslavia's 80s Music Underground Scene
 
-Growing up I always followed stories about the vibrant music scene of 1980s Yugoslavia, and wondered what that energy actually felt like. The tales of underground clubs, defiant punk attitudes, and the raw creativity born from cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.haus). My brother and friends started a band and it all got super close...
+Growing up I always followed stories about the vibrant music scene of 1980s
+Yugoslavia, and wondered what that energy actually felt like. The tales of
+underground clubs, defiant punk attitudes, and the raw creativity born from
+cultural chaos seemed almost mythical. Then came [CIVILI](https://civili.haus).
+My brother and friends started a band and it all got super close...
 
 ![Live!](/images/PICT0030.jpg){width=400}
 
-As rock band from **Zajecar** - Yugoslavia, initially they were on the outside of Belgrade, Zagreb, Ljubljana, and other major cities, but they quickly became a part of the underground punk and new wave scene of the 1980s. Those were goldeen years of Yugoslavian rock music, and once their songs started to spin on popular radio stations (legendary **Studio B**), they've managed to break to the scene that was vibrant, busy, and full of authenticity.
+As rock band from **Zajecar** - Yugoslavia, initially they were on the outside
+of Belgrade, Zagreb, Ljubljana, and other major cities, but they quickly became
+a part of the underground punk and new wave scene of the 1980s. Those were
+goldeen years of Yugoslavian rock music, and once their songs started to spin on
+popular radio stations (legendary **Studio B**), they've managed to break to the
+scene that was vibrant, busy, and full of authenticity.
 
 ## Discovering **CIVILI's** Sound
 
-[**CIVILI's**](https://civili.haus) music channels the spirit of iconic bands like Ekatarina Velika (EKV), Film, and Disciplina Kičme. Their blend of punk and new wave creates something that feels both nostalgic and immediate. The raw energy in their music carries that defiant spirit of that time. The songs are short, direct, and packed with emotion. There are love songs, songs about growing up, friendship, and the trials of youth.
+[**CIVILI's**](https://civili.haus) music channels the spirit of iconic bands
+like Ekatarina Velika (EKV), Film, and Disciplina Kičme. Their blend of punk and
+new wave creates something that feels both nostalgic and immediate. The raw
+energy in their music carries that defiant spirit of that time. The songs are
+short, direct, and packed with emotion. There are love songs, songs about
+growing up, friendship, and the trials of youth.
 
 ![Uzalud](/audio/B3-Uzalud-6.mp3){media=audio}
 
-Their performances at various events and festivals demonstrate the band's full force when playing live and the strong bond with fans. Listening their music today, older fans reconnect with cultural memories while younger listeners discover something genuine and unfiltered.
+Their performances at various events and festivals demonstrate the band's full
+force when playing live and the strong bond with fans. Listening their music
+today, older fans reconnect with cultural memories while younger listeners
+discover something genuine and unfiltered.
 
 ![Trebas Mi](/audio/B1-TrebasMi-18c.mp3){media=audio}
 
 ### Band Members
 
-Their lineup brings together taleneted musicians who lived and breathed the underground scene:
+Their lineup brings together taleneted musicians who lived and breathed the
+underground scene:
 
 - [Boba](): delivers vocals, lyrics that carry both melody and attitude
-![Box](/images/box.jpeg){width=200}
+  ![Box](/images/box.jpeg){width=200}
 
-- [Zdene]() creates guitar work that bridges punk aggression with new wave sophistication  
-![Zmaj](/images/zdenko.jpeg){width=200}
+- [Zdene]() creates guitar work that bridges punk aggression with new wave
+  sophistication\
+  ![Zmaj](/images/zdenko.jpeg){width=200}
 
-- [Srle Crnac]() songs author & provides bass lines that anchor the band's rhythmic foundation
-![Crnac](/images/srle.jpeg){width=200}
+- [Srle Crnac]() songs author & provides bass lines that anchor the band's
+  rhythmic foundation ![Crnac](/images/srle.jpeg){width=200}
 
-- [Miđa]() drives the energy with drumming that captures the underground scene's intensity
-![Midja](/images/midja-3.jpeg){width=200}
-
-
+- [Miđa]() drives the energy with drumming that captures the underground scene's
+  intensity ![Midja](/images/midja-3.jpeg){width=200}
 
 #### Helping hands...
 
-The musicians and friends that have contributed to their live shows and recordings:
+The musicians and friends that have contributed to their live shows and
+recordings:
 
 - [Paja Gerard](): Guitars
 - [Saša Maca](): Guitars
@@ -54,7 +72,8 @@ The musicians and friends that have contributed to their live shows and recordin
 
 #### ...and some friends
 
-Their dedicated support team for logistics, media, and photography shows they're serious about their craft and presentation.
+Their dedicated support team for logistics, media, and photography shows they're
+serious about their craft and presentation.
 
 - [Pedja†](): Roadie
 - [Kole](): Good vibes
@@ -67,8 +86,17 @@ Their dedicated support team for logistics, media, and photography shows they're
 
 ![A Call From The Past - CIVILI](/images/back-v11_djixmix.jpg){width=400}
 
-In 2024, [CIVILI](https://civili.haus) released a modern mix of their old recordings, album, "A Call From The Past." The album is a testament to their commitment to preserving the spirit of the 1980s underground scene while infusing it with modern sensibilities. The album's tracks are a mix of their most popular songs and one new composition, [Dacha](), all of which pay homage to the era's punk and new wave influences while remaining relevant to today's listeners.
+In 2024, [CIVILI](https://civili.haus) released a modern mix of their old
+recordings, album, "A Call From The Past." The album is a testament to their
+commitment to preserving the spirit of the 1980s underground scene while
+infusing it with modern sensibilities. The album's tracks are a mix of their
+most popular songs and one new composition, [Dacha](), all of which pay homage
+to the era's punk and new wave influences while remaining relevant to today's
+listeners.
 
 ![Dacha](/audio/A5-Dacha-35a.mp3){media=audio}
 
-[CIVILI](https://civili.haus)'s revival suggests that the best way to honor musical heritage is to keep it alive and evolving. Their success lies in understanding that the underground scene wasn't about specific sounds or styles, but about maintaining creative independence and authentic expression.
+[CIVILI](https://civili.haus)'s revival suggests that the best way to honor
+musical heritage is to keep it alive and evolving. Their success lies in
+understanding that the underground scene wasn't about specific sounds or styles,
+but about maintaining creative independence and authentic expression.

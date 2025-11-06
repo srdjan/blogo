@@ -1,53 +1,64 @@
-<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-  <circle cx="100" cy="100" r="95" fill="#faf8f5"/>
+<svg
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+  width="200"
+  height="200"
+>
+  <circle cx="100" cy="100" r="95" fill="#faf8f5" />
   <g transform="translate(100,100)">
     <!-- Outer ring -->
-    <circle r="80" fill="none" stroke="#2a2a2a" stroke-width="2.5"/>
-    
+    <circle r="80" fill="none" stroke="#2a2a2a" stroke-width="2.5" />
+
     <!-- Sun rays -->
     <g id="ray">
-      <path d="M 0,-75 L -5,-55 L 0,-50 L 5,-55 Z" fill="#2a2a2a"/>
-      <line x1="0" y1="-50" x2="0" y2="-35" stroke="#2a2a2a" stroke-width="2"/>
+      <path d="M 0,-75 L -5,-55 L 0,-50 L 5,-55 Z" fill="#2a2a2a" />
+      <line x1="0" y1="-50" x2="0" y2="-35" stroke="#2a2a2a" stroke-width="2" />
     </g>
-    <use href="#ray" transform="rotate(22.5)"/>
-    <use href="#ray" transform="rotate(45)"/>
-    <use href="#ray" transform="rotate(67.5)"/>
-    <use href="#ray" transform="rotate(90)"/>
-    <use href="#ray" transform="rotate(112.5)"/>
-    <use href="#ray" transform="rotate(135)"/>
-    <use href="#ray" transform="rotate(157.5)"/>
-    <use href="#ray" transform="rotate(180)"/>
-    <use href="#ray" transform="rotate(202.5)"/>
-    <use href="#ray" transform="rotate(225)"/>
-    <use href="#ray" transform="rotate(247.5)"/>
-    <use href="#ray" transform="rotate(270)"/>
-    <use href="#ray" transform="rotate(292.5)"/>
-    <use href="#ray" transform="rotate(315)"/>
-    <use href="#ray" transform="rotate(337.5)"/>
-    
+    <use href="#ray" transform="rotate(22.5)" />
+    <use href="#ray" transform="rotate(45)" />
+    <use href="#ray" transform="rotate(67.5)" />
+    <use href="#ray" transform="rotate(90)" />
+    <use href="#ray" transform="rotate(112.5)" />
+    <use href="#ray" transform="rotate(135)" />
+    <use href="#ray" transform="rotate(157.5)" />
+    <use href="#ray" transform="rotate(180)" />
+    <use href="#ray" transform="rotate(202.5)" />
+    <use href="#ray" transform="rotate(225)" />
+    <use href="#ray" transform="rotate(247.5)" />
+    <use href="#ray" transform="rotate(270)" />
+    <use href="#ray" transform="rotate(292.5)" />
+    <use href="#ray" transform="rotate(315)" />
+    <use href="#ray" transform="rotate(337.5)" />
+
     <!-- Central sun -->
-    <circle r="30" fill="none" stroke="#2a2a2a" stroke-width="2.5"/>
-    <circle r="25" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
-    
+    <circle r="30" fill="none" stroke="#2a2a2a" stroke-width="2.5" />
+    <circle r="25" fill="none" stroke="#2a2a2a" stroke-width="1.5" />
+
     <!-- Sun face -->
-    <circle cx="-8" cy="-5" r="3" fill="#2a2a2a"/>
-    <circle cx="8" cy="-5" r="3" fill="#2a2a2a"/>
-    <path d="M -10,8 Q 0,15 10,8" fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
-    
+    <circle cx="-8" cy="-5" r="3" fill="#2a2a2a" />
+    <circle cx="8" cy="-5" r="3" fill="#2a2a2a" />
+    <path
+      d="M -10,8 Q 0,15 10,8"
+      fill="none"
+      stroke="#2a2a2a"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+
     <!-- Decorative dots around -->
     <g id="star-dot">
-      <circle cx="0" cy="-42" r="2" fill="#2a2a2a"/>
+      <circle cx="0" cy="-42" r="2" fill="#2a2a2a" />
     </g>
-    <use href="#star-dot" transform="rotate(30)"/>
-    <use href="#star-dot" transform="rotate(60)"/>
-    <use href="#star-dot" transform="rotate(90)"/>
-    <use href="#star-dot" transform="rotate(120)"/>
-    <use href="#star-dot" transform="rotate(150)"/>
-    <use href="#star-dot" transform="rotate(180)"/>
-    <use href="#star-dot" transform="rotate(210)"/>
-    <use href="#star-dot" transform="rotate(240)"/>
-    <use href="#star-dot" transform="rotate(270)"/>
-    <use href="#star-dot" transform="rotate(300)"/>
-    <use href="#star-dot" transform="rotate(330)"/>
+    <use href="#star-dot" transform="rotate(30)" />
+    <use href="#star-dot" transform="rotate(60)" />
+    <use href="#star-dot" transform="rotate(90)" />
+    <use href="#star-dot" transform="rotate(120)" />
+    <use href="#star-dot" transform="rotate(150)" />
+    <use href="#star-dot" transform="rotate(180)" />
+    <use href="#star-dot" transform="rotate(210)" />
+    <use href="#star-dot" transform="rotate(240)" />
+    <use href="#star-dot" transform="rotate(270)" />
+    <use href="#star-dot" transform="rotate(300)" />
+    <use href="#star-dot" transform="rotate(330)" />
   </g>
 </svg>

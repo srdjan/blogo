@@ -19,4 +19,3 @@ for await (const f of expandGlob("content/posts/*.md")) {
 
 const list = [...tags.entries()].sort((a, b) => b[1] - a[1]);
 for (const [t, c] of list) console.log(`${c}\t${t}`);
-

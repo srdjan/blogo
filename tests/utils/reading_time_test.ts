@@ -1,10 +1,13 @@
 import { assertEquals } from "@std/assert";
-import { calculateReadingTime, getReadingTimeMeta } from "../../src/utils/reading-time.ts";
+import {
+  calculateReadingTime,
+  getReadingTimeMeta,
+} from "../../src/utils/reading-time.ts";
 
 Deno.test("calculateReadingTime - calculates correct reading time for short text", () => {
   const shortText = "This is a short text with exactly ten words here.";
   const result = calculateReadingTime(shortText);
-  
+
   assertEquals(result.words, 10);
   assertEquals(result.minutes, 1); // Minimum 1 minute
   assertEquals(result.text, "1 min read");
@@ -14,9 +17,9 @@ Deno.test("calculateReadingTime - calculates correct reading time for longer tex
   // Create text with approximately 450 words (should be 2 minutes at 225 wpm)
   const words = Array.from({ length: 450 }, (_, i) => `word${i}`);
   const longText = words.join(" ");
-  
+
   const result = calculateReadingTime(longText);
-  
+
   assertEquals(result.words, 450);
   assertEquals(result.minutes, 2);
   assertEquals(result.text, "2 min read");
@@ -34,7 +37,7 @@ tags:
 This is the actual content that should be counted for reading time calculation.`;
 
   const result = calculateReadingTime(textWithFrontmatter);
-  
+
   // Should only count the content after frontmatter
   assertEquals(result.words, 13);
   assertEquals(result.minutes, 1);
@@ -150,9 +153,10 @@ print("hello world")
 });
 
 Deno.test("calculateReadingTime - counts words correctly with punctuation", () => {
-  const textWithPunctuation = "Hello, world! This is a test. How are you? I'm fine, thanks.";
+  const textWithPunctuation =
+    "Hello, world! This is a test. How are you? I'm fine, thanks.";
   const result = calculateReadingTime(textWithPunctuation);
-  
+
   assertEquals(result.words, 12);
   assertEquals(result.minutes, 1);
 });
@@ -199,7 +203,7 @@ Deno.test("getReadingTimeMeta - formats time correctly", () => {
   const readingTime1 = { minutes: 1, words: 100, text: "1 min read" };
   const readingTime5 = { minutes: 5, words: 1000, text: "5 min read" };
   const readingTime15 = { minutes: 15, words: 3000, text: "15 min read" };
-  
+
   assertEquals(getReadingTimeMeta(readingTime1), "PT1M");
   assertEquals(getReadingTimeMeta(readingTime5), "PT5M");
   assertEquals(getReadingTimeMeta(readingTime15), "PT15M");

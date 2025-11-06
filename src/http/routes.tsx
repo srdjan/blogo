@@ -46,7 +46,7 @@ export const createRouteHandlers = (
   analyticsService: AnalyticsService,
 ): RouteHandlers => {
   const home: RouteHandler = async (ctx) => {
-    const postsResult = await contentService.loadPostsWithViews();
+    const postsResult = await contentService.loadPostsMetadataWithViews();
 
     return match(postsResult, {
       ok: (posts) =>

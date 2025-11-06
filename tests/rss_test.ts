@@ -28,7 +28,10 @@ Deno.test("generateRSS - generates valid RSS structure", () => {
   assertStringIncludes(rss, '<?xml version="1.0" encoding="UTF-8"?>');
 
   // Should have proper RSS structure
-  assertStringIncludes(rss, '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">');
+  assertStringIncludes(
+    rss,
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+  );
   assertStringIncludes(rss, "<channel>");
   assertStringIncludes(rss, "</channel>");
   assertStringIncludes(rss, "</rss>");
@@ -36,7 +39,12 @@ Deno.test("generateRSS - generates valid RSS structure", () => {
 
 Deno.test("generateRSS - includes feed metadata", () => {
   const posts = [createPost("test-post", "Test Post", "2025-01-01")];
-  const rss = generateRSS(posts, "My Blog", "https://example.com", "A test blog");
+  const rss = generateRSS(
+    posts,
+    "My Blog",
+    "https://example.com",
+    "A test blog",
+  );
 
   // Should include title
   assertStringIncludes(rss, "<title>My Blog</title>");
@@ -64,7 +72,10 @@ Deno.test("generateRSS - uses default description when not provided", () => {
   const rss = generateRSS(posts, "My Blog", "https://example.com");
 
   // Should use default description format
-  assertStringIncludes(rss, "<description>My Blog - Latest posts</description>");
+  assertStringIncludes(
+    rss,
+    "<description>My Blog - Latest posts</description>",
+  );
 });
 
 Deno.test("generateRSS - includes post items", () => {
@@ -96,16 +107,27 @@ Deno.test("generateRSS - includes post items", () => {
 
 Deno.test("generateRSS - uses excerpt as description when available", () => {
   const posts = [
-    createPost("post-1", "Test Post", "2025-01-01", [], "This is a custom excerpt"),
+    createPost(
+      "post-1",
+      "Test Post",
+      "2025-01-01",
+      [],
+      "This is a custom excerpt",
+    ),
   ];
   const rss = generateRSS(posts, "My Blog", "https://example.com");
 
   // Should use the excerpt
-  assertStringIncludes(rss, "<description>This is a custom excerpt</description>");
+  assertStringIncludes(
+    rss,
+    "<description>This is a custom excerpt</description>",
+  );
 });
 
 Deno.test("generateRSS - generates description from content when no excerpt", () => {
-  const longContent = "This is a very long content that should be truncated to 200 characters. ".repeat(5);
+  const longContent =
+    "This is a very long content that should be truncated to 200 characters. "
+      .repeat(5);
   const posts = [
     createPost("post-1", "Test Post", "2025-01-01", [], undefined, longContent),
   ];
@@ -117,7 +139,8 @@ Deno.test("generateRSS - generates description from content when no excerpt", ()
 });
 
 Deno.test("generateRSS - strips HTML from content description", () => {
-  const htmlContent = "<p>This is <strong>HTML</strong> content with <a href='/test'>links</a>.</p>";
+  const htmlContent =
+    "<p>This is <strong>HTML</strong> content with <a href='/test'>links</a>.</p>";
   const posts = [
     createPost("post-1", "Test Post", "2025-01-01", [], undefined, htmlContent),
   ];
@@ -132,7 +155,11 @@ Deno.test("generateRSS - strips HTML from content description", () => {
 
 Deno.test("generateRSS - includes post tags as categories", () => {
   const posts = [
-    createPost("post-1", "Test Post", "2025-01-01", ["TypeScript", "Deno", "WebDev"]),
+    createPost("post-1", "Test Post", "2025-01-01", [
+      "TypeScript",
+      "Deno",
+      "WebDev",
+    ]),
   ];
   const rss = generateRSS(posts, "My Blog", "https://example.com");
 
@@ -155,7 +182,7 @@ Deno.test("generateRSS - handles posts without tags", () => {
 
 Deno.test("generateRSS - escapes XML special characters in title", () => {
   const posts = [
-    createPost("post-1", "Post with <special> & \"characters\"", "2025-01-01"),
+    createPost("post-1", 'Post with <special> & "characters"', "2025-01-01"),
   ];
   const rss = generateRSS(posts, "My Blog", "https://example.com");
 
@@ -181,8 +208,14 @@ Deno.test("generateRSS - escapes XML special characters in tags", () => {
 
 Deno.test("generateRSS - limits to 20 most recent posts", () => {
   // Create 25 posts
-  const posts = Array.from({ length: 25 }, (_, i) =>
-    createPost(`post-${i}`, `Post ${i}`, `2025-01-${String(i + 1).padStart(2, "0")}`)
+  const posts = Array.from(
+    { length: 25 },
+    (_, i) =>
+      createPost(
+        `post-${i}`,
+        `Post ${i}`,
+        `2025-01-${String(i + 1).padStart(2, "0")}`,
+      ),
   );
 
   const rss = generateRSS(posts, "My Blog", "https://example.com");
@@ -241,10 +274,16 @@ Deno.test("generateTopicRssFeed - includes topic-specific metadata", () => {
   assertStringIncludes(rss, "<title>TypeScript Tips</title>");
 
   // Should include custom description
-  assertStringIncludes(rss, "<description>TypeScript programming tips</description>");
+  assertStringIncludes(
+    rss,
+    "<description>TypeScript programming tips</description>",
+  );
 
   // Should use self path for atom:link
-  assertStringIncludes(rss, 'atom:link href="https://example.com/rss/topic/typescript"');
+  assertStringIncludes(
+    rss,
+    'atom:link href="https://example.com/rss/topic/typescript"',
+  );
 });
 
 Deno.test("generateTopicRssFeed - uses default description format", () => {
@@ -257,7 +296,10 @@ Deno.test("generateTopicRssFeed - uses default description format", () => {
   );
 
   // Should use default description
-  assertStringIncludes(rss, "<description>TypeScript - Latest posts</description>");
+  assertStringIncludes(
+    rss,
+    "<description>TypeScript - Latest posts</description>",
+  );
 });
 
 Deno.test("generateTopicRssFeed - includes post items like generateRSS", () => {
@@ -286,8 +328,9 @@ Deno.test("generateTopicRssFeed - includes post items like generateRSS", () => {
 });
 
 Deno.test("generateTopicRssFeed - limits to 20 posts", () => {
-  const posts = Array.from({ length: 25 }, (_, i) =>
-    createPost(`post-${i}`, `Post ${i}`, `2025-01-01`)
+  const posts = Array.from(
+    { length: 25 },
+    (_, i) => createPost(`post-${i}`, `Post ${i}`, `2025-01-01`),
   );
 
   const rss = generateTopicRssFeed(

@@ -11,7 +11,7 @@ This is a paragraph with **bold** and *italic* text.
 Another paragraph with [a link](http://example.com).`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -19,7 +19,10 @@ Another paragraph with [a link](http://example.com).`;
     assertEquals(html.includes("<h2>Heading 2</h2>"), true);
     assertEquals(html.includes("<strong>bold</strong>"), true);
     assertEquals(html.includes("<em>italic</em>"), true);
-    assertEquals(html.includes('<a href="http://example.com">a link</a>'), true);
+    assertEquals(
+      html.includes('<a href="http://example.com">a link</a>'),
+      true,
+    );
   }
 });
 
@@ -41,12 +44,18 @@ def greet():
 \`\`\``;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
-    assertEquals(html.includes('<pre><code class="hljs language-javascript">'), true);
-    assertEquals(html.includes('<pre><code class="hljs language-python">'), true);
+    assertEquals(
+      html.includes('<pre><code class="hljs language-javascript">'),
+      true,
+    );
+    assertEquals(
+      html.includes('<pre><code class="hljs language-python">'),
+      true,
+    );
     assertEquals(html.includes("const"), true);
     assertEquals(html.includes("def"), true);
   }
@@ -56,7 +65,7 @@ Deno.test("markdownToHtml - handles inline code", () => {
   const markdown = "Use the `console.log()` function to output text.";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -78,7 +87,7 @@ Ordered list:
 3. Third item`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -94,7 +103,7 @@ Deno.test("markdownToHtml - handles blockquotes", () => {
 > It can span multiple lines.`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -107,11 +116,14 @@ Deno.test("markdownToHtml - handles images", () => {
   const markdown = "![Alt text](/images/test.png)";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
-    assertEquals(html.includes('<img src="/images/test.png" alt="Alt text"'), true);
+    assertEquals(
+      html.includes('<img src="/images/test.png" alt="Alt text"'),
+      true,
+    );
   }
 });
 
@@ -122,7 +134,7 @@ Deno.test("markdownToHtml - handles tables", () => {
 | Cell 3   | Cell 4   |`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -142,7 +154,7 @@ Deno.test("markdownToHtml - handles horizontal rules", () => {
 After the rule`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -154,7 +166,7 @@ Deno.test("markdownToHtml - handles strikethrough", () => {
   const markdown = "This is ~~strikethrough~~ text.";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -167,11 +179,11 @@ Deno.test.ignore("markdownToHtml - handles audio files", () => {
   const markdown = "Listen to this: [audio.mp3](/audio/test.mp3)";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
-    assertEquals(html.includes('<audio controls'), true);
+    assertEquals(html.includes("<audio controls"), true);
     assertEquals(html.includes('src="/audio/test.mp3"'), true);
     assertEquals(html.includes('type="audio/mpeg"'), true);
   }
@@ -190,7 +202,7 @@ Deno.test.ignore("markdownToHtml - handles different audio formats", () => {
   for (const testCase of testCases) {
     const markdown = `[${testCase.file}](/audio/${testCase.file})`;
     const result = markdownToHtml(markdown);
-    
+
     assertEquals(result.ok, true);
     if (result.ok) {
       const html = result.value;
@@ -204,7 +216,7 @@ Deno.test.ignore("markdownToHtml - handles image attributes", () => {
   const markdown = "![Alt text](/images/test.png){width=300 height=200}";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -223,7 +235,7 @@ flowchart TD
 \`\`\``;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -240,7 +252,7 @@ console.log(test);
 \`\`\``;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -250,26 +262,32 @@ console.log(test);
 });
 
 // TODO: Invalid language handling may need review
-Deno.test.ignore("markdownToHtml - handles invalid syntax highlighting gracefully", () => {
-  const markdown = `\`\`\`invalidlanguage
+Deno.test.ignore(
+  "markdownToHtml - handles invalid syntax highlighting gracefully",
+  () => {
+    const markdown = `\`\`\`invalidlanguage
 some code here
 \`\`\``;
 
-  const result = markdownToHtml(markdown);
-  
-  assertEquals(result.ok, true);
-  if (result.ok) {
-    const html = result.value;
-    assertEquals(html.includes('<pre><code class="language-invalidlanguage">'), true);
-    assertEquals(html.includes("some code here"), true);
-  }
-});
+    const result = markdownToHtml(markdown);
+
+    assertEquals(result.ok, true);
+    if (result.ok) {
+      const html = result.value;
+      assertEquals(
+        html.includes('<pre><code class="language-invalidlanguage">'),
+        true,
+      );
+      assertEquals(html.includes("some code here"), true);
+    }
+  },
+);
 
 Deno.test("markdownToHtml - handles empty input", () => {
   const markdown = "";
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     assertEquals(result.value.trim(), "");
@@ -309,7 +327,7 @@ function example() {
 Final paragraph with ~~strikethrough~~ text.`;
 
   const result = markdownToHtml(markdown);
-  
+
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
@@ -322,7 +340,10 @@ Final paragraph with ~~strikethrough~~ text.`;
     assertEquals(html.includes("<code>inline code</code>"), true);
     assertEquals(html.includes("<blockquote>"), true);
     assertEquals(html.includes('<a href="http://example.com">'), true);
-    assertEquals(html.includes('<pre><code class="hljs language-javascript">'), true);
+    assertEquals(
+      html.includes('<pre><code class="hljs language-javascript">'),
+      true,
+    );
     assertEquals(html.includes("<table>"), true);
     assertEquals(html.includes("<hr>"), true);
     assertEquals(html.includes("<del>strikethrough</del>"), true);

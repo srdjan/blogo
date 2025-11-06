@@ -9,7 +9,7 @@ import { createAnalyticsService } from "../domain/analytics.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
-import type { Post } from "../lib/types.ts";
+import type { Post, PostMeta } from "../lib/types.ts";
 
 async function main() {
   const config = createConfig();
@@ -23,15 +23,21 @@ async function main() {
 
   const fileSystem = createFileSystem();
   const cache = createInMemoryCache<readonly Post[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const healthCache = createInMemoryCache<unknown>();
+  const viewCountsCache = createInMemoryCache<Record<string, number>>();
 
-  const analyticsService = await createAnalyticsService();
+  const analyticsService = await createAnalyticsService({
+    viewCountsCache,
+  });
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
+    metadataCache,
     postsDir: config.blog.postsDir,
+    enableValidation: config.env !== "production",
     analyticsService,
   });
 
@@ -42,7 +48,11 @@ async function main() {
     startTime,
   });
 
-  const routes = createRouteHandlers(contentService, healthService, analyticsService);
+  const routes = createRouteHandlers(
+    contentService,
+    healthService,
+    analyticsService,
+  );
 
   const router = createRouter()
     .get("/", routes.home)
