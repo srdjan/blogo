@@ -702,9 +702,11 @@ ul, ol {
   margin-right: auto;
 }
 
+/* Topic headings - centered */
 .topic-section h2 {
   font-size: var(--font-size-xl);
-  margin-bottom: var(--space-lg);
+  margin: 0 auto var(--space-lg);
+  max-width: 800px;
   text-align: center;
 }
 

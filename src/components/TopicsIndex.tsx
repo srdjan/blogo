@@ -17,7 +17,7 @@ export const TopicsIndex = (props: { readonly groups: TagsByTopic }) => {
               key={topic}
               aria-labelledby={headingId}
             >
-              <h2 id={headingId}>{topic}</h2>
+              <h2 id={headingId} style="text-align: center;">{topic}</h2>
               <ul class="tag-grid" aria-label={`${topic} tags`}>
                 {tags.map((tag) => (
                   <li key={tag.name}>

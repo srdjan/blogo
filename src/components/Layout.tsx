@@ -179,16 +179,8 @@ export const createLayout = (props: LayoutProps): Response => {
         <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
         <link rel="stylesheet" href="/css/vendor/open-props.min.css" />
         <link rel="stylesheet" href="/css/main.css" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
-          rel="stylesheet"
-        />
+        {/* Self-hosted fonts for improved performance */}
+        <link rel="stylesheet" href="/fonts/fonts.css" />
         <link rel="manifest" href="/manifest.json" />
         <link
           rel="alternate"

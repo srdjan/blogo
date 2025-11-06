@@ -125,10 +125,11 @@ export const staticFiles =
     const isStaticFile = url.pathname.startsWith("/css/") ||
       url.pathname.startsWith("/js/") ||
       url.pathname.startsWith("/images/") ||
+      url.pathname.startsWith("/fonts/") ||
       url.pathname === "/favicon.svg" ||
       url.pathname === "/favicon.ico" ||
       url.pathname === "/manifest.json" ||
-      /\.(jpg|jpeg|png|gif|svg|ico|css|js|wav|mp3|ogg|flac|m4a|aac)$/.test(
+      /\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot|wav|mp3|ogg|flac|m4a|aac)$/.test(
         url.pathname,
       );
 
@@ -166,6 +167,10 @@ function getContentType(filePath: string): string {
     jpeg: "image/jpeg",
     png: "image/png",
     gif: "image/gif",
+    woff: "font/woff",
+    woff2: "font/woff2",
+    ttf: "font/ttf",
+    eot: "application/vnd.ms-fontobject",
     wav: "audio/wav",
     mp3: "audio/mpeg",
     ogg: "audio/ogg",
