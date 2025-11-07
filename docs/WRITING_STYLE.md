@@ -41,7 +41,7 @@ curiosity**. The tone is:
 
 ### Framing
 
-- **Balanced first-person** - Some "I" for personal notes, but not every
+- **Balanced first-person** - Some "I" for personal notes, but not often, not every
   sentence
 - **Direct statements with energy** - "This works because..." "Here's the cool
   part..."
@@ -106,7 +106,7 @@ Can include: what you'll do next, invitation to discuss, or simple "that's it"
 
 ### Cultural Authenticity
 
-- Subtle Serbian→English patterns (2-3 per post, not more)
+- Some Serbian→English patterns (3-5 per post, not more)
 - European perspective on tech and culture where relevant
 - Natural phrasing, not trying to sound like native English writer
 - Clarity first - quirks should add character, not confusion
