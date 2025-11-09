@@ -35,64 +35,7 @@ This blog system is built around several key architectural principles:
 The project follows a light functional programming style with TypeScript, and is
 built using a mono-jsx architecture with clean separation of concerns and
 semantic HTML/CSS. This modern approach creates a blog that's not just
-functional, but showcases the future of web development—clean, fast, accessible,
-and maintainable.
-
-### Core Structure
-
-```
-├── src/
-│   ├── app/
-│   │   └── main.ts               # Main application entry point
-│   ├── components/               # Reusable JSX components  
-│   │   ├── About.tsx            # About page component
-│   │   ├── Layout.tsx           # Main layout with HTML document generation
-│   │   ├── NotFound.tsx         # 404 error page component
-│   │   ├── PostList.tsx         # Blog post listing component
-│   │   ├── PostView.tsx         # Individual post display with HTML rendering
-│   │   ├── SearchResults.tsx    # Search results component
-│   │   └── TagIndex.tsx         # Tag cloud component
-│   ├── domain/                  # Business logic layer
-│   │   ├── config.ts            # Typed configuration management
-│   │   └── content.ts           # Content service with caching
-│   ├── http/                    # HTTP transport layer
-│   │   ├── middleware.ts        # HTTP middleware (logging, static files)
-│   │   ├── router.ts            # Route handling utilities
-│   │   ├── routes.tsx           # Route handlers and HTTP responses
-│   │   ├── server.ts            # HTTP server setup
-│   │   └── types.ts             # HTTP-related type definitions
-│   ├── lib/                     # Core utilities and types
-│   │   ├── error.ts             # Functional error handling
-│   │   ├── result.ts            # Result monad implementation
-│   │   └── types.ts             # Domain type definitions
-│   ├── ports/                   # Infrastructure adapters
-│   │   ├── cache.ts             # In-memory caching adapter
-│   │   ├── clock.ts             # Time abstraction
-│   │   ├── file-system.ts       # File system operations
-│   │   └── logger.ts            # Logging abstraction
-│   ├── utils/                   # Utility functions
-│   │   ├── reading-time.ts      # Reading time calculation
-│   │   └── seo-helpers.ts       # SEO metadata helpers
-│   ├── markdown-renderer.tsx    # Markdown to HTML conversion
-│   ├── mermaid-renderer.ts      # Mermaid diagram rendering
-│   ├── metadata.ts              # SEO metadata generation
-│   ├── og-image.ts              # Open Graph image generation
-│   ├── rss.ts                   # RSS feed generation
-│   ├── sitemap.ts               # XML sitemap generation
-│   └── utils.ts                 # General utility functions
-├── content/posts/               # Markdown blog posts
-├── public/
-│   ├── css/
-│   │   ├── main.css            # Modern CSS with design tokens, responsive architecture
-│   │   └── vendor/             # Third-party CSS (normalize, highlight.js theme)
-│   └── js/
-│       ├── site.js             # Theme toggle, search, HTMX integration
-│       └── htmx.min.js         # HTMX for dynamic interactions
-├── .claude/commands/
-│   └── blog-writer.md          # AI writing assistant slash command
-├── CLAUDE.md                   # Development guidance and architecture notes
-└── WRITING_STYLE.md            # Blog writing style guide
-```
+functional, but showcases the future of web development—clean, fast, accessible, and maintainable.
 
 ## Getting Started
 
