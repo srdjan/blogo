@@ -97,7 +97,7 @@ html {
 body {
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
-  line-height: 1.75;
+  /* line-height: 1.75; */
   color: var(--color-text-primary);
   background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
@@ -133,15 +133,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: var(--font-size-2xl);
-}
-
-h2 {
   font-size: var(--font-size-xl);
 }
 
+h2 {
+  font-size: var(--font-size-4);
+}
+
 h3 {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
 }
 
 h4 {
@@ -185,7 +185,7 @@ ul, ol {
    SITE HEADER: IDENTITY
    ==================================== */
 .site-header {
-  padding: var(--space-2xl) var(--content-padding) var(--space-xl);
+  padding: var(--space-md) var(--content-padding) var(--space-md);
   text-align: center;
   border-bottom: 2px solid var(--color-border-strong);
 }
@@ -298,14 +298,14 @@ ul, ol {
 .main-content {
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: var(--space-3xl) var(--content-padding);
+  padding: var(--space-md) var(--content-padding);
 }
 
 /* ====================================
    POST LIST: HOME PAGE
    ==================================== */
 .post-list-header {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-sm);
   text-align: left;
 }
 
@@ -323,7 +323,7 @@ ul, ol {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3xl);
+  gap: var(--space-md);
   padding: 0;
   width: 100%;
 }
@@ -336,7 +336,7 @@ ul, ol {
 .post-card {
   background: var(--color-surface);
   border: 2px solid var(--color-border-strong);
-  padding: var(--space-xl);
+  /* padding: var(--space-xl); */
   text-align: left;
   width: 100%;
   contain: layout style paint;
@@ -381,10 +381,10 @@ ul, ol {
 
 .post-card p {
   font-size: var(--font-size-md);
-  line-height: 1.8;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   margin-top: var(--space-md);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .post-card p:last-child {
@@ -480,7 +480,7 @@ ul, ol {
 }
 
 .post-header h1 {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-4);
   margin-bottom: var(--space-sm);
   text-align: left;
 }
@@ -500,8 +500,8 @@ ul, ol {
 
 /* Post content typography */
 .content h2 {
-  font-size: var(--font-size-xl);
-  margin-top: var(--space-2xl);
+  font-size: var(--font-size-3);
+  margin-top: var(--space-xl);
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--color-border);
@@ -704,7 +704,7 @@ ul, ol {
 
 /* Topic headings - centered */
 .topic-section h2 {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-4);
   margin: 0 auto var(--space-lg);
   max-width: 800px;
   text-align: center;
@@ -753,7 +753,7 @@ ul, ol {
 
 .about-content h2 {
   font-size: var(--font-size-lg);
-  margin-top: var(--space-2xl);
+  margin-top: var(--space-xl);
   margin-bottom: var(--space-md);
 }
 
@@ -826,8 +826,8 @@ ul, ol {
 }
 
 .rss-content h2 {
-  font-size: var(--font-size-lg);
-  margin-top: var(--space-2xl);
+  font-size: var(--font-size-4);
+  margin-top: var(--space-xl);
   margin-bottom: var(--space-md);
 }
 
@@ -1231,14 +1231,14 @@ html[data-palette="automerge"][data-theme="dark"] body {
 
   .post-card {
     width: 100%;
-    padding: var(--space-lg);
+    /* padding: var(--space-lg); */
   }
 
   /* Full width content on individual posts */
   .post-content,
   .about-content,
   .rss-content {
-    padding: var(--space-lg);
+    padding: var(--space-sm);
   }
 }
 
