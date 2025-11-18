@@ -1,7 +1,7 @@
 ---
 title: Equity Ownership Changes Everything
 date: 2025-09-04
-tags: [Performance, Workplace, Leadership, Research]
+tags: [Performance, Workplace, Leadership]
 excerpt: When people own a piece of what they're building, behavior shifts dramatically. Here's what happens when you align compensation with actual outcomes instead of just paying salaries.
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Lifion Development Platform Credos
 date: 2025-10-06
-tags: [Culture, Teams, Agile]
+tags: [Architecture, Enterprise, Product, Agile]
 excerpt: Company credos encapsulate organizational beliefs and serve as reference points to guide actions. Here's how we distilled our engineering philosophy into principles that enable teams to move autonomously while staying aligned.
 ---
 

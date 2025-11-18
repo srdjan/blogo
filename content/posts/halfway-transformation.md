@@ -1,7 +1,7 @@
 ---
 title: The Aesthetics of Modernization Without the Architecture
 date: 2025-01-17
-tags: [Engineering Culture, Organization, Digital Transformation]
+tags: [Architecture, Enterprise, Product, Agile, Digital Transformation]
 excerpt: Companies adopt the vocabulary of product thinking while keeping the power structure of project shops. Here's why the transformation stops at the slides.
 ---
 

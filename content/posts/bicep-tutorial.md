@@ -1,7 +1,7 @@
 ---
 title: "Type-Safe Infrastructure with Bicep"
 date: 2025-10-06
-tags: [Azure, Bicep, IaaC, DevOps]
+tags: [Azure, Bicep, Cloud]
 excerpt: "Bicep's type system brings compile-time safety to infrastructure code. Here's how discriminated unions, user-defined types, and helper functions turn error-prone YAML wrangling into predictable, maintainable infrastructure engineering."
 ---
 

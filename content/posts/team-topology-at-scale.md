@@ -1,7 +1,7 @@
 ---
 title: "Treat Team Structure Like Distributed Systems Architecture"
 date: 2024-01-16
-tags: [Engineering Culture, Organization, Team Topologies]
+tags: [Architecture, Enterprise, Product, Agile, Team Topologies]
 excerpt: When your organization grows, coupling debt kills velocity. Here's how to treat team structure like distributed systems architecture.
 ---
 

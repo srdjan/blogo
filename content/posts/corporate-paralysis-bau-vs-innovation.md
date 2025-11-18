@@ -1,7 +1,7 @@
 ---
 title: "Why (some) Big Companies Can't Ship New Things"
 date: 2024-08-15
-tags: [Engineering Culture, Organization, Software Teams]
+tags: [Architecture, Enterprise, Product, Agile]
 excerpt: Large companies claim they want innovation while their structure guarantees it will fail. Here's why the BAU vs. innovation split creates an immune system that rejects change.
 ---
 

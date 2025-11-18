@@ -1,7 +1,7 @@
 ---
 title: "Your Agile Transformation Failed Because Hierarchies Can't Be Agile"
 date: 2025-09-03
-tags: [Organization, Agile, Leadership, Teams]
+tags: [Architecture, Enterprise, Product, Agile]
 excerpt: Companies hire Scrum masters, implement ceremonies, deploy Kanban boards—but stay locked in hierarchical structures. Turns out organizational architecture determines what behaviors you can sustain, regardless of which framework you adopt.
 ---
 

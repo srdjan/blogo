@@ -1,16 +1,7 @@
 ---
-title: "Eliminating DNS Single Points of Failure: Dual-Authoritative Setup with AWS Route 53 and Azure DNS"
+title: "Eliminating DNS Single Points of Failure: Dual-Authoritative DNS Setup"
 date: 2025-11-03
-tags: [
-  DNS,
-  AWS,
-  Azure,
-  Infrastructure,
-  GitOps,
-  Multi-Cloud,
-  Reliability,
-  Incident-Response,
-]
+tags: [Cloud, Reliability]
 excerpt: "The recent Azure DNS outage was a wake-up call. Here's how to build truly redundant DNS across AWS Route 53 and Azure DNS using octoDNS, so no single provider outage takes you down again."
 ---
 
