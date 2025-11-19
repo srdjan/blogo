@@ -336,7 +336,7 @@ ul, ol {
 .post-card {
   background: var(--color-surface);
   border: 2px solid var(--color-border-strong);
-  /* padding: var(--space-xl); */
+  /* padding: var(--space-lg); */
   text-align: left;
   width: 100%;
   contain: layout style paint;
@@ -1221,7 +1221,7 @@ html[data-palette="automerge"][data-theme="dark"] body {
   .post-list {
     width: 100%;
     align-items: stretch;
-    gap: var(--space-2xl);
+    gap: var(--space-xl);
   }
 
   .post-list > li {
@@ -1231,7 +1231,7 @@ html[data-palette="automerge"][data-theme="dark"] body {
 
   .post-card {
     width: 100%;
-    /* padding: var(--space-lg); */
+    padding: var(--space-lg);
   }
 
   /* Full width content on individual posts */
@@ -1251,7 +1251,7 @@ html[data-palette="automerge"][data-theme="dark"] body {
   .post-content,
   .about-content,
   .rss-content {
-    padding: var(--space-2xl);
+    padding: var(--space-xl);
   }
 }
 
