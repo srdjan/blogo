@@ -1,6 +1,6 @@
 ---
 title: Migrating Enterprise Monoliths Without Breaking Everything
-date: 2025-01-15
+date: 2024-08-15
 tags: [Architecture, Microservices, Migration, Enterprise]
 excerpt: A practical guide to modernizing legacy monoliths using strangler fig, event sourcing, and data synchronization patterns that actually work in production.
 ---
