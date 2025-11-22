@@ -22,40 +22,6 @@ import { match } from "../lib/result.ts";
 import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 
-// Helper: Parse viewed posts from session cookie
-const parseViewedPosts = (cookieHeader: string | null): readonly string[] => {
-  if (!cookieHeader) return [];
-
-  const cookieMatch = cookieHeader.match(/viewed_posts=([^;]+)/);
-  if (!cookieMatch || !cookieMatch[1]) return [];
-
-  try {
-    const decoded = decodeURIComponent(cookieMatch[1]);
-    const parsed = JSON.parse(decoded);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-// Helper: Get client IP from request headers
-const getClientIP = (headers: Headers): string => {
-  // Try common headers in order of preference
-  const forwardedFor = headers.get("x-forwarded-for");
-  const ip = (forwardedFor ? forwardedFor.split(",")[0]?.trim() : undefined) ||
-             headers.get("x-real-ip") ||
-             headers.get("cf-connecting-ip") ||
-             "unknown";
-  return ip;
-};
-
-// Helper: Create session cookie header
-const createViewedPostsCookie = (viewedPosts: readonly string[]): string => {
-  const cookieValue = encodeURIComponent(JSON.stringify(viewedPosts));
-  // Session cookie (no Max-Age = expires on browser close), accessible to JS for client-side logic
-  return `viewed_posts=${cookieValue}; Path=/; SameSite=Lax`;
-};
-
 export type RouteHandlers = {
   readonly home: RouteHandler;
   readonly about: RouteHandler;
@@ -178,30 +144,14 @@ export const createRouteHandlers = (
       return new Response("Post not found", { status: 404 });
     }
 
-    // Parse session cookie and get client IP for view tracking
-    const cookieHeader = ctx.req.headers.get("cookie");
-    const viewedPosts = parseViewedPosts(cookieHeader);
-    const clientIP = getClientIP(ctx.req.headers);
-
-    // Increment view count with session tracking
-    const viewCountResult = await analyticsService.incrementViewCount(slug, {
-      viewedPosts,
-      clientIP,
-    });
-
-    let viewCount: number | undefined;
-    let wasIncremented = false;
-
-    if (viewCountResult.ok) {
-      viewCount = viewCountResult.value.count;
-      wasIncremented = viewCountResult.value.incremented;
-    }
+    // Increment view count
+    const viewCountResult = await analyticsService.incrementViewCount(slug);
+    const viewCount = viewCountResult.ok ? viewCountResult.value : undefined;
 
     // Add view count to post
     const postWithViews: typeof post = { ...post, viewCount };
 
-    // Create the response
-    const layoutResponse = createLayout({
+    return createLayout({
       title: `${post.title} - Blog`,
       description: post.excerpt || `Read ${post.title}`,
       path: createUrlPath(ctx.pathname),
@@ -212,28 +162,6 @@ export const createRouteHandlers = (
       ...(post.modified && { modifiedTime: post.modified }),
       ...(post.tags && { tags: post.tags }),
       author: "Srdjan Strbanovic",
-    });
-
-    // If view was incremented, update session cookie
-    if (wasIncremented) {
-      const updatedViewedPosts = [...viewedPosts, slug];
-      const headers = new Headers(layoutResponse.headers);
-      headers.set("Set-Cookie", createViewedPostsCookie(updatedViewedPosts));
-      headers.set("X-View-Incremented", "true");
-
-      return new Response(layoutResponse.body, {
-        status: layoutResponse.status,
-        headers,
-      });
-    }
-
-    // If not incremented, just add the header
-    const headers = new Headers(layoutResponse.headers);
-    headers.set("X-View-Incremented", "false");
-
-    return new Response(layoutResponse.body, {
-      status: layoutResponse.status,
-      headers,
     });
   };
 
