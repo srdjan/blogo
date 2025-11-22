@@ -16,7 +16,7 @@ export const PostView = (props: { readonly post: Post }) => {
             {post.formattedDate && (
               <time dateTime={post.date}>{post.formattedDate}</time>
             )}
-            <ViewCount count={post.viewCount} />
+            <ViewCount count={post.viewCount} slug={post.slug} />
           </div>
           {/* Derived topics shown above tags for hierarchy */}
           {post.tags && post.tags.length > 0 && (() => {

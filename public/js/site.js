@@ -137,7 +137,7 @@ const Core = {
       this.updateActiveNavLink();
     });
 
-    // Handle HTMX before swaps to filter content
+    // Handle HTMX before swaps to filter content and optimistically update view counts
     document.addEventListener("htmx:beforeSwap", (event) => {
       if (event.detail.target.id === "content-area") {
         // Create a temporary div to parse the response
@@ -149,6 +149,36 @@ const Core = {
         if (contentAreaInResponse) {
           // Extract only the content from within #content-area
           event.detail.serverResponse = contentAreaInResponse.innerHTML;
+        }
+
+        // Optimistic view count update: increment before server confirms
+        const path = event.detail.pathInfo?.path || window.location.pathname;
+        if (path && path.startsWith("/posts/")) {
+          // Extract slug from path
+          const slug = path.replace("/posts/", "");
+
+          // Try to find the view counter for this post in the response
+          const viewCounter = tempDiv.querySelector(`[data-post-slug="${slug}"]`);
+
+          if (viewCounter) {
+            const currentCount = parseInt(viewCounter.getAttribute("data-view-count"), 10);
+            if (!isNaN(currentCount)) {
+              // Optimistically increment the count in the DOM that's about to be swapped in
+              const optimisticCount = currentCount + 1;
+
+              // Update both the data attribute and the displayed count
+              viewCounter.setAttribute("data-view-count", optimisticCount);
+              const countSpan = viewCounter.querySelector(".view-count");
+              if (countSpan) {
+                countSpan.textContent = optimisticCount;
+              }
+
+              // Update the server response with the optimistic count
+              if (contentAreaInResponse) {
+                event.detail.serverResponse = contentAreaInResponse.innerHTML;
+              }
+            }
+          }
         }
       }
     });
@@ -171,6 +201,30 @@ const Core = {
           if (homeLink) {
             // Remove the push-url attribute to prevent history duplication on home
             homeLink.removeAttribute("hx-push-url");
+          }
+        }
+
+        // Reconcile optimistic view count with server response
+        const wasIncremented = event.detail.xhr?.getResponseHeader("X-View-Incremented");
+        const path = event.detail.pathInfo?.path || window.location.pathname;
+
+        if (path && path.startsWith("/posts/") && wasIncremented === "false") {
+          // Server didn't increment (already viewed in session), so revert optimistic update
+          const slug = path.replace("/posts/", "");
+          const viewCounter = document.querySelector(`[data-post-slug="${slug}"]`);
+
+          if (viewCounter) {
+            const currentOptimisticCount = parseInt(viewCounter.getAttribute("data-view-count"), 10);
+            if (!isNaN(currentOptimisticCount)) {
+              // Revert the optimistic increment
+              const actualCount = currentOptimisticCount - 1;
+
+              viewCounter.setAttribute("data-view-count", actualCount);
+              const countSpan = viewCounter.querySelector(".view-count");
+              if (countSpan) {
+                countSpan.textContent = actualCount;
+              }
+            }
           }
         }
 

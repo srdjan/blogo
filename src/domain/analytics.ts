@@ -5,9 +5,19 @@ import { err, ok } from "../lib/result.ts";
 
 type ViewsData = Record<string, number>;
 
+export type ViewTrackingContext = {
+  readonly viewedPosts: readonly string[];
+  readonly clientIP: string;
+};
+
+export type ViewCountResult = {
+  readonly count: number;
+  readonly incremented: boolean;
+};
+
 export type AnalyticsService = {
   readonly getViewCount: (slug: Slug) => Promise<AppResult<number>>;
-  readonly incrementViewCount: (slug: Slug) => Promise<AppResult<number>>;
+  readonly incrementViewCount: (slug: Slug, context?: ViewTrackingContext) => Promise<AppResult<ViewCountResult>>;
   readonly getAllViewCounts: () => Promise<AppResult<ViewsData>>;
   readonly close: () => void;
 };
@@ -43,9 +53,58 @@ export const createAnalyticsService = async (
     }
   };
 
-  const incrementViewCount = async (slug: Slug): Promise<AppResult<number>> => {
+  const shouldIncrementView = async (
+    slug: Slug,
+    context?: ViewTrackingContext,
+  ): Promise<boolean> => {
+    // If no context provided, allow increment (backward compatibility)
+    if (!context) {
+      return true;
+    }
+
+    // Check session tracking: if post already viewed in this session, skip
+    if (context.viewedPosts.includes(slug)) {
+      return false;
+    }
+
+    // Rate limiting fallback: check if this IP viewed this post recently (30 min window)
+    try {
+      const rateLimitKey = ["view_rate_limit", context.clientIP, slug];
+      const rateLimitEntry = await kv.get<number>(rateLimitKey);
+
+      if (rateLimitEntry.value) {
+        const lastViewTime = rateLimitEntry.value;
+        const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
+
+        // If viewed within last 30 minutes, skip increment
+        if (lastViewTime > thirtyMinutesAgo) {
+          return false;
+        }
+      }
+
+      // Set rate limit entry with 30-minute expiration
+      await kv.set(rateLimitKey, Date.now(), { expireIn: 30 * 60 * 1000 });
+      return true;
+    } catch (error) {
+      // If rate limiting fails, allow increment (fail open)
+      console.error(`Rate limiting check failed for ${slug}:`, error);
+      return true;
+    }
+  };
+
+  const incrementViewCount = async (slug: Slug, context?: ViewTrackingContext): Promise<AppResult<ViewCountResult>> => {
     try {
       const key = ["views", slug];
+
+      // Check if we should increment based on session and rate limiting
+      const shouldIncrement = await shouldIncrementView(slug, context);
+
+      if (!shouldIncrement) {
+        // Don't increment, just return current count
+        const current = await kv.get<number>(key);
+        const currentCount = current.value ?? 0;
+        return ok({ count: currentCount, incremented: false });
+      }
 
       // Use atomic operation to safely increment
       let newCount = 0;
@@ -64,7 +123,7 @@ export const createAnalyticsService = async (
         success = result.ok;
       }
 
-      return ok(newCount);
+      return ok({ count: newCount, incremented: true });
     } catch (error) {
       return err({
         kind: "IOError",

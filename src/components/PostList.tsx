@@ -46,7 +46,7 @@ export const PostList = (props: {
                   {post.formattedDate && (
                     <time dateTime={post.date}>{post.formattedDate}</time>
                   )}
-                  <ViewCount count={post.viewCount} />
+                  <ViewCount count={post.viewCount} slug={post.slug} />
                 </div>
                 {post.excerpt && <p>{post.excerpt}</p>}
                 {post.tags && post.tags.length > 0 && (

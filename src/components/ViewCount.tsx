@@ -17,15 +17,23 @@ const EyeIcon = () => (
   </svg>
 );
 
-export const ViewCount = (props: { readonly count?: number | undefined }) => {
-  const { count } = props;
+export const ViewCount = (props: {
+  readonly count?: number | undefined;
+  readonly slug?: string | undefined;
+}) => {
+  const { count, slug } = props;
 
   if (count === undefined) {
     return null;
   }
 
   return (
-    <span class="post-views" aria-label={`${count} views`}>
+    <span
+      class="post-views"
+      aria-label={`${count} views`}
+      data-post-slug={slug}
+      data-view-count={count}
+    >
       <EyeIcon />
       <span class="view-count">{count}</span>
     </span>
