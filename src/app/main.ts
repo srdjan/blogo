@@ -25,11 +25,8 @@ async function main() {
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const healthCache = createInMemoryCache<unknown>();
-  const viewCountsCache = createInMemoryCache<Record<string, number>>();
 
-  const analyticsService = await createAnalyticsService({
-    viewCountsCache,
-  });
+  const analyticsService = await createAnalyticsService();
 
   const contentService = createContentService({
     fileSystem,

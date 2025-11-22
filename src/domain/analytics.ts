@@ -1,6 +1,5 @@
 import type { Slug } from "../lib/types.ts";
 import type { AppResult } from "../lib/types.ts";
-import type { Cache } from "../ports/cache.ts";
 import { err, ok } from "../lib/result.ts";
 
 type ViewsData = Record<string, number>;
@@ -12,12 +11,7 @@ export type AnalyticsService = {
   readonly close: () => void;
 };
 
-export type AnalyticsDependencies = {
-  readonly viewCountsCache?: Cache<ViewsData>;
-};
-
 export const createAnalyticsService = async (
-  deps?: AnalyticsDependencies,
 ): Promise<AnalyticsService> => {
   let kv: Deno.Kv;
 
@@ -26,8 +20,6 @@ export const createAnalyticsService = async (
   } catch (error) {
     throw new Error(`Failed to open Deno KV: ${error}`);
   }
-
-  const { viewCountsCache } = deps || {};
 
   const getViewCount = async (slug: Slug): Promise<AppResult<number>> => {
     try {
@@ -75,14 +67,6 @@ export const createAnalyticsService = async (
   };
 
   const getAllViewCounts = async (): Promise<AppResult<ViewsData>> => {
-    // Check cache first if available
-    if (viewCountsCache) {
-      const cached = viewCountsCache.get("all_view_counts");
-      if (cached.ok && cached.value) {
-        return ok(cached.value);
-      }
-    }
-
     try {
       const viewsData: ViewsData = {};
       const entries = kv.list<number>({ prefix: ["views"] });
@@ -91,11 +75,6 @@ export const createAnalyticsService = async (
         // Extract slug from key: ["views", slug]
         const slug = entry.key[1] as string;
         viewsData[slug] = entry.value;
-      }
-
-      // Cache the result for 1 minute if cache is available
-      if (viewCountsCache) {
-        viewCountsCache.set("all_view_counts", viewsData, 60 * 1000); // 1 minute TTL
       }
 
       return ok(viewsData);

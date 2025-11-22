@@ -127,14 +127,29 @@ const Core = {
       ScrollRestoration.save();
     });
 
-    // Handle browser back/forward button - refresh to get latest data
+    // Handle browser back/forward button - always refresh home from server
     document.addEventListener("htmx:historyRestore", (event) => {
       const restoredPath = event?.detail?.path || window.location.pathname;
+
+      // When returning to home, force a fresh load so view counts reflect the
+      // latest increments (avoids reusing HTMX history snapshots).
+      if (restoredPath === "/") {
+        window.location.reload();
+        return;
+      }
+
       const restored = ScrollRestoration.restore(restoredPath);
       if (!restored) {
         window.scrollTo(0, 0);
       }
       this.updateActiveNavLink();
+    });
+
+    // Fallback for native history navigation (when HTMX doesn't fire)
+    window.addEventListener("popstate", () => {
+      if (window.location.pathname === "/") {
+        window.location.reload();
+      }
     });
 
     // Handle HTMX before swaps to filter content
