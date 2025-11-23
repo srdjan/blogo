@@ -8,7 +8,7 @@ This blog system is built around several key architectural principles:
 - **Deno** for minimal dependencies: Leveraging Deno's standard library with
   minimal external dependencies
 - Semantic **HTML**: Clean, accessible markup following modern best practices
-- Pure **CSS**: Minimal, semantic, responsive styling without frameworks
+- Pure **CSS**: Minimal, responsive styling without frameworks
 
 ## Features
 
