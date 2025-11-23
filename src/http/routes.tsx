@@ -21,6 +21,8 @@ import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
 import { match } from "../lib/result.ts";
 import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
+import { renderVNode } from "./render-vnode.ts";
+import type { RouteContext } from "./types.ts";
 
 export type RouteHandlers = {
   readonly home: RouteHandler;
@@ -45,12 +47,37 @@ export const createRouteHandlers = (
   healthService: HealthService,
   analyticsService: AnalyticsService,
 ): RouteHandlers => {
+  const isHtmxRequest = (req: Request): boolean =>
+    req.headers.get("HX-Request") === "true";
+
+  const renderFragment = (
+    props: Parameters<typeof createLayout>[0],
+  ): Response => {
+    const fragmentHtml = renderVNode(props.children);
+    return new Response(fragmentHtml, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "Vary": "HX-Request",
+      },
+    });
+  };
+
+  const renderPage = (
+    ctx: RouteContext,
+    props: Parameters<typeof createLayout>[0],
+  ): Response => {
+    return isHtmxRequest(ctx.req) ? renderFragment(props) : createLayout(props);
+  };
+
   const home: RouteHandler = async (ctx) => {
     const postsResult = await contentService.loadPostsMetadataWithViews();
 
     return match(postsResult, {
       ok: (posts) =>
-        createLayout({
+        renderPage(ctx, {
           title: "Blog - Home",
           description: "A minimal blog built with mono-jsx",
           path: createUrlPath(ctx.pathname),
@@ -59,7 +86,7 @@ export const createRouteHandlers = (
           author: "Srdjan Strbanovic",
         }),
       error: () =>
-        createLayout({
+        renderPage(ctx, {
           title: "Error - Blog",
           description: "Failed to load posts",
           path: createUrlPath(ctx.pathname),
@@ -70,7 +97,7 @@ export const createRouteHandlers = (
   };
 
   const about: RouteHandler = (ctx) => {
-    return createLayout({
+    return renderPage(ctx, {
       title: "About - Blog",
       description: "About this blog and its features",
       path: createUrlPath(ctx.pathname),
@@ -84,7 +111,7 @@ export const createRouteHandlers = (
 
     return match(tagsResult, {
       ok: (tags) =>
-        createLayout({
+        renderPage(ctx, {
           title: "Tags - Blog",
           description: "Browse posts by tags",
           path: createUrlPath(ctx.pathname),
@@ -93,7 +120,7 @@ export const createRouteHandlers = (
           author: "Srdjan Strbanovic",
         }),
       error: () =>
-        createLayout({
+        renderPage(ctx, {
           title: "Error - Blog",
           description: "Failed to load tags",
           path: createUrlPath(ctx.pathname),
@@ -111,7 +138,7 @@ export const createRouteHandlers = (
 
     return match(postsResult, {
       ok: (posts) =>
-        createLayout({
+        renderPage(ctx, {
           title: `Posts tagged "${tagName}" - Blog`,
           description: `All posts tagged with ${tagName}`,
           path: createUrlPath(ctx.pathname),
@@ -120,7 +147,7 @@ export const createRouteHandlers = (
           author: "Srdjan Strbanovic",
         }),
       error: () =>
-        createLayout({
+        renderPage(ctx, {
           title: "Error - Blog",
           description: "Failed to load posts for tag",
           path: createUrlPath(ctx.pathname),
@@ -151,7 +178,7 @@ export const createRouteHandlers = (
     // Add view count to post
     const postWithViews: typeof post = { ...post, viewCount };
 
-    return createLayout({
+    return renderPage(ctx, {
       title: `${post.title} - Blog`,
       description: post.excerpt || `Read ${post.title}`,
       path: createUrlPath(ctx.pathname),
@@ -169,7 +196,7 @@ export const createRouteHandlers = (
     const query = ctx.searchParams.get("q");
 
     if (!query) {
-      return createLayout({
+      return renderPage(ctx, {
         title: "Search - Blog",
         description: "Search blog posts",
         path: createUrlPath(ctx.pathname),
@@ -201,7 +228,7 @@ export const createRouteHandlers = (
 
     return match(postsResult, {
       ok: (posts) =>
-        createLayout({
+        renderPage(ctx, {
           title: `Search: "${query}" - Blog`,
           description: `Search results for ${query}`,
           path: createUrlPath(ctx.pathname),
@@ -211,7 +238,7 @@ export const createRouteHandlers = (
           children: <SearchResults posts={posts} query={query} />,
         }),
       error: () =>
-        createLayout({
+        renderPage(ctx, {
           title: "Error - Blog",
           description: "Failed to search posts",
           path: createUrlPath(ctx.pathname),
@@ -307,7 +334,7 @@ export const createRouteHandlers = (
           feedPath: `/rss/topic/${topicToSlug(topicName)}`,
           count: topicCounts.get(topicName) ?? 0,
         }));
-        return createLayout({
+        return renderPage(ctx, {
           title: "RSS Subscriptions - Blog",
           description: "Subscribe to the full feed or topic-specific feeds",
           path: createUrlPath(ctx.pathname),
@@ -316,7 +343,7 @@ export const createRouteHandlers = (
         });
       },
       error: () =>
-        createLayout({
+        renderPage(ctx, {
           title: "Error - Blog",
           description: "Failed to load RSS data",
           path: createUrlPath(ctx.pathname),

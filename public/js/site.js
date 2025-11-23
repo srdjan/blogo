@@ -152,22 +152,6 @@ const Core = {
       }
     });
 
-    // Handle HTMX before swaps to filter content
-    document.addEventListener("htmx:beforeSwap", (event) => {
-      if (event.detail.target.id === "content-area") {
-        // Create a temporary div to parse the response
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = event.detail.serverResponse;
-
-        // Check if the response contains a full page (has #content-area)
-        const contentAreaInResponse = tempDiv.querySelector("#content-area");
-        if (contentAreaInResponse) {
-          // Extract only the content from within #content-area
-          event.detail.serverResponse = contentAreaInResponse.innerHTML;
-        }
-      }
-    });
-
     // Handle HTMX after swaps for scrolling and active link updates
     document.addEventListener("htmx:afterSwap", (event) => {
       // Scroll to top after content swap

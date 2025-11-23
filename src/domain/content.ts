@@ -6,6 +6,7 @@ import type {
   TagInfo,
   TagName,
 } from "../lib/types.ts";
+import { createSlug } from "../lib/types.ts";
 import type { Result } from "../lib/result.ts";
 import { combine, err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
@@ -157,7 +158,7 @@ export const createContentService = (
 
       const postResults = await Promise.all(
         markdownFiles.map(async (filename) => {
-          const slug = filename.replace(/\.md$/, "") as Slug;
+          const slug = createSlug(filename.replace(/\.md$/, ""));
           const filePath = `${postsDir}/${filename}`;
           return await parseMarkdown(filePath, slug);
         }),
@@ -200,7 +201,7 @@ export const createContentService = (
 
       const metaResults = await Promise.all(
         markdownFiles.map(async (filename) => {
-          const slug = filename.replace(/\.md$/, "") as Slug;
+          const slug = createSlug(filename.replace(/\.md$/, ""));
           const filePath = `${postsDir}/${filename}`;
           return await parseMetadata(filePath, slug);
         }),
@@ -471,10 +472,14 @@ async function parseFrontmatter(
     const dateString = validatedMeta.date;
     const tags = validatedMeta.tags?.map((t) => t as TagName);
 
+    const normalizedSlug = createSlug(
+      (validatedMeta.slug as string | undefined) ?? (slug as string),
+    );
+
     const result: PostMeta = {
       title: validatedMeta.title,
       date: dateString,
-      slug: (validatedMeta.slug as Slug) || slug,
+      slug: normalizedSlug,
       ...(validatedMeta.excerpt && { excerpt: validatedMeta.excerpt }),
       ...(tags && { tags }),
       ...(validatedMeta.modified && { modified: validatedMeta.modified }),
