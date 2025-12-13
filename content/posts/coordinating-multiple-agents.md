@@ -22,7 +22,7 @@ But worktrees only solve the mechanical isolation. The harder problem is upstrea
 
 This is where Kanban thinking helps a lot.
 
-<img src="../../public/images/kanban.png" alt="alt text" style="max-width:210mm; max-height:297mm; width:100%; height:auto; object-fit:contain;" />
+<img src="/images/kanban.png" alt="alt text" style="max-width:210mm; max-height:297mm; width:100%; height:auto; object-fit:contain;" />
 
 Instead of slicing work horizontally by layer (one agent on backend, one on frontend, one on tests), slice it vertically into isolated story streams. Each stream is a thin, complete increment: a feature, a fix, a small capability that can be developed, tested, and merged without depending on work happening in other streams.
 
