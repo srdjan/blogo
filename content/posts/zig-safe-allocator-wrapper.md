@@ -5,15 +5,24 @@ tags: [Zig, Compilers, Fil-C]
 excerpt: A practical allocator wrapper that adds Fil-style runtime safety checks where you need them, with zero language changes and minimal code churn. Opt-in, idiomatic, and surprisingly elegant.
 ---
 
-Here's a question: what if you could get runtime memory safety in Zig—catching use-after-free and out-of-bounds writes—without changing the language, without fat pointers, and without sacrificing performance in your hot paths? I thought, Gipity, my friend may be able to help. So, here it goes: 
+Here's a question: what if you could get runtime memory safety in Zig—catching
+use-after-free and out-of-bounds writes—without changing the language, without
+fat pointers, and without sacrificing performance in your hot paths? I thought,
+Gipity, my friend may be able to help. So, here it goes:
 
-One possible way is wrapping Zig's `std.mem.Allocator` with a thin capability-tracking layer. Pass the wrapped allocator to your risky subsystems (parsers, decoders, FFI boundaries), keep the raw allocator everywhere else. You get targeted safety where it matters, zero cost where it doesn't.
+One possible way is wrapping Zig's `std.mem.Allocator` with a thin
+capability-tracking layer. Pass the wrapped allocator to your risky subsystems
+(parsers, decoders, FFI boundaries), keep the raw allocator everywhere else. You
+get targeted safety where it matters, zero cost where it doesn't.
 
 Let see how this could work...
 
 ## The Core Idea
 
-Zig's allocator interface is simple and explicit—you pass `std.mem.Allocator` to functions that need memory. This is actually perfect for adding optional safety: wrap the allocator, track capabilities on alloc, validate on bulk memory ops, invalidate on free.
+Zig's allocator interface is simple and explicit—you pass `std.mem.Allocator` to
+functions that need memory. This is actually perfect for adding optional safety:
+wrap the allocator, track capabilities on alloc, validate on bulk memory ops,
+invalidate on free.
 
 The wrapper maintains a side table:
 
@@ -26,9 +35,14 @@ pub const Cap = struct {
 };
 ```
 
-When you allocate memory, the wrapper registers `{base, len, epoch, writable}`. When you free it, epoch gets incremented—now any checked operation using the old pointer will panic with "epoch mismatch (UAF)". Bulk memory operations (`memcpy`, `memset`, `memmove`) go through checked helpers that validate bounds and epoch before touching memory.
+When you allocate memory, the wrapper registers `{base, len, epoch, writable}`.
+When you free it, epoch gets incremented—now any checked operation using the old
+pointer will panic with "epoch mismatch (UAF)". Bulk memory operations
+(`memcpy`, `memset`, `memmove`) go through checked helpers that validate bounds
+and epoch before touching memory.
 
-The beauty: it's completely opt-in. Swap allocators for the subsystem you want to harden. Done.
+The beauty: it's completely opt-in. Swap allocators for the subsystem you want
+to harden. Done.
 
 ## The Runtime (Intentionally Minimal)
 
@@ -48,13 +62,16 @@ pub fn checkedMemmove(dst: [*]u8, src: [*]const u8, n: usize) void { /* ... */ }
 pub fn checkedPtrAdd(base_ptr: [*]u8, add: usize) [*]u8 { /* ... */ }
 ```
 
-Implementation note: use a radix tree or flat hash map keyed by page-aligned base. For large allocations, consider guard pages (configurable). Make all functions `inline`/`noinline` strategically to keep hot paths tiny.
+Implementation note: use a radix tree or flat hash map keyed by page-aligned
+base. For large allocations, consider guard pages (configurable). Make all
+functions `inline`/`noinline` strategically to keep hot paths tiny.
 
 That's it. No compiler changes, no special syntax.
 
 ## The Allocator Wrapper (Drop-in Compatible)
 
-Here's the interesting bit: we implement all relevant `std.mem.Allocator` vtable methods so the wrapper is completely transparent:
+Here's the interesting bit: we implement all relevant `std.mem.Allocator` vtable
+methods so the wrapper is completely transparent:
 
 ```zig
 const std = @import("std");
@@ -127,9 +144,11 @@ pub const SafeAlloc = struct {
 };
 ```
 
-Look at this—it's just an `Allocator` with a vtable. No syntax changes, no fat pointers. You can slot it anywhere you already pass an allocator.
+Look at this—it's just an `Allocator` with a vtable. No syntax changes, no fat
+pointers. You can slot it anywhere you already pass an allocator.
 
-This feels completely native to Zig because it *is* native to Zig. The allocator pattern is how Zig handles memory—explicit, composable, and under your control.
+This feels completely native to Zig because it _is_ native to Zig. The allocator
+pattern is how Zig handles memory—explicit, composable, and under your control.
 
 ## How You Actually Use This
 
@@ -154,7 +173,8 @@ pub fn main() !void {
 }
 ```
 
-Result: only the parser pays for checks. Your internal hot path stays raw and fast.
+Result: only the parser pays for checks. Your internal hot path stays raw and
+fast.
 
 Typical alloc-and-free pattern:
 
@@ -164,9 +184,12 @@ const buf = try alloc.alloc(u8, 4096);
 alloc.free(buf);
 ```
 
-If a stale slice survives `free`, a subsequent checked operation will **panic with "epoch mismatch (UAF)"**. You get an immediate, precise failure—not a heisenbug an hour later.
+If a stale slice survives `free`, a subsequent checked operation will **panic
+with "epoch mismatch (UAF)"**. You get an immediate, precise failure—not a
+heisenbug an hour later.
 
-For bulk operations, you can expose a tiny module `safe.mem` that aliases either checked or raw versions based on a build flag:
+For bulk operations, you can expose a tiny module `safe.mem` that aliases either
+checked or raw versions based on a build flag:
 
 ```zig
 if (enable_checks) checkedMemcpy(dst.ptr, src.ptr, len)
@@ -186,7 +209,11 @@ Here's what we track and check:
 | `memcpy/move/set`   | —                                          | (1) bounds inside `len` (2) epoch fresh (3) `writable` for writes | panic   |
 | FFI import/export   | manual `capRegister`/`capInvalidate`       | same as above                                                     | panic   |
 
-To me is interesting that we only guarantee safety for operations that route through the wrapper—allocator and checked memory ops. If you do raw pointer arithmetic and loads/stores directly, those remain unchecked. But that's exactly why this allocator is the pragmatic baseline: minimal friction, maximum coverage for the typical bug sources (bulk copies, resizes, frees).
+To me is interesting that we only guarantee safety for operations that route
+through the wrapper—allocator and checked memory ops. If you do raw pointer
+arithmetic and loads/stores directly, those remain unchecked. But that's exactly
+why this allocator is the pragmatic baseline: minimal friction, maximum coverage
+for the typical bug sources (bulk copies, resizes, frees).
 
 ## Performance Knobs
 
@@ -197,7 +224,8 @@ You control the overhead:
   ```zig
   exe.addOption(bool, "enable_fil_safety", true);
   ```
-- **Redzones** (big blocks only): add guard pages with OS-backed pages on sizes ≥ threshold
+- **Redzones** (big blocks only): add guard pages with OS-backed pages on sizes
+  ≥ threshold
 - **Fast path inlining**: common cases perform a single table lookup + branch
 - **Table choice**: radix tree for predictable O(1) vs hash map for compactness
 
@@ -224,7 +252,9 @@ panic: fil: write out-of-bounds
   at main.zig:45
 ```
 
-Immediate, precise failure with full context. This is what makes it useful in practice—you catch bugs the moment they happen, not when they corrupt memory three layers up.
+Immediate, precise failure with full context. This is what makes it useful in
+practice—you catch bugs the moment they happen, not when they corrupt memory
+three layers up.
 
 ## Real Talk: Tradeoffs
 
@@ -238,8 +268,10 @@ This approach works beautifully for:
 It falls short when:
 
 - You need comprehensive memory safety everywhere (use Rust instead)
-- Your hot path can't afford a single table lookup + branch (keep it on raw allocator)
-- You're doing lots of raw pointer arithmetic outside bulk ops (checks won't catch those)
+- Your hot path can't afford a single table lookup + branch (keep it on raw
+  allocator)
+- You're doing lots of raw pointer arithmetic outside bulk ops (checks won't
+  catch those)
 
 Common pitfalls:
 
@@ -252,17 +284,29 @@ Common pitfalls:
 
 ## Why This Feels Right for Zig
 
-The allocator-centric extension is a first-class Zig idiom. You already pass allocators everywhere—swapping them is natural and explicit. Zero changes to types or syntax, no fat pointers, no new keywords, no borrow system.
+The allocator-centric extension is a first-class Zig idiom. You already pass
+allocators everywhere—swapping them is natural and explicit. Zero changes to
+types or syntax, no fat pointers, no new keywords, no borrow system.
 
-It's opt-in safety: you decide where to pay the cost. This keeps Zig's "you own the sharp tools" philosophy intact. The wrapper works with arenas, GPAs, fixed buffers—it can sit on top of any `std.mem.Allocator`.
+It's opt-in safety: you decide where to pay the cost. This keeps Zig's "you own
+the sharp tools" philosophy intact. The wrapper works with arenas, GPAs, fixed
+buffers—it can sit on top of any `std.mem.Allocator`.
 
-Compare this to how C teams adopt sanitizers—except this one lives in your allocator, not your compiler flags. It's explicit, composable, and under your control.
+Compare this to how C teams adopt sanitizers—except this one lives in your
+allocator, not your compiler flags. It's explicit, composable, and under your
+control.
 
 ## What You Gain
 
-Targeted runtime safety: OOB and UAF catching in the places they actually happen (copies, resizes, frees). Frictionless adoption: pass a different allocator, no rewrites. Predictable performance: checks only where you enable them, compile out in production. Clear diagnostics: panic with region/epoch context.
+Targeted runtime safety: OOB and UAF catching in the places they actually happen
+(copies, resizes, frees). Frictionless adoption: pass a different allocator, no
+rewrites. Predictable performance: checks only where you enable them, compile
+out in production. Clear diagnostics: panic with region/epoch context.
 
-Foundation for more: you can later add checked `memcpy` hoisting, redzones, even GC hooks, without changing call sites.
+Foundation for more: you can later add checked `memcpy` hoisting, redzones, even
+GC hooks, without changing call sites.
 
-Wrapping Zig's allocator seems to be the most idiomatic and pragmatic way to introduce as-needed runtime safety. It respects Zig's explicit control model, keeps developer experience clean, and gives teams a lever to harden the exact subsystems that interact with untrusted memory—no more, no less.
-
+Wrapping Zig's allocator seems to be the most idiomatic and pragmatic way to
+introduce as-needed runtime safety. It respects Zig's explicit control model,
+keeps developer experience clean, and gives teams a lever to harden the exact
+subsystems that interact with untrusted memory—no more, no less.

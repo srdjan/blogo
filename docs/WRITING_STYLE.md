@@ -41,8 +41,8 @@ curiosity**. The tone is:
 
 ### Framing
 
-- **Balanced first-person** - Some "I" for personal notes, but not often, not every
-  sentence
+- **Balanced first-person** - Some "I" for personal notes, but not often, not
+  every sentence
 - **Direct statements with energy** - "This works because..." "Here's the cool
   part..."
 - **Topic-focused with occasional asides** - Main content first, personal

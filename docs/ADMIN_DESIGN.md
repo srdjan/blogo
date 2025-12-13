@@ -700,7 +700,7 @@ export const PostEditor = (props: {
 
   return (
     <div class="post-editor">
-      <h1>{mode === "create" ? "Create New Post" : `Edit: ${post?.title}`}</h1>
+      <h2>{mode === "create" ? "Create New Post" : `Edit: ${post?.title}`}</h2>
 
       <form id="post-form" method="POST" action="/admin/posts/save">
         {post && <input type="hidden" name="originalSlug" value={post.slug} />}
@@ -1088,7 +1088,8 @@ export const AdminLayout = (props: {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>{props.title} - Blogo Admin</title>
-      <link rel="stylesheet" href="/css/main.css" />
+      <link rel="stylesheet" href="/css/mcss.css" />
+      <link rel="stylesheet" href="/css/custom.css" />
       <link rel="stylesheet" href="/css/admin.css" />
     </head>
     <body class="admin-body">
@@ -2090,7 +2091,8 @@ blogo/
 │   └── posts/              # Existing markdown posts (read-only)
 ├── public/
 │   ├── css/
-│   │   ├── main.css        # Existing: Public styles
+│   │   ├── mcss.css        # Existing: mCSS styles
+│   │   ├── custom.css      # Existing: Public styles
 │   │   └── admin.css       # NEW: Admin styles
 │   └── js/
 │       └── admin/          # NEW: Admin client scripts

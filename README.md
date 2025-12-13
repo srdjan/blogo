@@ -35,7 +35,8 @@ This blog system is built around several key architectural principles:
 The project follows a light functional programming style with TypeScript, and is
 built using a mono-jsx architecture with clean separation of concerns and
 semantic HTML/CSS. This modern approach creates a blog that's not just
-functional, but showcases the future of web development—clean, fast, accessible, and maintainable.
+functional, but showcases the future of web development—clean, fast, accessible,
+and maintainable.
 
 ## Getting Started
 
