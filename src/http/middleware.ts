@@ -129,10 +129,9 @@ export const staticFiles =
       url.pathname === "/favicon.svg" ||
       url.pathname === "/favicon.ico" ||
       url.pathname === "/manifest.json" ||
-      /\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot|wav|mp3|ogg|flac|m4a|aac)$/
-        .test(
-          url.pathname,
-        );
+      /\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot|wav|mp3|ogg|flac|m4a|aac)$/.test(
+        url.pathname,
+      );
 
     if (!isStaticFile) {
       return next(req);

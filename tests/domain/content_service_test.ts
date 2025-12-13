@@ -89,9 +89,7 @@ More content here.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -126,9 +124,7 @@ This post has invalid frontmatter.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -151,9 +147,7 @@ Deno.test("ContentService - handles missing files gracefully", async () => {
   const fileSystem = createMockFileSystem({});
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -184,9 +178,7 @@ date: 2025-01-15
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -218,9 +210,7 @@ date: 2025-01-15
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -261,9 +251,7 @@ date: 2025-01-14
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -308,9 +296,7 @@ tags:
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
@@ -358,9 +344,7 @@ This is about JavaScript.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<
-    readonly import("../../src/lib/types.ts").PostMeta[]
-  >();
+  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
 
   const contentService = createContentService({
     fileSystem,
