@@ -17,7 +17,10 @@ const isVNode = (v: unknown): v is [unknown, Record<string, unknown>, symbol] =>
 const renderAttrs = (props: Record<string, unknown>): string => {
   const parts: string[] = [];
   for (const [key, value] of Object.entries(props)) {
-    if (key === "children" || value === false || value === undefined || value === null) {
+    if (
+      key === "children" || value === false || value === undefined ||
+      value === null
+    ) {
       continue;
     }
     if (value === true) {
@@ -25,10 +28,12 @@ const renderAttrs = (props: Record<string, unknown>): string => {
       continue;
     }
     if (key === "style" && typeof value === "object" && value !== null) {
-      const styleStr = Object.entries(value as Record<string, unknown>).map(([k, v]) => {
-        const kebab = k.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
-        return `${kebab}:${v}`;
-      }).join(";");
+      const styleStr = Object.entries(value as Record<string, unknown>).map(
+        ([k, v]) => {
+          const kebab = k.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+          return `${kebab}:${v}`;
+        },
+      ).join(";");
       parts.push(` style="${escapeHtml(styleStr)}"`);
       continue;
     }
@@ -55,15 +60,21 @@ const voidEls = new Set([
 ]);
 
 export const renderVNode = (node: unknown): string => {
-  if (node === null || node === undefined || typeof node === "boolean") return "";
-  if (typeof node === "string" || typeof node === "number") return escapeHtml(String(node));
+  if (node === null || node === undefined || typeof node === "boolean") {
+    return "";
+  }
+  if (typeof node === "string" || typeof node === "number") {
+    return escapeHtml(String(node));
+  }
 
   if (isVNode(node) || (Array.isArray(node) && typeof node[2] === "symbol")) {
     const [tag, props = {}] = node;
     const children = (props as { children?: unknown }).children;
 
     // Raw HTML node (created by html``)
-    if (typeof tag === "symbol" && (props as Record<string, unknown>).innerHTML) {
+    if (
+      typeof tag === "symbol" && (props as Record<string, unknown>).innerHTML
+    ) {
       return String((props as Record<string, unknown>).innerHTML);
     }
 

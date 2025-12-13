@@ -43,82 +43,12 @@ const ScrollRestoration = {
 const Core = {
   init() {
     this.setupEventListeners();
-    this.initTheme();
-    this.initPalette();
 
-    // Initialize home link to have correct behavior on first page load
-    const homeLink = document.querySelector('a[href="/"].link');
-    if (homeLink && window.location.pathname === "/") {
-      // On the home page, we don't need push-url for the home link
-      // homeLink.removeAttribute("hx-push-url");
-    }
+    // Set Verdana theme permanently
+    document.documentElement.setAttribute("data-theme", "verdana");
 
     // Set active nav link on initial page load
     this.updateActiveNavLink();
-  },
-
-  initTheme() {
-    // Get saved theme or default to system preference
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark =
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
-
-    // Apply theme
-    document.documentElement.setAttribute("data-theme", theme);
-    this.updateThemeIcon(theme);
-
-    // Listen for theme toggle button clicks
-    const themeToggle = document.querySelector(".theme-toggle");
-    if (themeToggle) {
-      themeToggle.addEventListener("click", () => this.toggleTheme());
-    }
-  },
-
-  initPalette() {
-    // Get saved palette or default to 'automerge'
-    const savedPalette = localStorage.getItem("palette");
-    const palette = savedPalette || "automerge";
-
-    // Apply palette
-    document.documentElement.setAttribute("data-palette", palette);
-
-    // Listen for palette toggle button clicks
-    const paletteToggle = document.querySelector(".palette-toggle");
-    if (paletteToggle) {
-      paletteToggle.addEventListener("click", () => this.togglePalette());
-    }
-  },
-
-  togglePalette() {
-    const current = document.documentElement.getAttribute("data-palette") ||
-      "automerge";
-    const next = current === "automerge" ? "default" : "automerge";
-    document.documentElement.setAttribute("data-palette", next);
-    localStorage.setItem("palette", next);
-  },
-
-  toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute("data-theme") ||
-      "light";
-    const newTheme = currentTheme === "light" ? "dark" : "light";
-
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-    this.updateThemeIcon(newTheme);
-  },
-
-  updateThemeIcon(theme) {
-    const sunIcon = document.querySelector(".sun-icon");
-    const moonIcon = document.querySelector(".moon-icon");
-
-    if (theme === "dark") {
-      sunIcon?.style.setProperty("display", "block");
-      moonIcon?.style.setProperty("display", "none");
-    } else {
-      sunIcon?.style.setProperty("display", "none");
-      moonIcon?.style.setProperty("display", "block");
-    }
   },
 
   setupEventListeners() {
@@ -242,7 +172,7 @@ const Search = {
     this.searchInput = document.getElementById("search-input");
     this.searchResults = document.getElementById("search-results");
     this.searchModal = document.getElementById("search-modal");
-    this.searchToggle = document.querySelector(".search-toggle");
+    this.searchToggle = document.getElementById("search-toggle");
 
     if (!this.searchForm || !this.searchInput || !this.searchResults) return;
 
@@ -306,7 +236,7 @@ const Search = {
 };
 
 const updateSearchToggleState = (expanded) => {
-  const toggle = document.querySelector(".search-toggle");
+  const toggle = document.getElementById("search-toggle");
   if (toggle) {
     toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
   }
@@ -314,11 +244,9 @@ const updateSearchToggleState = (expanded) => {
 
 // Simple function to ensure search functionality works
 function ensureSearchToggleWorks() {
-  const searchToggle = document.querySelector(".search-toggle");
-  const searchCloseBtn = document.querySelector(
-    'button[aria-label="Close search"]',
-  );
+  const searchToggle = document.getElementById("search-toggle");
   const searchModal = document.getElementById("search-modal");
+  const searchCloseBtn = document.querySelector(".search-close");
 
   updateSearchToggleState(false);
 
@@ -327,7 +255,7 @@ function ensureSearchToggleWorks() {
     searchToggle.setAttribute("data-listener-attached", "true");
 
     searchToggle.addEventListener("click", (e) => {
-      e.preventDefault();
+      e.preventDefault(); // Prevent anchor navigation
       const modal = document.getElementById("search-modal");
       const input = document.getElementById("search-input");
       if (modal) {
@@ -358,7 +286,7 @@ function ensureSearchToggleWorks() {
     });
   }
 
-  // Click outside modal
+  // Click outside modal to close
   if (searchModal && !searchModal.hasAttribute("data-listener-attached")) {
     searchModal.setAttribute("data-listener-attached", "true");
 

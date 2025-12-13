@@ -1,6 +1,6 @@
 export const About = () => {
   return (
-    <div class="about-content" role="presentation">
+    <>
       <h1>Hi, I'm Srdjan...</h1>
       <p>
         This is my personal, minimal blog built for experimenting with AI agents
@@ -17,7 +17,10 @@ export const About = () => {
         Technologies, I have a strong background in software development and
         agile culture advisory.
       </p>
-      <nav class="social-links" aria-label="Social media links">
+      <p>
+        <strong>Connect with me:</strong>
+      </p>
+      <nav aria-label="Social media links">
         <a
           href="https://github.com/srdjan"
           target="_blank"
@@ -110,7 +113,8 @@ export const About = () => {
           <span>Home</span>
         </a>
       </nav>
-      <nav style="text-align: center; margin-top: var(--space-xl);">
+      <hr />
+      <p>
         <a
           href="/"
           hx-get="/"
@@ -118,9 +122,9 @@ export const About = () => {
           hx-swap="innerHTML"
           hx-push-url="true"
         >
-          &lArr; Back
+          ← Back to all posts
         </a>
-      </nav>
-    </div>
+      </p>
+    </>
   );
 };

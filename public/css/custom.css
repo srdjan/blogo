@@ -1,0 +1,211 @@
+/* Custom overrides for mCSS */
+
+/* Balance readability: comfortable body text width, but allow wider headers */
+:root {
+  --line-length: 75ch;
+  --page-padding-block: 0;
+}
+
+/* Position search on the right side of navigation */
+nav[aria-label="Primary"] ul {
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--gutter, 1rem);
+}
+
+nav[aria-label="Primary"] #search-nav-item {
+  margin-left: auto;
+}
+
+/* Prevent aggressive hyphenation in article headers */
+article header h2 {
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+/* Keep post headers full-width and compact */
+main article > header {
+  width: 100%;
+  max-width: unset; /* avoid inheriting tag-page width caps */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35em;
+  margin-block-end: calc(var(--stack) * 1.25);
+}
+
+main article > header > * {
+  margin: 0;
+}
+
+main article > header p + p {
+  margin-block-start: 0;
+}
+
+/* Remove bullets from post list */
+section[aria-label*="posts"] ul,
+section[aria-label*="Posts"] ul {
+  list-style: none;
+}
+
+/* Remove paragraph indentation in articles */
+article header p,
+article section p,
+article p {
+  text-indent: 0 !important;
+}
+
+/* Add spacing between paragraphs */
+article section p + p,
+article p + p {
+  margin-block-start: 1em;
+}
+
+/* Floating card search modal */
+#search-modal {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 540px;
+  width: 85vw;
+  padding: 0;
+  border: 1px solid color-mix(in oklch, canvasText 12%, transparent);
+  background: canvas;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#search-modal::backdrop {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+#search-modal[open] {
+  animation: modalFadeIn 0.15s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.search-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: canvasText;
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.search-close:hover {
+  opacity: 1;
+  background: color-mix(in oklch, canvasText 8%, transparent);
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.5rem 1.25rem 1.5rem;
+  border-bottom: 1px solid color-mix(in oklch, canvasText 12%, transparent);
+}
+
+.search-input-wrapper svg {
+  flex-shrink: 0;
+  opacity: 0.4;
+}
+
+.search-input-wrapper input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 1em;
+  outline: none;
+}
+
+.search-input-wrapper input:focus {
+  outline: none;
+}
+
+#search-results {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+#search-results:empty {
+  display: none;
+}
+
+/* Search result items */
+.search-result-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.1s ease;
+}
+
+.search-result-link:hover {
+  background: color-mix(in oklch, canvasText 6%, transparent);
+}
+
+/* RSS copy button */
+button.copy {
+  padding: 0.25rem;
+  min-width: auto;
+  border: 1px solid color-mix(in oklch, canvasText 20%, transparent);
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+button.copy:hover {
+  background: color-mix(in oklch, canvasText 5%, transparent);
+  border-color: color-mix(in oklch, canvasText 30%, transparent);
+}
+
+button.copy.copied {
+  background: color-mix(in oklch, green 15%, transparent);
+  border-color: green;
+}
+
+button.copy svg {
+  opacity: 0.7;
+}
+
+button.copy:hover svg {
+  opacity: 1;
+}
+
+button.copy.copied svg {
+  opacity: 1;
+}

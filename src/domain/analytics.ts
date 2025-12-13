@@ -11,8 +11,7 @@ export type AnalyticsService = {
   readonly close: () => void;
 };
 
-export const createAnalyticsService = async (
-): Promise<AnalyticsService> => {
+export const createAnalyticsService = async (): Promise<AnalyticsService> => {
   let kv: Deno.Kv;
 
   try {

@@ -25,9 +25,8 @@ export const ViewCount = (props: { readonly count?: number | undefined }) => {
   }
 
   return (
-    <span class="post-views" aria-label={`${count} views`}>
-      <EyeIcon />
-      <span class="view-count">{count}</span>
+    <span aria-label={`${count} views`}>
+      {count} views
     </span>
   );
 };
