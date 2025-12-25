@@ -2,8 +2,12 @@
 
 ## Project Structure
 
-- `src/` – Deno TypeScript app. Key areas: `app/` (entrypoint), `http/` (router, server, middleware), `domain/` (content/config/analytics services), `components/` (mono‑jsx views), `ports/` (adapters like cache/filesystem), `utils/` and `lib/` (shared helpers/types).
-- `content/posts/` – Markdown posts with YAML frontmatter. Slugs are kebab‑case filenames (e.g., `my-post-title.md`).
+- `src/` – Deno TypeScript app. Key areas: `app/` (entrypoint), `http/` (router,
+  server, middleware), `domain/` (content/config/analytics services),
+  `components/` (mono‑jsx views), `ports/` (adapters like cache/filesystem),
+  `utils/` and `lib/` (shared helpers/types).
+- `content/posts/` – Markdown posts with YAML frontmatter. Slugs are kebab‑case
+  filenames (e.g., `my-post-title.md`).
 - `public/` – Static assets served as‑is (CSS, JS, images).
 - `tests/` – Deno tests mirroring `src/` modules; `_test.ts` suffix.
 - `scripts/` – Maintenance tools (frontmatter checks, tag listing).
@@ -24,10 +28,15 @@ Use Deno tasks from `deno.json`:
 
 ## Coding Style & Naming Conventions
 
-- Formatting is enforced by `deno fmt` (2‑space indent, 80‑col line width). Run `deno task fmt` before PRs.
-- Keep semicolons and explicit `.ts`/`.tsx` import extensions as in existing code.
-- File naming: kebab‑case for non‑component files (`render-vnode.ts`), PascalCase for JSX components in `components/` matching exported symbols (`PostView.tsx`).
-- Prefer small, pure functions and dependency injection (see `create*Service` patterns).
+- Formatting is enforced by `deno fmt` (2‑space indent, 80‑col line width). Run
+  `deno task fmt` before PRs.
+- Keep semicolons and explicit `.ts`/`.tsx` import extensions as in existing
+  code.
+- File naming: kebab‑case for non‑component files (`render-vnode.ts`),
+  PascalCase for JSX components in `components/` matching exported symbols
+  (`PostView.tsx`).
+- Prefer small, pure functions and dependency injection (see `create*Service`
+  patterns).
 
 ## Testing Guidelines
 
@@ -37,9 +46,14 @@ Use Deno tasks from `deno.json`:
 
 ## Commit & Pull Request Guidelines
 
-- Commit messages in history are short, verb‑led summaries (e.g., “fixed counting”, “added more blog posts”). Follow that style: one line, imperative, scoped if helpful.
-- PRs should include: a brief summary, linked issue (if any), and screenshots for UI/content changes. Note any new env vars or tasks.
+- Commit messages in history are short, verb‑led summaries (e.g., “fixed
+  counting”, “added more blog posts”). Follow that style: one line, imperative,
+  scoped if helpful.
+- PRs should include: a brief summary, linked issue (if any), and screenshots
+  for UI/content changes. Note any new env vars or tasks.
 
 ## Configuration Tips
 
-Local settings live in `.env`; common vars include `DENO_ENV`, `PORT`, `PUBLIC_URL`, `BLOG_TITLE`, `POSTS_DIR`, and `POSTS_PER_PAGE`. Don’t commit secrets.
+Local settings live in `.env`; common vars include `DENO_ENV`, `PORT`,
+`PUBLIC_URL`, `BLOG_TITLE`, `POSTS_DIR`, and `POSTS_PER_PAGE`. Don’t commit
+secrets.
