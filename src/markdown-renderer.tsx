@@ -1,9 +1,28 @@
 import { marked } from "marked";
 import hljs from "highlight.js";
+import DOMPurify from "isomorphic-dompurify";
 import type { AppResult } from "./lib/types.ts";
 import { createError } from "./lib/error.ts";
 import { renderMermaidToSVG } from "./mermaid-renderer.ts";
 import { escapeHtml } from "./utils.ts";
+
+// Configure DOMPurify to allow custom elements and HTMX attributes
+const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ADD_TAGS: ["audio", "source"],
+    ADD_ATTR: [
+      "controls",
+      "loading",
+      "decoding",
+      "hx-get",
+      "hx-target",
+      "hx-swap",
+      "hx-push-url",
+      "hx-trigger",
+      "hx-boost",
+    ],
+  });
+};
 
 // Custom renderer for mermaid blocks
 const renderer = new marked.Renderer();
@@ -177,6 +196,9 @@ export const markdownToHtml = (markdown: string): AppResult<string> => {
 
     // Clean up any nested paragraph issues with audio elements
     html = cleanupAudioHTML(html);
+
+    // Sanitize HTML to prevent XSS (defense-in-depth)
+    html = sanitizeHtml(html);
 
     return { ok: true, value: html };
   } catch (error) {

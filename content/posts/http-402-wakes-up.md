@@ -1,6 +1,6 @@
 ---
 title: HTTP 402 Wakes Up After 30 Years
-date: 20245-12-14
+date: 2025-12-14
 tags: [Payments, APIs, AI Agents, Protocols]
 excerpt: The "Payment Required" status code sat dormant since 1995, waiting for the right payment rails. Stablecoins and autonomous agents finally made it practical.
 ---
