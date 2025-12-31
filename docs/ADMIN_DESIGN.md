@@ -97,7 +97,7 @@ architecture while adding administrative functionality through Deno KV storage.
 - Authenticated section at `/admin/*`
 - CRUD operations stored in Deno KV
 - Tiptap editor for content creation/editing
-- Server-rendered mono-jsx components
+- Server-rendered hsx components
 
 **Hybrid Approach:**
 
@@ -1887,9 +1887,9 @@ aligned with project philosophy.
 
 ---
 
-#### Trade-off 4: Mono-jsx Admin UI vs. SPA Framework
+#### Trade-off 4: hsx Admin UI vs. SPA Framework
 
-**Decision:** Server-rendered mono-jsx for admin UI
+**Decision:** Server-rendered hsx for admin UI
 
 **Pros:**
 

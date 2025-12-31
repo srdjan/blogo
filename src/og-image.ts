@@ -106,7 +106,7 @@ export function generateOGImage(
 export function generateDefaultOGImage(): string {
   return generateOGImage(
     "Blog",
-    "A minimal blog built with mono-jsx, Deno & TypeScript",
+    "A minimal blog built with hsx, Deno & TypeScript",
     ["WebDev", "TypeScript", "Deno"],
   );
 }

@@ -300,7 +300,7 @@ export const createRouteHandlers = (
           Array.from(posts),
           "Blog",
           baseUrl,
-          "A minimal blog built with mono-jsx",
+          "A minimal blog built with hsx",
         );
 
         return new Response(rssContent, {

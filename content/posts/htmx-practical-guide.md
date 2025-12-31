@@ -68,7 +68,7 @@ Reliability in diverse deployment environments.
 
 ```typescript
 // routes/contact.tsx
-import { render } from "mono-jsx";
+import { renderHtml } from "@srdjan/hsx";
 
 type ContactForm = {
   name: string;

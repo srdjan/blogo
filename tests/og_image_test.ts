@@ -158,7 +158,7 @@ Deno.test("generateDefaultOGImage - generates valid default image", () => {
   // Should include default subtitle
   assertStringIncludes(
     svg,
-    "A minimal blog built with mono-jsx, Deno &amp; TypeScript",
+    "A minimal blog built with hsx, Deno &amp; TypeScript",
   );
 
   // Should include default tags

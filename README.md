@@ -2,7 +2,7 @@
 
 This blog system is built around several key architectural principles:
 
-- **mono-jsx** architecture: Server-side JSX rendering without React overhead
+- **hsx** architecture: Server-side JSX rendering without React overhead
 - **HTMX** for interactivity: HTMX for dynamic interactions and progressive
   enhancement
 - **Deno** for minimal dependencies: Leveraging Deno's standard library with
@@ -33,7 +33,7 @@ This blog system is built around several key architectural principles:
 ## Architecture
 
 The project follows a light functional programming style with TypeScript, and is
-built using a mono-jsx architecture with clean separation of concerns and
+built using an hsx architecture with clean separation of concerns and
 semantic HTML/CSS. This modern approach creates a blog that's not just
 functional, but showcases the future of web development—clean, fast, accessible,
 and maintainable.
@@ -43,8 +43,7 @@ and maintainable.
 ### Prerequisites
 
 - [Deno](https://deno.land/) v2.x or higher
-- [mono-jsx](https://github.com/ije/mono-jsx/) v0.6.11 (automatically installed
-  via npm)
+- [hsx](https://github.com/srdjan/hsx) (JSR package @srdjan/hsx)
 - [HTMX](https://htmx.org/) v2.x (automatically downloaded via setup task)
 
 ### Installation
@@ -110,7 +109,7 @@ modified: 2025-01-16 # Optional
 # Your Post Content
 
 Write your post content in markdown here. The blog automatically converts
-markdown to HTML and renders it properly using mono-jsx's `html()` function.
+markdown to HTML and renders it properly using the `html()` function.
 
 Supports:
 
@@ -129,12 +128,12 @@ flowchart TD
 
 ### HTML Rendering
 
-The blog uses mono-jsx's `html()` function to properly render markdown-converted
+The blog uses the `html()` function to properly render markdown-converted
 HTML content:
 
 ```tsx
 // In PostView component
-import { html } from "mono-jsx/jsx-runtime";
+import { html } from "../http/render-vnode.ts";
 
 export const PostView = ({ post }: { post: Post }) => {
   return (
@@ -254,7 +253,8 @@ The blog is configured for Deno Deploy in `deno.json`:
     "dev": "deno run --allow-net --allow-read --allow-env --allow-write --watch src/app/main.ts"
   },
   "imports": {
-    "mono-jsx": "npm:mono-jsx@0.6.11"
+    "hsx/jsx-runtime": "jsr:@srdjan/hsx/jsx-runtime",
+    "@srdjan/hsx": "jsr:@srdjan/hsx"
   },
   "deploy": {
     "exclude": ["**/node_modules", "coverage/", "tests/"],
@@ -437,27 +437,25 @@ The codebase follows light FP patterns as documented in CLAUDE.md:
 
 ### HTML Rendering Solution
 
-The blog properly renders markdown-converted HTML using mono-jsx:
+The blog properly renders markdown-converted HTML using the custom `html()` function:
 
 ```tsx
-import { html } from "mono-jsx/jsx-runtime";
+import { html } from "../http/render-vnode.ts";
 
 // ✅ Correct: renders HTML properly
 {
   html(post.content);
 }
 
-// ❌ Incorrect: would escape HTML
+// ❌ Incorrect: would escape HTML as a string
 {
-  html`
-    ${post.content}
-  `;
+  post.content;
 }
 ```
 
 ## Performance
 
-- **Server-side rendering** with mono-jsx
+- **Server-side rendering** with hsx
 - **Intelligent caching** with TTL (5-minute default)
 - **Minimal JavaScript payload** (only HTMX)
 - **Progressive enhancement** with HTMX
@@ -467,7 +465,7 @@ import { html } from "mono-jsx/jsx-runtime";
 ## Technology Stack
 
 - **Runtime**: Deno v2.x
-- **Rendering**: mono-jsx v0.6.11+ (server-side JSX without React)
+- **Rendering**: hsx (server-side JSX without React)
 - **Enhancement**: HTMX v2.x for dynamic interactions
 - **Styling**: Modern CSS with design tokens, responsive architecture,
   light/dark themes
