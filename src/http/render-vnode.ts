@@ -1,6 +1,19 @@
-import { Fragment as JsxFragment } from "mono-jsx/jsx-runtime";
+import { Fragment as JsxFragment } from "hsx/jsx-runtime";
 
-const VNODE_SYMBOL = Symbol.for("jsx.vnode");
+// Symbol for raw HTML marker
+const RAW_HTML_MARKER = Symbol.for("hsx.rawHtml");
+
+// HSX VNode structure
+type HsxVNode = {
+  readonly type?: string | ((...args: unknown[]) => unknown);
+  readonly props?: Record<string, unknown>;
+};
+
+// Raw HTML node type
+type RawHtmlNode = {
+  readonly [RAW_HTML_MARKER]: true;
+  readonly content: string;
+};
 
 const escapeHtml = (s: string): string =>
   s.replace(/&/g, "&amp;")
@@ -9,10 +22,30 @@ const escapeHtml = (s: string): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-const isVNode = (v: unknown): v is [unknown, Record<string, unknown>, symbol] =>
-  Array.isArray(v) && typeof v[2] === "symbol" && (
-    v[2] === VNODE_SYMBOL || String(v[2]).includes("jsx.vnode")
-  );
+// Check if node is HSX VNode (object with props)
+const isHsxVNode = (v: unknown): v is HsxVNode =>
+  v !== null &&
+  typeof v === "object" &&
+  "props" in v;
+
+// Check if node is raw HTML marker
+const isRawHtml = (v: unknown): v is RawHtmlNode =>
+  v !== null &&
+  typeof v === "object" &&
+  RAW_HTML_MARKER in v;
+
+// HSX semantic alias to HTMX attribute mapping
+const htmxAliasMap: Record<string, string> = {
+  get: "hx-get",
+  post: "hx-post",
+  put: "hx-put",
+  patch: "hx-patch",
+  delete: "hx-delete",
+  target: "hx-target",
+  swap: "hx-swap",
+  pushUrl: "hx-push-url",
+  trigger: "hx-trigger",
+};
 
 const renderAttrs = (props: Record<string, unknown>): string => {
   const parts: string[] = [];
@@ -20,8 +53,18 @@ const renderAttrs = (props: Record<string, unknown>): string => {
     if (key === "children" || value === false || value === undefined || value === null) {
       continue;
     }
+
+    // Handle HSX behavior="boost" → hx-boost
+    if (key === "behavior" && value === "boost") {
+      parts.push(` hx-boost="true"`);
+      continue;
+    }
+
+    // Map HSX semantic aliases to HTMX attributes
+    const attrName = htmxAliasMap[key] ?? key;
+
     if (value === true) {
-      parts.push(` ${key}`);
+      parts.push(` ${attrName}`);
       continue;
     }
     if (key === "style" && typeof value === "object" && value !== null) {
@@ -32,7 +75,7 @@ const renderAttrs = (props: Record<string, unknown>): string => {
       parts.push(` style="${escapeHtml(styleStr)}"`);
       continue;
     }
-    parts.push(` ${key}="${escapeHtml(String(value))}"`);
+    parts.push(` ${attrName}="${escapeHtml(String(value))}"`);
   }
   return parts.join("");
 };
@@ -58,46 +101,55 @@ export const renderVNode = (node: unknown): string => {
   if (node === null || node === undefined || typeof node === "boolean") return "";
   if (typeof node === "string" || typeof node === "number") return escapeHtml(String(node));
 
-  if (isVNode(node) || (Array.isArray(node) && typeof node[2] === "symbol")) {
-    const [tag, props = {}] = node;
-    const children = (props as { children?: unknown }).children;
+  // Raw HTML node (created by html())
+  if (isRawHtml(node)) {
+    return node.content;
+  }
 
-    // Raw HTML node (created by html``)
-    if (typeof tag === "symbol" && (props as Record<string, unknown>).innerHTML) {
-      return String((props as Record<string, unknown>).innerHTML);
-    }
+  // HSX VNode: { type?, props }
+  if (isHsxVNode(node)) {
+    const { type, props = {} } = node;
+    const children = props.children;
 
-    // Fragment
-    if (tag === JsxFragment || typeof tag === "symbol") {
+    // Fragment (no type property, or type is Fragment function)
+    if (type === undefined || type === JsxFragment) {
       return renderVNode(children);
     }
 
     // Function component
-    if (typeof tag === "function") {
-      return renderVNode(tag(props));
+    if (typeof type === "function") {
+      return renderVNode(type(props));
     }
 
     // Native element
-    if (typeof tag === "string") {
-      const attrs = renderAttrs(props as Record<string, unknown>);
-      if (voidEls.has(tag)) {
-        return `<${tag}${attrs}>`;
+    if (typeof type === "string") {
+      const attrs = renderAttrs(props);
+      if (voidEls.has(type)) {
+        return `<${type}${attrs}>`;
       }
-      const inner = isVNode(children)
-        ? renderVNode(children)
-        : Array.isArray(children)
+      const inner = Array.isArray(children)
         ? children.map(renderVNode).join("")
         : renderVNode(children);
-      return `<${tag}${attrs}>${inner}</${tag}>`;
+      return `<${type}${attrs}>${inner}</${type}>`;
     }
   }
 
+  // Array of nodes
   if (Array.isArray(node)) {
     return node.map(renderVNode).join("");
   }
 
   return escapeHtml(String(node));
 };
+
+/**
+ * Create a raw HTML node that bypasses escaping.
+ * Use only with sanitized content (e.g., from DOMPurify).
+ */
+export const html = (content: string): RawHtmlNode => ({
+  [RAW_HTML_MARKER]: true,
+  content,
+});
 
 // Exported for unit tests
 export const renderVNodeForTest = renderVNode;

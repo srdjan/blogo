@@ -1,6 +1,6 @@
-// Individual post view component for mono-jsx
+// Individual post view component for hsx
 import type { Post } from "../lib/types.ts";
-import { html } from "mono-jsx/jsx-runtime";
+import { html } from "../http/render-vnode.ts";
 import { deriveTopicsFromTags } from "../config/topics.ts";
 import { ViewCount } from "./ViewCount.tsx";
 
@@ -38,10 +38,10 @@ export const PostView = (props: { readonly post: Post }) => {
                 <li>
                   <a
                     href={`/tags/${encodeURIComponent(tag)}`}
-                    hx-get={`/tags/${encodeURIComponent(tag)}`}
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get={`/tags/${encodeURIComponent(tag)}`}
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                     class="tag"
                     rel="tag"
                   >
@@ -62,10 +62,10 @@ export const PostView = (props: { readonly post: Post }) => {
       >
         <a
           href="/"
-          hx-get="/"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
+          get="/"
+          target="#content-area"
+          swap="innerHTML"
+          pushUrl="true"
         >
           &lArr; Back
         </a>

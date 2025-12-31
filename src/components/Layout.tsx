@@ -1,4 +1,5 @@
 import type { LayoutProps } from "../lib/types.ts";
+import { renderVNode } from "../http/render-vnode.ts";
 
 export const createLayout = (props: LayoutProps): Response => {
   const {
@@ -210,10 +211,10 @@ export const createLayout = (props: LayoutProps): Response => {
               <h1 class="site-title">
                 <a
                   href="/"
-                  hx-get="/"
-                  hx-target="#content-area"
-                  hx-swap="innerHTML"
-                  hx-push-url="true"
+                  get="/"
+                  target="#content-area"
+                  swap="innerHTML"
+                  pushUrl="true"
                   rel="home"
                 >
                   Blogo
@@ -229,10 +230,10 @@ export const createLayout = (props: LayoutProps): Response => {
                   <a
                     href="/"
                     {...(path === "/" && { "aria-current": "page" })}
-                    hx-get="/"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get="/"
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     Home
                   </a>
@@ -241,10 +242,10 @@ export const createLayout = (props: LayoutProps): Response => {
                   <a
                     href="/tags"
                     {...(path === "/tags" && { "aria-current": "page" })}
-                    hx-get="/tags"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get="/tags"
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     Tags
                   </a>
@@ -253,10 +254,10 @@ export const createLayout = (props: LayoutProps): Response => {
                   <a
                     href="/rss"
                     {...(path === "/rss" && { "aria-current": "page" })}
-                    hx-get="/rss"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get="/rss"
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     RSS
                   </a>
@@ -266,10 +267,10 @@ export const createLayout = (props: LayoutProps): Response => {
                   <a
                     href="/about"
                     {...(path === "/about" && { "aria-current": "page" })}
-                    hx-get="/about"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get="/about"
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     About
                   </a>
@@ -450,12 +451,8 @@ export const createLayout = (props: LayoutProps): Response => {
     </html>
   );
 
-  // Convert JSX to string manually, handling mono-jsx Response conversion
-  const htmlString = html instanceof Response ? html : String(html);
-
-  if (htmlString instanceof Response) {
-    return htmlString;
-  }
+  // Convert JSX VNode to HTML string using our custom renderer
+  const htmlString = "<!DOCTYPE html>" + renderVNode(html);
 
   return new Response(htmlString, {
     headers: {

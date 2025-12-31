@@ -113,10 +113,10 @@ export const About = () => {
       <nav style="text-align: center; margin-top: var(--space-xl);">
         <a
           href="/"
-          hx-get="/"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
+          get="/"
+          target="#content-area"
+          swap="innerHTML"
+          pushUrl="true"
         >
           &lArr; Back
         </a>

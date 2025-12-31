@@ -24,10 +24,10 @@ export const SearchResults = (props: {
                 <h2>
                   <a
                     href={`/posts/${post.slug}`}
-                    hx-get={`/posts/${post.slug}`}
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get={`/posts/${post.slug}`}
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     {post.title}
                   </a>
@@ -44,10 +44,10 @@ export const SearchResults = (props: {
       <nav class="u-shell u-text-center">
         <a
           href="/"
-          hx-get="/"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
+          get="/"
+          target="#content-area"
+          swap="innerHTML"
+          pushUrl="true"
         >
           &lArr; Back
         </a>

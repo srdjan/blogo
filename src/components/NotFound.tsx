@@ -6,10 +6,10 @@ export const NotFound = () => {
       <nav class="u-shell u-text-center">
         <a
           href="/"
-          hx-get="/"
-          hx-target="#content-area"
-          hx-swap="innerHTML"
-          hx-push-url="true"
+          get="/"
+          target="#content-area"
+          swap="innerHTML"
+          pushUrl="true"
         >
           &lArr; Back
         </a>

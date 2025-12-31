@@ -32,3 +32,26 @@ Deno.test("renderVNode renders fragments", () => {
   const html = renderVNodeForTest(fragment);
   assertStringIncludes(html, "<div>A</div><div>B</div>");
 });
+
+Deno.test("renderVNode converts HSX semantic HTMX aliases to hx-* attributes", () => {
+  const link = (
+    <a
+      href="/test"
+      get="/test"
+      target="#content"
+      swap="innerHTML"
+      pushUrl="true"
+    >
+      Test Link
+    </a>
+  );
+
+  const html = renderVNodeForTest(link);
+
+  // HSX should convert semantic aliases to hx-* attributes
+  assertStringIncludes(html, 'hx-get="/test"');
+  assertStringIncludes(html, 'hx-target="#content"');
+  assertStringIncludes(html, 'hx-swap="innerHTML"');
+  assertStringIncludes(html, 'hx-push-url="true"');
+  assertStringIncludes(html, 'href="/test"');
+});

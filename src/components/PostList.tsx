@@ -16,10 +16,10 @@ export const PostList = (props: {
           <p>
             <a
               href="/tags"
-              hx-get="/tags"
-              hx-target="#content-area"
-              hx-swap="innerHTML"
-              hx-push-url="true"
+              get="/tags"
+              target="#content-area"
+              swap="innerHTML"
+              pushUrl="true"
             >
               View all tags
             </a>
@@ -34,10 +34,10 @@ export const PostList = (props: {
                 <h2>
                   <a
                     href={`/posts/${post.slug}`}
-                    hx-get={`/posts/${post.slug}`}
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
+                    get={`/posts/${post.slug}`}
+                    target="#content-area"
+                    swap="innerHTML"
+                    pushUrl="true"
                   >
                     {post.title}
                   </a>
@@ -56,10 +56,10 @@ export const PostList = (props: {
                         <li key={`${post.slug}-${tag}`}>
                           <a
                             href={`/tags/${encodeURIComponent(tag)}`}
-                            hx-get={`/tags/${encodeURIComponent(tag)}`}
-                            hx-target="#content-area"
-                            hx-swap="innerHTML"
-                            hx-push-url="true"
+                            get={`/tags/${encodeURIComponent(tag)}`}
+                            target="#content-area"
+                            swap="innerHTML"
+                            pushUrl="true"
                             class="tag"
                             rel="tag"
                           >

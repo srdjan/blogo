@@ -79,7 +79,7 @@ export const createRouteHandlers = (
       ok: (posts) =>
         renderPage(ctx, {
           title: "Blog - Home",
-          description: "A minimal blog built with mono-jsx",
+          description: "A minimal blog built with hsx",
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <PostList posts={posts} />,
@@ -211,10 +211,10 @@ export const createRouteHandlers = (
             <p>Please provide a search query.</p>
             <a
               href="/"
-              hx-get="/"
-              hx-target="#content-area"
-              hx-swap="innerHTML"
-              hx-push-url="true"
+              get="/"
+              target="#content-area"
+              swap="innerHTML"
+              pushUrl="true"
             >
               &lArr; Back
             </a>

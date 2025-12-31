@@ -12,10 +12,10 @@ export const TagIndex = (props: { readonly tags: readonly TagInfo[] }) => {
             <>
               <a
                 href={`/tags/${encodeURIComponent(tag.name)}`}
-                hx-get={`/tags/${encodeURIComponent(tag.name)}`}
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                hx-push-url="true"
+                get={`/tags/${encodeURIComponent(tag.name)}`}
+                target="#content-area"
+                swap="innerHTML"
+                pushUrl="true"
                 class="tag"
               >
                 {tag.name}({tag.count})

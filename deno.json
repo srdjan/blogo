@@ -29,7 +29,8 @@
   },
   "imports": {
     "@srdjan/bluesky-bot": "jsr:@srdjan/bluesky-bot@^1.5.0",
-    "mono-jsx": "npm:mono-jsx@0.8.0-beta.4",
+    "hsx/jsx-runtime": "jsr:@srdjan/hsx/jsx-runtime",
+    "@srdjan/hsx": "jsr:@srdjan/hsx",
     "@rendermaid/core": "jsr:@rendermaid/core@0.6.0",
     "ts-pattern": "npm:ts-pattern@5.9.0",
     "marked": "https://esm.sh/marked@15.0.12",
@@ -45,7 +46,8 @@
     "exactOptionalPropertyTypes": true,
     "useUnknownInCatchVariables": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "mono-jsx"
+    "jsxImportSource": "hsx",
+    "types": ["./src/types/jsx.d.ts"]
   },
   "unstable": ["kv"],
   "deploy": {
