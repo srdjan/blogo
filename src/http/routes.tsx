@@ -171,12 +171,14 @@ export const createRouteHandlers = (
       return new Response("Post not found", { status: 404 });
     }
 
-    // Increment view count
-    const viewCountResult = await analyticsService.incrementViewCount(slug);
-    const viewCount = viewCountResult.ok ? viewCountResult.value : undefined;
+    // Fire-and-forget: increment view count without blocking response
+    // Use cached view count for display; increment happens in background
+    analyticsService.incrementViewCount(slug).catch(() => {
+      // Silently ignore analytics errors - not critical path
+    });
 
-    // Add view count to post
-    const postWithViews: typeof post = { ...post, viewCount };
+    // Use existing view count from post (may lag by one view, acceptable for analytics)
+    const postWithViews: typeof post = { ...post, viewCount: post.viewCount };
 
     return renderPage(ctx, {
       title: `${post.title} - Blog`,

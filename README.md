@@ -2,8 +2,7 @@
 
 This blog system is built around several key architectural principles:
 
-- **hsx** architecture: Server-side JSX rendering without React overhead
-- **HTMX** for interactivity: HTMX for dynamic interactions and progressive
+- **hsx** architecture: Server-side JSX rendering without React overhead, using **HTMX** for dynamic interactions and progressive
   enhancement
 - **Deno** for minimal dependencies: Leveraging Deno's standard library with
   minimal external dependencies
@@ -27,8 +26,6 @@ This blog system is built around several key architectural principles:
   theme
 - **Mermaid Diagrams**: Support for Mermaid diagram rendering in posts
 - **HTMX Navigation**: Smooth page transitions without full page reloads
-- **AI-Powered Writing Assistant**: `/blog-writer` command for creating posts in
-  the blog's voice
 
 ## Architecture
 
@@ -143,62 +140,6 @@ export const PostView = ({ post }: { post: Post }) => {
   );
 };
 ```
-
-### Using the Blog Writer Assistant
-
-The blog includes an AI-powered writing assistant that helps you create posts in
-the blog's established voice and style.
-
-#### Quick Start
-
-In your Claude Code conversation, use the `/blog-writer` slash command:
-
-```
-/blog-writer Write a post about microservices and organizational complexity
-```
-
-```
-/blog-writer Rewrite content/posts/hateoas.md to be more conversational
-```
-
-#### What It Does
-
-The `/blog-writer` command will:
-
-1. **Load the writing style guide** from `WRITING_STYLE.md` into context
-2. **Ask clarifying questions** (topic, length, experiences to include)
-3. **Write in the blog's voice**:
-   - Conversational, not corporate
-   - Mix of personal experience and objective facts
-   - Technical depth with business/cultural context
-   - Opinionated but humble
-4. **Follow the structure**: Hook → Context → Insights → Examples → Synthesis
-5. **Include proper frontmatter** (title, date, tags, excerpt)
-6. **Save to** `content/posts/your-post-slug.md`
-
-#### Example Prompts
-
-```
-/blog-writer Create a 2000-word post about Conway's Law with real team examples
-
-/blog-writer I want to write about choosing boring technology. Include pros/cons from both business and engineering perspectives
-
-/blog-writer Rewrite the Light FP guide to include more war stories and be less academic
-```
-
-#### Writing Style
-
-The blog writer follows these principles (defined in `WRITING_STYLE.md`):
-
-- **Conversational tone** - Like explaining to a colleague over coffee
-- **Personal + Objective** - Mix experience ("I spent 3 months debugging
-  this...") with facts
-- **Technical + Human** - Connect code decisions to culture, incentives, and
-  outcomes
-- **Concrete examples** - Real scenarios, not abstract theory
-- **Honest nuance** - "It depends" is valid if you explain what it depends on
-
-See `WRITING_STYLE.md` for the complete style guide.
 
 ## Deployment
 
@@ -465,8 +406,7 @@ import { html } from "../http/render-vnode.ts";
 ## Technology Stack
 
 - **Runtime**: Deno v2.x
-- **Rendering**: hsx (server-side JSX without React)
-- **Enhancement**: HTMX v2.x for dynamic interactions
+- **Rendering**: hsx (server-side JSX without React) with HTMX v2.x for dynamic interactions
 - **Styling**: Modern CSS with design tokens, responsive architecture,
   light/dark themes
 - **Syntax Highlighting**: Highlight.js with Atom One Dark theme
@@ -476,16 +416,7 @@ import { html } from "../http/render-vnode.ts";
 - **Theme**: Manual light/dark toggle with localStorage persistence
 - **Hosting**: Deno Deploy (edge computing platform)
 - **Language**: TypeScript with strict type checking
-- **AI Assistant**: Claude Code slash command for blog writing
-
-## Development Guidelines
-
-See these files for detailed guidance:
-
-- **`CLAUDE.md`** - Development patterns, architecture, Light FP style, testing
-  strategies
-- **`WRITING_STYLE.md`** - Blog writing voice, structure, and content principles
-- **`.claude/commands/blog-writer.md`** - AI writing assistant configuration
+- **Testing**: Deno's built-in testing framework with assertions from @std/testing/asserts
 
 ## Design System
 
@@ -513,7 +444,7 @@ See these files for detailed guidance:
 
 ---
 
-Built with ❤️ by Clodey, Gipity & Srdjan
+Built with ❤️ by Clodi, Gipiti & Srdjan
 
 ---
 

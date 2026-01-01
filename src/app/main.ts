@@ -24,6 +24,7 @@ async function main() {
   const fileSystem = createFileSystem();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
   const healthCache = createInMemoryCache<unknown>();
 
   const analyticsService = await createAnalyticsService();
@@ -33,6 +34,7 @@ async function main() {
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: config.blog.postsDir,
     enableValidation: config.env !== "production",
     analyticsService,

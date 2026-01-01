@@ -9,6 +9,21 @@ import {
 } from "@rendermaid/core";
 import { match } from "ts-pattern";
 
+// === SVG Cache ===
+// Cache rendered mermaid SVGs by content hash for performance
+const mermaidSvgCache = new Map<string, string>();
+
+// Simple hash function for cache keys
+const simpleHash = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash.toString(36);
+};
+
 // === Types ===
 
 // Analysis results type (matching v0.6.0 ASTAnalysis)
@@ -189,11 +204,19 @@ const renderMermaidDiagramWithConfig = (
 /**
  * Renders a Mermaid diagram to SVG using @rendermaid/core
  * Maintains the same interface as the previous custom implementation
+ * Uses caching to avoid re-rendering identical diagrams
  */
 export const renderMermaidToSVG = (mermaidText: string): string => {
+  // Check cache first
+  const cacheKey = simpleHash(mermaidText);
+  const cached = mermaidSvgCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const renderResult = renderMermaidDiagram(mermaidText);
 
-  return match(renderResult)
+  const output = match(renderResult)
     .with({ success: true }, ({ content }) => content)
     .with(
       { success: false },
@@ -203,6 +226,13 @@ export const renderMermaidToSVG = (mermaidText: string): string => {
       </div>`,
     )
     .exhaustive();
+
+  // Cache successful renders (don't cache errors)
+  if (renderResult.success) {
+    mermaidSvgCache.set(cacheKey, output);
+  }
+
+  return output;
 };
 
 /**

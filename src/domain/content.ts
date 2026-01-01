@@ -20,6 +20,7 @@ import {
   validateMarkdownContent,
 } from "./validation.ts";
 import { TOPICS } from "../config/topics.ts";
+import { parse as parseYaml } from "@std/yaml";
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
@@ -41,6 +42,7 @@ export type ContentDependencies = {
   readonly logger: Logger;
   readonly cache: Cache<readonly Post[]>;
   readonly metadataCache: Cache<readonly PostMeta[]>;
+  readonly postCache: Cache<Post>;
   readonly postsDir: string;
   readonly enableValidation?: boolean;
   readonly analyticsService?: {
@@ -56,6 +58,7 @@ export const createContentService = (
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir,
     enableValidation = true,
     analyticsService,
@@ -95,7 +98,7 @@ export const createContentService = (
         }
       }
 
-      const metaResult = await parseFrontmatter(frontmatter, slug);
+      const metaResult = parseFrontmatter(frontmatter, slug);
 
       if (!metaResult.ok) return metaResult;
 
@@ -133,7 +136,7 @@ export const createContentService = (
       if (!result.ok) return result;
 
       const { frontmatter } = result.value;
-      const metaResult = await parseFrontmatter(frontmatter, slug);
+      const metaResult = parseFrontmatter(frontmatter, slug);
 
       return metaResult;
     } catch (error) {
@@ -334,11 +337,30 @@ export const createContentService = (
   };
 
   const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {
-    const postsResult = await loadPosts();
-    if (!postsResult.ok) return postsResult;
+    // Check individual post cache first (fast path)
+    const cached = postCache.get(slug as string);
+    if (cached.ok && cached.value) {
+      logger.debug(`Using cached post: ${slug}`);
+      return ok(cached.value);
+    }
 
-    const post = postsResult.value.find((p) => p.slug === slug) ?? null;
-    return ok(post);
+    // Direct file lookup - O(1) instead of loading all posts
+    const filePath = `${postsDir}/${slug}.md`;
+    const exists = await fileSystem.exists(filePath);
+    if (!exists) {
+      // Fallback: check if slug exists with different casing in full posts list
+      const postsResult = await loadPosts();
+      if (!postsResult.ok) return postsResult;
+      const post = postsResult.value.find((p) => p.slug === slug) ?? null;
+      return ok(post);
+    }
+
+    // Parse the single post directly
+    const postResult = await parseMarkdown(filePath, slug);
+    if (postResult.ok) {
+      postCache.set(slug as string, postResult.value, 30 * 60 * 1000);
+    }
+    return postResult;
   };
 
   // Case-insensitive tag normalization helpers (kept pure)
@@ -452,13 +474,12 @@ function extractFrontmatter(
   });
 }
 
-async function parseFrontmatter(
+function parseFrontmatter(
   frontmatter: string,
   slug: Slug,
-): Promise<AppResult<PostMeta>> {
+): AppResult<PostMeta> {
   try {
-    const { parse } = await import("@std/yaml");
-    const meta = parse(frontmatter) as Record<string, unknown>;
+    const meta = parseYaml(frontmatter) as Record<string, unknown>;
 
     // Use comprehensive frontmatter validation
     const validationResult = validateFrontmatter(meta);

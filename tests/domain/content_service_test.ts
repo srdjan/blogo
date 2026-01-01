@@ -2,9 +2,8 @@ import { assertEquals, assertExists } from "@std/assert";
 import { createContentService } from "../../src/domain/content.ts";
 import type { FileSystem } from "../../src/ports/file-system.ts";
 import type { Logger } from "../../src/ports/logger.ts";
-import type { Cache } from "../../src/ports/cache.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import { createSlug, type Post } from "../../src/lib/types.ts";
+import { createSlug, type Post, type PostMeta } from "../../src/lib/types.ts";
 
 // Mock FileSystem implementation for testing
 function createMockFileSystem(files: Record<string, string>): FileSystem {
@@ -89,13 +88,15 @@ More content here.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -124,13 +125,15 @@ This post has invalid frontmatter.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -147,13 +150,15 @@ Deno.test("ContentService - handles missing files gracefully", async () => {
   const fileSystem = createMockFileSystem({});
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -178,13 +183,15 @@ date: 2025-01-15
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -210,13 +217,15 @@ date: 2025-01-15
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -251,13 +260,15 @@ date: 2025-01-14
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -296,13 +307,15 @@ tags:
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
@@ -344,13 +357,15 @@ This is about JavaScript.`,
   const fileSystem = createMockFileSystem(mockFiles);
   const logger = createMockLogger();
   const cache = createInMemoryCache<readonly Post[]>();
-  const metadataCache = createInMemoryCache<readonly import("../../src/lib/types.ts").PostMeta[]>();
+  const metadataCache = createInMemoryCache<readonly PostMeta[]>();
+  const postCache = createInMemoryCache<Post>();
 
   const contentService = createContentService({
     fileSystem,
     logger,
     cache,
     metadataCache,
+    postCache,
     postsDir: "content/posts",
   });
 
