@@ -1,15 +1,15 @@
 ---
-title: "**zigttp**: Building a JavaScript Runtime from Scratch in Zig"
-date: 2026-01-01
-tags: [Zig, JavaScript, Serverless, Performance]
-excerpt: A serverless JavaScript runtime with sub-millisecond cold starts, 500KB footprint, and a complete JS engine written from scratch in pure Zig.
+title: "zigttp: Building a JavaScript Runtime from Scratch in Zig"
+date: 2026-01-02
+tags: [Zig, JavaScript, Serverless, Performance, TypeScript]
+excerpt: A serverless JavaScript runtime with sub-millisecond cold starts, 500KB footprint, TypeScript support, and compile-time evaluation - all written from scratch in pure Zig.
 ---
 
-Lets start 2026 with the bang! What if I told you a JavaScript runtime could cold start in under a millisecond? 
+Let's start 2026 with a bang! What if I told you about JavaScript runtime could cold start in under a millisecond?
 
-> It is just an experiment, we will see how far it goes... Developed in last two weeks, while on vacation, with help of Clodi & Gipiti. We live in magical times, this would not be possible to do in the same timeframe few months ago.
+> This is an experiment, and we'll have to wait and see how far it goes... It started by an attempt to port a new JavaScript engine mQuickJS to Zig. It quickly became a project of its own. Developed in last two (intense) weeks, while on vacation, with my dev team (Clodi and Gipiti). The code is available on [GitHub][def]
 
-Inreoducing **zigttp** - a serverless JavaScript runtime written entirely in Zig. Not a wrapper around V8. Not a transpiler. An almost complete JavaScript engine from scratch, optimized for one thing: spinning up fast and handling requests.
+We live in magical times - this would not be possible to do in the same timeframe just few months ago: introducing **zigttp** - a serverless JavaScript runtime written entirely in Zig. Not a wrapper around V8 nor a transpiler. An almost complete JavaScript engine from scratch, optimized for one thing: spinning up fast and handling HTTP requests.
 
 The numbers still surprise me: sub-millisecond cold starts, 256KB memory baseline, ~500KB total binary size. Zero dependencies. This is what happens when you build a runtime for a specific purpose instead of trying to be everything to everyone.
 
@@ -21,8 +21,8 @@ For most applications, this is fine. For latency-sensitive stuff - API gateways,
 
 Here's the comparison that got me excited:
 
-| Metric | Node.js/Deno | **zigttp** |
-|--------|--------------|---------------|
+| Metric | Node.js/Deno | zigttp |
+|--------|--------------|--------|
 | Cold start | 50-200ms | < 1ms |
 | Memory baseline | 50MB+ | 256KB |
 | Binary size | 50MB+ | ~500KB |
@@ -30,15 +30,19 @@ Here's the comparison that got me excited:
 
 ## The zts Engine: JavaScript from First Principles
 
-At the heart of **zigttp** is **zts** - about 30,000 lines of Zig implementing a complete JavaScript engine. Here's the cool part: it's not trying to be V8. It's trying to be fast at one specific pattern: receive request, execute handler, return response, reset.
+At the heart of zigttp is **zts** - about 30,000 lines of Zig implementing a complete JavaScript engine. Here's the cool part: it's not trying to be V8. It's trying to be fast at one specific pattern: receive request, execute handler, return response, reset.
 
-### Two-Pass Compilation
+### Compilation Pipeline
 
 The compilation pipeline looks like this:
 
 ```
-Source Code -> Tokenizer -> Parser -> IR Nodes -> Scope Analyzer -> Bytecode
+.ts/.tsx Source -> Type Stripper -> comptime() Eval ─┐
+                                                     ├─> Tokenizer -> Parser -> Bytecode
+.js/.jsx Source ─────────────────────────────────────┘
 ```
+
+For TypeScript files, the stripper removes type annotations while preserving line numbers. The comptime evaluator then replaces `comptime(...)` expressions with literal values. After that, it's the same path as JavaScript: tokenize, parse with scope analysis, emit bytecode.
 
 The scope analyzer identifies variable bindings and closure captures at parse time. This means no runtime scope chain lookups - we know exactly where every variable lives before execution starts.
 
@@ -82,6 +86,105 @@ Object {x: 1, y: 2} -> HiddenClass B (properties: [x @ slot 0, y @ slot 1])
 
 Property access sites cache the hidden class and slot offset. If an object has the cached shape, property lookup is one memory load. No hash table traversal. This technique is borrowed from V8, and it works beautifully.
 
+## TypeScript Without the Build Step
+
+Here's something I'm genuinely excited about: native TypeScript support. Not transpilation - type stripping at load time. You get the editor experience of TypeScript with the runtime simplicity of JavaScript.
+
+```typescript
+interface User {
+    id: number;
+    name: string;
+}
+
+function handler(request: Request): Response {
+    const user: User = { id: 1, name: "Alice" };
+    return Response.json(user);
+}
+```
+
+The stripper runs in a single pass, replacing type syntax with spaces (to preserve line numbers for error messages). No AST construction, no type checking - just surgical removal of type annotations.
+
+What's supported:
+- Type and interface declarations
+- Parameter and return type annotations
+- Generic parameters on functions and types
+- `as` and `satisfies` assertions
+- `import type` / `export type`
+
+What's not supported (and will error clearly):
+- `enum` and `const enum`
+- `namespace` and `module`
+- Decorators
+- Class access modifiers
+
+This means you can write handlers in TypeScript for the developer experience, and the runtime strips types without needing a build step. Like a good espresso - simple on the surface, complex underneath.
+
+## Compile-Time Evaluation: The comptime() Function
+
+This is one of my favorite parts. Zig has `comptime` for compile-time evaluation, and I wanted something similar for JavaScript constants. It is just rudamentary now, but it is extensible.
+
+```typescript
+// Basic arithmetic - evaluated at load time
+const x = comptime(1 + 2 * 3);              // -> const x = 7;
+
+// String operations
+const upper = comptime("hello".toUpperCase()); // -> const upper = "HELLO";
+const parts = comptime("a,b,c".split(","));    // -> const parts = ["a","b","c"];
+
+// Math functions
+const pi = comptime(Math.PI);               // -> const pi = 3.141592653589793;
+const max = comptime(Math.max(1, 5, 3));    // -> const max = 5;
+
+// Hash function for ETags
+const etag = comptime(hash("content-v1"));  // -> const etag = "a1b2c3d4";
+
+// Even works in TSX
+const el = <div>{comptime(1+2)}</div>;      // -> <div>{3}</div>
+```
+
+The evaluator implements a Pratt parser with full operator precedence, all Math functions, string methods, and even JSON.parse. Non-deterministic operations like `Date.now()` and `Math.random()` are explicitly disallowed - comptime must be reproducible.
+
+For now, this feature enables patterns like:
+
+```typescript
+// Build-time constants
+const BUILD_TIME = comptime(__BUILD_TIME__);
+const VERSION = comptime(__VERSION__);
+
+// Pre-computed lookup tables
+const LOOKUP = comptime({
+    "GET": 1,
+    "POST": 2,
+    "PUT": 3,
+    "DELETE": 4
+});
+
+// Content hashing for cache keys
+const STATIC_ETAG = comptime(hash("v1.2.3-" + "main.css"));
+```
+
+## Benchmarks: zts vs mQuickJS
+
+I benchmarked zts against mQuickJS (the WebAssembly-compiled QuickJS). The results are mixed - honest assessment here:
+
+| Operation | zts | mQuickJS | Ratio |
+|-----------|-----|----------|-------|
+| String operations | 7.8M ops/sec | 258K ops/sec | **30x faster** |
+| Object creation | 4.7M ops/sec | 1.7M ops/sec | **2.8x faster** |
+| HTTP handler | 912K ops/sec | 332K ops/sec | **2.7x faster** |
+| Property access | 6.1M ops/sec | 3.4M ops/sec | **1.8x faster** |
+| Function calls | 6.2M ops/sec | 5.1M ops/sec | 1.2x faster |
+| GC pressure | 256K ops/sec | 229K ops/sec | 1.1x faster |
+| JSON ops | 70K ops/sec | 71K ops/sec | At parity |
+| Integer arithmetic | 6.3M ops/sec | 16.1M ops/sec | 0.4x (slower) |
+| for...of loops | 11.9M ops/sec | 54.8M ops/sec | 0.2x (slower) |
+
+**Where zts shines**: String operations (30x!), object creation, HTTP handlers - exactly what you need for request processing. The hidden class optimization pays off big time for property access patterns common in HTTP handlers.
+
+**Where mQuickJS wins**: Integer arithmetic and loop iteration. QuickJS has had years of optimization work on its bytecode interpreter. These benchmarks use tight numeric loops that play to QuickJS's strengths.
+
+**What this means for real handlers**: HTTP request/response patterns hit zts's sweet spots. The 2.7x advantage on HTTP handler throughput is what matters for serverless functions.
+
 ## Runtime Architecture: Warm Instances, Cold Isolation
 
 Each request gets an isolated runtime - separate GC state, independent heap, fresh execution context. But here's the trick: runtimes are pooled and reset between requests.
@@ -102,20 +205,20 @@ You get the isolation guarantees of a fresh runtime with the speed of a warm one
 Handlers follow the Deno/Cloudflare Workers pattern - if you've worked with either, this looks familiar:
 
 ```javascript
-function handler(request) {
-    return Response.json({
-        method: request.method,
-        url: request.url,
-        timestamp: Date.now()
-    });
+function handler(req: Request): Response {
+    const data = { name: "World", count: 42 } as RequestData;
+    const result: ResponseData = processData(data);
+    return Response.json(result);
 }
+
 ```
+
 
 Built-in Response helpers handle the common cases: `Response.json()`, `Response.text()`, `Response.html()`, `Response.redirect()`.
 
 ### Native JSX Support
 
-This is one of my favorite parts. JSX transforms with no build step:
+JSX transforms with no build step:
 
 ```jsx
 function Page({ title }) {
@@ -134,26 +237,11 @@ function handler(request) {
 }
 ```
 
-The JSX transformer is a single-pass tokenizer-to-hyperscript converter. No AST construction, no external tools. Like a good espresso - simple on the surface, complex underneath.
-
-## Performance Numbers
-
-Measured on the zts engine with 50,000 iterations:
-
-| Operation | Throughput |
-|-----------|------------|
-| Integer arithmetic | 16.1M ops/sec |
-| for...of loops | 54.8M ops/sec |
-| Property access | 3.4M ops/sec |
-| Function calls | 5.1M ops/sec |
-| Closures | 6.1M ops/sec |
-| HTTP handler | 332K ops/sec |
-
-These numbers reflect interpreted bytecode execution. The architecture supports future JIT compilation - inline caches and superinstructions are already in place.
+The JSX transformer is a single-pass tokenizer-to-hyperscript converter. No AST construction, no external tools.
 
 ## Real Talk: What's Not Here
 
-To me is interesting that the power comes from what we left out:
+The power comes from what we left out:
 
 **No async/await.** FaaS handlers are synchronous by design. You receive a request, you return a response. If you need to call external services, you do it synchronously. This eliminates entire categories of complexity.
 
@@ -183,10 +271,13 @@ The result is a runtime where you control every byte of memory and every cycle o
 zig build -Doptimize=ReleaseFast
 
 # Run with inline handler
-./zig-out/bin/**zigttp** -e "function handler(req) { return Response.json({ok: true}); }"
+./zig-out/bin/zigttp -e "function handler(req) { return Response.json({ok: true}); }"
 
-# Run with file
-./zig-out/bin/**zigttp** examples/handler.jsx -p 3000
+# Run with TypeScript file
+./zig-out/bin/zigttp examples/handler.ts -p 3000
+
+# Run with JSX/TSX
+./zig-out/bin/zigttp examples/handler.tsx -p 3000
 
 # Options
 -p, --port      Port (default: 8080)
@@ -201,7 +292,7 @@ zig build -Doptimize=ReleaseFast
 **Works beautifully for:**
 - Edge computing where cold starts matter
 - Simple API handlers and webhooks
-- Server-side rendering with JSX
+- Server-side rendering with JSX/TSX
 - IoT gateways and CDN edge nodes
 
 **Falls apart (for now) when:**
@@ -210,8 +301,11 @@ zig build -Doptimize=ReleaseFast
 - You need full ES6+ features (generators, async iterators)
 - You need the complete Date or Intl APIs
 
-For the right use case - fast, isolated, stateless handlers - this approach works beautifully, if it ever reaches the maturity, off course. For now, you better stick with  or Deno, Bun or Node.
+For the right use case - fast, isolated, stateless handlers - this approach works beautifully, if it ever reaches the maturity, of course. For now, you better stick with Deno, Bun or Node for production workloads.
 
 ---
 
-***zigttp** is experimental and under active development. The code is available on GitHub.*
+*zigttp is experimental and under active development. The code is available on [GitHub][def].*
+
+
+[def]: https://github.com/srdjan/zigttp
