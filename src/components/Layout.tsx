@@ -19,6 +19,9 @@ export const createLayout = (props: LayoutProps): Response => {
     structuredData,
   } = props;
 
+  const env = Deno.env.get("DENO_ENV") || "development";
+  const isProd = env === "production";
+
   const fallbackOrigin = Deno.env.get("PUBLIC_URL") ||
     "https://blogo.timok.deno.net";
   const siteOrigin = origin || fallbackOrigin;
@@ -457,9 +460,16 @@ export const createLayout = (props: LayoutProps): Response => {
   return new Response(htmlString, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      "Pragma": "no-cache",
-      "Expires": "0",
+      ...(isProd
+        ? {
+          "Cache-Control":
+            "public, max-age=60, stale-while-revalidate=300",
+        }
+        : {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        }),
       "Vary": "HX-Request",
     },
   });

@@ -92,7 +92,9 @@ export const deriveTopicsFromTags = (
   return [...set.keys()];
 };
 
-export const ALL_TOPICS = Object.keys(TOPICS) as readonly Topic[];
+export const ALL_TOPICS: readonly Topic[] = Object.keys(TOPICS).map((topic) =>
+  topic as Topic
+);
 
 export const topicToSlug = (
   topic: Topic,
@@ -102,9 +104,7 @@ export const topicToSlug = (
   .replace(/^-+|-+$/g, ""));
 
 export const slugToTopic = (slug: string): Topic | null => {
-  const found = (Object.keys(TOPICS) as Topic[]).find((t) =>
-    topicToSlug(t) === slug
-  );
+  const found = ALL_TOPICS.find((t) => topicToSlug(t) === slug);
   return found ?? null;
 };
 

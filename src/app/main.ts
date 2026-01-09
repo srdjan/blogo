@@ -1,6 +1,11 @@
 import { startServer } from "../http/server.ts";
 import { createRouter } from "../http/router.ts";
-import { createAccessLog, staticFiles } from "../http/middleware.ts";
+import {
+  compress,
+  createAccessLog,
+  etag,
+  staticFiles,
+} from "../http/middleware.ts";
 import { createRouteHandlers } from "../http/routes.tsx";
 import { createContentService } from "../domain/content.ts";
 import { createConfig } from "../domain/config.ts";
@@ -90,6 +95,8 @@ async function main() {
     signal: abortController.signal,
     middlewares: [
       createAccessLog(healthService),
+      compress(),
+      etag,
       staticFiles("public"),
     ],
     beforeStart: () => {

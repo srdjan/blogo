@@ -47,6 +47,20 @@ export const createRouteHandlers = (
   healthService: HealthService,
   analyticsService: AnalyticsService,
 ): RouteHandlers => {
+  const env = Deno.env.get("DENO_ENV") || "development";
+  const isProd = env === "production";
+
+  const htmlCacheHeaders = isProd
+    ? {
+      "Cache-Control":
+        "public, max-age=60, stale-while-revalidate=300",
+    }
+    : {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+    };
+
   const isHtmxRequest = (req: Request): boolean =>
     req.headers.get("HX-Request") === "true";
 
@@ -57,9 +71,7 @@ export const createRouteHandlers = (
     return new Response(fragmentHtml, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        ...htmlCacheHeaders,
         "Vary": "HX-Request",
       },
     });
