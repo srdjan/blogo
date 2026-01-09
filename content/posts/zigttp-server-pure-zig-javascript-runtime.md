@@ -36,11 +36,7 @@ At the heart of zigttp is **zts** - about 30,000 lines of Zig implementing a com
 
 The compilation pipeline looks like this:
 
-```
-.ts/.tsx Source -> Type Stripper -> comptime() Eval ─┐
-                                                     ├─> Tokenizer -> Parser -> Bytecode
-.js/.jsx Source ─────────────────────────────────────┘
-```
+ 
 
 For TypeScript files, the stripper removes type annotations while preserving line numbers. The comptime evaluator then replaces `comptime(...)` expressions with literal values. After that, it's the same path as JavaScript: tokenize, parse with scope analysis, emit bytecode.
 
