@@ -3,18 +3,25 @@ import { createHealthService } from "../../src/domain/health.ts";
 import type { FileSystem } from "../../src/ports/file-system.ts";
 import type { Cache } from "../../src/ports/cache.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
+import { createClock, createFixedClock } from "../../src/ports/clock.ts";
+import type { AppResult } from "../../src/lib/types.ts";
+import { err, ok } from "../../src/lib/result.ts";
 
 // Mock FileSystem implementation for testing
 function createMockFileSystem(shouldFail = false): FileSystem {
   return {
-    readFile: async (path: string): Promise<string> => {
-      if (shouldFail) throw new Error("File system error");
-      return "mock content";
+    readFile: async (path: string): Promise<AppResult<string>> => {
+      if (shouldFail) {
+        return err({ kind: "IOError", message: "File system error" });
+      }
+      return ok("mock content");
     },
 
-    readDir: async (path: string): Promise<readonly string[]> => {
-      if (shouldFail) throw new Error("Directory read error");
-      return ["file1.md", "file2.md"];
+    readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
+      if (shouldFail) {
+        return err({ kind: "IOError", message: "Directory read error" });
+      }
+      return ok(["file1.md", "file2.md"]);
     },
 
     exists: async (path: string): Promise<boolean> => {
@@ -38,12 +45,14 @@ function createMockFileSystem(shouldFail = false): FileSystem {
 Deno.test("HealthService - reports healthy status when all checks pass", async () => {
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now() - 10000, // 10 seconds ago
+    startTime: clock.timestamp() - 10000, // 10 seconds ago
+    clock,
   });
 
   const result = await healthService.checkHealth();
@@ -62,12 +71,14 @@ Deno.test("HealthService - reports healthy status when all checks pass", async (
 Deno.test("HealthService - reports unhealthy status when filesystem fails", async () => {
   const fileSystem = createMockFileSystem(true);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const result = await healthService.checkHealth();
@@ -86,12 +97,14 @@ Deno.test("HealthService - reports unhealthy status when filesystem fails", asyn
 Deno.test("HealthService - filesystem check detects missing directory", async () => {
   const fileSystem = createMockFileSystem(true);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "nonexistent",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const filesystemCheck = await healthService.checkFileSystem();
@@ -104,12 +117,14 @@ Deno.test("HealthService - filesystem check detects missing directory", async ()
 Deno.test("HealthService - cache check validates operations", async () => {
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const cacheCheck = await healthService.checkCache();
@@ -122,12 +137,14 @@ Deno.test("HealthService - cache check validates operations", async () => {
 Deno.test("HealthService - provides system metrics", () => {
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now() - 5000, // 5 seconds ago
+    startTime: clock.timestamp() - 5000, // 5 seconds ago
+    clock,
   });
 
   const metrics = healthService.getMetrics();
@@ -141,7 +158,8 @@ Deno.test("HealthService - provides system metrics", () => {
 });
 
 Deno.test("HealthService - includes uptime in health report", async () => {
-  const startTime = Date.now() - 30000; // 30 seconds ago
+  const clock = createClock();
+  const startTime = clock.timestamp() - 30000; // 30 seconds ago
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
 
@@ -150,6 +168,7 @@ Deno.test("HealthService - includes uptime in health report", async () => {
     cache,
     postsDir: "content/posts",
     startTime,
+    clock,
   });
 
   const result = await healthService.checkHealth();
@@ -164,6 +183,7 @@ Deno.test("HealthService - includes uptime in health report", async () => {
 
 Deno.test("HealthService - handles cache operation failures", async () => {
   const fileSystem = createMockFileSystem(false);
+  const clock = createClock();
 
   // Create a mock cache that fails operations
   const failingCache: Cache<unknown> = {
@@ -177,7 +197,8 @@ Deno.test("HealthService - handles cache operation failures", async () => {
     fileSystem,
     cache: failingCache,
     postsDir: "content/posts",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const cacheCheck = await healthService.checkCache();
@@ -190,12 +211,14 @@ Deno.test("HealthService - handles cache operation failures", async () => {
 Deno.test("HealthService - measures check duration", async () => {
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const filesystemCheck = await healthService.checkFileSystem();
@@ -210,12 +233,14 @@ Deno.test("HealthService - measures check duration", async () => {
 Deno.test("HealthService - includes timestamps in checks", async () => {
   const fileSystem = createMockFileSystem(false);
   const cache = createInMemoryCache<unknown>();
+  const clock = createClock();
 
   const healthService = createHealthService({
     fileSystem,
     cache,
     postsDir: "content/posts",
-    startTime: Date.now(),
+    startTime: clock.timestamp(),
+    clock,
   });
 
   const result = await healthService.checkHealth();

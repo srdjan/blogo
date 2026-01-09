@@ -101,3 +101,42 @@ export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
 export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
   return !result.ok;
 }
+
+export async function chainAsync<T, U, E>(
+  result: Result<T, E>,
+  fn: (value: T) => Promise<Result<U, E>>,
+): Promise<Result<U, E>> {
+  if (result.ok) {
+    return fn(result.value);
+  }
+  return result;
+}
+
+export async function mapAsync<T, U, E>(
+  result: Result<T, E>,
+  fn: (value: T) => Promise<U>,
+): Promise<Result<U, E>> {
+  if (result.ok) {
+    return ok(await fn(result.value));
+  }
+  return result;
+}
+
+export const getOrElse = <T, E>(result: Result<T, E>, defaultValue: T): T =>
+  result.ok ? result.value : defaultValue;
+
+export const tap = <T, E>(
+  result: Result<T, E>,
+  fn: (value: T) => void,
+): Result<T, E> => {
+  if (result.ok) fn(result.value);
+  return result;
+};
+
+export const tapError = <T, E>(
+  result: Result<T, E>,
+  fn: (error: E) => void,
+): Result<T, E> => {
+  if (!result.ok) fn(result.error);
+  return result;
+};

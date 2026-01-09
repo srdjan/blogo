@@ -8,7 +8,7 @@ import type {
 } from "../lib/types.ts";
 import { createSlug } from "../lib/types.ts";
 import type { Result } from "../lib/result.ts";
-import { combine, err, ok } from "../lib/result.ts";
+import { chainAsync, combine, err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Logger } from "../ports/logger.ts";
@@ -21,6 +21,51 @@ import {
 } from "./validation.ts";
 import { TOPICS } from "../config/topics.ts";
 import { parse as parseYaml } from "@std/yaml";
+
+// Pure helper functions for tag normalization
+const normalizeTag = (s: string): string => s.trim().toLowerCase();
+
+const canonicalCaseFromTopics = (lower: string): string | null => {
+  for (const tags of Object.values(TOPICS)) {
+    for (const t of tags) {
+      if (t.trim().toLowerCase() === lower) return t;
+    }
+  }
+  return null;
+};
+
+// Pure function: aggregates tags from posts without any service dependencies
+export const aggregateTags = (
+  posts: readonly Post[],
+): readonly TagInfo[] => {
+  const tagMap = new Map<string, TagInfo>();
+
+  for (const post of posts) {
+    if (!post.tags || post.tags.length === 0) continue;
+    const seenInThisPost = new Set<string>();
+
+    for (const raw of post.tags) {
+      const key = normalizeTag(String(raw));
+      if (seenInThisPost.has(key)) continue;
+      seenInThisPost.add(key);
+
+      const canonical = canonicalCaseFromTopics(key) ?? String(raw);
+      const existing = tagMap.get(key);
+      const displayName = existing?.name ?? (canonical as TagName);
+
+      const postsArr = existing?.posts ?? [];
+      const alreadyIncluded = postsArr.includes(post);
+      const updated: TagInfo = {
+        name: displayName,
+        count: (existing?.count ?? 0) + (alreadyIncluded ? 0 : 1),
+        posts: alreadyIncluded ? postsArr : [...postsArr, post],
+      };
+      tagMap.set(key, updated);
+    }
+  }
+
+  return Array.from(tagMap.values()).sort((a, b) => b.count - a.count);
+};
 
 export interface ContentService {
   readonly loadPosts: () => Promise<AppResult<readonly Post[]>>;
@@ -68,178 +113,152 @@ export const createContentService = (
     filePath: string,
     slug: Slug,
   ): Promise<AppResult<Post>> => {
-    try {
-      const content = await fileSystem.readFile(filePath);
-      const result = extractFrontmatter(content);
+    const contentResult = await fileSystem.readFile(filePath);
+    if (!contentResult.ok) return contentResult;
 
-      if (!result.ok) return result;
+    const content = contentResult.value;
+    const result = extractFrontmatter(content);
 
-      const { frontmatter, markdown } = result.value;
+    if (!result.ok) return result;
 
-      // Validate markdown content (skip in production for performance)
-      if (enableValidation) {
-        const contentValidation = validateMarkdownContent(markdown);
-        if (!contentValidation.ok) {
-          logger.warn(
-            `Content validation issues for ${filePath}`,
-            contentValidation.error,
-          );
-          // Continue processing despite content warnings
-        }
+    const { frontmatter, markdown } = result.value;
 
-        // Validate image references
-        const imageValidation = validateImageReferences(markdown);
-        if (!imageValidation.ok) {
-          logger.warn(
-            `Image validation issues for ${filePath}`,
-            imageValidation.error,
-          );
-          // Continue processing despite image warnings
-        }
+    // Validate markdown content (skip in production for performance)
+    if (enableValidation) {
+      const contentValidation = validateMarkdownContent(markdown);
+      if (!contentValidation.ok) {
+        logger.warn(
+          `Content validation issues for ${filePath}`,
+          contentValidation.error,
+        );
+        // Continue processing despite content warnings
       }
 
-      const metaResult = parseFrontmatter(frontmatter, slug);
-
-      if (!metaResult.ok) return metaResult;
-
-      const meta = metaResult.value;
-      const htmlResult = markdownToHtml(markdown);
-
-      if (!htmlResult.ok) return htmlResult;
-
-      const formattedDate = formatDate(meta.date);
-
-      return ok({
-        ...meta,
-        content: htmlResult.value,
-        formattedDate,
-      });
-    } catch (error) {
-      return err(createError(
-        "IOError",
-        `Failed to parse markdown file: ${filePath}`,
-        error,
-        { path: filePath },
-      ));
+      // Validate image references
+      const imageValidation = validateImageReferences(markdown);
+      if (!imageValidation.ok) {
+        logger.warn(
+          `Image validation issues for ${filePath}`,
+          imageValidation.error,
+        );
+        // Continue processing despite image warnings
+      }
     }
+
+    const metaResult = parseFrontmatter(frontmatter, slug);
+
+    if (!metaResult.ok) return metaResult;
+
+    const meta = metaResult.value;
+    const htmlResult = markdownToHtml(markdown);
+
+    if (!htmlResult.ok) return htmlResult;
+
+    const formattedDate = formatDate(meta.date);
+
+    return ok({
+      ...meta,
+      content: htmlResult.value,
+      formattedDate,
+    });
   };
 
-  // Metadata-only parsing: extracts frontmatter without markdown→HTML conversion
+  // Metadata-only parsing: extracts frontmatter without markdown->HTML conversion
   const parseMetadata = async (
     filePath: string,
     slug: Slug,
   ): Promise<AppResult<PostMeta>> => {
-    try {
-      const content = await fileSystem.readFile(filePath);
-      const result = extractFrontmatter(content);
+    const contentResult = await fileSystem.readFile(filePath);
+    if (!contentResult.ok) return contentResult;
 
-      if (!result.ok) return result;
+    const result = extractFrontmatter(contentResult.value);
+    if (!result.ok) return result;
 
-      const { frontmatter } = result.value;
-      const metaResult = parseFrontmatter(frontmatter, slug);
-
-      return metaResult;
-    } catch (error) {
-      return err(createError(
-        "IOError",
-        `Failed to parse metadata from file: ${filePath}`,
-        error,
-        { path: filePath },
-      ));
-    }
+    const { frontmatter } = result.value;
+    return parseFrontmatter(frontmatter, slug);
   };
 
   const loadPostsFromDisk = async (): Promise<AppResult<readonly Post[]>> => {
-    try {
-      const entries = await fileSystem.readDir(postsDir);
-      const markdownFiles = entries.filter((name) => name.endsWith(".md"));
+    const entriesResult = await fileSystem.readDir(postsDir);
+    if (!entriesResult.ok) return entriesResult;
 
-      if (markdownFiles.length === 0) {
-        logger.warn(`No markdown files found in ${postsDir}`);
-        return ok([]);
-      }
+    const markdownFiles = entriesResult.value.filter((name) =>
+      name.endsWith(".md")
+    );
 
-      const postResults = await Promise.all(
-        markdownFiles.map(async (filename) => {
-          const slug = createSlug(filename.replace(/\.md$/, ""));
-          const filePath = `${postsDir}/${filename}`;
-          return await parseMarkdown(filePath, slug);
-        }),
-      );
-
-      const combinedResult = combine(postResults);
-
-      if (!combinedResult.ok) {
-        logger.error("Failed to load some posts", combinedResult.error);
-        return combinedResult;
-      }
-
-      const sortedPosts = [...combinedResult.value].sort((a: Post, b: Post) =>
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-
-      logger.info(`Loaded ${sortedPosts.length} posts`);
-      return ok(sortedPosts);
-    } catch (error) {
-      return err(createError(
-        "IOError",
-        `Failed to load posts from ${postsDir}`,
-        error,
-        { path: postsDir },
-      ));
+    if (markdownFiles.length === 0) {
+      logger.warn(`No markdown files found in ${postsDir}`);
+      return ok([]);
     }
+
+    const postResults = await Promise.all(
+      markdownFiles.map(async (filename) => {
+        const slug = createSlug(filename.replace(/\.md$/, ""));
+        const filePath = `${postsDir}/${filename}`;
+        return await parseMarkdown(filePath, slug);
+      }),
+    );
+
+    const combinedResult = combine(postResults);
+
+    if (!combinedResult.ok) {
+      logger.error("Failed to load some posts", combinedResult.error);
+      return combinedResult;
+    }
+
+    const sortedPosts = [...combinedResult.value].sort((a: Post, b: Post) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    logger.info(`Loaded ${sortedPosts.length} posts`);
+    return ok(sortedPosts);
   };
 
   const loadPostsMetadataFromDisk = async (): Promise<
     AppResult<readonly PostMeta[]>
   > => {
-    try {
-      const entries = await fileSystem.readDir(postsDir);
-      const markdownFiles = entries.filter((name) => name.endsWith(".md"));
+    const entriesResult = await fileSystem.readDir(postsDir);
+    if (!entriesResult.ok) return entriesResult;
 
-      if (markdownFiles.length === 0) {
-        logger.warn(`No markdown files found in ${postsDir}`);
-        return ok([]);
-      }
+    const markdownFiles = entriesResult.value.filter((name) =>
+      name.endsWith(".md")
+    );
 
-      const metaResults = await Promise.all(
-        markdownFiles.map(async (filename) => {
-          const slug = createSlug(filename.replace(/\.md$/, ""));
-          const filePath = `${postsDir}/${filename}`;
-          return await parseMetadata(filePath, slug);
-        }),
-      );
-
-      const combinedResult = combine(metaResults);
-
-      if (!combinedResult.ok) {
-        logger.error("Failed to load some post metadata", combinedResult.error);
-        return combinedResult;
-      }
-
-      const sortedMeta = [...combinedResult.value].sort((
-        a: PostMeta,
-        b: PostMeta,
-      ) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-      logger.info(`Loaded metadata for ${sortedMeta.length} posts`);
-      return ok(sortedMeta);
-    } catch (error) {
-      return err(createError(
-        "IOError",
-        `Failed to load post metadata from ${postsDir}`,
-        error,
-        { path: postsDir },
-      ));
+    if (markdownFiles.length === 0) {
+      logger.warn(`No markdown files found in ${postsDir}`);
+      return ok([]);
     }
+
+    const metaResults = await Promise.all(
+      markdownFiles.map(async (filename) => {
+        const slug = createSlug(filename.replace(/\.md$/, ""));
+        const filePath = `${postsDir}/${filename}`;
+        return await parseMetadata(filePath, slug);
+      }),
+    );
+
+    const combinedResult = combine(metaResults);
+
+    if (!combinedResult.ok) {
+      logger.error("Failed to load some post metadata", combinedResult.error);
+      return combinedResult;
+    }
+
+    const sortedMeta = [...combinedResult.value].sort((
+      a: PostMeta,
+      b: PostMeta,
+    ) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    logger.info(`Loaded metadata for ${sortedMeta.length} posts`);
+    return ok(sortedMeta);
   };
 
   const loadPosts = async (): Promise<AppResult<readonly Post[]>> => {
     const cached = cache.get("posts");
 
-    if (cached.ok && cached.value) {
+    if (cached.ok && cached.value.status === "hit") {
       logger.debug("Using cached posts");
-      return ok(cached.value);
+      return ok(cached.value.value);
     }
 
     logger.info("Loading posts from disk");
@@ -257,9 +276,9 @@ export const createContentService = (
   > => {
     const cached = metadataCache.get("metadata");
 
-    if (cached.ok && cached.value) {
+    if (cached.ok && cached.value.status === "hit") {
       logger.debug("Using cached post metadata");
-      return ok(cached.value);
+      return ok(cached.value.value);
     }
 
     logger.info("Loading post metadata from disk");
@@ -339,9 +358,9 @@ export const createContentService = (
   const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {
     // Check individual post cache first (fast path)
     const cached = postCache.get(slug as string);
-    if (cached.ok && cached.value) {
+    if (cached.ok && cached.value.status === "hit") {
       logger.debug(`Using cached post: ${slug}`);
-      return ok(cached.value);
+      return ok(cached.value.value);
     }
 
     // Direct file lookup - O(1) instead of loading all posts
@@ -361,17 +380,6 @@ export const createContentService = (
       postCache.set(slug as string, postResult.value, 30 * 60 * 1000);
     }
     return postResult;
-  };
-
-  // Case-insensitive tag normalization helpers (kept pure)
-  const normalizeTag = (s: string): string => s.trim().toLowerCase();
-  const canonicalCaseFromTopics = (lower: string): string | null => {
-    for (const tags of Object.values(TOPICS)) {
-      for (const t of tags) {
-        if (t.trim().toLowerCase() === lower) return t;
-      }
-    }
-    return null;
   };
 
   const getPostsByTag = async (
@@ -394,34 +402,7 @@ export const createContentService = (
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
 
-    // Aggregate tags case-insensitively, preserving a canonical display casing.
-    const tagMap = new Map<string, TagInfo>(); // key: lowercased tag
-
-    for (const post of postsResult.value) {
-      if (!post.tags || post.tags.length === 0) continue;
-      const seenInThisPost = new Set<string>();
-      for (const raw of post.tags) {
-        const key = normalizeTag(String(raw));
-        if (seenInThisPost.has(key)) continue; // avoid double-counting same tag variant within one post
-        seenInThisPost.add(key);
-
-        const canonical = canonicalCaseFromTopics(key) ?? String(raw);
-        const existing = tagMap.get(key);
-        const displayName = existing?.name ?? (canonical as TagName);
-
-        const postsArr = existing?.posts ?? [];
-        const alreadyIncluded = postsArr.includes(post);
-        const updated: TagInfo = {
-          name: displayName,
-          count: (existing?.count ?? 0) + (alreadyIncluded ? 0 : 1),
-          posts: alreadyIncluded ? postsArr : [...postsArr, post],
-        };
-        tagMap.set(key, updated);
-      }
-    }
-
-    const tags = Array.from(tagMap.values()).sort((a, b) => b.count - a.count);
-    return ok(tags);
+    return ok(aggregateTags(postsResult.value));
   };
 
   const searchPosts = async (

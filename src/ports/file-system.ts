@@ -1,6 +1,10 @@
+import type { AppResult } from "../lib/types.ts";
+import { tryCatch } from "../lib/result.ts";
+import { createError } from "../lib/error.ts";
+
 export interface FileSystem {
-  readonly readFile: (path: string) => Promise<string>;
-  readonly readDir: (path: string) => Promise<readonly string[]>;
+  readonly readFile: (path: string) => Promise<AppResult<string>>;
+  readonly readDir: (path: string) => Promise<AppResult<readonly string[]>>;
   readonly exists: (path: string) => Promise<boolean>;
   readonly stat: (path: string) => Promise<FileInfo | null>;
 }
@@ -14,16 +18,24 @@ export type FileInfo = {
 };
 
 export const createFileSystem = (): FileSystem => ({
-  readFile: async (path: string): Promise<string> => {
-    return await Deno.readTextFile(path);
+  readFile: async (path: string): Promise<AppResult<string>> => {
+    return tryCatch(
+      () => Deno.readTextFile(path),
+      (e) => createError("IOError", `Failed to read file: ${path}`, e, { path }),
+    );
   },
 
-  readDir: async (path: string): Promise<readonly string[]> => {
-    const entries: string[] = [];
-    for await (const entry of Deno.readDir(path)) {
-      entries.push(entry.name);
-    }
-    return entries;
+  readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
+    return tryCatch(
+      async () => {
+        const entries: string[] = [];
+        for await (const entry of Deno.readDir(path)) {
+          entries.push(entry.name);
+        }
+        return entries;
+      },
+      (e) => createError("IOError", `Failed to read directory: ${path}`, e, { path }),
+    );
   },
 
   exists: async (path: string): Promise<boolean> => {

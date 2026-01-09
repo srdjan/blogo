@@ -1,9 +1,10 @@
 import type { Middleware } from "./types.ts";
-import { updateRequestMetrics } from "../domain/health.ts";
+import type { HealthService } from "../domain/health.ts";
 import { generateRequestId } from "../utils.ts";
 
 // Enhanced access logging with correlation IDs and structured data
-export const accessLog: Middleware = (next) => async (req) => {
+export const createAccessLog = (healthService: HealthService): Middleware =>
+(next) => async (req) => {
   const correlationId = generateRequestId();
   const start = performance.now();
   const url = new URL(req.url);
@@ -33,7 +34,7 @@ export const accessLog: Middleware = (next) => async (req) => {
     };
 
     // Update request metrics
-    updateRequestMetrics(parseFloat(duration), res.status >= 400);
+    healthService.updateMetrics(parseFloat(duration), res.status >= 400);
 
     // Add correlation ID to response headers
     const headers = new Headers(res.headers);

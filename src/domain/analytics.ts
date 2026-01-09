@@ -1,6 +1,7 @@
 import type { Slug } from "../lib/types.ts";
 import type { AppResult } from "../lib/types.ts";
-import { err, ok } from "../lib/result.ts";
+import { err, ok, tryCatch } from "../lib/result.ts";
+import { createError } from "../lib/error.ts";
 
 type ViewsData = Record<string, number>;
 
@@ -11,15 +12,19 @@ export type AnalyticsService = {
   readonly close: () => void;
 };
 
-export const createAnalyticsService = async (
-): Promise<AnalyticsService> => {
-  let kv: Deno.Kv;
+export const createAnalyticsService = async (): Promise<
+  AppResult<AnalyticsService>
+> => {
+  const kvResult = await tryCatch(
+    () => Deno.openKv(),
+    (e) => createError("IOError", `Failed to open Deno KV: ${e}`),
+  );
 
-  try {
-    kv = await Deno.openKv();
-  } catch (error) {
-    throw new Error(`Failed to open Deno KV: ${error}`);
+  if (!kvResult.ok) {
+    return kvResult;
   }
+
+  const kv = kvResult.value;
 
   const getViewCount = async (slug: Slug): Promise<AppResult<number>> => {
     try {
@@ -91,10 +96,10 @@ export const createAnalyticsService = async (
     kv.close();
   };
 
-  return {
+  return ok({
     getViewCount,
     incrementViewCount,
     getAllViewCounts,
     close,
-  };
+  });
 };

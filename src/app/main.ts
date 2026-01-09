@@ -1,6 +1,6 @@
 import { startServer } from "../http/server.ts";
 import { createRouter } from "../http/router.ts";
-import { accessLog, staticFiles } from "../http/middleware.ts";
+import { createAccessLog, staticFiles } from "../http/middleware.ts";
 import { createRouteHandlers } from "../http/routes.tsx";
 import { createContentService } from "../domain/content.ts";
 import { createConfig } from "../domain/config.ts";
@@ -9,11 +9,13 @@ import { createAnalyticsService } from "../domain/analytics.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
+import { createClock } from "../ports/clock.ts";
 import type { Post, PostMeta } from "../lib/types.ts";
 
 async function main() {
   const config = createConfig();
-  const startTime = Date.now();
+  const clock = createClock();
+  const startTime = clock.timestamp();
 
   const logger = createLogger({
     enableLogs: config.debug.enableLogs,
@@ -27,7 +29,12 @@ async function main() {
   const postCache = createInMemoryCache<Post>();
   const healthCache = createInMemoryCache<unknown>();
 
-  const analyticsService = await createAnalyticsService();
+  const analyticsResult = await createAnalyticsService();
+  if (!analyticsResult.ok) {
+    logger.error("Failed to initialize analytics", analyticsResult.error);
+    Deno.exit(1);
+  }
+  const analyticsService = analyticsResult.value;
 
   const contentService = createContentService({
     fileSystem,
@@ -45,6 +52,7 @@ async function main() {
     cache: healthCache,
     postsDir: config.blog.postsDir,
     startTime,
+    clock,
   });
 
   const routes = createRouteHandlers(
@@ -81,7 +89,7 @@ async function main() {
     hostname: config.server.host,
     signal: abortController.signal,
     middlewares: [
-      accessLog,
+      createAccessLog(healthService),
       staticFiles("public"),
     ],
     beforeStart: () => {

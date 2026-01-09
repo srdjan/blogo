@@ -3,11 +3,14 @@ import {
   chain,
   combine,
   err,
+  getOrElse,
   isErr,
   isOk,
   map,
   match,
   ok,
+  tap,
+  tapError,
 } from "../src/lib/result.ts";
 
 Deno.test("Result - ok creates success result", () => {
@@ -102,4 +105,64 @@ Deno.test("Result - type guards work correctly", () => {
   assertEquals(isErr(success), false);
   assertEquals(isOk(failure), false);
   assertEquals(isErr(failure), true);
+});
+
+Deno.test("Result - getOrElse returns value on success", () => {
+  const result = ok(42);
+  assertEquals(getOrElse(result, 0), 42);
+});
+
+Deno.test("Result - getOrElse returns default on error", () => {
+  const result = err("error");
+  assertEquals(getOrElse(result, 0), 0);
+});
+
+Deno.test("Result - tap executes side effect on success", () => {
+  let sideEffect = 0;
+  const result = ok(42);
+  const tapped = tap(result, (x) => {
+    sideEffect = x;
+  });
+
+  assertEquals(sideEffect, 42);
+  assertEquals(tapped.ok, true);
+  if (tapped.ok) {
+    assertEquals(tapped.value, 42);
+  }
+});
+
+Deno.test("Result - tap does not execute on error", () => {
+  let sideEffect = 0;
+  const result = err("error");
+  const tapped = tap(result, (_x: number) => {
+    sideEffect = 1;
+  });
+
+  assertEquals(sideEffect, 0);
+  assertEquals(tapped.ok, false);
+});
+
+Deno.test("Result - tapError executes side effect on error", () => {
+  let sideEffect = "";
+  const result = err("error message");
+  const tapped = tapError(result, (e) => {
+    sideEffect = e;
+  });
+
+  assertEquals(sideEffect, "error message");
+  assertEquals(tapped.ok, false);
+  if (!tapped.ok) {
+    assertEquals(tapped.error, "error message");
+  }
+});
+
+Deno.test("Result - tapError does not execute on success", () => {
+  let sideEffect = "";
+  const result = ok(42);
+  const tapped = tapError(result, (e: string) => {
+    sideEffect = e;
+  });
+
+  assertEquals(sideEffect, "");
+  assertEquals(tapped.ok, true);
 });

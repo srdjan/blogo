@@ -1,7 +1,11 @@
 import type { Result } from "../lib/result.ts";
 
+export type CacheGetResult<T> =
+  | { readonly status: "hit"; readonly value: T }
+  | { readonly status: "miss" };
+
 export interface Cache<T> {
-  readonly get: (key: string) => Result<T | null, CacheError>;
+  readonly get: (key: string) => Result<CacheGetResult<T>, CacheError>;
   readonly set: (
     key: string,
     value: T,
@@ -11,7 +15,7 @@ export interface Cache<T> {
   readonly clear: () => Result<void, CacheError>;
 }
 
-export type CacheError = "CACHE_MISS" | "CACHE_ERROR" | "EXPIRED";
+export type CacheError = "CACHE_ERROR";
 
 export type CacheEntry<T> = {
   readonly value: T;
@@ -30,15 +34,15 @@ export const createInMemoryCache = <T>(): Cache<T> => {
       try {
         const entry = store.get(key);
         if (!entry) {
-          return { ok: true, value: null };
+          return { ok: true, value: { status: "miss" as const } };
         }
 
         if (isExpired(entry)) {
           store.delete(key);
-          return { ok: true, value: null };
+          return { ok: true, value: { status: "miss" as const } };
         }
 
-        return { ok: true, value: entry.value };
+        return { ok: true, value: { status: "hit" as const, value: entry.value } };
       } catch {
         return { ok: false, error: "CACHE_ERROR" };
       }

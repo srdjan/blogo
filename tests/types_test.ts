@@ -16,9 +16,45 @@ Deno.test("Types - createSlug removes multiple dashes", () => {
   assertEquals(slug, "multiple-spaces");
 });
 
-Deno.test("Types - createTagName preserves input", () => {
-  const tag = createTagName("TypeScript");
-  assertEquals(tag, "TypeScript");
+Deno.test("Types - createTagName returns ok for valid input", () => {
+  const result = createTagName("TypeScript");
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value, "TypeScript");
+  }
+});
+
+Deno.test("Types - createTagName trims whitespace", () => {
+  const result = createTagName("  TypeScript  ");
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value, "TypeScript");
+  }
+});
+
+Deno.test("Types - createTagName returns error for empty string", () => {
+  const result = createTagName("");
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(result.error.kind, "ValidationError");
+  }
+});
+
+Deno.test("Types - createTagName returns error for whitespace only", () => {
+  const result = createTagName("   ");
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(result.error.kind, "ValidationError");
+  }
+});
+
+Deno.test("Types - createTagName returns error for too long input", () => {
+  const longTag = "a".repeat(51);
+  const result = createTagName(longTag);
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(result.error.kind, "ValidationError");
+  }
 });
 
 Deno.test("Types - createUrlPath preserves input", () => {

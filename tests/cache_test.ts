@@ -10,17 +10,20 @@ Deno.test("Cache - set and get value", () => {
   const getResult = cache.get("key1");
   assertEquals(getResult.ok, true);
   if (getResult.ok) {
-    assertEquals(getResult.value, "value1");
+    assertEquals(getResult.value.status, "hit");
+    if (getResult.value.status === "hit") {
+      assertEquals(getResult.value.value, "value1");
+    }
   }
 });
 
-Deno.test("Cache - get non-existent key returns null", () => {
+Deno.test("Cache - get non-existent key returns miss", () => {
   const cache = createInMemoryCache<string>();
 
   const getResult = cache.get("non-existent");
   assertEquals(getResult.ok, true);
   if (getResult.ok) {
-    assertEquals(getResult.value, null);
+    assertEquals(getResult.value.status, "miss");
   }
 });
 
@@ -32,7 +35,10 @@ Deno.test("Cache - TTL expiration", async () => {
   const immediate = cache.get("key1");
   assertEquals(immediate.ok, true);
   if (immediate.ok) {
-    assertEquals(immediate.value, "value1");
+    assertEquals(immediate.value.status, "hit");
+    if (immediate.value.status === "hit") {
+      assertEquals(immediate.value.value, "value1");
+    }
   }
 
   // Wait for expiration
@@ -41,7 +47,7 @@ Deno.test("Cache - TTL expiration", async () => {
   const expired = cache.get("key1");
   assertEquals(expired.ok, true);
   if (expired.ok) {
-    assertEquals(expired.value, null);
+    assertEquals(expired.value.status, "miss");
   }
 });
 
@@ -52,7 +58,10 @@ Deno.test("Cache - delete removes key", () => {
 
   const beforeDelete = cache.get("key1");
   if (beforeDelete.ok) {
-    assertEquals(beforeDelete.value, "value1");
+    assertEquals(beforeDelete.value.status, "hit");
+    if (beforeDelete.value.status === "hit") {
+      assertEquals(beforeDelete.value.value, "value1");
+    }
   }
 
   const deleteResult = cache.delete("key1");
@@ -60,7 +69,7 @@ Deno.test("Cache - delete removes key", () => {
 
   const afterDelete = cache.get("key1");
   if (afterDelete.ok) {
-    assertEquals(afterDelete.value, null);
+    assertEquals(afterDelete.value.status, "miss");
   }
 });
 
@@ -76,9 +85,9 @@ Deno.test("Cache - clear removes all keys", () => {
   const get1 = cache.get("key1");
   const get2 = cache.get("key2");
   if (get1.ok) {
-    assertEquals(get1.value, null);
+    assertEquals(get1.value.status, "miss");
   }
   if (get2.ok) {
-    assertEquals(get2.value, null);
+    assertEquals(get2.value.status, "miss");
   }
 });

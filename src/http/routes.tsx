@@ -131,9 +131,21 @@ export const createRouteHandlers = (
   };
 
   const tagPosts: RouteHandler = async (ctx) => {
-    const tagName = createTagName(
+    const tagNameResult = createTagName(
       decodeURIComponent(ctx.pathname.replace("/tags/", "")),
     );
+
+    if (!tagNameResult.ok) {
+      return renderPage(ctx, {
+        title: "Error - Blog",
+        description: "Invalid tag name",
+        path: createUrlPath(ctx.pathname),
+        origin: ctx.url.origin,
+        children: <div>Invalid tag name</div>,
+      });
+    }
+
+    const tagName = tagNameResult.value;
     const postsResult = await contentService.getPostsByTag(tagName);
 
     return match(postsResult, {

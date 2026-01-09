@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert";
 import { generateRSS, generateTopicRssFeed } from "../src/rss.ts";
-import type { Post } from "../src/lib/types.ts";
+import type { Post, Slug, TagName } from "../src/lib/types.ts";
 
 // Helper to create test posts
 const createPost = (
@@ -11,12 +11,12 @@ const createPost = (
   excerpt?: string,
   content = "This is test content for the post.",
 ): Post => ({
-  slug,
+  slug: slug as Slug,
   title,
   date,
   excerpt,
   content,
-  tags,
+  tags: tags as unknown as TagName[],
   draft: false,
 });
 

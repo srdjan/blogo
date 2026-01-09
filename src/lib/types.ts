@@ -1,4 +1,4 @@
-import type { Result } from "./result.ts";
+import { err, ok, type Result } from "./result.ts";
 
 export type Brand<T, K> = T & { readonly __brand: K };
 
@@ -14,8 +14,34 @@ export const createSlug = (value: string): Slug => {
   ) as Slug;
 };
 
-export const createPostId = (value: string): PostId => value as PostId;
-export const createTagName = (value: string): TagName => value as TagName;
+export const createPostId = (value: string): AppResult<PostId> => {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return err({
+      kind: "ValidationError",
+      message: "Post ID cannot be empty",
+    });
+  }
+  return ok(trimmed as PostId);
+};
+
+export const createTagName = (value: string): AppResult<TagName> => {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return err({
+      kind: "ValidationError",
+      message: "Tag name cannot be empty",
+    });
+  }
+  if (trimmed.length > 50) {
+    return err({
+      kind: "ValidationError",
+      message: "Tag name too long (max 50 characters)",
+    });
+  }
+  return ok(trimmed as TagName);
+};
+
 export const createUrlPath = (value: string): UrlPath => value as UrlPath;
 
 export type PostMeta = {

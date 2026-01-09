@@ -1,11 +1,13 @@
 import { assertEquals, assertExists } from "@std/assert";
 import {
-  accessLog,
+  createAccessLog,
   errorBoundary,
   performanceMonitoring,
   staticFiles,
 } from "../../src/http/middleware.ts";
 import type { Handler } from "../../src/http/types.ts";
+import type { HealthService } from "../../src/domain/health.ts";
+import { ok } from "../../src/lib/result.ts";
 
 // Helper to create test requests
 function createTestRequest(url: string, options: RequestInit = {}): Request {
@@ -23,9 +25,45 @@ function createErrorHandler(error: Error): Handler {
   };
 }
 
+// Mock health service for testing
+function createMockHealthService(): HealthService {
+  return {
+    checkHealth: async () =>
+      ok({
+        status: "healthy" as const,
+        timestamp: new Date().toISOString(),
+        version: "1.0.0",
+        uptime: 0,
+        checks: [],
+        metrics: {
+          memory: { used: 0, total: 0, percentage: 0 },
+          cache: {},
+          requests: { total: 0, errors: 0, averageResponseTime: 0 },
+        },
+      }),
+    checkFileSystem: async () => ({
+      name: "filesystem",
+      status: "healthy" as const,
+      timestamp: new Date().toISOString(),
+    }),
+    checkCache: async () => ({
+      name: "cache",
+      status: "healthy" as const,
+      timestamp: new Date().toISOString(),
+    }),
+    getMetrics: () => ({
+      memory: { used: 0, total: 0, percentage: 0 },
+      cache: {},
+      requests: { total: 0, errors: 0, averageResponseTime: 0 },
+    }),
+    updateMetrics: () => {},
+  };
+}
+
 Deno.test("accessLog middleware - adds correlation ID and logs request", async () => {
   const handler = createTestHandler(new Response("OK", { status: 200 }));
-  const middleware = accessLog(handler);
+  const healthService = createMockHealthService();
+  const middleware = createAccessLog(healthService)(handler);
 
   const request = createTestRequest("http://localhost:8000/test");
   const response = await middleware(request);
@@ -37,7 +75,8 @@ Deno.test("accessLog middleware - adds correlation ID and logs request", async (
 Deno.test("accessLog middleware - handles errors and logs them", async () => {
   const error = new Error("Test error");
   const handler = createErrorHandler(error);
-  const middleware = accessLog(handler);
+  const healthService = createMockHealthService();
+  const middleware = createAccessLog(healthService)(handler);
 
   const request = createTestRequest("http://localhost:8000/test");
 

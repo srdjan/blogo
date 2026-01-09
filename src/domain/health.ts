@@ -3,6 +3,7 @@ import { err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Cache } from "../ports/cache.ts";
+import type { Clock } from "../ports/clock.ts";
 
 export type HealthStatus = "healthy" | "degraded" | "unhealthy";
 
@@ -45,6 +46,7 @@ export interface HealthService {
   readonly checkFileSystem: () => Promise<HealthCheck>;
   readonly checkCache: () => Promise<HealthCheck>;
   readonly getMetrics: () => SystemMetrics;
+  readonly updateMetrics: (responseTime: number, isError: boolean) => void;
 }
 
 export type HealthDependencies = {
@@ -52,68 +54,64 @@ export type HealthDependencies = {
   readonly cache: Cache<unknown>;
   readonly postsDir: string;
   readonly startTime: number;
-};
-
-// Simple metrics store (in production, use proper metrics collection)
-let requestMetrics = {
-  total: 0,
-  errors: 0,
-  totalResponseTime: 0,
-};
-
-export const updateRequestMetrics = (
-  responseTime: number,
-  isError: boolean,
-) => {
-  requestMetrics.total++;
-  requestMetrics.totalResponseTime += responseTime;
-  if (isError) {
-    requestMetrics.errors++;
-  }
+  readonly clock: Clock;
 };
 
 export const createHealthService = (
   deps: HealthDependencies,
 ): HealthService => {
-  const { fileSystem, cache, postsDir, startTime } = deps;
+  const { fileSystem, cache, postsDir, startTime, clock } = deps;
+
+  // Encapsulated metrics state - not global
+  let requestMetrics = {
+    total: 0,
+    errors: 0,
+    totalResponseTime: 0,
+  };
+
+  const updateMetrics = (responseTime: number, isError: boolean) => {
+    requestMetrics.total++;
+    requestMetrics.totalResponseTime += responseTime;
+    if (isError) {
+      requestMetrics.errors++;
+    }
+  };
 
   const checkFileSystem = async (): Promise<HealthCheck> => {
     const start = performance.now();
 
-    try {
-      // Check if posts directory exists and is readable
-      const exists = await fileSystem.exists(postsDir);
-      if (!exists) {
-        return {
-          name: "filesystem",
-          status: "unhealthy",
-          message: `Posts directory not found: ${postsDir}`,
-          duration: performance.now() - start,
-          timestamp: new Date().toISOString(),
-        };
-      }
-
-      // Try to read the directory
-      await fileSystem.readDir(postsDir);
-
-      return {
-        name: "filesystem",
-        status: "healthy",
-        message: "File system accessible",
-        duration: performance.now() - start,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
+    // Check if posts directory exists and is readable
+    const exists = await fileSystem.exists(postsDir);
+    if (!exists) {
       return {
         name: "filesystem",
         status: "unhealthy",
-        message: `File system error: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+        message: `Posts directory not found: ${postsDir}`,
         duration: performance.now() - start,
-        timestamp: new Date().toISOString(),
+        timestamp: clock.isoString(),
       };
     }
+
+    // Try to read the directory
+    const readResult = await fileSystem.readDir(postsDir);
+
+    if (!readResult.ok) {
+      return {
+        name: "filesystem",
+        status: "unhealthy",
+        message: `File system error: ${readResult.error.message}`,
+        duration: performance.now() - start,
+        timestamp: clock.isoString(),
+      };
+    }
+
+    return {
+      name: "filesystem",
+      status: "healthy",
+      message: "File system accessible",
+      duration: performance.now() - start,
+      timestamp: clock.isoString(),
+    };
   };
 
   const checkCache = async (): Promise<HealthCheck> => {
@@ -131,7 +129,7 @@ export const createHealthService = (
           status: "unhealthy",
           message: "Cache set operation failed",
           duration: performance.now() - start,
-          timestamp: new Date().toISOString(),
+          timestamp: clock.isoString(),
         };
       }
 
@@ -142,7 +140,7 @@ export const createHealthService = (
           status: "unhealthy",
           message: "Cache get operation failed",
           duration: performance.now() - start,
-          timestamp: new Date().toISOString(),
+          timestamp: clock.isoString(),
         };
       }
 
@@ -154,7 +152,7 @@ export const createHealthService = (
         status: "healthy",
         message: "Cache operations working",
         duration: performance.now() - start,
-        timestamp: new Date().toISOString(),
+        timestamp: clock.isoString(),
       };
     } catch (error) {
       return {
@@ -164,7 +162,7 @@ export const createHealthService = (
           error instanceof Error ? error.message : String(error)
         }`,
         duration: performance.now() - start,
-        timestamp: new Date().toISOString(),
+        timestamp: clock.isoString(),
       };
     }
   };
@@ -226,9 +224,9 @@ export const createHealthService = (
 
       const health: SystemHealth = {
         status: overallStatus,
-        timestamp: new Date().toISOString(),
+        timestamp: clock.isoString(),
         version: "1.0.0", // Could be read from package.json or environment
-        uptime: Date.now() - startTime,
+        uptime: clock.timestamp() - startTime,
         checks,
         metrics: getMetrics(),
       };
@@ -249,5 +247,6 @@ export const createHealthService = (
     checkFileSystem,
     checkCache,
     getMetrics,
+    updateMetrics,
   };
 };

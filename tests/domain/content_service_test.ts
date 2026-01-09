@@ -3,24 +3,34 @@ import { createContentService } from "../../src/domain/content.ts";
 import type { FileSystem } from "../../src/ports/file-system.ts";
 import type { Logger } from "../../src/ports/logger.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import { createSlug, type Post, type PostMeta } from "../../src/lib/types.ts";
+import {
+  type AppResult,
+  createSlug,
+  type Post,
+  type PostMeta,
+} from "../../src/lib/types.ts";
+import { err, ok } from "../../src/lib/result.ts";
 
 // Mock FileSystem implementation for testing
 function createMockFileSystem(files: Record<string, string>): FileSystem {
   return {
-    readFile: async (path: string): Promise<string> => {
+    readFile: async (path: string): Promise<AppResult<string>> => {
       if (path in files) {
-        return files[path] ?? "";
+        return ok(files[path] ?? "");
       }
-      throw new Error(`File not found: ${path}`);
+      return err({
+        kind: "IOError",
+        message: `File not found: ${path}`,
+      });
     },
 
-    readDir: async (path: string): Promise<readonly string[]> => {
+    readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
       const prefix = path.endsWith("/") ? path : `${path}/`;
-      return Object.keys(files)
+      const entries = Object.keys(files)
         .filter((filePath) => filePath.startsWith(prefix))
         .map((filePath) => filePath.substring(prefix.length))
         .filter((name) => !name.includes("/"));
+      return ok(entries);
     },
 
     exists: async (path: string): Promise<boolean> => {
