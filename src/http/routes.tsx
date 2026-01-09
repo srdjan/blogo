@@ -342,7 +342,7 @@ export const createRouteHandlers = (
 
   // RSS subscription page
   const rssPage: RouteHandler = async (ctx) => {
-    const postsResult = await contentService.loadPosts();
+    const postsResult = await contentService.loadPostsMetadata();
     return match(postsResult, {
       ok: (posts) => {
         const topicCounts = new Map<string, number>();

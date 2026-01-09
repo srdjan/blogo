@@ -119,7 +119,7 @@ export const staticFiles =
   (publicDir: string): Middleware => (next) => async (req) => {
     const url = new URL(req.url);
 
-    if (req.method !== "GET") {
+    if (req.method !== "GET" && req.method !== "HEAD") {
       return next(req);
     }
 
@@ -140,15 +140,39 @@ export const staticFiles =
 
     try {
       const filePath = `${publicDir}${url.pathname}`;
-      const file = await Deno.readFile(filePath);
-      const contentType = getContentType(filePath);
+      const info = await Deno.stat(filePath);
+      if (!info.isFile) {
+        return new Response("File not found", { status: 404 });
+      }
 
-      return new Response(file, {
-        headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "public, max-age=3600",
-        },
+      const contentType = getContentType(filePath);
+      const headers = new Headers({
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=3600",
+        "Content-Length": info.size.toString(),
       });
+
+      if (info.mtime) {
+        headers.set("Last-Modified", info.mtime.toUTCString());
+        const ims = req.headers.get("if-modified-since");
+        if (ims) {
+          const imsDate = new Date(ims);
+          if (!Number.isNaN(imsDate.getTime())) {
+            const mtimeSeconds = Math.floor(info.mtime.getTime() / 1000);
+            const imsSeconds = Math.floor(imsDate.getTime() / 1000);
+            if (mtimeSeconds <= imsSeconds) {
+              return new Response(null, { status: 304, headers });
+            }
+          }
+        }
+      }
+
+      if (req.method === "HEAD") {
+        return new Response(null, { status: 200, headers });
+      }
+
+      const file = await Deno.readFile(filePath);
+      return new Response(file, { headers });
     } catch {
       return new Response("File not found", { status: 404 });
     }

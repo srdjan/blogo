@@ -1,7 +1,11 @@
 if (window.htmx) {
   window.htmx.config.scrollBehavior = "auto";
   window.htmx.config.scrollIntoViewOnBoost = false;
-  window.htmx.config.getCacheBusterParam = true; // Disable GET request caching
+  const isDevHost = ["localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+  );
+  // Disable GET cache-busting in production for faster back/forward restores
+  window.htmx.config.getCacheBusterParam = isDevHost;
   window.htmx.config.refreshOnHistoryMiss = true; // Refresh on back/forward
 }
 
@@ -122,6 +126,17 @@ const Core = {
   },
 
   setupEventListeners() {
+    const refreshHome = () => {
+      if (window.htmx) {
+        window.htmx.ajax("GET", "/", {
+          target: "#content-area",
+          swap: "innerHTML",
+        });
+        return;
+      }
+      window.location.reload();
+    };
+
     // Persist scroll position before HTMX navigation swaps content
     document.addEventListener("htmx:beforeRequest", () => {
       ScrollRestoration.save();
@@ -134,7 +149,7 @@ const Core = {
       // When returning to home, force a fresh load so view counts reflect the
       // latest increments (avoids reusing HTMX history snapshots).
       if (restoredPath === "/") {
-        window.location.reload();
+        refreshHome();
         return;
       }
 
@@ -148,7 +163,7 @@ const Core = {
     // Fallback for native history navigation (when HTMX doesn't fire)
     window.addEventListener("popstate", () => {
       if (window.location.pathname === "/") {
-        window.location.reload();
+        refreshHome();
       }
     });
 

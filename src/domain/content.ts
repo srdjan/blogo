@@ -12,7 +12,7 @@ import { chainAsync, combine, err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Logger } from "../ports/logger.ts";
-import type { Cache } from "../ports/cache.ts";
+import { createInMemoryCache, type Cache } from "../ports/cache.ts";
 import { markdownToHtml } from "../markdown-renderer.tsx";
 import {
   validateFrontmatter,
@@ -108,6 +108,33 @@ export const createContentService = (
     enableValidation = true,
     analyticsService,
   } = deps;
+
+  const viewCountsCache = createInMemoryCache<Record<string, number>>();
+  const viewCountsCacheKey = "view-counts";
+  const viewCountsCacheTtlMs = 30 * 1000;
+
+  const getAllViewCountsCached = async (): Promise<
+    AppResult<Record<string, number>>
+  > => {
+    if (!analyticsService) {
+      return ok({});
+    }
+
+    const cached = viewCountsCache.get(viewCountsCacheKey);
+    if (cached.ok && cached.value.status === "hit") {
+      return ok(cached.value.value);
+    }
+
+    const result = await analyticsService.getAllViewCounts();
+    if (result.ok) {
+      viewCountsCache.set(
+        viewCountsCacheKey,
+        result.value,
+        viewCountsCacheTtlMs,
+      );
+    }
+    return result;
+  };
 
   const parseMarkdown = async (
     filePath: string,
@@ -308,7 +335,7 @@ export const createContentService = (
       return ok(postsWithoutContent);
     }
 
-    const viewCountsResult = await analyticsService.getAllViewCounts();
+    const viewCountsResult = await getAllViewCountsCached();
     if (!viewCountsResult.ok) {
       logger.warn("Failed to load view counts, returning posts without views");
       const postsWithoutViews = metadataResult.value.map((meta) => ({
@@ -340,7 +367,7 @@ export const createContentService = (
       return postsResult;
     }
 
-    const viewCountsResult = await analyticsService.getAllViewCounts();
+    const viewCountsResult = await getAllViewCountsCached();
     if (!viewCountsResult.ok) {
       logger.warn("Failed to load view counts, returning posts without views");
       return postsResult;
@@ -385,24 +412,35 @@ export const createContentService = (
   const getPostsByTag = async (
     tagName: TagName,
   ): Promise<AppResult<readonly Post[]>> => {
-    const postsResult = await loadPosts();
+    const postsResult = await loadPostsMetadata();
     if (!postsResult.ok) return postsResult;
 
     const needle = normalizeTag(String(tagName));
-    const filteredPosts = postsResult.value.filter((post) =>
+    const filteredMeta = postsResult.value.filter((post) =>
       post.tags
         ? post.tags.some((t) => normalizeTag(String(t)) === needle)
         : false
     );
 
-    return ok(filteredPosts);
+    const posts = filteredMeta.map((meta) => ({
+      ...meta,
+      content: "",
+      formattedDate: formatDate(meta.date),
+    }));
+
+    return ok(posts);
   };
 
   const getTags = async (): Promise<AppResult<readonly TagInfo[]>> => {
-    const postsResult = await loadPosts();
+    const postsResult = await loadPostsMetadata();
     if (!postsResult.ok) return postsResult;
 
-    return ok(aggregateTags(postsResult.value));
+    const posts = postsResult.value.map((meta) => ({
+      ...meta,
+      content: "",
+    }));
+
+    return ok(aggregateTags(posts));
   };
 
   const searchPosts = async (

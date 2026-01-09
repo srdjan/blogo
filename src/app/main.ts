@@ -66,6 +66,12 @@ async function main() {
     analyticsService,
   );
 
+  if (config.env === "production") {
+    contentService.loadPostsMetadataWithViews().catch((error) => {
+      logger.warn("Failed to prewarm posts metadata cache", error);
+    });
+  }
+
   const router = createRouter()
     .get("/", routes.home)
     .get("/about", routes.about)

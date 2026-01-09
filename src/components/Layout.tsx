@@ -180,6 +180,27 @@ export const createLayout = (props: LayoutProps): Response => {
         <meta name="robots" content={robotsMeta} />
         <meta name="theme-color" content="#000000" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/montserrat-v26-latin-regular.woff2"
+          type="font/woff2"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/montserrat-v26-latin-600.woff2"
+          type="font/woff2"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/jetbrains-mono-v18-latin-regular.woff2"
+          type="font/woff2"
+          crossorigin="anonymous"
+        />
         <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
         <link rel="stylesheet" href="/css/vendor/open-props.min.css" />
         <link rel="stylesheet" href="/css/main.css" />
