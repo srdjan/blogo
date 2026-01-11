@@ -1,13 +1,82 @@
 ## <img src="public/images/blogo-logo.png" alt="Blogo Logo" width="60"> A lightweight blog built with modern web technologies
 
+> **See it live:** [blogo.timok.com](https://blogo.timok.com/) - A production blog built entirely with Blogo.
+
 This blog system is built around several key architectural principles:
 
-- **hsx** architecture: Server-side JSX rendering without React overhead, using **HTMX** for dynamic interactions and progressive
-  enhancement
-- **Deno** for minimal dependencies: Leveraging Deno's standard library with
-  minimal external dependencies
+- **hsx** architecture: Server-side JSX rendering without React overhead, using **HTMX** for dynamic interactions and progressive enhancement
+- **Deno** for minimal dependencies: Leveraging Deno's standard library with minimal external dependencies
 - Semantic **HTML**: Clean, accessible markup following modern best practices
 - Pure **CSS**: Minimal, responsive styling without frameworks
+
+## The Superstar Ingredient: hsx
+
+**hsx** is a server-side JSX runtime that delivers the developer experience of React without the runtime cost. It transforms JSX into HTML strings at request time, producing zero JavaScript for the browser to parse.
+
+### What Makes hsx Different
+
+Traditional React sends a JavaScript bundle to the browser that reconstructs the DOM client-side. hsx takes a fundamentally different approach: JSX compiles to VNodes on the server, which render directly to HTML strings. The browser receives pure HTML, ready to display.
+
+```tsx
+// This JSX compiles to a VNode, not React.createElement
+const PostCard = ({ title, excerpt }: { title: string; excerpt: string }) => (
+  <article class="post-card">
+    <h2>{title}</h2>
+    <p>{excerpt}</p>
+  </article>
+);
+
+// renderVNode() converts VNode tree to HTML string
+const html = renderVNode(<PostCard title="Hello" excerpt="World" />);
+// Result: <article class="post-card"><h2>Hello</h2><p>World</p></article>
+```
+
+### HTMX Integration
+
+hsx provides semantic aliases for HTMX attributes, making dynamic behavior declarative in JSX:
+
+```tsx
+// Instead of writing hx-get, hx-target, hx-swap...
+<a
+  href="/posts"
+  get="/posts"           // Maps to hx-get
+  target="#content"      // Maps to hx-target
+  swap="innerHTML"       // Maps to hx-swap
+  pushUrl="true"         // Maps to hx-push-url
+>
+  Load Posts
+</a>
+
+// behavior="boost" enables hx-boost for progressive enhancement
+<body behavior="boost">
+  {/* All links and forms automatically use HTMX */}
+</body>
+```
+
+### Raw HTML Injection
+
+When rendering markdown or other pre-processed HTML, hsx provides a safe escape hatch:
+
+```tsx
+import { html } from "../http/render-vnode.ts";
+
+// html() creates a raw HTML node that bypasses escaping
+const PostContent = ({ content }: { content: string }) => (
+  <section class="content">
+    {html(content)}  {/* Renders HTML directly, not escaped */}
+  </section>
+);
+```
+
+### Why hsx Matters
+
+1. **Zero client-side JavaScript** for rendering: The browser receives HTML, not instructions to build HTML
+2. **Familiar DX**: Write JSX components exactly like React, but without useState, useEffect, or bundle complexity
+3. **Server-side composition**: Components compose on the server where data lives
+4. **HTMX synergy**: Semantic aliases make HTMX feel native to JSX
+5. **Type safety**: Full TypeScript support with proper JSX types
+
+The result is a blog that loads instantly, works without JavaScript, and progressively enhances with HTMX when available.
 
 ## Features
 
@@ -29,11 +98,7 @@ This blog system is built around several key architectural principles:
 
 ## Architecture
 
-The project follows a light functional programming style with TypeScript, and is
-built using an hsx architecture with clean separation of concerns and
-semantic HTML/CSS. This modern approach creates a blog that's not just
-functional, but showcases the future of web development—clean, fast, accessible,
-and maintainable.
+The project follows a light functional programming style with TypeScript, built on the hsx + HTMX architecture. Every page renders server-side through hsx components, while HTMX handles navigation and dynamic updates without full page reloads. This creates a blog that loads instantly, works without JavaScript, and feels like a SPA when JavaScript is available.
 
 ## Getting Started
 
@@ -289,7 +354,7 @@ border-block-start: 1px solid; /* Instead of border-top */
 - CSS Grid with `auto-fit` and `minmax()`
 - Modern color functions and gradients
 
-### ♿ Modern Accessibility Features
+### Modern Accessibility Features
 
 - ARIA roles and properties
 - Proper heading hierarchy
@@ -303,7 +368,7 @@ border-block-start: 1px solid; /* Instead of border-top */
 - HTMX for smooth interactions
 - Graceful degradation
 
-### 🎯 User Experience Enhancements with View Transitions API
+### User Experience Enhancements with View Transitions API
 
 ```css
 /* Smooth page transitions (Chrome/Edge) */
@@ -312,7 +377,7 @@ border-block-start: 1px solid; /* Instead of border-top */
 }
 ```
 
-### 📱 Mobile-First Container-Based Responsive Design
+### Mobile-First Container-Based Responsive Design
 
 ```css
 /* Component-aware responsive design */
@@ -376,22 +441,26 @@ The codebase follows light FP patterns as documented in CLAUDE.md:
 └─────────────────────────────────────────────────────────┘
 ```
 
-### HTML Rendering Solution
+### hsx Rendering Pipeline
 
-The blog properly renders markdown-converted HTML using the custom `html()` function:
+The blog uses hsx's VNode-to-HTML pipeline. Components return VNodes (virtual DOM nodes), which `renderVNode()` recursively converts to HTML strings:
 
 ```tsx
+// Component returns a VNode tree
+const Page = () => (
+  <Layout title="Home">
+    <PostList posts={posts} />
+  </Layout>
+);
+
+// renderVNode() walks the tree and produces HTML
+const htmlString = renderVNode(<Page />);
+
+// For raw HTML (markdown output), use html() to bypass escaping
 import { html } from "../http/render-vnode.ts";
 
-// ✅ Correct: renders HTML properly
-{
-  html(post.content);
-}
-
-// ❌ Incorrect: would escape HTML as a string
-{
-  post.content;
-}
+{html(post.content)}  // Renders as-is, not escaped
+{post.content}        // Would escape HTML entities
 ```
 
 ## Performance
@@ -406,9 +475,9 @@ import { html } from "../http/render-vnode.ts";
 ## Technology Stack
 
 - **Runtime**: Deno v2.x
-- **Rendering**: hsx (server-side JSX without React) with HTMX v2.x for dynamic interactions
-- **Styling**: Modern CSS with design tokens, responsive architecture,
-  light/dark themes
+- **Rendering**: [hsx](https://github.com/srdjan/hsx) (server-side JSX without React) - the core rendering engine that transforms JSX to HTML strings with zero client-side overhead
+- **Interactivity**: HTMX v2.x for dynamic interactions via HTML attributes, seamlessly integrated through hsx semantic aliases
+- **Styling**: Modern CSS with design tokens, responsive architecture, light/dark themes
 - **Syntax Highlighting**: Highlight.js with Atom One Dark theme
 - **Content**: Markdown with YAML frontmatter, parsed by marked
 - **Diagrams**: @rendermaid/core for server-side Mermaid rendering
@@ -444,7 +513,9 @@ import { html } from "../http/render-vnode.ts";
 
 ---
 
-Built with ❤️ by Clodi, Gipiti & Srdjan
+Built with hsx by Claude, GPT, and Srdjan.
+
+**Try it yourself:** Fork the repo and deploy your own blog in minutes with Deno Deploy.
 
 ---
 
