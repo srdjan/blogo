@@ -52,8 +52,7 @@ export const createRouteHandlers = (
 
   const htmlCacheHeaders = isProd
     ? {
-      "Cache-Control":
-        "public, max-age=60, stale-while-revalidate=300",
+      "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
     }
     : {
       "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -233,7 +232,7 @@ export const createRouteHandlers = (
           : ctx.pathname,
         children: (
           <section aria-label="Search">
-            <h2>Search</h2>
+            <h1>Search</h1>
             <p>Please provide a search query.</p>
             <a
               href="/"
@@ -279,7 +278,13 @@ export const createRouteHandlers = (
     const query = ctx.searchParams.get("q");
 
     if (!query) {
-      return new Response("Missing query parameter", { status: 400 });
+      return new Response("Missing query parameter", {
+        status: 400,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "X-Robots-Tag": "noindex, nofollow",
+        },
+      });
     }
 
     const postsResult = await contentService.searchPosts(query);
@@ -288,7 +293,10 @@ export const createRouteHandlers = (
       ok: (posts) => {
         if (posts.length === 0) {
           return new Response(`<p>No posts found for "${query}".</p>`, {
-            headers: { "Content-Type": "text/html" },
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+              "X-Robots-Tag": "noindex, nofollow",
+            },
           });
         }
 
@@ -309,10 +317,20 @@ export const createRouteHandlers = (
           `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
 
         return new Response(html, {
-          headers: { "Content-Type": "text/html" },
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "X-Robots-Tag": "noindex, nofollow",
+          },
         });
       },
-      error: () => new Response("Search failed", { status: 500 }),
+      error: () =>
+        new Response("Search failed", {
+          status: 500,
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Robots-Tag": "noindex, nofollow",
+          },
+        }),
     });
   };
 
@@ -510,6 +528,7 @@ export const createRouteHandlers = (
           headers: {
             "Content-Type": "application/json; charset=utf-8",
             "Cache-Control": "no-cache",
+            "X-Robots-Tag": "noindex, nofollow",
           },
         });
       },
@@ -525,6 +544,7 @@ export const createRouteHandlers = (
           headers: {
             "Content-Type": "application/json; charset=utf-8",
             "Cache-Control": "no-cache",
+            "X-Robots-Tag": "noindex, nofollow",
           },
         });
       },

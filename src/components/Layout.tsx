@@ -183,21 +183,14 @@ export const createLayout = (props: LayoutProps): Response => {
         <link
           rel="preload"
           as="font"
-          href="/fonts/montserrat-v26-latin-regular.woff2"
-          type="font/woff2"
-          crossorigin="anonymous"
-        />
-        <link
-          rel="preload"
-          as="font"
-          href="/fonts/montserrat-v26-latin-600.woff2"
-          type="font/woff2"
-          crossorigin="anonymous"
-        />
-        <link
-          rel="preload"
-          as="font"
           href="/fonts/jetbrains-mono-v18-latin-regular.woff2"
+          type="font/woff2"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/jetbrains-mono-v18-latin-600.woff2"
           type="font/woff2"
           crossorigin="anonymous"
         />
@@ -232,7 +225,7 @@ export const createLayout = (props: LayoutProps): Response => {
         <div id="app-layout">
           <header class="site-header" role="banner">
             <div class="site-branding">
-              <h1 class="site-title">
+              <p class="site-title">
                 <a
                   href="/"
                   get="/"
@@ -243,7 +236,7 @@ export const createLayout = (props: LayoutProps): Response => {
                 >
                   Blogo
                 </a>
-              </h1>
+              </p>
               <p class="site-description">
                 Modern Development Blog
               </p>
@@ -483,8 +476,7 @@ export const createLayout = (props: LayoutProps): Response => {
       "Content-Type": "text/html; charset=utf-8",
       ...(isProd
         ? {
-          "Cache-Control":
-            "public, max-age=60, stale-while-revalidate=300",
+          "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
         }
         : {
           "Cache-Control": "no-cache, no-store, must-revalidate",

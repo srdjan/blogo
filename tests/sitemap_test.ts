@@ -19,14 +19,14 @@ const createPost = (
   draft: false,
 });
 
-Deno.test("generateSitemap - includes static pages", () => {
+Deno.test("generateSitemap - only includes post URLs", () => {
   const sitemap = generateSitemap([], "https://example.com");
 
-  // Should include all static pages
-  assertStringIncludes(sitemap, "<loc>https://example.com/</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/about</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/rss</loc>");
+  // Should not include non-post pages
+  assertEquals(sitemap.includes("<loc>https://example.com/</loc>"), false);
+  assertEquals(sitemap.includes("<loc>https://example.com/about</loc>"), false);
+  assertEquals(sitemap.includes("<loc>https://example.com/tags</loc>"), false);
+  assertEquals(sitemap.includes("<loc>https://example.com/rss</loc>"), false);
 });
 
 Deno.test("generateSitemap - includes post pages", () => {
@@ -45,50 +45,6 @@ Deno.test("generateSitemap - includes post pages", () => {
     sitemap,
     "<loc>https://example.com/posts/test-post-2</loc>",
   );
-});
-
-Deno.test("generateSitemap - includes tag pages from posts", () => {
-  const posts = [
-    createPost("post-1", ["TypeScript", "Deno"]),
-    createPost("post-2", ["TypeScript", "WebDev"]),
-  ];
-
-  const sitemap = generateSitemap(posts, "https://example.com");
-
-  // Should include unique tag pages
-  assertStringIncludes(
-    sitemap,
-    "<loc>https://example.com/tags/TypeScript</loc>",
-  );
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags/Deno</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags/WebDev</loc>");
-});
-
-Deno.test("generateSitemap - deduplicates tags across posts", () => {
-  const posts = [
-    createPost("post-1", ["TypeScript"]),
-    createPost("post-2", ["TypeScript"]),
-  ];
-
-  const sitemap = generateSitemap(posts, "https://example.com");
-
-  // Should only include TypeScript tag once
-  const matches = sitemap.match(
-    /<loc>https:\/\/example\.com\/tags\/TypeScript<\/loc>/g,
-  );
-  assertEquals(matches?.length, 1);
-});
-
-Deno.test("generateSitemap - encodes special characters in tag URLs", () => {
-  const posts = [
-    createPost("post-1", ["C++", "Node.js"]),
-  ];
-
-  const sitemap = generateSitemap(posts, "https://example.com");
-
-  // Should URL encode special characters
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags/C%2B%2B</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags/Node.js</loc>");
 });
 
 Deno.test("generateSitemap - uses modified date when available", () => {
@@ -120,21 +76,11 @@ Deno.test("generateSitemap - sets correct priorities", () => {
 
   const sitemap = generateSitemap(posts, "https://example.com");
 
-  // Check priorities for different page types
-  const homePriority = sitemap.match(
-    /<loc>https:\/\/example\.com\/<\/loc>[\s\S]*?<priority>([\d.]+)<\/priority>/,
-  );
-  assertEquals(homePriority?.[1], "1.0");
-
+  // Posts: 0.9
   const postPriority = sitemap.match(
     /<loc>https:\/\/example\.com\/posts\/post-1<\/loc>[\s\S]*?<priority>([\d.]+)<\/priority>/,
   );
   assertEquals(postPriority?.[1], "0.9");
-
-  const tagPriority = sitemap.match(
-    /<loc>https:\/\/example\.com\/tags\/TypeScript<\/loc>[\s\S]*?<priority>([\d.]+)<\/priority>/,
-  );
-  assertEquals(tagPriority?.[1], "0.6");
 });
 
 Deno.test("generateSitemap - sets correct change frequencies", () => {
@@ -144,30 +90,11 @@ Deno.test("generateSitemap - sets correct change frequencies", () => {
 
   const sitemap = generateSitemap(posts, "https://example.com");
 
-  // Homepage: daily
-  assertStringIncludes(sitemap, "<loc>https://example.com/</loc>");
-  const homeFreq = sitemap.match(
-    /<loc>https:\/\/example\.com\/<\/loc>[\s\S]*?<changefreq>(\w+)<\/changefreq>/,
-  );
-  assertEquals(homeFreq?.[1], "daily");
-
   // Posts: monthly
   const postFreq = sitemap.match(
     /<loc>https:\/\/example\.com\/posts\/post-1<\/loc>[\s\S]*?<changefreq>(\w+)<\/changefreq>/,
   );
   assertEquals(postFreq?.[1], "monthly");
-
-  // Tags: weekly
-  const tagFreq = sitemap.match(
-    /<loc>https:\/\/example\.com\/tags\/TypeScript<\/loc>[\s\S]*?<changefreq>(\w+)<\/changefreq>/,
-  );
-  assertEquals(tagFreq?.[1], "weekly");
-
-  // About: monthly (default)
-  const aboutFreq = sitemap.match(
-    /<loc>https:\/\/example\.com\/about<\/loc>[\s\S]*?<changefreq>(\w+)<\/changefreq>/,
-  );
-  assertEquals(aboutFreq?.[1], "monthly");
 });
 
 Deno.test("generateSitemap - generates valid XML structure", () => {
@@ -205,16 +132,15 @@ Deno.test("generateSitemap - handles posts without tags", () => {
   assertStringIncludes(sitemap, "<loc>https://example.com/posts/post-1</loc>");
   assertStringIncludes(sitemap, "<loc>https://example.com/posts/post-2</loc>");
 
-  // Should still include static tag page
-  assertStringIncludes(sitemap, "<loc>https://example.com/tags</loc>");
+  // Should not include tag pages
+  assertEquals(sitemap.includes("<loc>https://example.com/tags"), false);
 });
 
 Deno.test("generateSitemap - handles empty posts array", () => {
   const sitemap = generateSitemap([], "https://example.com");
 
-  // Should still have static pages
-  assertStringIncludes(sitemap, "<loc>https://example.com/</loc>");
-  assertStringIncludes(sitemap, "<loc>https://example.com/about</loc>");
+  // Should have no <url> entries
+  assertEquals(sitemap.includes("<url>"), false);
 
   // Should be valid XML
   assertStringIncludes(sitemap, '<?xml version="1.0" encoding="UTF-8"?>');

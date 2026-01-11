@@ -12,6 +12,9 @@ export const PostList = (props: {
       aria-label={activeTag ? `Posts tagged ${activeTag}` : "Latest posts"}
     >
       <header class="post-list-header">
+        <h1>
+          {activeTag ? `Posts tagged ${activeTag}` : "Latest posts"}
+        </h1>
         {activeTag && (
           <p>
             <a
