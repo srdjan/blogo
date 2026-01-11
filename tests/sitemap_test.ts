@@ -8,16 +8,22 @@ const createPost = (
   tags: string[] = [],
   date = "2025-01-01",
   modified?: string,
-): Post => ({
-  slug: slug as Slug,
-  title: `Test Post ${slug}`,
-  date,
-  modified,
-  excerpt: "Test excerpt",
-  content: "Test content",
-  tags: tags as unknown as TagName[],
-  draft: false,
-});
+): Post => {
+  const post: Post = {
+    slug: slug as Slug,
+    title: `Test Post ${slug}`,
+    date,
+    excerpt: "Test excerpt",
+    content: "Test content",
+    tags: tags as unknown as TagName[],
+  };
+
+  if (modified !== undefined) {
+    return { ...post, modified };
+  }
+
+  return post;
+};
 
 Deno.test("generateSitemap - only includes post URLs", () => {
   const sitemap = generateSitemap([], "https://example.com");

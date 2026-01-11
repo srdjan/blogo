@@ -8,11 +8,11 @@ import type {
 } from "../lib/types.ts";
 import { createSlug } from "../lib/types.ts";
 import type { Result } from "../lib/result.ts";
-import { chainAsync, combine, err, ok } from "../lib/result.ts";
+import { combine, err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { FileSystem } from "../ports/file-system.ts";
 import type { Logger } from "../ports/logger.ts";
-import { createInMemoryCache, type Cache } from "../ports/cache.ts";
+import { type Cache, createInMemoryCache } from "../ports/cache.ts";
 import { markdownToHtml } from "../markdown-renderer.tsx";
 import {
   validateFrontmatter,

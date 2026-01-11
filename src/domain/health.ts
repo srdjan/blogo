@@ -63,7 +63,7 @@ export const createHealthService = (
   const { fileSystem, cache, postsDir, startTime, clock } = deps;
 
   // Encapsulated metrics state - not global
-  let requestMetrics = {
+  const requestMetrics = {
     total: 0,
     errors: 0,
     totalResponseTime: 0,
@@ -114,7 +114,7 @@ export const createHealthService = (
     };
   };
 
-  const checkCache = async (): Promise<HealthCheck> => {
+  const checkCache = (): Promise<HealthCheck> => {
     const start = performance.now();
 
     try {
@@ -124,38 +124,38 @@ export const createHealthService = (
 
       const setResult = cache.set(testKey, testValue, 1000);
       if (!setResult.ok) {
-        return {
+        return Promise.resolve({
           name: "cache",
           status: "unhealthy",
           message: "Cache set operation failed",
           duration: performance.now() - start,
           timestamp: clock.isoString(),
-        };
+        });
       }
 
       const getResult = cache.get(testKey);
       if (!getResult.ok) {
-        return {
+        return Promise.resolve({
           name: "cache",
           status: "unhealthy",
           message: "Cache get operation failed",
           duration: performance.now() - start,
           timestamp: clock.isoString(),
-        };
+        });
       }
 
       // Clean up test key
       cache.delete(testKey);
 
-      return {
+      return Promise.resolve({
         name: "cache",
         status: "healthy",
         message: "Cache operations working",
         duration: performance.now() - start,
         timestamp: clock.isoString(),
-      };
+      });
     } catch (error) {
-      return {
+      return Promise.resolve({
         name: "cache",
         status: "unhealthy",
         message: `Cache error: ${
@@ -163,7 +163,7 @@ export const createHealthService = (
         }`,
         duration: performance.now() - start,
         timestamp: clock.isoString(),
-      };
+      });
     }
   };
 

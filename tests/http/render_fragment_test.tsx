@@ -1,4 +1,4 @@
-import { assertStringIncludes, assert } from "@std/assert";
+import { assert, assertStringIncludes } from "@std/assert";
 import { renderVNodeForTest } from "../../src/http/render-vnode.ts";
 import { PostList } from "../../src/components/PostList.tsx";
 import { createSlug } from "../../src/lib/types.ts";
@@ -24,10 +24,12 @@ Deno.test("renderVNode handles single vnode child without exposing symbols", () 
 });
 
 Deno.test("renderVNode renders fragments", () => {
-  const fragment = <>
-    <div>A</div>
-    <div>B</div>
-  </>;
+  const fragment = (
+    <>
+      <div>A</div>
+      <div>B</div>
+    </>
+  );
 
   const html = renderVNodeForTest(fragment);
   assertStringIncludes(html, "<div>A</div><div>B</div>");

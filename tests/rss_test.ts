@@ -10,15 +10,21 @@ const createPost = (
   tags: string[] = [],
   excerpt?: string,
   content = "This is test content for the post.",
-): Post => ({
-  slug: slug as Slug,
-  title,
-  date,
-  excerpt,
-  content,
-  tags: tags as unknown as TagName[],
-  draft: false,
-});
+): Post => {
+  const post: Post = {
+    slug: slug as Slug,
+    title,
+    date,
+    content,
+    tags: tags as unknown as TagName[],
+  };
+
+  if (excerpt !== undefined) {
+    return { ...post, excerpt };
+  }
+
+  return post;
+};
 
 Deno.test("generateRSS - generates valid RSS structure", () => {
   const posts = [createPost("test-post", "Test Post", "2025-01-01")];

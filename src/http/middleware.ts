@@ -3,66 +3,66 @@ import type { HealthService } from "../domain/health.ts";
 import { generateRequestId } from "../utils.ts";
 
 // Enhanced access logging with correlation IDs and structured data
-export const createAccessLog = (healthService: HealthService): Middleware =>
-(next) => async (req) => {
-  const correlationId = generateRequestId();
-  const start = performance.now();
-  const url = new URL(req.url);
+export const createAccessLog =
+  (healthService: HealthService): Middleware => (next) => async (req) => {
+    const correlationId = generateRequestId();
+    const start = performance.now();
+    const url = new URL(req.url);
 
-  // Add correlation ID to request headers for downstream services
-  const enhancedReq = new Request(req, {
-    headers: {
-      ...Object.fromEntries(req.headers.entries()),
-      "x-correlation-id": correlationId,
-    },
-  });
-
-  try {
-    const res = await next(enhancedReq);
-    const duration = (performance.now() - start).toFixed(1);
-
-    // Structured logging
-    const logData = {
-      correlationId,
-      method: req.method,
-      path: url.pathname,
-      query: url.search,
-      status: res.status,
-      duration: `${duration}ms`,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      timestamp: new Date().toISOString(),
-    };
-
-    // Update request metrics
-    healthService.updateMetrics(parseFloat(duration), res.status >= 400);
-
-    // Add correlation ID to response headers
-    const headers = new Headers(res.headers);
-    headers.set("x-correlation-id", correlationId);
-
-    return new Response(res.body, {
-      status: res.status,
-      statusText: res.statusText,
-      headers,
+    // Add correlation ID to request headers for downstream services
+    const enhancedReq = new Request(req, {
+      headers: {
+        ...Object.fromEntries(req.headers.entries()),
+        "x-correlation-id": correlationId,
+      },
     });
-  } catch (error) {
-    const duration = (performance.now() - start).toFixed(1);
 
-    // Log error with correlation ID
-    const errorLogData = {
-      correlationId,
-      method: req.method,
-      path: url.pathname,
-      error: error instanceof Error ? error.message : String(error),
-      duration: `${duration}ms`,
-      timestamp: new Date().toISOString(),
-      level: "ERROR",
-    };
+    try {
+      const res = await next(enhancedReq);
+      const duration = (performance.now() - start).toFixed(1);
 
-    console.error(JSON.stringify(errorLogData));
-    throw error;
-  }
-};
+      // Structured logging
+      const _logData = {
+        correlationId,
+        method: req.method,
+        path: url.pathname,
+        query: url.search,
+        status: res.status,
+        duration: `${duration}ms`,
+        userAgent: req.headers.get("user-agent") || "unknown",
+        timestamp: new Date().toISOString(),
+      };
+
+      // Update request metrics
+      healthService.updateMetrics(parseFloat(duration), res.status >= 400);
+
+      // Add correlation ID to response headers
+      const headers = new Headers(res.headers);
+      headers.set("x-correlation-id", correlationId);
+
+      return new Response(res.body, {
+        status: res.status,
+        statusText: res.statusText,
+        headers,
+      });
+    } catch (error) {
+      const duration = (performance.now() - start).toFixed(1);
+
+      // Log error with correlation ID
+      const errorLogData = {
+        correlationId,
+        method: req.method,
+        path: url.pathname,
+        error: error instanceof Error ? error.message : String(error),
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString(),
+        level: "ERROR",
+      };
+
+      console.error(JSON.stringify(errorLogData));
+      throw error;
+    }
+  };
 
 export const timeout = (ms: number): Middleware => (next) => async (req) => {
   const controller = new AbortController();
@@ -130,9 +130,10 @@ export const staticFiles =
       url.pathname === "/favicon.svg" ||
       url.pathname === "/favicon.ico" ||
       url.pathname === "/manifest.json" ||
-      /\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot|wav|mp3|ogg|flac|m4a|aac)$/.test(
-        url.pathname,
-      );
+      /\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot|wav|mp3|ogg|flac|m4a|aac)$/
+        .test(
+          url.pathname,
+        );
 
     if (!isStaticFile) {
       return next(req);

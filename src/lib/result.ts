@@ -102,14 +102,14 @@ export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
   return !result.ok;
 }
 
-export async function chainAsync<T, U, E>(
+export function chainAsync<T, U, E>(
   result: Result<T, E>,
   fn: (value: T) => Promise<Result<U, E>>,
 ): Promise<Result<U, E>> {
   if (result.ok) {
     return fn(result.value);
   }
-  return result;
+  return Promise.resolve(result);
 }
 
 export async function mapAsync<T, U, E>(

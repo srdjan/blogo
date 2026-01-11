@@ -28,11 +28,13 @@ export type HeadingInfo = {
 function extractHeadings(markdown: string): HeadingInfo[] {
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
   const headings: HeadingInfo[] = [];
-  let match;
+  let match: RegExpExecArray | null;
 
   while ((match = headingRegex.exec(markdown)) !== null) {
-    const level = match[1].length;
-    const text = match[2].trim();
+    // RegExp capture groups are guaranteed by the regex, but TS can't infer
+    // that with `noUncheckedIndexedAccess`.
+    const level = match[1]!.length;
+    const text = match[2]!.trim();
     const slug = text
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -99,8 +101,8 @@ function generateRecommendations(
 
   // Check for heading hierarchy
   for (let i = 1; i < headings.length; i++) {
-    const current = headings[i];
-    const previous = headings[i - 1];
+    const current = headings[i]!;
+    const previous = headings[i - 1]!;
 
     if (current.level > previous.level + 1) {
       recommendations.push(

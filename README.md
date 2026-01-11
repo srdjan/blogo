@@ -1,12 +1,17 @@
 # <img src="public/images/blogo-logo.png" alt="Blogo Logo" width="60"> Blogo: A Showcase for hsx
 
-**Blogo** is a production-ready blog that demonstrates what you can build with [hsx](https://github.com/srdjan/hsx), a server-side JSX runtime for Deno. It proves you don't need React, Next.js, or any client-side framework to build fast, modern web applications.
+**Blogo** is a production-ready blog that demonstrates what you can build with
+[hsx](https://github.com/srdjan/hsx), a server-side JSX runtime for Deno. It
+proves you don't need React, Next.js, or any client-side framework to build
+fast, modern web applications.
 
 > **See it live:** [blogo.timok.com](https://blogo.timok.com/)
 
 ## What is hsx?
 
-**hsx** is a server-side JSX runtime that gives you React's developer experience without shipping JavaScript to the browser. Write JSX components, get HTML strings. Zero client-side rendering. Zero hydration. Zero bundle.
+**hsx** is a server-side JSX runtime that gives you React's developer experience
+without shipping JavaScript to the browser. Write JSX components, get HTML
+strings. Zero client-side rendering. Zero hydration. Zero bundle.
 
 ```tsx
 // This is hsx, not React
@@ -26,38 +31,46 @@ The browser receives HTML. Not JavaScript instructions to build HTML. Just HTML.
 
 ## Why hsx Matters
 
-Modern web development has become absurdly complex. React alone ships ~40KB minified, and that's before your app code. Then you need a meta-framework for SSR, a bundler, a build step, hydration logic, and state management. For what? To render HTML.
+Modern web development has become absurdly complex. React alone ships ~40KB
+minified, and that's before your app code. Then you need a meta-framework for
+SSR, a bundler, a build step, hydration logic, and state management. For what?
+To render HTML.
 
 hsx takes a different path:
 
-1. **Zero client-side JavaScript for rendering** - The browser receives HTML, ready to display
-2. **Familiar JSX syntax** - Write components exactly like React, minus useState/useEffect complexity
+1. **Zero client-side JavaScript for rendering** - The browser receives HTML,
+   ready to display
+2. **Familiar JSX syntax** - Write components exactly like React, minus
+   useState/useEffect complexity
 3. **Server-side composition** - Components compose where your data lives
 4. **Type safety** - Full TypeScript support with proper JSX types
 5. **HTMX synergy** - Semantic aliases make HTMX feel native to JSX
 
 ## hsx + HTMX: The Architecture
 
-Blogo demonstrates how hsx and HTMX work together. hsx renders the initial HTML, HTMX handles dynamic updates without page reloads:
+Blogo demonstrates how hsx and HTMX work together. hsx renders the initial HTML,
+HTMX handles dynamic updates without page reloads:
 
 ```tsx
 // hsx provides semantic aliases for HTMX attributes
 <a
   href="/posts"
-  get="/posts"           // Maps to hx-get
-  target="#content"      // Maps to hx-target
-  swap="innerHTML"       // Maps to hx-swap
-  pushUrl="true"         // Maps to hx-push-url
+  get="/posts" // Maps to hx-get
+  target="#content" // Maps to hx-target
+  swap="innerHTML" // Maps to hx-swap
+  pushUrl="true" // Maps to hx-push-url
 >
   Load Posts
-</a>
+</a>;
 ```
 
-The result feels like a SPA but works without JavaScript. Progressive enhancement, not progressive complexity.
+The result feels like a SPA but works without JavaScript. Progressive
+enhancement, not progressive complexity.
 
 ## hsx Rendering Pipeline
 
-Components return VNodes (virtual DOM nodes). The `renderVNode()` function recursively converts them to HTML strings:
+Components return VNodes (virtual DOM nodes). The `renderVNode()` function
+recursively converts them to HTML strings:
 
 ```tsx
 // Component tree
@@ -72,18 +85,22 @@ const htmlString = renderVNode(<Page />);
 
 // For pre-rendered HTML (like markdown), bypass escaping
 import { html } from "./render-vnode.ts";
-{html(post.content)}  // Renders as-is
+{
+  html(post.content);
+} // Renders as-is
 ```
 
 ## What Blogo Demonstrates
 
 This blog showcases hsx capabilities in a real application:
 
-- **Server-side JSX components** - Layout, PostView, PostList, TagCloud, SearchResults
+- **Server-side JSX components** - Layout, PostView, PostList, TagCloud,
+  SearchResults
 - **HTMX integration** - SPA-like navigation without client-side routing
 - **Markdown rendering** - Using `html()` for safe raw HTML injection
 - **Dynamic content** - Search, filtering, pagination via HTMX partial updates
-- **Progressive enhancement** - Works fully without JavaScript, enhanced with HTMX
+- **Progressive enhancement** - Works fully without JavaScript, enhanced with
+  HTMX
 
 ### Blog Features
 
@@ -172,16 +189,16 @@ Every push to `main` triggers automatic deployment.
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| Runtime | Deno v2.x |
-| Rendering | [hsx](https://github.com/srdjan/hsx) (server-side JSX) |
-| Interactivity | HTMX v2.x |
-| Styling | Modern CSS (nesting, container queries, logical properties) |
-| Content | Markdown with marked |
-| Syntax | Highlight.js |
-| Diagrams | @rendermaid/core |
-| Hosting | Deno Deploy |
+| Layer         | Technology                                                  |
+| ------------- | ----------------------------------------------------------- |
+| Runtime       | Deno v2.x                                                   |
+| Rendering     | [hsx](https://github.com/srdjan/hsx) (server-side JSX)      |
+| Interactivity | HTMX v2.x                                                   |
+| Styling       | Modern CSS (nesting, container queries, logical properties) |
+| Content       | Markdown with marked                                        |
+| Syntax        | Highlight.js                                                |
+| Diagrams      | @rendermaid/core                                            |
+| Hosting       | Deno Deploy                                                 |
 
 ## Learn More About hsx
 

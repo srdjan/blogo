@@ -67,7 +67,9 @@
   --content-padding: 1.25rem;
 
   /* === FONTS === */
-  --font-sans: -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-sans:
+    -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI",
+    "Helvetica Neue", sans-serif;
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
 

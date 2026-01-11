@@ -6,6 +6,25 @@ export const About = () => {
         This is my personal, minimal blog built for experimenting with AI agents
         and ability to fine tune custom writing styles.
       </p>
+      <p>
+        Built with{" "}
+        <a
+          href="https://github.com/srdjan/hsx"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          hsx
+        </a>
+        , a server-side JSX runtime I created for Deno. It gives you React's
+        developer experience without shipping JavaScript to the browser. Write
+        JSX components, get HTML strings. Zero client-side rendering, zero
+        hydration, zero bundle. Combined with{" "}
+        <a href="https://htmx.org/" target="_blank" rel="noopener noreferrer">
+          HTMX
+        </a>{" "}
+        for interactivity, this blog loads instantly and works without
+        JavaScript.
+      </p>
 
       <h2>About me</h2>
       <p>

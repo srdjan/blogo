@@ -18,14 +18,15 @@ export type FileInfo = {
 };
 
 export const createFileSystem = (): FileSystem => ({
-  readFile: async (path: string): Promise<AppResult<string>> => {
+  readFile: (path: string): Promise<AppResult<string>> => {
     return tryCatch(
       () => Deno.readTextFile(path),
-      (e) => createError("IOError", `Failed to read file: ${path}`, e, { path }),
+      (e) =>
+        createError("IOError", `Failed to read file: ${path}`, e, { path }),
     );
   },
 
-  readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
+  readDir: (path: string): Promise<AppResult<readonly string[]>> => {
     return tryCatch(
       async () => {
         const entries: string[] = [];
@@ -34,7 +35,10 @@ export const createFileSystem = (): FileSystem => ({
         }
         return entries;
       },
-      (e) => createError("IOError", `Failed to read directory: ${path}`, e, { path }),
+      (e) =>
+        createError("IOError", `Failed to read directory: ${path}`, e, {
+          path,
+        }),
     );
   },
 

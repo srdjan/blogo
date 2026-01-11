@@ -42,7 +42,10 @@ export const createInMemoryCache = <T>(): Cache<T> => {
           return { ok: true, value: { status: "miss" as const } };
         }
 
-        return { ok: true, value: { status: "hit" as const, value: entry.value } };
+        return {
+          ok: true,
+          value: { status: "hit" as const, value: entry.value },
+        };
       } catch {
         return { ok: false, error: "CACHE_ERROR" };
       }

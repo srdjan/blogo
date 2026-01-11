@@ -57,12 +57,12 @@ Deno.test("analyzeSEO - extracts headings correctly", () => {
   const analysis = analyzeSEO("Title", "Description", markdown);
 
   assertEquals(analysis.headingStructure.length, 4);
-  assertEquals(analysis.headingStructure[0].level, 1);
-  assertEquals(analysis.headingStructure[0].text, "Main Heading");
-  assertEquals(analysis.headingStructure[1].level, 2);
-  assertEquals(analysis.headingStructure[1].text, "Second Level");
-  assertEquals(analysis.headingStructure[2].level, 3);
-  assertEquals(analysis.headingStructure[3].level, 2);
+  assertEquals(analysis.headingStructure[0]!.level, 1);
+  assertEquals(analysis.headingStructure[0]!.text, "Main Heading");
+  assertEquals(analysis.headingStructure[1]!.level, 2);
+  assertEquals(analysis.headingStructure[1]!.text, "Second Level");
+  assertEquals(analysis.headingStructure[2]!.level, 3);
+  assertEquals(analysis.headingStructure[3]!.level, 2);
 });
 
 Deno.test("analyzeSEO - generates slugs from headings", () => {
@@ -72,9 +72,12 @@ Deno.test("analyzeSEO - generates slugs from headings", () => {
 
   const analysis = analyzeSEO("Title", "Description", markdown);
 
-  assertEquals(analysis.headingStructure[0].slug, "main-heading-test");
-  assertEquals(analysis.headingStructure[1].slug, "special-characters-symbols");
-  assertEquals(analysis.headingStructure[2].slug, "another-heading");
+  assertEquals(analysis.headingStructure[0]!.slug, "main-heading-test");
+  assertEquals(
+    analysis.headingStructure[1]!.slug,
+    "special-characters-symbols",
+  );
+  assertEquals(analysis.headingStructure[2]!.slug, "another-heading");
 });
 
 Deno.test("analyzeSEO - recommends longer title for short titles", () => {
@@ -255,7 +258,7 @@ Deno.test("generateFAQSchema - includes all FAQ data", () => {
   ];
 
   const schema = generateFAQSchema(faqs);
-  const entity = schema.mainEntity[0];
+  const entity = schema.mainEntity[0]!;
 
   assertEquals(entity["@type"], "Question");
   assertEquals(entity.name, "What is Deno?");
@@ -283,8 +286,8 @@ Deno.test("generateFAQSchema - handles multiple FAQs", () => {
   const schema = generateFAQSchema(faqs);
 
   assertEquals(schema.mainEntity.length, 5);
-  assertEquals(schema.mainEntity[0].name, "Question 1");
-  assertEquals(schema.mainEntity[4].name, "Question 5");
+  assertEquals(schema.mainEntity[0]!.name, "Question 1");
+  assertEquals(schema.mainEntity[4]!.name, "Question 5");
 });
 
 Deno.test("generateHowToSchema - generates valid HowTo schema", () => {
@@ -316,13 +319,13 @@ Deno.test("generateHowToSchema - includes step positions", () => {
 
   const schema = generateHowToSchema("How To", "Description", steps);
 
-  assertEquals(schema.step[0]["@type"], "HowToStep");
-  assertEquals(schema.step[0].position, 1);
-  assertEquals(schema.step[0].name, "First Step");
-  assertEquals(schema.step[0].text, "Start here");
+  assertEquals(schema.step[0]!["@type"], "HowToStep");
+  assertEquals(schema.step[0]!.position, 1);
+  assertEquals(schema.step[0]!.name, "First Step");
+  assertEquals(schema.step[0]!.text, "Start here");
 
-  assertEquals(schema.step[1].position, 2);
-  assertEquals(schema.step[2].position, 3);
+  assertEquals(schema.step[1]!.position, 2);
+  assertEquals(schema.step[2]!.position, 3);
 });
 
 Deno.test("generateHowToSchema - handles empty steps array", () => {
@@ -338,6 +341,6 @@ Deno.test("generateHowToSchema - handles single step", () => {
   const schema = generateHowToSchema("Simple How To", "Description", steps);
 
   assertEquals(schema.step.length, 1);
-  assertEquals(schema.step[0].position, 1);
-  assertEquals(schema.step[0].name, "Only Step");
+  assertEquals(schema.step[0]!.position, 1);
+  assertEquals(schema.step[0]!.name, "Only Step");
 });

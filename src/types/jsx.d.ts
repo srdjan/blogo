@@ -219,7 +219,15 @@ declare namespace JSX {
     "aria-colindex"?: number;
     "aria-colspan"?: number;
     "aria-controls"?: string;
-    "aria-current"?: boolean | "true" | "false" | "page" | "step" | "location" | "date" | "time";
+    "aria-current"?:
+      | boolean
+      | "true"
+      | "false"
+      | "page"
+      | "step"
+      | "location"
+      | "date"
+      | "time";
     "aria-describedby"?: string;
     "aria-details"?: string;
     "aria-disabled"?: boolean | "true" | "false";
@@ -228,7 +236,15 @@ declare namespace JSX {
     "aria-expanded"?: boolean | "true" | "false";
     "aria-flowto"?: string;
     "aria-grabbed"?: boolean | "true" | "false";
-    "aria-haspopup"?: boolean | "true" | "false" | "menu" | "listbox" | "tree" | "grid" | "dialog";
+    "aria-haspopup"?:
+      | boolean
+      | "true"
+      | "false"
+      | "menu"
+      | "listbox"
+      | "tree"
+      | "grid"
+      | "dialog";
     "aria-hidden"?: boolean | "true" | "false";
     "aria-invalid"?: boolean | "true" | "false" | "grammar" | "spelling";
     "aria-keyshortcuts"?: string;
@@ -245,7 +261,12 @@ declare namespace JSX {
     "aria-posinset"?: number;
     "aria-pressed"?: boolean | "true" | "false" | "mixed";
     "aria-readonly"?: boolean | "true" | "false";
-    "aria-relevant"?: "additions" | "additions text" | "all" | "removals" | "text";
+    "aria-relevant"?:
+      | "additions"
+      | "additions text"
+      | "all"
+      | "removals"
+      | "text";
     "aria-required"?: boolean | "true" | "false";
     "aria-roledescription"?: string;
     "aria-rowcount"?: number;
@@ -439,7 +460,14 @@ declare namespace JSX {
     checked?: boolean;
     crossOrigin?: string;
     disabled?: boolean;
-    enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
+    enterKeyHint?:
+      | "enter"
+      | "done"
+      | "go"
+      | "next"
+      | "previous"
+      | "search"
+      | "send";
     form?: string;
     formAction?: string;
     formEncType?: string;

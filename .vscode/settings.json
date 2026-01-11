@@ -1,6 +1,6 @@
 {
-    "editor.tabSize": 2,
-    "zenMode.showTabs": "single",
-    "terminal.integrated.cwd": "${workspaceFolder}",
-    "terminal.integrated.defaultProfile.osx": "zsh"
+  "editor.tabSize": 2,
+  "zenMode.showTabs": "single",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.defaultProfile.osx": "zsh"
 }

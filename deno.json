@@ -16,6 +16,9 @@
     "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
   },
   "fmt": {
+    "exclude": [
+      "public/css/vendor/open-props.min.css"
+    ],
     "options": {
       "indentWidth": 2,
       "lineWidth": 80,
