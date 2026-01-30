@@ -5,7 +5,7 @@ tags: [CSS, HTML, Web Components, HTMX, No-Framework]
 excerpt: An honest look at hsx-ui - a framework-free CSS component library that uses :has() selectors and data attributes to build interactive UIs without a single line of JavaScript framework code.
 ---
 
-# CSS-Only UI Components: A Kanban Board Without JavaScript
+# CSS-Only UI Components: Experiment with hsx-ui
 
 Look at this CSS selector:
 
