@@ -474,8 +474,8 @@ export const createContentService = (
   };
 };
 
-// Helper functions
-function extractFrontmatter(
+// Helper functions - exported for reuse by AT Protocol service
+export function extractFrontmatter(
   text: string,
 ): Result<
   { frontmatter: string; markdown: string },

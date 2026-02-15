@@ -16,6 +16,7 @@ import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
 import { createClock } from "../ports/clock.ts";
 import type { Post, PostMeta } from "../lib/types.ts";
+import { createAtProtoConfig } from "../config/atproto.ts";
 
 async function main() {
   const config = createConfig();
@@ -60,10 +61,16 @@ async function main() {
     clock,
   });
 
+  const atConfig = createAtProtoConfig();
+  if (atConfig) {
+    logger.info(`AT Protocol configured for ${atConfig.did}`);
+  }
+
   const routes = createRouteHandlers(
     contentService,
     healthService,
     analyticsService,
+    atConfig,
   );
 
   if (config.env === "production") {
@@ -90,7 +97,11 @@ async function main() {
     .get("/robots.txt", routes.robots)
     .get("/images/og-default.svg", routes.ogImageDefault)
     .get(/^\/images\/og\/(.+)\.svg$/, routes.ogImagePost)
-    .get("/health", routes.health);
+    .get("/health", routes.health)
+    .get(
+      "/.well-known/site.standard.publication",
+      routes.atprotoVerification,
+    );
 
   // Graceful shutdown setup
   const abortController = new AbortController();

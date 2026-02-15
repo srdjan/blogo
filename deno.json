@@ -13,7 +13,11 @@
     "smoke": "deno test --allow-read --allow-write tests/result_test.ts tests/types_test.ts",
     "frontmatter:check": "deno run --allow-read scripts/check_frontmatter.ts",
     "hooks:install": "git config core.hooksPath .githooks",
-    "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js"
+    "setup": "mkdir -p public/css public/js content/posts && curl -sL https://unpkg.com/htmx.org/dist/htmx.min.js -o public/js/htmx.min.js",
+    "build": "deno run --allow-net --allow-read --allow-env --allow-write src/app/build.ts",
+    "at:publish": "deno run --allow-net --allow-read --allow-env src/app/at-publish.ts",
+    "at:pull": "deno run --allow-net --allow-read --allow-env --allow-write src/app/at-pull.ts",
+    "at:verify": "deno run --allow-net --allow-read --allow-env src/app/at-verify.ts"
   },
   "fmt": {
     "exclude": [

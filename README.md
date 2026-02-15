@@ -5,6 +5,9 @@
 proves you don't need React, Next.js, or any client-side framework to build
 fast, modern web applications.
 
+v2 adds static site generation and AT Protocol integration, giving you
+decentralized content ownership through the Standard.site lexicon.
+
 > **See it live:** [blogo.timok.com](https://blogo.timok.com/)
 
 ## What is hsx?
@@ -112,6 +115,8 @@ This blog showcases hsx capabilities in a real application:
 - Mermaid diagram support
 - RSS feeds
 - SEO optimization with structured data
+- Static site generation (`deno task build`)
+- AT Protocol publishing via Standard.site lexicon
 
 ## Getting Started
 
@@ -138,25 +143,82 @@ Open `http://localhost:8000`
 ```bash
 deno task dev          # Development server with hot reload
 deno task start        # Production server
+deno task build        # Generate static site to _site/
 deno task test         # Run tests
 deno task check        # Type check
 deno task fmt          # Format code
 deno task lint         # Lint code
 ```
 
+### AT Protocol Commands
+
+These require AT Protocol credentials (see [docs/pds-guide.md](docs/pds-guide.md)):
+
+```bash
+deno task at:publish   # Publish all posts to your PDS
+deno task at:pull      # Pull documents from PDS to local markdown
+deno task at:verify    # Verify well-known endpoint and link tags
+```
+
+## Static Site Generation
+
+`deno task build` renders every route (pages, fragments, feeds, sitemaps) into
+a `_site/` directory that can be deployed to any static host. HTMX navigation
+continues to work via pre-rendered fragment files.
+
+```bash
+deno task build
+# Build complete: 98 pages, 42 fragments
+```
+
+When AT Protocol environment variables are set at build time, the static output
+includes the `.well-known/site.standard.publication` endpoint and per-post
+`<link rel="site.standard.document">` tags.
+
+## AT Protocol Integration
+
+Blogo can publish your posts as `site.standard.document` records on any AT
+Protocol Personal Data Server. This gives you decentralized ownership of your
+content - your posts live on the AT Protocol network alongside the rendered
+blog.
+
+The integration is opt-in. Set three environment variables to enable it:
+
+```bash
+ATPROTO_DID=did:plc:your-did
+ATPROTO_HANDLE=yourhandle.bsky.social
+ATPROTO_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+```
+
+With credentials configured, the server exposes a verification endpoint at
+`/.well-known/site.standard.publication` and each post page includes a
+`<link rel="site.standard.document">` tag linking to the corresponding PDS
+record.
+
+See [docs/pds-guide.md](docs/pds-guide.md) for the full setup guide, including
+credential setup, publishing, pulling, and verification.
+
 ## Project Structure
 
 ```
 src/
-  app/main.ts          # Entry point
+  app/
+    main.ts            # Server entry point
+    build.ts           # Static site generator
+    at-publish.ts      # CLI: publish posts to PDS
+    at-pull.ts         # CLI: pull documents from PDS
+    at-verify.ts       # CLI: verify AT Protocol setup
   http/                # Routes, server, middleware
     render-vnode.ts    # hsx VNode to HTML renderer
   components/          # JSX components (Layout, PostView, etc.)
-  domain/              # Business logic
-  ports/               # Dependency interfaces
+  domain/              # Business logic (content, atproto, static-builder)
+  atproto/             # Standard.site lexicon types and mapping
+  config/              # Configuration (atproto env vars)
+  ports/               # Dependency interfaces (filesystem, cache, atproto, writer)
   lib/                 # Core utilities (Result types, etc.)
 content/posts/         # Markdown blog posts
 public/                # Static assets
+docs/                  # Guides (PDS setup)
 ```
 
 ## Creating Content
@@ -187,6 +249,9 @@ Blogo deploys to [Deno Deploy](https://deno.com/deploy) with zero configuration:
 
 Every push to `main` triggers automatic deployment.
 
+Alternatively, generate a static site with `deno task build` and deploy the
+`_site/` directory to any static host (Netlify, Cloudflare Pages, S3, etc.).
+
 ## Technology Stack
 
 | Layer         | Technology                                                  |
@@ -198,7 +263,8 @@ Every push to `main` triggers automatic deployment.
 | Content       | Markdown with marked                                        |
 | Syntax        | Highlight.js                                                |
 | Diagrams      | @rendermaid/core                                            |
-| Hosting       | Deno Deploy                                                 |
+| Protocol      | AT Protocol (Standard.site lexicon)                         |
+| Hosting       | Deno Deploy / any static host                               |
 
 ## Learn More About hsx
 

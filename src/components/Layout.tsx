@@ -17,6 +17,7 @@ export const createLayout = (props: LayoutProps): Response => {
     canonicalPath,
     robots,
     structuredData,
+    atprotoDocUri,
   } = props;
 
   const env = Deno.env.get("DENO_ENV") || "development";
@@ -212,6 +213,9 @@ export const createLayout = (props: LayoutProps): Response => {
           title="Blogo Full RSS Feed"
           type="application/rss+xml"
         />
+        {atprotoDocUri && (
+          <link rel="site.standard.document" href={atprotoDocUri} />
+        )}
 
         <script type="application/ld+json">
           {JSON.stringify(jsonLdPayload)}

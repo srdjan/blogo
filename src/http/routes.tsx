@@ -23,6 +23,8 @@ import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 import { renderVNode } from "./render-vnode.ts";
 import type { RouteContext } from "./types.ts";
+import type { AtProtoConfig } from "../config/atproto.ts";
+import { slugToRkey } from "../atproto/mapping.ts";
 
 export type RouteHandlers = {
   readonly home: RouteHandler;
@@ -40,12 +42,14 @@ export type RouteHandlers = {
   readonly ogImageDefault: RouteHandler;
   readonly ogImagePost: RouteHandler;
   readonly health: RouteHandler;
+  readonly atprotoVerification: RouteHandler;
 };
 
 export const createRouteHandlers = (
   contentService: ContentService,
   healthService: HealthService,
   analyticsService: AnalyticsService,
+  atConfig?: AtProtoConfig | null,
 ): RouteHandlers => {
   const env = Deno.env.get("DENO_ENV") || "development";
   const isProd = env === "production";
@@ -203,6 +207,10 @@ export const createRouteHandlers = (
     // Use existing view count from post (may lag by one view, acceptable for analytics)
     const postWithViews: typeof post = { ...post, viewCount: post.viewCount };
 
+    const atprotoDocUri = atConfig
+      ? `at://${atConfig.did}/site.standard.document/${slugToRkey(slug)}`
+      : undefined;
+
     return renderPage(ctx, {
       title: `${post.title} - Blog`,
       description: post.excerpt || `Read ${post.title}`,
@@ -214,6 +222,7 @@ export const createRouteHandlers = (
       ...(post.modified && { modifiedTime: post.modified }),
       ...(post.tags && { tags: post.tags }),
       author: "Srdjan Strbanovic",
+      ...(atprotoDocUri ? { atprotoDocUri } : {}),
     });
   };
 
@@ -551,6 +560,20 @@ export const createRouteHandlers = (
     });
   };
 
+  const atprotoVerification: RouteHandler = () => {
+    if (!atConfig) {
+      return new Response("Not Found", { status: 404 });
+    }
+
+    const uri = `at://${atConfig.did}/site.standard.publication/self`;
+    return new Response(uri, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "max-age=3600",
+      },
+    });
+  };
+
   return {
     home,
     about,
@@ -567,5 +590,6 @@ export const createRouteHandlers = (
     ogImageDefault,
     ogImagePost,
     health,
+    atprotoVerification,
   };
 };

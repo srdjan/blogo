@@ -89,6 +89,7 @@ export type LayoutProps = {
   readonly canonicalPath?: string;
   readonly robots?: string;
   readonly structuredData?: readonly unknown[] | Record<string, unknown>;
+  readonly atprotoDocUri?: string;
 };
 
 export type AppErrorKind =
