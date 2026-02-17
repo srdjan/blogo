@@ -233,8 +233,8 @@ export function validateMarkdownContent(content: string): AppResult<string> {
     errors.push("Content is too long (maximum 100,000 characters)");
   }
 
-  // Check for broken internal links (basic check)
-  const internalLinkRegex = /\[([^\]]+)\]\(\/[^)]+\)/g;
+  // Check for broken internal links (basic check, excludes image syntax ![...])
+  const internalLinkRegex = /(?<!!)\[([^\]]+)\]\(\/[^)]+\)/g;
   const internalLinks = [...content.matchAll(internalLinkRegex)];
 
   for (const match of internalLinks) {
