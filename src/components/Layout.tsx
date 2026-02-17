@@ -1,6 +1,10 @@
 import type { LayoutProps } from "../lib/types.ts";
 import { renderVNode } from "../http/render-vnode.ts";
 
+// Critical CSS inlined for instant first paint (above-the-fold styles only).
+// The full main.css is loaded asynchronously after this.
+const criticalCss = `@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:400;font-display:swap;src:url("/fonts/jetbrains-mono-v18-latin-regular.woff2") format("woff2")}@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:600;font-display:swap;src:url("/fonts/jetbrains-mono-v18-latin-600.woff2") format("woff2")}:root{--color-bg:#fefdf8;--color-surface:#f3f5f9;--color-text-primary:#1a1a1a;--color-text-secondary:#3a3a3a;--color-text-muted:#6a6a6a;--color-accent:#5b4fc6;--color-accent-hover:#453aa3;--color-accent-subtle:#e8e5f7;--color-border-light:#e8e6df;--color-border:#d4d2c8;--color-border-strong:#2a2a2a;--color-link:#5b4fc6;--color-link-visited:#7b6fd6;--font-size-xs:clamp(0.65rem,0.6rem + 0.2vw,0.75rem);--font-size-sm:clamp(0.75rem,0.7rem + 0.2vw,0.85rem);--font-size-base:clamp(0.8rem,0.75rem + 0.2vw,0.9rem);--font-size-lg:clamp(0.95rem,0.9rem + 0.3vw,1.1rem);--font-size-xl:clamp(1.25rem,1.1rem + 0.75vw,1.6rem);--font-size-2xl:clamp(1.6rem,1.3rem + 1.5vw,2.4rem);--font-size-md:1rem;--font-size-3:1.25rem;--font-size-4:1.5rem;--space-xs:0.5rem;--space-sm:0.75rem;--space-md:1rem;--space-lg:1.5rem;--space-xl:2.5rem;--space-2xl:4rem;--space-3xl:4rem;--content-width:min(80vw,72rem);--content-padding:1.25rem;--font-sans:-apple-system,".SFNSText-Regular","San Francisco","Roboto","Segoe UI","Helvetica Neue",sans-serif;--font-mono:"JetBrains Mono","Fira Code","Cascadia Code",ui-monospace,monospace;--transition-speed:300ms;--transition-easing:cubic-bezier(0.4,0,0.2,1)}@media(prefers-color-scheme:dark){:root{--color-bg:#1c1b18;--color-surface:#252420;--color-text-primary:#e8e6e1;--color-text-secondary:#c4c2bc;--color-text-muted:#8a8983;--color-accent:#9b8fe8;--color-accent-hover:#b5abf0;--color-accent-subtle:#2d2940;--color-border-light:#333229;--color-border:#444339;--color-border-strong:#666;--color-link:#9b8fe8;--color-link-visited:#b9a8f5}}[data-theme="dark"]{--color-bg:#1c1b18;--color-surface:#252420;--color-text-primary:#e8e6e1;--color-text-secondary:#c4c2bc;--color-text-muted:#8a8983;--color-accent:#9b8fe8;--color-accent-hover:#b5abf0;--color-accent-subtle:#2d2940;--color-border-light:#333229;--color-border:#444339;--color-border-strong:#666;--color-link:#9b8fe8;--color-link-visited:#b9a8f5}[data-theme="light"]{--color-bg:#fefdf8;--color-surface:#f9f8f3;--color-text-primary:#1a1a1a;--color-text-secondary:#3a3a3a;--color-text-muted:#6a6a6a;--color-accent:#5b4fc6;--color-accent-hover:#453aa3;--color-accent-subtle:#e8e5f7;--color-border-light:#e8e6df;--color-border:#d4d2c8;--color-border-strong:#2a2a2a;--color-link:#5b4fc6;--color-link-visited:#7b6fd6}[data-palette="automerge"]{--color-bg:#fff6e5;--color-surface:#fffdfa;--color-text-primary:#232016;--color-text-secondary:#4a4332;--color-text-muted:#7a715c;--color-accent:#2b6de9;--color-accent-hover:#1e4fcb;--color-accent-subtle:#e6efff;--color-border-light:#eadfcb;--color-border:#e1d5bd;--color-border-strong:#232016;--color-link:#2b6de9;--color-link-visited:#6a95ff}html[data-palette="automerge"][data-theme="dark"]{--color-bg:#1e1c17;--color-surface:#24211b;--color-text-primary:#f5efe4;--color-text-secondary:#d8d2c6;--color-text-muted:#a59d8d;--color-accent:#ffd24a;--color-accent-hover:#ffcc33;--color-border-light:#3a352b;--color-border:#4a4336;--color-border-strong:#f5efe4;--color-link:#6aa0ff;--color-link-visited:#8bb4ff}*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html{height:100%;scroll-behavior:auto}body{font-family:var(--font-sans);font-size:var(--font-size-base);color:var(--color-text-primary);background-color:var(--color-bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh}.skip-link{position:absolute;left:-999px;top:0.5rem;background-color:var(--color-accent);color:#fff;padding:var(--space-xs) var(--space-sm);border-radius:4px;z-index:1000}.skip-link:focus,.skip-link:focus-visible{left:1rem}.site-header{padding:var(--space-md) var(--content-padding) var(--space-md);text-align:center;border-bottom:2px solid var(--color-border-strong)}.site-branding{display:flex;flex-direction:column;align-items:center;gap:var(--space-xs)}.site-branding .site-title{margin-bottom:0}.site-branding .site-title a{color:var(--color-text-primary)}.site-title{font-size:var(--font-size-2xl);margin-bottom:var(--space-sm);text-transform:uppercase;letter-spacing:-0.03em;font-weight:700;line-height:1.2}.site-description{font-size:var(--font-size-sm);color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.1em}.site-nav{margin-top:var(--space-lg)}.site-nav ul{list-style:none;display:flex;justify-content:center;gap:var(--space-lg);flex-wrap:wrap}.site-nav a{font-family:var(--font-mono);font-size:var(--font-size-md);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-primary);padding:var(--space-xs) var(--space-sm);border-bottom:2px solid transparent;text-decoration:none}.site-nav button{background:none;border:none;cursor:pointer;font-family:inherit;font-size:inherit;padding:var(--space-xs);color:var(--color-text-primary)}.site-nav svg{width:20px;height:20px}.main-content{max-width:var(--content-width);margin:0 auto;padding:var(--space-md) var(--content-padding)}a{color:var(--color-link);text-decoration:none}h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.2;letter-spacing:-0.02em;margin-bottom:var(--space-md)}`;
+
 export const createLayout = (props: LayoutProps): Response => {
   const {
     title,
@@ -188,18 +192,16 @@ export const createLayout = (props: LayoutProps): Response => {
           type="font/woff2"
           crossorigin="anonymous"
         />
+        <style>{criticalCss}</style>
         <link
           rel="preload"
-          as="font"
-          href="/fonts/jetbrains-mono-v18-latin-600.woff2"
-          type="font/woff2"
-          crossorigin="anonymous"
+          href="/css/main.css"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'"
         />
-        <link rel="stylesheet" href="/css/vendor/normalize.min.css" />
-        <link rel="stylesheet" href="/css/vendor/open-props.min.css" />
-        <link rel="stylesheet" href="/css/main.css" />
-        {/* Self-hosted fonts for improved performance */}
-        <link rel="stylesheet" href="/fonts/fonts.css" />
+        <noscript>
+          <link rel="stylesheet" href="/css/main.css" />
+        </noscript>
         <link rel="manifest" href="/manifest.json" />
         <link
           rel="alternate"

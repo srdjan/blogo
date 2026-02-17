@@ -4,6 +4,24 @@
    ==================================== */
 
 /* ====================================
+   SELF-HOSTED FONTS
+   ==================================== */
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-v18-latin-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-v18-latin-600.woff2") format("woff2");
+}
+
+/* ====================================
    DESIGN SYSTEM FOUNDATION
    ==================================== */
 :root {
@@ -53,6 +71,11 @@
   --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.6rem);
   --font-size-2xl: clamp(1.6rem, 1.3rem + 1.5vw, 2.4rem);
 
+  /* Formerly from open-props */
+  --font-size-md: 1rem;
+  --font-size-3: 1.25rem;
+  --font-size-4: 1.5rem;
+
   /* === SPACING SCALE === */
   --space-xs: 0.5rem; /* 8px */
   --space-sm: 0.75rem; /* 12px */
@@ -92,6 +115,15 @@
 html {
   height: 100%;
   scroll-behavior: auto;
+}
+
+/* Normalize: search input appearance */
+input[type="search"] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
 }
 
 body {

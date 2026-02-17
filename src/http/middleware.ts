@@ -147,9 +147,13 @@ export const staticFiles =
       }
 
       const contentType = getContentType(filePath);
+      const isFingerprinted = /\.[a-f0-9]{16}\.\w+$/.test(url.pathname);
+      const cacheControl = isFingerprinted
+        ? "public, max-age=31536000, immutable"
+        : "public, max-age=3600";
       const headers = new Headers({
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": cacheControl,
         "Content-Length": info.size.toString(),
       });
 
