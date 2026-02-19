@@ -62,17 +62,12 @@ const Core = {
   },
 
   initTheme() {
-    // Get saved theme or default to system preference
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark =
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
-
-    // Apply theme
-    document.documentElement.setAttribute("data-theme", theme);
+    // Theme attribute is already set by the inline <script> in <head> to
+    // prevent FOUC. Here we only sync the icon state and attach listeners.
+    const theme =
+      document.documentElement.getAttribute("data-theme") || "light";
     this.updateThemeIcon(theme);
 
-    // Listen for theme toggle button clicks
     const themeToggle = document.querySelector(".theme-toggle");
     if (themeToggle) {
       themeToggle.addEventListener("click", () => this.toggleTheme());
@@ -80,14 +75,8 @@ const Core = {
   },
 
   initPalette() {
-    // Get saved palette or default to 'automerge'
-    const savedPalette = localStorage.getItem("palette");
-    const palette = savedPalette || "automerge";
-
-    // Apply palette
-    document.documentElement.setAttribute("data-palette", palette);
-
-    // Listen for palette toggle button clicks
+    // Palette attribute is already set by the inline <script> in <head>.
+    // Only attach the toggle listener here.
     const paletteToggle = document.querySelector(".palette-toggle");
     if (paletteToggle) {
       paletteToggle.addEventListener("click", () => this.togglePalette());
