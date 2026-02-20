@@ -2,8 +2,7 @@ import { startServer } from "../http/server.ts";
 import { createRouter } from "../http/router.ts";
 import {
   compress,
-  createAccessLog,
-  etag,
+  createRequestTracking,
   staticFiles,
 } from "../http/middleware.ts";
 import { createRouteHandlers } from "../http/routes.tsx";
@@ -73,9 +72,23 @@ async function main() {
     atConfig,
   );
 
+  // Pre-warm all caches at startup (production only)
   if (config.env === "production") {
-    contentService.loadPostsMetadataWithViews().catch((error) => {
-      logger.warn("Failed to prewarm posts metadata cache", error);
+    const warmStart = performance.now();
+    Promise.all([
+      contentService.loadPosts(),
+      contentService.loadPostsMetadataWithViews(),
+    ]).then(([postsResult, _metaResult]) => {
+      // Populate individual post cache entries
+      if (postsResult.ok) {
+        for (const post of postsResult.value) {
+          postCache.set(post.slug as string, post, Infinity);
+        }
+      }
+      const elapsed = (performance.now() - warmStart).toFixed(0);
+      logger.info(`Cache pre-warming completed in ${elapsed}ms`);
+    }).catch((error) => {
+      logger.warn("Failed to prewarm caches", error);
     });
   }
 
@@ -111,10 +124,9 @@ async function main() {
     hostname: config.server.host,
     signal: abortController.signal,
     middlewares: [
-      createAccessLog(healthService),
-      compress(),
-      etag,
       staticFiles("public"),
+      createRequestTracking(healthService),
+      compress(),
     ],
     beforeStart: () => {
       logger.info(`Starting blog server in ${config.env} mode`);
@@ -125,6 +137,45 @@ async function main() {
       return new Response("Internal Server Error", { status: 500 });
     },
   });
+
+  // File watcher for cache invalidation (production only)
+  if (config.env === "production") {
+    let rewarmInProgress = false;
+    const watcher = Deno.watchFs(config.blog.postsDir);
+    (async () => {
+      for await (const event of watcher) {
+        if (!["modify", "create", "remove"].includes(event.kind)) continue;
+        if (rewarmInProgress) continue;
+
+        rewarmInProgress = true;
+        logger.info(`File change detected (${event.kind}), invalidating caches`);
+
+        // Clear all caches
+        cache.clear();
+        metadataCache.clear();
+        postCache.clear();
+        routes.clearHtmlCache();
+
+        // Re-warm
+        try {
+          const [postsResult] = await Promise.all([
+            contentService.loadPosts(),
+            contentService.loadPostsMetadataWithViews(),
+          ]);
+          if (postsResult.ok) {
+            for (const post of postsResult.value) {
+              postCache.set(post.slug as string, post, Infinity);
+            }
+          }
+          logger.info("Cache re-warming completed after file change");
+        } catch (error) {
+          logger.warn("Failed to re-warm caches after file change", error);
+        } finally {
+          rewarmInProgress = false;
+        }
+      }
+    })();
+  }
 
   const shutdown = () => {
     logger.info("Shutting down server...");

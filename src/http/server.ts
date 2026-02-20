@@ -1,24 +1,11 @@
 import type { Handler, Middleware, ServerOptions } from "./types.ts";
-import { errorBoundary, performanceMonitoring } from "./middleware.ts";
-import { generateRequestId } from "../utils.ts";
+import { errorBoundary } from "./middleware.ts";
 
 const compose = (
   handler: Handler,
   middlewares: readonly Middleware[] = [],
 ): Handler =>
   middlewares.reduceRight((next, middleware) => middleware(next), handler);
-
-// Generate request ID for tracing
-const requestId = (): Middleware => (next) => async (req) => {
-  const id = generateRequestId();
-  const enhancedReq = new Request(req, {
-    headers: {
-      ...Object.fromEntries(req.headers.entries()),
-      "x-request-id": id,
-    },
-  });
-  return await next(enhancedReq);
-};
 
 // Enhanced error recovery with structured logging
 const recover =
@@ -30,7 +17,6 @@ const recover =
     } catch (error) {
       const correlationId = req.headers.get("x-correlation-id") || "unknown";
 
-      // Log the error with context
       const errorLog = {
         correlationId,
         requestId: req.headers.get("x-request-id") || "unknown",
@@ -67,8 +53,6 @@ export function startServer(
 ): Deno.HttpServer {
   const wrapped = compose(handler, [
     errorBoundary,
-    performanceMonitoring,
-    requestId(),
     recover(options.onError),
     ...(options.middlewares ?? []),
   ]);

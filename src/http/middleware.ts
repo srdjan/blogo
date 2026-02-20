@@ -410,6 +410,60 @@ export const errorBoundary: Middleware = (next) => async (req) => {
   }
 };
 
+// Combined request tracking: request ID, correlation ID, access log, perf monitoring
+export const createRequestTracking =
+  (healthService: HealthService): Middleware => (next) => async (req) => {
+    const id = generateRequestId();
+    const start = performance.now();
+    const url = new URL(req.url);
+
+    // Single Request construction with both IDs
+    const enhancedReq = new Request(req, {
+      headers: {
+        ...Object.fromEntries(req.headers.entries()),
+        "x-request-id": id,
+        "x-correlation-id": id,
+      },
+    });
+
+    try {
+      const res = await next(enhancedReq);
+      const duration = performance.now() - start;
+
+      // Update health metrics
+      healthService.updateMetrics(duration, res.status >= 400);
+
+      // Log slow requests inline (>1000ms)
+      if (duration > 1000) {
+        console.warn(JSON.stringify({
+          correlationId: id,
+          method: req.method,
+          path: url.pathname,
+          duration: `${duration.toFixed(1)}ms`,
+          timestamp: new Date().toISOString(),
+          level: "WARN",
+          type: "SLOW_REQUEST",
+        }));
+      }
+
+      // Mutate response headers directly instead of creating new Response
+      res.headers.set("x-correlation-id", id);
+      return res;
+    } catch (error) {
+      const duration = performance.now() - start;
+      console.error(JSON.stringify({
+        correlationId: id,
+        method: req.method,
+        path: url.pathname,
+        error: error instanceof Error ? error.message : String(error),
+        duration: `${duration.toFixed(1)}ms`,
+        timestamp: new Date().toISOString(),
+        level: "ERROR",
+      }));
+      throw error;
+    }
+  };
+
 // Performance monitoring middleware
 export const performanceMonitoring: Middleware = (next) => async (req) => {
   const start = performance.now();

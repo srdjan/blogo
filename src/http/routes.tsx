@@ -25,6 +25,7 @@ import { renderVNode } from "./render-vnode.ts";
 import type { RouteContext } from "./types.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
 import { slugToRkey } from "../atproto/mapping.ts";
+import { type Cache, createInMemoryCache } from "../ports/cache.ts";
 
 export type RouteHandlers = {
   readonly home: RouteHandler;
@@ -43,6 +44,7 @@ export type RouteHandlers = {
   readonly ogImagePost: RouteHandler;
   readonly health: RouteHandler;
   readonly atprotoVerification: RouteHandler;
+  readonly clearHtmlCache: () => void;
 };
 
 export const createRouteHandlers = (
@@ -85,6 +87,57 @@ export const createRouteHandlers = (
     props: Parameters<typeof createLayout>[0],
   ): Response => {
     return isHtmxRequest(ctx.req) ? renderFragment(props) : createLayout(props);
+  };
+
+  // HTML response cache: caches rendered HTML keyed by route path
+  const htmlCache: Cache<string> = createInMemoryCache<string>();
+  const htmlCacheTtlMs = isProd ? Infinity : 0;
+
+  const clearHtmlCache = (): void => {
+    htmlCache.clear();
+  };
+
+  const cachedRender = (
+    handler: RouteHandler,
+  ): RouteHandler =>
+  async (ctx) => {
+    if (htmlCacheTtlMs === 0) return handler(ctx);
+
+    const prefix = isHtmxRequest(ctx.req) ? "htmx:" : "page:";
+    const cacheKey = `${prefix}${ctx.pathname}`;
+
+    const cached = htmlCache.get(cacheKey);
+    if (cached.ok && cached.value.status === "hit") {
+      const contentType = prefix === "htmx:"
+        ? "text/html; charset=utf-8"
+        : "text/html; charset=utf-8";
+      return new Response(cached.value.value, {
+        headers: {
+          "Content-Type": contentType,
+          ...htmlCacheHeaders,
+          "Vary": "HX-Request",
+          "X-Cache": "HIT",
+        },
+      });
+    }
+
+    const response = await handler(ctx);
+
+    // Only cache successful HTML responses
+    if (response.status === 200) {
+      const body = await response.text();
+      htmlCache.set(cacheKey, body, htmlCacheTtlMs);
+      return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: new Headers([
+          ...response.headers.entries(),
+          ["X-Cache", "MISS"],
+        ]),
+      });
+    }
+
+    return response;
   };
 
   const home: RouteHandler = async (ctx) => {
@@ -575,15 +628,15 @@ export const createRouteHandlers = (
   };
 
   return {
-    home,
-    about,
-    tags,
-    tagPosts,
-    post,
+    home: cachedRender(home),
+    about: cachedRender(about),
+    tags: cachedRender(tags),
+    tagPosts: cachedRender(tagPosts),
+    post: cachedRender(post),
     search,
     searchModal,
     rss,
-    rssPage,
+    rssPage: cachedRender(rssPage),
     rssByTopic,
     sitemap,
     robots,
@@ -591,5 +644,6 @@ export const createRouteHandlers = (
     ogImagePost,
     health,
     atprotoVerification,
+    clearHtmlCache,
   };
 };

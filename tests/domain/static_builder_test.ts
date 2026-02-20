@@ -112,6 +112,7 @@ function createMockRoutes(): RouteHandlers {
     ogImagePost: svgHandler,
     health: htmlHandler,
     atprotoVerification: textHandler,
+    clearHtmlCache: () => {},
   };
 }
 

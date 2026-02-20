@@ -111,7 +111,24 @@ export const createContentService = (
 
   const viewCountsCache = createInMemoryCache<Record<string, number>>();
   const viewCountsCacheKey = "view-counts";
-  const viewCountsCacheTtlMs = 30 * 1000;
+  const viewCountsCacheTtlMs = 5 * 60 * 1000; // 5 minutes
+  let lastKnownViewCounts: Record<string, number> | null = null;
+  let viewCountsRefreshInFlight = false;
+
+  const refreshViewCountsInBackground = (): void => {
+    if (viewCountsRefreshInFlight || !analyticsService) return;
+    viewCountsRefreshInFlight = true;
+    analyticsService.getAllViewCounts().then((result) => {
+      if (result.ok) {
+        lastKnownViewCounts = result.value;
+        viewCountsCache.set(viewCountsCacheKey, result.value, viewCountsCacheTtlMs);
+      }
+    }).catch(() => {
+      // Silently ignore background refresh errors
+    }).finally(() => {
+      viewCountsRefreshInFlight = false;
+    });
+  };
 
   const getAllViewCountsCached = async (): Promise<
     AppResult<Record<string, number>>
@@ -125,8 +142,16 @@ export const createContentService = (
       return ok(cached.value.value);
     }
 
+    // Cache miss: return stale data immediately if available, refresh in background
+    if (lastKnownViewCounts !== null) {
+      refreshViewCountsInBackground();
+      return ok(lastKnownViewCounts);
+    }
+
+    // First-ever load: must block
     const result = await analyticsService.getAllViewCounts();
     if (result.ok) {
+      lastKnownViewCounts = result.value;
       viewCountsCache.set(
         viewCountsCacheKey,
         result.value,
@@ -292,7 +317,7 @@ export const createContentService = (
     const result = await loadPostsFromDisk();
 
     if (result.ok) {
-      cache.set("posts", result.value, 30 * 60 * 1000); // 30 minutes TTL
+      cache.set("posts", result.value, Infinity);
     }
 
     return result;
@@ -312,7 +337,7 @@ export const createContentService = (
     const result = await loadPostsMetadataFromDisk();
 
     if (result.ok) {
-      metadataCache.set("metadata", result.value, 30 * 60 * 1000); // 30 minutes TTL
+      metadataCache.set("metadata", result.value, Infinity);
     }
 
     return result;
@@ -404,7 +429,7 @@ export const createContentService = (
     // Parse the single post directly
     const postResult = await parseMarkdown(filePath, slug);
     if (postResult.ok) {
-      postCache.set(slug as string, postResult.value, 30 * 60 * 1000);
+      postCache.set(slug as string, postResult.value, Infinity);
     }
     return postResult;
   };
