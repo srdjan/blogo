@@ -27,12 +27,18 @@ const sanitizeHtml = (html: string): string => {
 // Custom renderer for mermaid blocks
 const renderer = new marked.Renderer();
 
+const isMermaidLanguage = (lang?: string): boolean => {
+  if (!lang) return false;
+  const normalized = lang.trim().toLowerCase();
+  return /^mermaid(?:$|[\s{])/.test(normalized);
+};
+
 renderer.code = function (token) {
   // Handle the new marked API where token is an object
   const code = token.text;
   const lang = token.lang;
 
-  if (lang === "mermaid") {
+  if (isMermaidLanguage(lang)) {
     return renderMermaidToSVG(code);
   }
 
@@ -46,7 +52,7 @@ renderer.code = function (token) {
         `Failed to highlight code block with language "${lang}":`,
         err,
       );
-      return `<pre><code class="language-${lang}">${code}</code></pre>`;
+      return `<pre><code class="language-${escapeHtml(lang)}">${escapeHtml(code)}</code></pre>`;
     }
   }
 
@@ -56,7 +62,7 @@ renderer.code = function (token) {
     return `<pre><code class="hljs">${highlighted}</code></pre>`;
   } catch (_err) {
     // Final fallback - plain code
-    return `<pre><code>${code}</code></pre>`;
+    return `<pre><code>${escapeHtml(code)}</code></pre>`;
   }
 };
 

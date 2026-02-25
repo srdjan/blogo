@@ -11,15 +11,45 @@ import { createInMemoryCache } from "./ports/cache.ts";
 import { err, match, ok } from "./lib/result.ts";
 import type { AppResult } from "./lib/types.ts";
 import { createError } from "./lib/error.ts";
+import { escapeHtml, escapeXml } from "./utils.ts";
 
 // === SVG Cache ===
 
 const svgCache = createInMemoryCache<string>();
 
+const normalizeMermaidText = (text: string): string =>
+  text
+    .replace(/\r\n?/g, "\n")
+    .trim();
+
+const stableStringify = (value: unknown): string => {
+  if (value === null || typeof value !== "object") {
+    return JSON.stringify(value);
+  }
+
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(",")}]`;
+  }
+
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  return `{${
+    entries.map(([k, v]) => `${JSON.stringify(k)}:${stableStringify(v)}`).join(
+      ",",
+    )
+  }}`;
+};
+
 const buildCacheKey = (
   text: string,
   config?: Partial<SvgConfig>,
-): string => config ? `${text}\0${JSON.stringify(config)}` : text;
+): string => {
+  const normalizedText = normalizeMermaidText(text);
+  if (!config) return normalizedText;
+  return `${normalizedText}\0${stableStringify(config)}`;
+};
 
 // === Configuration ===
 
@@ -58,7 +88,9 @@ const calculateDynamicConfig = (analysis: {
 // === Error HTML rendering ===
 
 const renderErrorHtml = (message: string): string =>
-  `<div class="mermaid-error"><strong>Mermaid Error:</strong> ${message}</div>`;
+  `<div class="mermaid-error"><strong>Mermaid Error:</strong> ${
+    escapeHtml(message)
+  }</div>`;
 
 // === Public API ===
 
@@ -83,23 +115,8 @@ export const renderMermaidWithConfig = (
   });
 };
 
-export const renderMermaidToSVG = (mermaidText: string): string => {
-  const cacheKey = buildCacheKey(mermaidText);
-  const cacheResult = svgCache.get(cacheKey);
-  if (cacheResult.ok && cacheResult.value.status === "hit") {
-    return cacheResult.value.value;
-  }
-
-  const result = renderMermaidDiagramCore(mermaidText);
-
-  return match(result, {
-    ok: (svg) => {
-      svgCache.set(cacheKey, svg);
-      return svg;
-    },
-    error: (e) => renderErrorHtml(e.message),
-  });
-};
+export const renderMermaidToSVG = (mermaidText: string): string =>
+  renderMermaidWithConfig(mermaidText);
 
 // === Core rendering ===
 
@@ -108,16 +125,16 @@ const renderMermaidDiagramCore = (
   customConfig?: Partial<SvgConfig>,
 ): AppResult<string> => {
   try {
-    const trimmedText = mermaidText.trim();
+    const trimmedText = normalizeMermaidText(mermaidText);
 
-    if (trimmedText.startsWith("graph ")) {
+    if (trimmedText.toLowerCase().startsWith("graph ")) {
       return err(createError(
         "RenderError",
         "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
       ));
     }
 
-    if (trimmedText.startsWith("sequenceDiagram")) {
+    if (trimmedText.toLowerCase().startsWith("sequencediagram")) {
       return err(createError(
         "RenderError",
         "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
@@ -144,7 +161,8 @@ const renderMermaidDiagramCore = (
     }
 
     const enhancedAST = enhanceAST(ast);
-    const analysis = analyzeAST(enhancedAST);
+    const sanitizedAST = sanitizeAstLabels(enhancedAST);
+    const analysis = analyzeAST(sanitizedAST);
 
     const finalConfig = customConfig
       ? { ...calculateDynamicConfig(analysis), ...customConfig }
@@ -154,7 +172,7 @@ const renderMermaidDiagramCore = (
       ? withPerformanceMonitoring(renderSvg, "Complex Mermaid Rendering")
       : renderSvg;
 
-    const svgResult = renderFunction(enhancedAST, finalConfig);
+    const svgResult = renderFunction(sanitizedAST, finalConfig);
 
     if (!svgResult.success) {
       return err(createError(
@@ -172,20 +190,50 @@ const renderMermaidDiagramCore = (
 };
 
 const wrapSvgWithClass = (svgContent: string): string => {
-  if (svgContent.includes('class="mermaid-diagram"')) {
+  const svgTagMatch = svgContent.match(/<svg\b[^>]*>/i);
+  if (!svgTagMatch) {
     return svgContent;
   }
-  return svgContent.replace(
-    /<svg([^>]*)>/,
-    '<svg$1 class="mermaid-diagram">',
-  );
+
+  const svgTag = svgTagMatch[0];
+  if (
+    /class\s*=\s*["'][^"']*\bmermaid-diagram\b[^"']*["']/i.test(svgTag)
+  ) {
+    return svgContent;
+  }
+
+  let updatedTag = svgTag;
+  if (/class\s*=/.test(svgTag)) {
+    updatedTag = svgTag.replace(
+      /class\s*=\s*(["'])([^"']*)\1/i,
+      (_match, quote: string, classNames: string) => {
+        const merged = `${classNames} mermaid-diagram`.trim();
+        return `class=${quote}${merged}${quote}`;
+      },
+    );
+  } else {
+    const classAttr = ' class="mermaid-diagram"';
+    updatedTag = /\/>$/.test(svgTag)
+      ? svgTag.replace(/\s*\/>$/, `${classAttr} />`)
+      : svgTag.replace(/>$/, `${classAttr}>`);
+  }
+
+  return svgContent.replace(svgTag, updatedTag);
 };
 
 // === Utility Functions ===
 
 export const isValidMermaidSyntax = (mermaidText: string): boolean => {
   try {
-    const parseResult = parseMermaid(mermaidText.trim());
+    const normalized = normalizeMermaidText(mermaidText);
+    if (
+      normalized.toLowerCase().startsWith("graph ") ||
+      normalized.toLowerCase().startsWith("sequencediagram")
+    ) {
+      return false;
+    }
+
+    const parseResult = parseMermaid(normalized);
     if (!parseResult.success) return false;
     const validationErrors = validateAST(parseResult.data);
     return validationErrors.length === 0;
@@ -204,7 +252,23 @@ export const getMermaidInfo = (mermaidText: string): {
   error?: string;
 } => {
   try {
-    const parseResult = parseMermaid(mermaidText.trim());
+    const normalized = normalizeMermaidText(mermaidText);
+    if (normalized.toLowerCase().startsWith("graph ")) {
+      return {
+        isValid: false,
+        error:
+          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+      };
+    }
+    if (normalized.toLowerCase().startsWith("sequencediagram")) {
+      return {
+        isValid: false,
+        error:
+          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+      };
+    }
+
+    const parseResult = parseMermaid(normalized);
 
     if (!parseResult.success) {
       return {
@@ -215,12 +279,13 @@ export const getMermaidInfo = (mermaidText: string): {
 
     const ast = parseResult.data;
     const validationErrors = validateAST(ast);
-    const analysis = analyzeAST(ast);
+    const enhanced = enhanceAST(ast);
+    const analysis = analyzeAST(enhanced);
 
     return {
       isValid: validationErrors.length === 0,
-      nodeCount: ast.nodes.size,
-      edgeCount: ast.edges.length,
+      nodeCount: enhanced.nodes.size,
+      edgeCount: enhanced.edges.length,
       diagramType: ast.diagramType,
       complexity: analysis.complexity,
       ...(validationErrors.length > 0 && { validationErrors }),
@@ -242,7 +307,23 @@ export const renderWithMetrics = (mermaidText: string): {
   const startTime = performance.now();
 
   try {
-    const parseResult = parseMermaid(mermaidText.trim());
+    const normalized = normalizeMermaidText(mermaidText);
+    if (normalized.toLowerCase().startsWith("graph ")) {
+      return {
+        result: "",
+        error:
+          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+      };
+    }
+    if (normalized.toLowerCase().startsWith("sequencediagram")) {
+      return {
+        result: "",
+        error:
+          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+      };
+    }
+
+    const parseResult = parseMermaid(normalized);
 
     if (!parseResult.success) {
       return {
@@ -253,14 +334,27 @@ export const renderWithMetrics = (mermaidText: string): {
 
     const ast = parseResult.data;
     const validationErrors = validateAST(ast);
-    const analysis = analyzeAST(ast);
+
+    if (validationErrors.length > 0) {
+      const endTime = performance.now();
+      return {
+        result: "",
+        renderTime: endTime - startTime,
+        validationErrors,
+        error: `Validation errors: ${validationErrors.join(", ")}`,
+      };
+    }
+
+    const enhancedAST = enhanceAST(ast);
+    const sanitizedAST = sanitizeAstLabels(enhancedAST);
+    const analysis = analyzeAST(sanitizedAST);
     const dynamicConfig = calculateDynamicConfig(analysis);
 
     const monitoredRender = withPerformanceMonitoring(
       renderSvg,
       "Mermaid Rendering",
     );
-    const svgResult = monitoredRender(ast, dynamicConfig);
+    const svgResult = monitoredRender(sanitizedAST, dynamicConfig);
     const endTime = performance.now();
 
     if (!svgResult.success) {
@@ -268,14 +362,12 @@ export const renderWithMetrics = (mermaidText: string): {
         result: "",
         renderTime: endTime - startTime,
         error: svgResult.error || "Render error",
-        ...(validationErrors.length > 0 && { validationErrors }),
       };
     }
 
     return {
       result: wrapSvgWithClass(svgResult.data),
       renderTime: endTime - startTime,
-      ...(validationErrors.length > 0 && { validationErrors }),
     };
   } catch (error) {
     const endTime = performance.now();
@@ -285,4 +377,59 @@ export const renderWithMetrics = (mermaidText: string): {
       error: String(error),
     };
   }
+};
+
+const decodeBasicXmlEntities = (text: string): string =>
+  text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0*39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&");
+
+const sanitizeSvgLabel = (label: string): string =>
+  escapeXml(decodeBasicXmlEntities(label));
+
+const sanitizeAstLabels = <
+  T extends {
+    nodes: ReadonlyMap<string, unknown>;
+    edges: readonly unknown[];
+  },
+>(ast: T): T => {
+  const nodes = new Map<string, unknown>();
+  for (const [id, node] of ast.nodes.entries()) {
+    if (
+      node &&
+      typeof node === "object" &&
+      "label" in (node as Record<string, unknown>) &&
+      typeof (node as { label?: unknown }).label === "string"
+    ) {
+      const nodeObject = node as Record<string, unknown>;
+      nodes.set(id, {
+        ...nodeObject,
+        label: sanitizeSvgLabel(nodeObject.label as string),
+      });
+      continue;
+    }
+    nodes.set(id, node);
+  }
+
+  const edges = ast.edges.map((edge) => {
+    if (
+      edge &&
+      typeof edge === "object" &&
+      "label" in (edge as Record<string, unknown>) &&
+      typeof (edge as { label?: unknown }).label === "string"
+    ) {
+      const edgeObject = edge as Record<string, unknown>;
+      return {
+        ...edgeObject,
+        label: sanitizeSvgLabel(edgeObject.label as string),
+      };
+    }
+    return edge;
+  });
+
+  return { ...ast, nodes, edges } as T;
 };

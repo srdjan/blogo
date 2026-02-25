@@ -64,6 +64,20 @@ Deno.test("renderMermaidWithConfig - caches with config key", () => {
   assertEquals(first, second);
 });
 
+Deno.test("renderMermaidToSVG - escapes node labels for valid SVG output", () => {
+  const result = renderMermaidToSVG("flowchart TD\nA[R&D] --> B[Done]");
+  assertEquals(result.includes("R&amp;D"), true);
+  assertEquals(result.includes("R&D"), false);
+});
+
+Deno.test("renderMermaidToSVG - strips executable tags from labels", () => {
+  const result = renderMermaidToSVG(
+    "flowchart TD\nA[<script>alert(1)</script>] --> B[Done]",
+  );
+  assertEquals(result.includes("<script>"), false);
+  assertEquals(result.includes("&lt;script&gt;alert(1)&lt;/script&gt;"), true);
+});
+
 Deno.test("getMermaidInfo - returns info for valid diagram", () => {
   const info = getMermaidInfo(VALID_FLOWCHART);
   assertEquals(info.isValid, true);
@@ -75,4 +89,10 @@ Deno.test("getMermaidInfo - returns info for valid diagram", () => {
 Deno.test("getMermaidInfo - returns invalid for bad input", () => {
   const info = getMermaidInfo("not mermaid");
   assertEquals(info.isValid, false);
+});
+
+Deno.test("getMermaidInfo - returns unsupported error for graph syntax", () => {
+  const info = getMermaidInfo("graph TD\nA --> B");
+  assertEquals(info.isValid, false);
+  assertEquals(info.error?.includes("flowchart TD"), true);
 });

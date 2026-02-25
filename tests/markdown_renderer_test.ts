@@ -244,6 +244,32 @@ flowchart TD
   }
 });
 
+Deno.test("markdownToHtml - detects Mermaid language case-insensitively", () => {
+  const markdown = `\`\`\`Mermaid
+flowchart TD
+    A[Start] --> B[End]
+\`\`\``;
+
+  const result = markdownToHtml(markdown);
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.includes("<svg"), true);
+  }
+});
+
+Deno.test("markdownToHtml - detects Mermaid fences with info string", () => {
+  const markdown = `\`\`\`mermaid title=\"Example\"
+flowchart TD
+    A[Start] --> B[End]
+\`\`\``;
+
+  const result = markdownToHtml(markdown);
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.includes("<svg"), true);
+  }
+});
+
 Deno.test("markdownToHtml - mermaid SVG survives DOMPurify sanitization", () => {
   const markdown = `\`\`\`mermaid
 flowchart TD
