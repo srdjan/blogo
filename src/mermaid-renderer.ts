@@ -6,7 +6,7 @@ import {
   type SvgConfig,
   validateAST,
   withPerformanceMonitoring,
-} from "@rendermaid/core";
+} from "@srdjan/rendermaid";
 import { createInMemoryCache } from "./ports/cache.ts";
 import { err, match, ok } from "./lib/result.ts";
 import type { AppResult } from "./lib/types.ts";
