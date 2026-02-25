@@ -7,75 +7,45 @@ import {
   validateAST,
   withPerformanceMonitoring,
 } from "@rendermaid/core";
-import { match } from "ts-pattern";
+import { createInMemoryCache } from "./ports/cache.ts";
+import { err, match, ok } from "./lib/result.ts";
+import type { AppResult } from "./lib/types.ts";
+import { createError } from "./lib/error.ts";
 
 // === SVG Cache ===
-// Cache rendered mermaid SVGs by content hash for performance
-const mermaidSvgCache = new Map<string, string>();
 
-// Simple hash function for cache keys
-const simpleHash = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash.toString(36);
-};
+const svgCache = createInMemoryCache<string>();
 
-// === Types ===
+const buildCacheKey = (
+  text: string,
+  config?: Partial<SvgConfig>,
+): string => config ? `${text}\0${JSON.stringify(config)}` : text;
 
-// Analysis results type (matching v0.6.0 ASTAnalysis)
-type DiagramAnalysis = {
-  readonly complexity: number;
-  readonly nodeShapes: Record<string, number>;
-  readonly edgeTypes: Record<string, number>;
-  readonly depth: number;
-  readonly cycleDetected: boolean;
-};
-
-type RenderResult =
-  | { success: true; content: string; analysis?: DiagramAnalysis }
-  | { success: false; error: string };
-
-// === Enhanced Configuration ===
+// === Configuration ===
 
 const DEFAULT_SVG_CONFIG: SvgConfig = {
   width: 800,
-  height: 800, // Increased from 600 to prevent bottom overflow
+  height: 800,
   theme: "light",
-  nodeSpacing: 120, // Optimized spacing from v0.6.0
+  nodeSpacing: 120,
 };
 
-/**
- * Calculate dynamic SVG configuration based on diagram complexity
- */
-const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
+const calculateDynamicConfig = (analysis: {
+  readonly complexity: number;
+  readonly depth: number;
+}): SvgConfig => {
   const baseConfig = { ...DEFAULT_SVG_CONFIG };
-
-  // Calculate minimum height based on diagram structure
   const depth = analysis.depth || 3;
 
-  // Dynamic height calculation with generous bottom padding
-  const nodeHeight = 60; // Estimated node height including labels
-  const layerSpacing = baseConfig.nodeSpacing * 1.5; // Layer spacing from @rendermaid/core
-  const topPadding = 80; // Top margin
-  const bottomPadding = 120; // Generous bottom padding to prevent overflow
-  const edgeLabelPadding = 40; // Additional space for edge labels
-
-  const calculatedHeight = topPadding + (depth * layerSpacing) + nodeHeight +
-    bottomPadding + edgeLabelPadding;
-
-  // Use the larger of default height or calculated height
+  const layerSpacing = baseConfig.nodeSpacing * 1.5;
+  const calculatedHeight = 80 + (depth * layerSpacing) + 60 + 120 + 40;
   const dynamicHeight = Math.max(baseConfig.height, calculatedHeight);
 
-  // For complex diagrams, add extra height and width
   if (analysis.complexity > 20) {
     return {
       ...baseConfig,
-      height: Math.max(dynamicHeight, 1000), // Minimum 1000px for complex diagrams
-      width: Math.max(baseConfig.width, 1000), // Also increase width for complex diagrams
+      height: Math.max(dynamicHeight, 1000),
+      width: Math.max(baseConfig.width, 1000),
     };
   }
 
@@ -85,272 +55,138 @@ const calculateDynamicConfig = (analysis: DiagramAnalysis): SvgConfig => {
   };
 };
 
-/**
- * Enhanced rendering function with custom configuration override
- */
+// === Error HTML rendering ===
+
+const renderErrorHtml = (message: string): string =>
+  `<div class="mermaid-error"><strong>Mermaid Error:</strong> ${message}</div>`;
+
+// === Public API ===
+
 export const renderMermaidWithConfig = (
   mermaidText: string,
   customConfig?: Partial<SvgConfig>,
 ): string => {
-  const renderResult = renderMermaidDiagramWithConfig(
-    mermaidText,
-    customConfig,
-  );
+  const cacheKey = buildCacheKey(mermaidText, customConfig);
+  const cacheResult = svgCache.get(cacheKey);
+  if (cacheResult.ok && cacheResult.value.status === "hit") {
+    return cacheResult.value.value;
+  }
 
-  return match(renderResult)
-    .with({ success: true }, ({ content }) => content)
-    .with(
-      { success: false },
-      ({ error }) =>
-        `<div class="mermaid-error" style="padding: 1rem; border: 1px solid #ff6b6b; background: #ffe0e0; color: #d63031; border-radius: 4px;">
-        <strong>Mermaid Parse Error:</strong> ${error}
-      </div>`,
-    )
-    .exhaustive();
+  const result = renderMermaidDiagramCore(mermaidText, customConfig);
+
+  return match(result, {
+    ok: (svg) => {
+      svgCache.set(cacheKey, svg);
+      return svg;
+    },
+    error: (e) => renderErrorHtml(e.message),
+  });
 };
 
-/**
- * Core rendering function with custom configuration support
- */
-const renderMermaidDiagramWithConfig = (
+export const renderMermaidToSVG = (mermaidText: string): string => {
+  const cacheKey = buildCacheKey(mermaidText);
+  const cacheResult = svgCache.get(cacheKey);
+  if (cacheResult.ok && cacheResult.value.status === "hit") {
+    return cacheResult.value.value;
+  }
+
+  const result = renderMermaidDiagramCore(mermaidText);
+
+  return match(result, {
+    ok: (svg) => {
+      svgCache.set(cacheKey, svg);
+      return svg;
+    },
+    error: (e) => renderErrorHtml(e.message),
+  });
+};
+
+// === Core rendering ===
+
+const renderMermaidDiagramCore = (
   mermaidText: string,
   customConfig?: Partial<SvgConfig>,
-): RenderResult => {
+): AppResult<string> => {
   try {
     const trimmedText = mermaidText.trim();
 
-    // Provide helpful error messages for common syntax issues
     if (trimmedText.startsWith("graph ")) {
-      return {
-        success: false,
-        error:
-          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
-      };
+      return err(createError(
+        "RenderError",
+        "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
+      ));
     }
 
     if (trimmedText.startsWith("sequenceDiagram")) {
-      return {
-        success: false,
-        error:
-          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
-      };
+      return err(createError(
+        "RenderError",
+        "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
+      ));
     }
 
-    // Parse the Mermaid diagram using @rendermaid/core
     const parseResult = parseMermaid(trimmedText);
 
     if (!parseResult.success) {
-      return {
-        success: false,
-        error: parseResult.error || "Failed to parse Mermaid diagram",
-      };
+      return err(createError(
+        "RenderError",
+        parseResult.error || "Failed to parse Mermaid diagram",
+      ));
     }
 
     const ast = parseResult.data;
 
-    // v0.6.0: Validate AST integrity before rendering
     const validationErrors = validateAST(ast);
     if (validationErrors.length > 0) {
-      return {
-        success: false,
-        error: `Validation errors: ${validationErrors.join(", ")}`,
-      };
+      return err(createError(
+        "RenderError",
+        `Validation errors: ${validationErrors.join(", ")}`,
+      ));
     }
 
-    // v0.6.0: Enhance AST with analysis metadata
     const enhancedAST = enhanceAST(ast);
-
-    // v0.6.0: Analyze diagram complexity for optimization
     const analysis = analyzeAST(enhancedAST);
 
-    // Calculate dynamic configuration or use custom config
     const finalConfig = customConfig
       ? { ...calculateDynamicConfig(analysis), ...customConfig }
       : calculateDynamicConfig(analysis);
 
-    // v0.6.0: Use performance monitoring for complex diagrams
     const renderFunction = analysis.complexity > 20
       ? withPerformanceMonitoring(renderSvg, "Complex Mermaid Rendering")
       : renderSvg;
 
-    // Render to SVG using @rendermaid/core with final configuration
     const svgResult = renderFunction(enhancedAST, finalConfig);
 
     if (!svgResult.success) {
-      return {
-        success: false,
-        error: svgResult.error || "Failed to render SVG",
-      };
+      return err(createError(
+        "RenderError",
+        svgResult.error || "Failed to render SVG",
+      ));
     }
 
-    // Wrap the SVG with the expected CSS class for styling consistency
-    const wrappedSvg = wrapSvgWithClass(svgResult.data);
-
-    return {
-      success: true,
-      content: wrappedSvg,
-      analysis, // Include analysis data for debugging/optimization
-    };
+    return ok(wrapSvgWithClass(svgResult.data));
   } catch (error) {
-    return {
-      success: false,
-      error: `Rendering error: ${String(error)}`,
-    };
+    return err(
+      createError("RenderError", `Rendering error: ${String(error)}`, error),
+    );
   }
 };
 
-// === Main Renderer Function ===
-
-/**
- * Renders a Mermaid diagram to SVG using @rendermaid/core
- * Maintains the same interface as the previous custom implementation
- * Uses caching to avoid re-rendering identical diagrams
- */
-export const renderMermaidToSVG = (mermaidText: string): string => {
-  // Check cache first
-  const cacheKey = simpleHash(mermaidText);
-  const cached = mermaidSvgCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
-  const renderResult = renderMermaidDiagram(mermaidText);
-
-  const output = match(renderResult)
-    .with({ success: true }, ({ content }) => content)
-    .with(
-      { success: false },
-      ({ error }) =>
-        `<div class="mermaid-error" style="padding: 1rem; border: 1px solid #ff6b6b; background: #ffe0e0; color: #d63031; border-radius: 4px;">
-        <strong>Mermaid Parse Error:</strong> ${error}
-      </div>`,
-    )
-    .exhaustive();
-
-  // Cache successful renders (don't cache errors)
-  if (renderResult.success) {
-    mermaidSvgCache.set(cacheKey, output);
-  }
-
-  return output;
-};
-
-/**
- * Enhanced core rendering function with v0.6.0 features
- */
-const renderMermaidDiagram = (mermaidText: string): RenderResult => {
-  try {
-    const trimmedText = mermaidText.trim();
-
-    // Provide helpful error messages for common syntax issues
-    if (trimmedText.startsWith("graph ")) {
-      return {
-        success: false,
-        error:
-          "Use 'flowchart TD' instead of 'graph TD' for @rendermaid/core v0.6.0",
-      };
-    }
-
-    if (trimmedText.startsWith("sequenceDiagram")) {
-      return {
-        success: false,
-        error:
-          "Sequence diagrams are not yet supported in @rendermaid/core v0.6.0. Please use flowchart format.",
-      };
-    }
-
-    // Parse the Mermaid diagram using @rendermaid/core
-    const parseResult = parseMermaid(trimmedText);
-
-    if (!parseResult.success) {
-      return {
-        success: false,
-        error: parseResult.error || "Failed to parse Mermaid diagram",
-      };
-    }
-
-    const ast = parseResult.data;
-
-    // v0.6.0: Validate AST integrity before rendering
-    const validationErrors = validateAST(ast);
-    if (validationErrors.length > 0) {
-      return {
-        success: false,
-        error: `Validation errors: ${validationErrors.join(", ")}`,
-      };
-    }
-
-    // v0.6.0: Enhance AST with analysis metadata
-    const enhancedAST = enhanceAST(ast);
-
-    // v0.6.0: Analyze diagram complexity for optimization
-    const analysis = analyzeAST(enhancedAST);
-
-    // Calculate dynamic configuration to prevent bottom overflow
-    const dynamicConfig = calculateDynamicConfig(analysis);
-
-    // v0.6.0: Use performance monitoring for complex diagrams
-    const renderFunction = analysis.complexity > 20
-      ? withPerformanceMonitoring(renderSvg, "Complex Mermaid Rendering")
-      : renderSvg;
-
-    // Render to SVG using @rendermaid/core with dynamic configuration
-    const svgResult = renderFunction(enhancedAST, dynamicConfig);
-
-    if (!svgResult.success) {
-      return {
-        success: false,
-        error: svgResult.error || "Failed to render SVG",
-      };
-    }
-
-    // Wrap the SVG with the expected CSS class for styling consistency
-    const wrappedSvg = wrapSvgWithClass(svgResult.data);
-
-    return {
-      success: true,
-      content: wrappedSvg,
-      analysis, // Include analysis data for debugging/optimization
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Rendering error: ${String(error)}`,
-    };
-  }
-};
-
-/**
- * Wraps the SVG output with the expected CSS class for styling consistency
- */
 const wrapSvgWithClass = (svgContent: string): string => {
-  // Check if the SVG already has the mermaid-diagram class
   if (svgContent.includes('class="mermaid-diagram"')) {
     return svgContent;
   }
-
-  // Add the class to the SVG element for consistent styling
   return svgContent.replace(
     /<svg([^>]*)>/,
     '<svg$1 class="mermaid-diagram">',
   );
 };
 
-// === Export Types for Compatibility ===
+// === Utility Functions ===
 
-export type { RenderResult };
-
-// === Additional Utility Functions ===
-
-/**
- * Enhanced validation with v0.6.0 comprehensive checking
- */
 export const isValidMermaidSyntax = (mermaidText: string): boolean => {
   try {
     const parseResult = parseMermaid(mermaidText.trim());
     if (!parseResult.success) return false;
-
-    // v0.6.0: Additional validation using validateAST
     const validationErrors = validateAST(parseResult.data);
     return validationErrors.length === 0;
   } catch {
@@ -358,16 +194,12 @@ export const isValidMermaidSyntax = (mermaidText: string): boolean => {
   }
 };
 
-/**
- * Enhanced diagram analysis with v0.6.0 comprehensive metrics
- */
 export const getMermaidInfo = (mermaidText: string): {
   isValid: boolean;
   nodeCount?: number;
   edgeCount?: number;
   diagramType?: unknown;
   complexity?: number;
-  analysis?: DiagramAnalysis;
   validationErrors?: string[];
   error?: string;
 } => {
@@ -382,35 +214,17 @@ export const getMermaidInfo = (mermaidText: string): {
     }
 
     const ast = parseResult.data;
-
-    // v0.6.0: Comprehensive validation
     const validationErrors = validateAST(ast);
-
-    // v0.6.0: Detailed analysis
     const analysis = analyzeAST(ast);
 
-    const result: {
-      isValid: boolean;
-      nodeCount: number;
-      edgeCount: number;
-      diagramType: unknown;
-      complexity: number;
-      analysis: DiagramAnalysis;
-      validationErrors?: string[];
-    } = {
+    return {
       isValid: validationErrors.length === 0,
       nodeCount: ast.nodes.size,
       edgeCount: ast.edges.length,
       diagramType: ast.diagramType,
       complexity: analysis.complexity,
-      analysis,
+      ...(validationErrors.length > 0 && { validationErrors }),
     };
-
-    if (validationErrors.length > 0) {
-      result.validationErrors = validationErrors;
-    }
-
-    return result;
   } catch (error) {
     return {
       isValid: false,
@@ -419,13 +233,9 @@ export const getMermaidInfo = (mermaidText: string): {
   }
 };
 
-/**
- * v0.6.0: New function to get detailed performance metrics
- */
 export const renderWithMetrics = (mermaidText: string): {
   result: string;
   renderTime?: number;
-  analysis?: DiagramAnalysis;
   validationErrors?: string[];
   error?: string;
 } => {
@@ -444,56 +254,29 @@ export const renderWithMetrics = (mermaidText: string): {
     const ast = parseResult.data;
     const validationErrors = validateAST(ast);
     const analysis = analyzeAST(ast);
-
-    // Calculate dynamic configuration to prevent bottom overflow
     const dynamicConfig = calculateDynamicConfig(analysis);
 
-    // Use performance monitoring for rendering
     const monitoredRender = withPerformanceMonitoring(
       renderSvg,
       "Mermaid Rendering",
     );
     const svgResult = monitoredRender(ast, dynamicConfig);
-
     const endTime = performance.now();
 
     if (!svgResult.success) {
-      const result: {
-        result: string;
-        renderTime: number;
-        analysis: DiagramAnalysis;
-        validationErrors?: string[];
-        error: string;
-      } = {
+      return {
         result: "",
         renderTime: endTime - startTime,
-        analysis,
         error: svgResult.error || "Render error",
+        ...(validationErrors.length > 0 && { validationErrors }),
       };
-
-      if (validationErrors.length > 0) {
-        result.validationErrors = validationErrors;
-      }
-
-      return result;
     }
 
-    const result: {
-      result: string;
-      renderTime: number;
-      analysis: DiagramAnalysis;
-      validationErrors?: string[];
-    } = {
+    return {
       result: wrapSvgWithClass(svgResult.data),
       renderTime: endTime - startTime,
-      analysis,
+      ...(validationErrors.length > 0 && { validationErrors }),
     };
-
-    if (validationErrors.length > 0) {
-      result.validationErrors = validationErrors;
-    }
-
-    return result;
   } catch (error) {
     const endTime = performance.now();
     return {

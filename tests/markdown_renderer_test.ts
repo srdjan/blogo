@@ -244,6 +244,68 @@ flowchart TD
   }
 });
 
+Deno.test("markdownToHtml - mermaid SVG survives DOMPurify sanitization", () => {
+  const markdown = `\`\`\`mermaid
+flowchart TD
+    A[Start] --> B[Decision]
+    B -->|Yes| C[Process]
+    B -->|No| D[End]
+    C --> D
+\`\`\``;
+
+  const result = markdownToHtml(markdown);
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    const html = result.value;
+    // SVG structure must survive DOMPurify
+    assertEquals(html.includes("<svg"), true);
+    // Core SVG elements that rendermaid generates should not be stripped
+    const hasStructuralElements = html.includes("<rect") ||
+      html.includes("<path") || html.includes("<text") ||
+      html.includes("<line") || html.includes("<g");
+    assertEquals(hasStructuralElements, true);
+    // The diagram class must survive sanitization
+    assertEquals(html.includes("mermaid-diagram"), true);
+  }
+});
+
+Deno.test("markdownToHtml - mermaid handles angle brackets in labels", () => {
+  // marked encodes < as &lt; in code block content before passing to the renderer.
+  // The renderer should handle this gracefully - either by decoding or by not crashing.
+  const markdown = `\`\`\`mermaid
+flowchart TD
+    A[Value < 10] --> B[Done]
+\`\`\``;
+
+  const result = markdownToHtml(markdown);
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    const html = result.value;
+    // The output should be valid HTML - either an SVG or an error div, not a crash
+    const isValidOutput = html.includes("<svg") ||
+      html.includes("mermaid-error");
+    assertEquals(isValidOutput, true);
+  }
+});
+
+Deno.test("markdownToHtml - mermaid error renders with CSS class", () => {
+  const markdown = `\`\`\`mermaid
+graph TD
+    A --> B
+\`\`\``;
+
+  const result = markdownToHtml(markdown);
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    const html = result.value;
+    assertEquals(html.includes("mermaid-error"), true);
+    assertEquals(html.includes("flowchart TD"), true);
+  }
+});
+
 // TODO: Auto-detection of code language may need review
 Deno.test.ignore("markdownToHtml - handles code without language", () => {
   const markdown = `\`\`\`

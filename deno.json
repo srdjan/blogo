@@ -37,7 +37,6 @@
     "hsx/jsx-runtime": "jsr:@srdjan/hsx/jsx-runtime",
     "@srdjan/hsx": "jsr:@srdjan/hsx",
     "@rendermaid/core": "jsr:@rendermaid/core@0.6.0",
-    "ts-pattern": "npm:ts-pattern@5.9.0",
     "marked": "https://esm.sh/marked@15.0.12",
     "highlight.js": "https://esm.sh/highlight.js@11.11.1",
     "isomorphic-dompurify": "npm:isomorphic-dompurify@2.22.0",
