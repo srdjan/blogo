@@ -47,13 +47,11 @@ the other.
 
 The conceptual architecture looks like this:
 
-```typescript
-type DNSArchitecture = {
-  delegation: "mixed-ns"; // Both providers at registrar
-  sync: "octodns-gitops"; // Single source of truth
-  steering: "edge-first"; // CDN handles most routing
-  dns_policy: "simple-with-escape"; // Basic records + selective smart routing
-};
+```mermaid
+flowchart TD
+    GIT[Zone Config in Git] --> OD[octoDNS Sync]
+    OD --> R53[AWS Route 53]
+    OD --> AZ[Azure DNS]
 ```
 
 This means:
@@ -151,6 +149,18 @@ providers. Ask me how I know this is important.
 
 Here's the cool part: every DNS change goes through a pull request with a plan,
 just like Terraform:
+
+```mermaid
+flowchart TD
+    D[Developer] --> PR[Pull Request]
+    PR --> V[Validate Config]
+    V --> P[Plan - Dry Run]
+    P --> RE{Review + Approve}
+    RE --> M[Merge to Main]
+    M --> AP[Apply via octoDNS]
+    AP --> R53[Route 53]
+    AP --> AZ[Azure DNS]
+```
 
 ```yaml
 # .github/workflows/dns-sync.yml

@@ -22,7 +22,19 @@ Let me walk through the patterns that, in my experience, actually work.
 The fundamental pattern is simple: gradually replace legacy components by
 intercepting requests at the network boundary. New functionality lives in modern
 services, old stuff stays in the monolith. Traffic routing shifts
-incrementally—5%, 20%, 50%—until eventually the legacy code can be retired.
+incrementally - 5%, 20%, 50% - until eventually the legacy code can be retired.
+
+```mermaid
+flowchart TD
+    C[Client Request] --> P[API Gateway / Proxy]
+    P --> FF{Feature Flag / Route Rule}
+    FF --> M[Legacy Monolith]
+    FF --> S1[Modern Service A]
+    FF --> S2[Modern Service B]
+    M --> DB1[Legacy Database]
+    S1 --> DB2[Service A Database]
+    S2 --> DB3[Service B Database]
+```
 
 This works beautifully when you can draw clear boundaries at API level. User
 facing features? Perfect candidates. Deeply tangled business logic spread across
@@ -105,6 +117,17 @@ what works.
 This is the cornerstone of reliable event-driven migration. Instead of
 publishing events directly, you write them to an outbox table within the same
 database transaction as your business operation:
+
+```mermaid
+flowchart TD
+    A[Business Operation] --> TX[Database Transaction]
+    TX --> W1[Write Business Data]
+    TX --> W2[Write Event to Outbox]
+    PO[Outbox Poller] --> OB[Read Outbox Table]
+    OB --> MQ[Message Queue]
+    MQ --> LC[Legacy Consumer]
+    MQ --> MC[Modern Consumer]
+```
 
 ```typescript
 async function placeOrder(order: Order): Promise<void> {

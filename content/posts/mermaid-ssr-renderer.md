@@ -19,6 +19,19 @@ The core idea is simple: parse Mermaid diagram syntax into an AST, then render
 that AST directly to SVG using functional TypeScript patterns. No DOM, no
 browser APIs, just types and pure functions.
 
+```mermaid
+flowchart TD
+    M[Mermaid Text] --> P[Parser]
+    P --> AST[Typed AST]
+    AST --> V[Validator]
+    V --> E[Enhancer]
+    E --> R{Output Format}
+    R --> SVG[SVG Renderer]
+    R --> HTML[HTML Renderer]
+    R --> JSON[JSON Renderer]
+    R --> RT[Round-trip Mermaid]
+```
+
 The latest version (v0.6.0) handles:
 
 - **Native TypeScript parsing** - Zero browser dependencies

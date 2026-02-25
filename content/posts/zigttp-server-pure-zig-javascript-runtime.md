@@ -57,6 +57,17 @@ return response, reset.
 
 The compilation pipeline looks like this:
 
+```mermaid
+flowchart TD
+    TS[TypeScript Source] --> ST[Type Stripper]
+    ST --> CE[Comptime Evaluator]
+    CE --> TK[Tokenizer]
+    JS[JavaScript Source] --> TK
+    TK --> PA[Parser + Scope Analysis]
+    PA --> BC[Bytecode Emitter]
+    BC --> VM[Virtual Machine]
+```
+
 For TypeScript files, the stripper removes type annotations while preserving
 line numbers. The comptime evaluator then replaces `comptime(...)` expressions
 with literal values. After that, it's the same path as JavaScript: tokenize,
@@ -237,13 +248,15 @@ Each request gets an isolated runtime - separate GC state, independent heap,
 fresh execution context. But here's the trick: runtimes are pooled and reset
 between requests.
 
-```
-                 +-----------------+
-Request 1 -----> | Runtime Pool    |
-Request 2 -----> | [R1][R2]...[Rn] | -----> Handler Execution
-Request 3 -----> +-----------------+
-                        |
-                 Acquire/Release
+```mermaid
+flowchart TD
+    R1[Request 1] --> P[Runtime Pool]
+    R2[Request 2] --> P
+    R3[Request 3] --> P
+    P --> A{Acquire Runtime}
+    A --> H[Handler Execution]
+    H --> RE[Release + Reset]
+    RE --> P
 ```
 
 You get the isolation guarantees of a fresh runtime with the speed of a warm
