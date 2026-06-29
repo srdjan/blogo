@@ -35,7 +35,7 @@ user asks to fix proof   -> proof repair workflow
 user asks for env vars   -> env workflow
 ```
 
-Then the compiler injects deterministic guidance into the agent context. Not vibes. Not "please be careful." Actual ZigTS-specific workflow notes.
+Then the compiler injects deterministic guidance into the agent context. Not vibes, not "please be careful," but actual ZigTS-specific workflow notes.
 
 For example, if the user asks for JWT auth, Pi is reminded to use the current `zigttp:auth` and `zigttp:env` shape, to read secrets through environment APIs, to check `Result.ok`, and to avoid fallback secrets. If the user asks for SQL, Pi gets the registered-query path and the named-parameter rules.
 
@@ -65,11 +65,11 @@ user request
 
 That last part matters. The model does not get final say.
 
-If Pi generates code that looks nice but violates ZigTS semantics, the compiler rejects it. If it leaks a secret, mishandles a `Result`, misses an optional, or creates a route that cannot satisfy the declared spec, the patch does not quietly pass because it sounded confident.
+If Pi generates code that looks nice but violates ZigTS semantics, the compiler rejects it. If it leaks a secret, mishandles a `Result`, misses an optional, or creates a route that cannot satisfy the declared spec, the patch does not pass just because it sounded confident.
 
 The compiler can say no.
 
-And honestly, this is exactly the relationship I want between AI and systems code. Let model be creative. Let compiler be strict.
+This is exactly the relationship I want between AI and systems code. Let model be creative. Let compiler be strict.
 
 ## A Tiny Example
 
@@ -88,7 +88,7 @@ const user = verifyJwt(req.headers.get("authorization"), secret);
 router.get("/profile", () => Response.json({ user }));
 ```
 
-This looks fine at a glance. It is also the kind of code that makes release engineers develop eye twitch. Fallback secret. No result check. Probably wrong auth shape. Maybe wrong router API.
+This looks fine at a glance. It is also the kind of code that makes release engineers develop eye twitch. A fallback secret, no result check, probably the wrong auth shape, maybe the wrong router API.
 
 In the ZigTS loop, Pi gets guided toward the actual pattern:
 
@@ -116,9 +116,9 @@ export default route([
 ]);
 ```
 
-This is still just a draft. The important thing is what happens next: ZigTS parses it, analyzes it, checks strict supported semantics, and runs it through the proof/veto path. If some API detail is wrong, or if the code violates the active contract, the loop catches it before user accepts the patch.
+This is still just a draft. The real work starts next: ZigTS parses it, analyzes it, checks strict supported semantics, and runs it through the proof/veto path. If some API detail is wrong, or if the code violates the active contract, the loop catches it before user accepts the patch.
 
-Here is the cool part: the agent can also ask compiler-native repair tools for a candidate fix without writing files. So Pi can explore a repair, inspect the proposed content, and only apply it when the compiler path agrees.
+The agent can also ask compiler-native repair tools for a candidate fix without writing files. So Pi can explore a repair, inspect the proposed content, and only apply it when the compiler path agrees.
 
 ## Why This Reduces Model Back-And-Forth
 
@@ -143,7 +143,7 @@ So we put that truth close to the agent.
 
 Pi still uses language-model reasoning, but the compiler narrows the lane before generation and enforces the lane after generation. This means fewer nonsense drafts, fewer retries, and less "almost right" code.
 
-I worked with this pattern enough to appreciate how simple it feels when it works. The model writes. The compiler checks. The repair loop tightens. The user sees a patch that already survived the important machinery.
+I worked with this pattern enough to appreciate how simple it feels when it works. The model writes. The compiler checks. The repair loop tightens. The user sees a patch that already survived the checks that matter.
 
 ## Real Talk: This Is Not Magic
 
