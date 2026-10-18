@@ -102,6 +102,20 @@ const voidEls = new Set([
   "wbr",
 ]);
 
+// Browsers do not decode entities inside these elements, so their text must
+// stay raw. "</" becomes "<\/" so the text cannot close the element early.
+const rawTextEls = new Set(["script", "style"]);
+
+const renderRawText = (children: unknown): string => {
+  const parts = Array.isArray(children) ? children : [children];
+  return parts
+    .filter((c): c is string | number =>
+      typeof c === "string" || typeof c === "number"
+    )
+    .map((c) => String(c).replace(/<\//g, "<\\/"))
+    .join("");
+};
+
 export const renderVNode = (node: unknown): string => {
   if (node === null || node === undefined || typeof node === "boolean") {
     return "";
@@ -135,6 +149,9 @@ export const renderVNode = (node: unknown): string => {
       const attrs = renderAttrs(props);
       if (voidEls.has(type)) {
         return `<${type}${attrs}>`;
+      }
+      if (rawTextEls.has(type)) {
+        return `<${type}${attrs}>${renderRawText(children)}</${type}>`;
       }
       const inner = Array.isArray(children)
         ? children.map(renderVNode).join("")
