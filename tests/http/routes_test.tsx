@@ -109,3 +109,28 @@ Deno.test("routes - Vary header names HX-Request-Type", async () => {
   const page = await handlers.home(contextFor("/"));
   assert(page.headers.get("Vary")?.includes("HX-Request-Type"));
 });
+
+// --- search-modal escaping ---
+
+Deno.test("routes - search-modal escapes the query when nothing matches", async () => {
+  const handlers = createHandlers();
+  const res = await handlers.searchModal(
+    contextFor(
+      `/search-modal?q=${encodeURIComponent("<img src=x onerror=alert(1)>")}`,
+    ),
+  );
+  const body = await res.text();
+  assertStringIncludes(body, "&lt;img");
+  assertEquals(body.includes("<img"), false);
+});
+
+Deno.test("routes - search-modal escapes matching post titles", async () => {
+  const evil = makePost("<script>x</script>", "evil-post");
+  const handlers = createHandlers(
+    createContentService({ searchPosts: async () => ok([evil]) }),
+  );
+  const res = await handlers.searchModal(contextFor("/search-modal?q=x"));
+  const body = await res.text();
+  assertStringIncludes(body, "&lt;script&gt;");
+  assertEquals(body.includes("<script>"), false);
+});

@@ -26,6 +26,7 @@ import type { RouteContext } from "./types.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
 import { slugToRkey } from "../atproto/mapping.ts";
 import { type Cache, createInMemoryCache } from "../ports/cache.ts";
+import { escapeHtml } from "../utils.ts";
 
 export type RouteHandlers = {
   readonly home: RouteHandler;
@@ -357,23 +358,26 @@ export const createRouteHandlers = (
     return match(postsResult, {
       ok: (posts) => {
         if (posts.length === 0) {
-          return new Response(`<p>No posts found for "${query}".</p>`, {
-            headers: {
-              "Content-Type": "text/html; charset=utf-8",
-              "X-Robots-Tag": "noindex, nofollow",
+          return new Response(
+            `<p>No posts found for "${escapeHtml(query)}".</p>`,
+            {
+              headers: {
+                "Content-Type": "text/html; charset=utf-8",
+                "X-Robots-Tag": "noindex, nofollow",
+              },
             },
-          });
+          );
         }
 
         const listItems = posts.map((post) =>
           `<li>
-            <a href="/posts/${post.slug}"
-               hx-get="/posts/${post.slug}"
+            <a href="/posts/${escapeHtml(post.slug)}"
+               hx-get="/posts/${escapeHtml(post.slug)}"
                hx-target="#content-area"
                hx-swap="innerHTML"
                hx-push-url="true"
                class="search-result-link">
-              ${post.title}
+              ${escapeHtml(post.title)}
             </a>
           </li>`
         ).join("");
