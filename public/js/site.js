@@ -1,14 +1,3 @@
-if (window.htmx) {
-  window.htmx.config.scrollBehavior = "auto";
-  window.htmx.config.scrollIntoViewOnBoost = false;
-  const isDevHost = ["localhost", "127.0.0.1"].includes(
-    window.location.hostname,
-  );
-  // Disable GET cache-busting in production for faster back/forward restores
-  window.htmx.config.getCacheBusterParam = isDevHost;
-  window.htmx.config.refreshOnHistoryMiss = true; // Refresh on back/forward
-}
-
 const ScrollRestoration = {
   storageKey(path) {
     return `scroll:${path}`;
@@ -64,8 +53,8 @@ const Core = {
   initTheme() {
     // Theme attribute is already set by the inline <script> in <head> to
     // prevent FOUC. Here we only sync the icon state and attach listeners.
-    const theme =
-      document.documentElement.getAttribute("data-theme") || "light";
+    const theme = document.documentElement.getAttribute("data-theme") ||
+      "light";
     this.updateThemeIcon(theme);
 
     const themeToggle = document.querySelector(".theme-toggle");
@@ -115,60 +104,59 @@ const Core = {
   },
 
   setupEventListeners() {
-    const refreshHome = () => {
-      if (window.htmx) {
-        window.htmx.ajax("GET", "/", {
-          target: "#content-area",
-          swap: "innerHTML",
-        });
-        return;
-      }
-      window.location.reload();
-    };
+    // Path that htmx 4 is restoring after back/forward navigation. htmx 4
+    // fetches the page from the server and swaps the whole body.
+    let pendingRestorePath = null;
 
-    // Persist scroll position before HTMX navigation swaps content
-    document.addEventListener("htmx:beforeRequest", () => {
+    document.addEventListener("htmx:before:history:restore", (event) => {
+      pendingRestorePath = event?.detail?.path || window.location.pathname;
+    });
+
+    // Persist scroll position before HTMX navigation swaps content.
+    // During a restore, location already shows the destination path, so a
+    // save would store the departing page position under the wrong key.
+    document.addEventListener("htmx:before:request", () => {
+      if (pendingRestorePath) return;
       ScrollRestoration.save();
     });
 
-    // Handle browser back/forward button - always refresh home from server
-    document.addEventListener("htmx:historyRestore", (event) => {
-      const restoredPath = event?.detail?.path || window.location.pathname;
+    // Handle HTMX after swaps for scrolling and active link updates
+    document.addEventListener("htmx:after:swap", (event) => {
+      const ctx = event?.detail?.ctx;
+      const target = ctx?.target;
+      if (!target) return;
 
-      // When returning to home, force a fresh load so view counts reflect the
-      // latest increments (avoids reusing HTMX history snapshots).
-      if (restoredPath === "/") {
-        refreshHome();
+      if (pendingRestorePath) {
+        const restorePath = pendingRestorePath;
+        pendingRestorePath = null;
+
+        const restored = ScrollRestoration.restore(restorePath);
+        if (!restored) {
+          window.scrollTo(0, 0);
+        }
+
+        // The body swap removed every listener bound inside body
+        this.initTheme();
+        this.initPalette();
+        Search.init();
+        this.updateActiveNavLink();
+        ensureSearchToggleWorks();
         return;
       }
 
-      const restored = ScrollRestoration.restore(restoredPath);
-      if (!restored) {
-        window.scrollTo(0, 0);
-      }
-      this.updateActiveNavLink();
-    });
-
-    // Fallback for native history navigation (when HTMX doesn't fire)
-    window.addEventListener("popstate", () => {
-      if (window.location.pathname === "/") {
-        refreshHome();
-      }
-    });
-
-    // Handle HTMX after swaps for scrolling and active link updates
-    document.addEventListener("htmx:afterSwap", (event) => {
       // Scroll to top after content swap
-      if (event.detail.target.id === "content-area") {
-        const nextPath = event?.detail?.pathInfo?.path ||
-          window.location.pathname;
+      if (target.id === "content-area") {
+        const action = ctx?.request?.action;
+        const nextPath = action
+          ? new URL(action, window.location.href).pathname
+          : window.location.pathname;
         const restored = ScrollRestoration.restore(nextPath);
         if (!restored) {
           window.scrollTo(0, 0);
         }
 
         // Prevent duplicate rendering for home page
-        if (event.detail.pathInfo?.path === "/") {
+        if (nextPath === "/") {
           // Ensure we don't add event handlers multiple times
           const homeLink = document.querySelector('a[href="/"].link');
           if (homeLink) {

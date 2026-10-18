@@ -44,7 +44,10 @@ export const createStaticBuilder = (
   ): RouteContext => {
     const url = new URL(path, baseUrl);
     const headers = new Headers();
-    if (htmx) headers.set("HX-Request", "true");
+    if (htmx) {
+      headers.set("HX-Request", "true");
+      headers.set("HX-Request-Type", "partial");
+    }
     const req = new Request(url.toString(), { headers });
 
     return {
@@ -305,7 +308,9 @@ const fingerprintAssets = async (
       const relativePath = entry.path.substring(outputDir.length);
       const hash = await hashFileContents(entry.path);
       const dotIndex = relativePath.lastIndexOf(".");
-      const fingerprinted = `${relativePath.substring(0, dotIndex)}.${hash}${relativePath.substring(dotIndex)}`;
+      const fingerprinted = `${relativePath.substring(0, dotIndex)}.${hash}${
+        relativePath.substring(dotIndex)
+      }`;
 
       // Rename the file
       const newPath = `${outputDir}${fingerprinted}`;
@@ -356,7 +361,9 @@ const fingerprintAssets = async (
       ok: false,
       error: createError(
         "IOError",
-        `Asset fingerprinting failed: ${e instanceof Error ? e.message : String(e)}`,
+        `Asset fingerprinting failed: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
         e,
       ),
     };

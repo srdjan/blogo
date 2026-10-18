@@ -481,7 +481,7 @@ export const createLayout = (props: LayoutProps): Response => {
           "Pragma": "no-cache",
           "Expires": "0",
         }),
-      "Vary": "HX-Request",
+      "Vary": "HX-Request, HX-Request-Type",
     },
   });
 };

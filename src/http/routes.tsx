@@ -66,8 +66,11 @@ export const createRouteHandlers = (
       "Expires": "0",
     };
 
+  // htmx 4 marks body-targeted requests (including history restore) as "full".
+  // Those need the whole page, not a fragment.
   const isHtmxRequest = (req: Request): boolean =>
-    req.headers.get("HX-Request") === "true";
+    req.headers.get("HX-Request") === "true" &&
+    req.headers.get("HX-Request-Type") !== "full";
 
   const renderFragment = (
     props: Parameters<typeof createLayout>[0],
@@ -77,7 +80,7 @@ export const createRouteHandlers = (
       headers: {
         "Content-Type": "text/html; charset=utf-8",
         ...htmlCacheHeaders,
-        "Vary": "HX-Request",
+        "Vary": "HX-Request, HX-Request-Type",
       },
     });
   };
@@ -115,7 +118,7 @@ export const createRouteHandlers = (
         headers: {
           "Content-Type": contentType,
           ...htmlCacheHeaders,
-          "Vary": "HX-Request",
+          "Vary": "HX-Request, HX-Request-Type",
           "X-Cache": "HIT",
         },
       });

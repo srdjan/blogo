@@ -300,3 +300,28 @@ Deno.test("StaticBuilder - generates well-known verification route", async () =>
   );
   assertEquals(wellKnownWritten, true);
 });
+
+Deno.test("StaticBuilder - fragment render request carries HX-Request-Type partial", async () => {
+  const seen = new Map<string, Headers>();
+  const routes = createMockRoutes();
+  const recordingHome = (ctx: RouteContext) => {
+    seen.set(ctx.pathname, ctx.req.headers);
+    return new Response("<html><body>Page</body></html>");
+  };
+  const builder = createStaticBuilder({
+    contentService: createMockContentService(),
+    routes: { ...routes, home: recordingHome },
+    fileWriter: createMockFileWriter(),
+    logger: createMockLogger(),
+    publicDir: "public",
+  });
+
+  await builder.build({
+    outputDir: "_site",
+    baseUrl: "https://blog.example.com",
+  });
+
+  // home is rendered twice for "/": once as a page, once as a fragment
+  assertEquals(seen.get("/")?.get("HX-Request"), "true");
+  assertEquals(seen.get("/")?.get("HX-Request-Type"), "partial");
+});
