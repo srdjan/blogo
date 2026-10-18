@@ -126,6 +126,10 @@ function createMockFileWriter(): FileWriter & {
     ensureDir: async (): Promise<AppResult<void>> => ok(undefined),
     copyDir: async (): Promise<AppResult<void>> => ok(undefined),
     clean: async (): Promise<AppResult<void>> => ok(undefined),
+    listFiles: async (): Promise<AppResult<readonly string[]>> => ok([]),
+    readBytes: async (): Promise<AppResult<Uint8Array>> => ok(new Uint8Array()),
+    readText: async (): Promise<AppResult<string>> => ok(""),
+    rename: async (): Promise<AppResult<void>> => ok(undefined),
   };
 }
 

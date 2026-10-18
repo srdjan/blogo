@@ -1,12 +1,11 @@
-import type { AppResult } from "../lib/types.ts";
-import { ok } from "../lib/result.ts";
+import type { AppError, AppResult } from "../lib/types.ts";
+import { err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { ContentService } from "./content.ts";
 import type { FileWriter } from "../ports/writer.ts";
 import type { Logger } from "../ports/logger.ts";
 import type { RouteHandlers } from "../http/routes.tsx";
 import type { RouteContext } from "../http/types.ts";
-import { walk } from "jsr:@std/fs@1.0.14/walk";
 
 export type BuildOptions = {
   readonly outputDir: string;
@@ -68,17 +67,6 @@ export const createStaticBuilder = (
     const ctx = synthesizeContext(path, baseUrl, htmx);
     const response = await handler(ctx);
     return response.text();
-  };
-
-  const isHtmlRoute = (path: string): boolean => {
-    const nonHtml = [
-      "/feed.xml",
-      "/rss.xml",
-      "/sitemap.xml",
-      "/robots.txt",
-      ".svg",
-    ];
-    return !nonHtml.some((ext) => path.endsWith(ext));
   };
 
   const rewriteHtmxUrls = (html: string): string => {
@@ -260,7 +248,11 @@ export const createStaticBuilder = (
 
     // 6. Fingerprint static assets and rewrite HTML references
     logger.info("Fingerprinting static assets...");
-    const fingerprintResult = await fingerprintAssets(outputDir, logger);
+    const fingerprintResult = await fingerprintAssets(
+      outputDir,
+      fileWriter,
+      logger,
+    );
     if (!fingerprintResult.ok) {
       errors.push(`Asset fingerprinting: ${fingerprintResult.error.message}`);
     }
@@ -284,88 +276,106 @@ const FINGERPRINT_EXTENSIONS = new Set([
   ".ttf",
 ]);
 
-const hashFileContents = async (path: string): Promise<string> => {
-  const data = await Deno.readFile(path);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+const hashBytes = async (data: Uint8Array): Promise<string> => {
+  const hashBuffer = await crypto.subtle.digest(
+    "SHA-256",
+    new Uint8Array(data),
+  );
   const hashArray = new Uint8Array(hashBuffer);
   return Array.from(hashArray.slice(0, 8))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 };
 
+// "/css/main.css" + "abc" -> "/css/main.abc.css"
+export const fingerprintedPath = (
+  relativePath: string,
+  hash: string,
+): string => {
+  const dotIndex = relativePath.lastIndexOf(".");
+  return `${relativePath.substring(0, dotIndex)}.${hash}${
+    relativePath.substring(dotIndex)
+  }`;
+};
+
 const fingerprintAssets = async (
   outputDir: string,
+  fileWriter: FileWriter,
   logger: Logger,
 ): Promise<AppResult<void>> => {
-  try {
-    // Collect files to fingerprint
-    const manifest: Record<string, string> = {};
-
-    for await (const entry of walk(outputDir, { includeDirs: false })) {
-      const ext = entry.path.substring(entry.path.lastIndexOf("."));
-      if (!FINGERPRINT_EXTENSIONS.has(ext)) continue;
-
-      const relativePath = entry.path.substring(outputDir.length);
-      const hash = await hashFileContents(entry.path);
-      const dotIndex = relativePath.lastIndexOf(".");
-      const fingerprinted = `${relativePath.substring(0, dotIndex)}.${hash}${
-        relativePath.substring(dotIndex)
-      }`;
-
-      // Rename the file
-      const newPath = `${outputDir}${fingerprinted}`;
-      await Deno.rename(entry.path, newPath);
-      manifest[relativePath] = fingerprinted;
-      logger.debug(`Fingerprinted: ${relativePath} -> ${fingerprinted}`);
-    }
-
-    if (Object.keys(manifest).length === 0) {
-      return ok(undefined);
-    }
-
-    // Rewrite HTML files to reference fingerprinted assets
-    for await (
-      const entry of walk(outputDir, {
-        includeDirs: false,
-        exts: [".html"],
-      })
-    ) {
-      let html = await Deno.readTextFile(entry.path);
-      let changed = false;
-
-      for (const [original, fingerprinted] of Object.entries(manifest)) {
-        if (html.includes(original)) {
-          html = html.replaceAll(original, fingerprinted);
-          changed = true;
-        }
-      }
-
-      if (changed) {
-        await Deno.writeTextFile(entry.path, html);
-      }
-    }
-
-    // Write manifest for debugging/cache-busting verification
-    await Deno.writeTextFile(
-      `${outputDir}/asset-manifest.json`,
-      JSON.stringify(manifest, null, 2),
-    );
-
-    logger.info(
-      `Fingerprinted ${Object.keys(manifest).length} assets`,
-    );
-
-    return ok(undefined);
-  } catch (e) {
-    return {
-      ok: false,
-      error: createError(
+  const fail = (error: AppError): AppResult<void> =>
+    err(
+      createError(
         "IOError",
-        `Asset fingerprinting failed: ${
-          e instanceof Error ? e.message : String(e)
-        }`,
-        e,
+        `Asset fingerprinting failed: ${error.message}`,
+        error,
       ),
-    };
+    );
+
+  // Collect the full file list before any rename
+  const listed = await fileWriter.listFiles(outputDir);
+  if (!listed.ok) return fail(listed.error);
+
+  const manifest: Record<string, string> = {};
+
+  for (const filePath of listed.value) {
+    const ext = filePath.substring(filePath.lastIndexOf("."));
+    if (!FINGERPRINT_EXTENSIONS.has(ext)) continue;
+
+    const bytes = await fileWriter.readBytes(filePath);
+    if (!bytes.ok) return fail(bytes.error);
+
+    const relativePath = filePath.substring(outputDir.length);
+    const hash = await hashBytes(bytes.value);
+    const fingerprinted = fingerprintedPath(relativePath, hash);
+
+    const renamed = await fileWriter.rename(
+      filePath,
+      `${outputDir}${fingerprinted}`,
+    );
+    if (!renamed.ok) return fail(renamed.error);
+
+    manifest[relativePath] = fingerprinted;
+    logger.debug(`Fingerprinted: ${relativePath} -> ${fingerprinted}`);
   }
+
+  if (Object.keys(manifest).length === 0) {
+    return ok(undefined);
+  }
+
+  // Rewrite HTML files to reference fingerprinted assets
+  for (const filePath of listed.value) {
+    if (!filePath.endsWith(".html")) continue;
+
+    const read = await fileWriter.readText(filePath);
+    if (!read.ok) return fail(read.error);
+
+    let html = read.value;
+    let changed = false;
+
+    for (const [original, fingerprinted] of Object.entries(manifest)) {
+      if (html.includes(original)) {
+        html = html.replaceAll(original, fingerprinted);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      const written = await fileWriter.writeFile(filePath, html);
+      if (!written.ok) return fail(written.error);
+    }
+  }
+
+  // Write manifest for debugging/cache-busting verification
+  const manifestResult = await fileWriter.writeFile(
+    `${outputDir}/asset-manifest.json`,
+    JSON.stringify(manifest, null, 2),
+  );
+  if (!manifestResult.ok) return fail(manifestResult.error);
+
+  logger.info(
+    `Fingerprinted ${Object.keys(manifest).length} assets`,
+  );
+
+  return ok(undefined);
 };

@@ -3,6 +3,7 @@ import { ok, tryCatch } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import { copy } from "jsr:@std/fs@1.0.14/copy";
 import { ensureDir } from "jsr:@std/fs@1.0.14/ensure-dir";
+import { walk } from "jsr:@std/fs@1.0.14/walk";
 
 export interface FileWriter {
   readonly writeFile: (
@@ -12,6 +13,10 @@ export interface FileWriter {
   readonly ensureDir: (path: string) => Promise<AppResult<void>>;
   readonly copyDir: (src: string, dest: string) => Promise<AppResult<void>>;
   readonly clean: (path: string) => Promise<AppResult<void>>;
+  readonly listFiles: (dir: string) => Promise<AppResult<readonly string[]>>;
+  readonly readBytes: (path: string) => Promise<AppResult<Uint8Array>>;
+  readonly readText: (path: string) => Promise<AppResult<string>>;
+  readonly rename: (from: string, to: string) => Promise<AppResult<void>>;
 }
 
 export const createFileWriter = (): FileWriter => ({
@@ -57,6 +62,45 @@ export const createFileWriter = (): FileWriter => ({
       (e) =>
         createError("IOError", `Failed to clean directory: ${path}`, e, {
           path,
+        }),
+    ),
+
+  listFiles: (dir: string): Promise<AppResult<readonly string[]>> =>
+    tryCatch(
+      async () => {
+        // Collect the full list first so callers can rename during use
+        const files: string[] = [];
+        for await (const entry of walk(dir, { includeDirs: false })) {
+          files.push(entry.path);
+        }
+        return files;
+      },
+      (e) =>
+        createError("IOError", `Failed to list files: ${dir}`, e, {
+          path: dir,
+        }),
+    ),
+
+  readBytes: (path: string): Promise<AppResult<Uint8Array>> =>
+    tryCatch(
+      () => Deno.readFile(path),
+      (e) =>
+        createError("IOError", `Failed to read file: ${path}`, e, { path }),
+    ),
+
+  readText: (path: string): Promise<AppResult<string>> =>
+    tryCatch(
+      () => Deno.readTextFile(path),
+      (e) =>
+        createError("IOError", `Failed to read file: ${path}`, e, { path }),
+    ),
+
+  rename: (from: string, to: string): Promise<AppResult<void>> =>
+    tryCatch(
+      () => Deno.rename(from, to),
+      (e) =>
+        createError("IOError", `Failed to rename ${from} to ${to}`, e, {
+          path: from,
         }),
     ),
 });
