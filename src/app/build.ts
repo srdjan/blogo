@@ -46,9 +46,9 @@ async function main() {
 
   // Minimal analytics stub for route handlers (no KV needed for static build)
   const analyticsStub: AnalyticsService = {
-    incrementViewCount: async () => ok(0),
-    getViewCount: async () => ok(0),
-    getAllViewCounts: async () => ok({} as Record<string, number>),
+    incrementViewCount: () => Promise.resolve(ok(0)),
+    getViewCount: () => Promise.resolve(ok(0)),
+    getAllViewCounts: () => Promise.resolve(ok({} as Record<string, number>)),
     close: () => {},
   };
 

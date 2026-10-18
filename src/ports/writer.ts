@@ -1,5 +1,5 @@
 import type { AppResult } from "../lib/types.ts";
-import { ok, tryCatch } from "../lib/result.ts";
+import { tryCatch } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import { copy } from "@std/fs/copy";
 import { ensureDir } from "@std/fs/ensure-dir";

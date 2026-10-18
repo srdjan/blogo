@@ -1,5 +1,5 @@
 import type { AppResult } from "../lib/types.ts";
-import { err, ok, tryCatch } from "../lib/result.ts";
+import { ok, tryCatch } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
 import type {
@@ -76,7 +76,7 @@ export const createAtProtoClient = async (
 
   const session = sessionResult.value;
 
-  const xrpc = async <T>(
+  const xrpc = <T>(
     method: "GET" | "POST",
     endpoint: string,
     body?: Record<string, unknown>,

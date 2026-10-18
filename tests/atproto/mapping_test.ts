@@ -18,7 +18,6 @@ const makePost = (overrides?: Partial<Post>): Post => ({
 });
 
 const PUBLICATION_URI = "at://did:plc:abc123/site.standard.publication/self";
-const PUBLIC_URL = "https://blog.example.com";
 
 Deno.test("slugToRkey - strips non-alphanumeric/hyphen characters", () => {
   assertEquals(slugToRkey("test-post" as Slug), "test-post");
@@ -34,7 +33,6 @@ Deno.test("postToDocument - maps all fields correctly", () => {
     post,
     rawMarkdown,
     publicationUri: PUBLICATION_URI,
-    publicUrl: PUBLIC_URL,
   });
 
   assertEquals(doc.$type, "site.standard.document");
@@ -64,7 +62,6 @@ Deno.test("postToDocument - handles missing optional fields", () => {
     post,
     rawMarkdown,
     publicationUri: PUBLICATION_URI,
-    publicUrl: PUBLIC_URL,
   });
 
   assertEquals(doc.description, undefined);
@@ -80,7 +77,6 @@ Deno.test("postToDocument - includes updatedAt from modified field", () => {
     post,
     rawMarkdown,
     publicationUri: PUBLICATION_URI,
-    publicUrl: PUBLIC_URL,
   });
 
   assertEquals(doc.updatedAt, "2025-02-01T00:00:00.000Z");
@@ -94,7 +90,6 @@ Deno.test("postToDocument - truncates textContent at 10000 chars", () => {
     post,
     rawMarkdown,
     publicationUri: PUBLICATION_URI,
-    publicUrl: PUBLIC_URL,
   });
 
   assertEquals(doc.textContent?.length, 10000);
@@ -172,7 +167,6 @@ Deno.test("round trip - post -> document -> markdown preserves key fields", () =
     post,
     rawMarkdown,
     publicationUri: PUBLICATION_URI,
-    publicUrl: PUBLIC_URL,
   });
 
   const result = documentToMarkdown(doc);

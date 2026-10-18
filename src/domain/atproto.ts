@@ -74,7 +74,7 @@ export const createAtProtoService = (
 
   const publicationUri = `at://${config.did}/site.standard.publication/self`;
 
-  const ensurePublication = async (): Promise<
+  const ensurePublication = (): Promise<
     AppResult<PutRecordResponse>
   > => {
     const record: Publication = {
@@ -132,7 +132,6 @@ export const createAtProtoService = (
       post,
       rawMarkdown: markdown,
       publicationUri,
-      publicUrl,
     });
 
     const rkey = slugToRkey(slug);

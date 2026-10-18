@@ -13,13 +13,12 @@ export type PostToDocumentParams = {
   readonly post: Post;
   readonly rawMarkdown: string;
   readonly publicationUri: string;
-  readonly publicUrl: string;
 };
 
 export const postToDocument = (
   params: PostToDocumentParams,
 ): StandardDocument => {
-  const { post, rawMarkdown, publicationUri, publicUrl } = params;
+  const { post, rawMarkdown, publicationUri } = params;
 
   const content: DocumentContent = {
     $type: "site.standard.content.markdown",
