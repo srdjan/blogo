@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from "jsr:@std/assert";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import { generateDefaultOGImage, generateOGImage } from "../src/og-image.ts";
 
 Deno.test("generateOGImage - generates valid SVG with basic inputs", () => {

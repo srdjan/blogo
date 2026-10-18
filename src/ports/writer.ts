@@ -1,9 +1,9 @@
 import type { AppResult } from "../lib/types.ts";
 import { ok, tryCatch } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
-import { copy } from "jsr:@std/fs@1.0.14/copy";
-import { ensureDir } from "jsr:@std/fs@1.0.14/ensure-dir";
-import { walk } from "jsr:@std/fs@1.0.14/walk";
+import { copy } from "@std/fs/copy";
+import { ensureDir } from "@std/fs/ensure-dir";
+import { walk } from "@std/fs/walk";
 
 export interface FileWriter {
   readonly writeFile: (

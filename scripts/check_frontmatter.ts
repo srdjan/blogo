@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-read
 
-import { expandGlob } from "jsr:@std/fs/expand-glob";
+import { expandGlob } from "@std/fs/expand-glob";
 import { parse } from "@std/yaml";
 import { validateFrontmatter } from "../src/domain/validation.ts";
 

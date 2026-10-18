@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from "jsr:@std/assert";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import { generateRobotsTxt, generateSitemap } from "../src/sitemap.ts";
 import type { Post, Slug, TagName } from "../src/lib/types.ts";
 

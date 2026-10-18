@@ -10,4 +10,4 @@ if ! command -v deno >/dev/null 2>&1; then
 fi
 
 # Run the bot from JSR
-exec deno run --allow-env --allow-net --allow-run --allow-read --allow-write jsr:@srdjan/bluesky-bot
+exec deno run --allow-env --allow-net --allow-run --allow-read --allow-write jsr:@srdjan/bluesky-bot@1.5.0
