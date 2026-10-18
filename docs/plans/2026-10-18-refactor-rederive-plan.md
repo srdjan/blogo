@@ -251,7 +251,14 @@ this file.
   it (section 5), do not delete it.
 - htmx 1.9.10 to a newer major: out of scope.
 
-## Decisions for the user
+## Decisions (answered 2026-10-18)
+
+The user chose option (a) for D1 to D6 and approved Phase 0. For D2 the user
+also chose to upgrade htmx from 1.9.10 to 4.0.0, because htmx 1.9 does not
+swap 5xx responses and htmx 4 does. The Phase 0 spec is
+`docs/plans/2026-10-18-phase-0-spec.md`. It replaces the B2 idea "skip names
+that already carry a hash": `build()` cleans the output directory first, so
+the repeated hashes come only from the tests' disk leak.
 
 - D1 B1 search escaping: (a) fix now in Phase 0 (recommended), (b) defer.
 - D2 B4 error caching: (a) error pages return 500 (recommended), (b) keep
