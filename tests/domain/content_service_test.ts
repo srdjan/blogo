@@ -387,3 +387,59 @@ This is about JavaScript.`,
     assertEquals(result.value[0]?.title, "Searchable Post");
   }
 });
+
+Deno.test("ContentService - hides draft posts from every reader", async () => {
+  const mockFiles = {
+    "content/posts/live-post.md": `---
+title: Live Post
+date: 2025-01-15
+tags:
+  - Public
+---
+
+# Live
+
+Visible content about apples.`,
+
+    "content/posts/draft-post.md": `---
+title: Draft Post
+date: 2025-01-16
+tags:
+  - Secret
+draft: true
+---
+
+# Draft
+
+Hidden content about zebras.`,
+  };
+
+  const postCache = createInMemoryCache<Post>();
+  const contentService = createContentService({
+    fileSystem: createMockFileSystem(mockFiles),
+    logger: createMockLogger(),
+    cache: createInMemoryCache<readonly Post[]>(),
+    metadataCache: createInMemoryCache<readonly PostMeta[]>(),
+    postCache,
+    postsDir: "content/posts",
+  });
+
+  const posts = await contentService.loadPosts();
+  assertEquals(posts.ok && posts.value.map((p) => p.title), ["Live Post"]);
+
+  const metadata = await contentService.loadPostsMetadata();
+  assertEquals(metadata.ok && metadata.value.map((p) => p.title), [
+    "Live Post",
+  ]);
+
+  const tags = await contentService.getTags();
+  assertEquals(tags.ok && tags.value.map((t) => String(t.name)), ["Public"]);
+
+  const search = await contentService.searchPosts("zebras");
+  assertEquals(search.ok && search.value.length, 0);
+
+  const draft = await contentService.getPostBySlug(createSlug("draft-post"));
+  assertEquals(draft.ok && draft.value, null);
+  const cached = postCache.get("draft-post");
+  assertEquals(cached.ok && cached.value.status, "miss");
+});

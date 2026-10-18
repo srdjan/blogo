@@ -258,9 +258,11 @@ export const createContentService = (
       return combinedResult;
     }
 
-    const sortedPosts = [...combinedResult.value].sort((a: Post, b: Post) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    // Drafts are never published
+    const sortedPosts = combinedResult.value.filter((p) => !p.draft).sort((
+      a: Post,
+      b: Post,
+    ) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     logger.info(`Loaded ${sortedPosts.length} posts`);
     return ok(sortedPosts);
@@ -296,7 +298,8 @@ export const createContentService = (
       return combinedResult;
     }
 
-    const sortedMeta = [...combinedResult.value].sort((
+    // Drafts are never published
+    const sortedMeta = combinedResult.value.filter((m) => !m.draft).sort((
       a: PostMeta,
       b: PostMeta,
     ) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -428,9 +431,12 @@ export const createContentService = (
 
     // Parse the single post directly
     const postResult = await parseMarkdown(filePath, slug);
-    if (postResult.ok) {
-      postCache.set(slug as string, postResult.value, Infinity);
-    }
+    if (!postResult.ok) return postResult;
+
+    // A draft looks like a missing post and stays out of the cache
+    if (postResult.value.draft) return ok(null);
+
+    postCache.set(slug as string, postResult.value, Infinity);
     return postResult;
   };
 
@@ -548,6 +554,7 @@ function parseFrontmatter(
       ...(validatedMeta.excerpt && { excerpt: validatedMeta.excerpt }),
       ...(tags && { tags }),
       ...(validatedMeta.modified && { modified: validatedMeta.modified }),
+      ...(validatedMeta.draft === true ? { draft: true as const } : {}),
     };
 
     return ok(result);

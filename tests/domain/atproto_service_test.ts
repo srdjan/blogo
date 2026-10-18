@@ -261,6 +261,39 @@ Deno.test("AtProtoService - publishAll publishes all markdown files", async () =
   }
 });
 
+Deno.test("AtProtoService - publishAll skips draft posts", async () => {
+  const client = createMockClient();
+  const files: Record<string, string> = {
+    "content/posts/draft-post.md": POST_CONTENT.replace(
+      "excerpt:",
+      "draft: true\nexcerpt:",
+    ),
+  };
+
+  const service = createAtProtoService({
+    client,
+    fileSystem: createMockFileSystem(files),
+    fileWriter: createMockFileWriter(),
+    logger: createMockLogger(),
+    config: TEST_CONFIG,
+    postsDir: "content/posts",
+    publicUrl: "https://blog.example.com",
+    blogName: "Test Blog",
+    blogDescription: "A test blog",
+  });
+
+  const result = await service.publishAll();
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.published, 0);
+    assertEquals(result.value.skipped, 1);
+    assertEquals(result.value.errors.length, 0);
+  }
+  // No putRecord call: the mock client stores nothing
+  assertEquals(client.store.size, 0);
+});
+
 Deno.test("AtProtoService - pullAll writes documents as markdown files", async () => {
   const client = createMockClient();
   const fileWriter = createMockFileWriter();

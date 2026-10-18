@@ -51,6 +51,7 @@ export type PostMeta = {
   readonly excerpt?: string;
   readonly tags?: readonly TagName[];
   readonly modified?: string;
+  readonly draft?: true;
 };
 
 export type Post = PostMeta & {

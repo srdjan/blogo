@@ -26,6 +26,10 @@ export type PublishReport = {
   readonly errors: readonly string[];
 };
 
+export type PublishOutcome =
+  | { readonly kind: "published"; readonly response: PutRecordResponse }
+  | { readonly kind: "skipped"; readonly reason: "draft" };
+
 export type PullReport = {
   readonly pulled: number;
   readonly skipped: number;
@@ -35,7 +39,7 @@ export type PullReport = {
 export interface AtProtoService {
   readonly ensurePublication: () => Promise<AppResult<PutRecordResponse>>;
   readonly publishAll: () => Promise<AppResult<PublishReport>>;
-  readonly publishPost: (slug: Slug) => Promise<AppResult<PutRecordResponse>>;
+  readonly publishPost: (slug: Slug) => Promise<AppResult<PublishOutcome>>;
   readonly pullAll: (
     options?: { readonly force?: boolean },
   ) => Promise<AppResult<PullReport>>;
@@ -90,7 +94,7 @@ export const createAtProtoService = (
 
   const publishPost = async (
     slug: Slug,
-  ): Promise<AppResult<PutRecordResponse>> => {
+  ): Promise<AppResult<PublishOutcome>> => {
     const filePath = `${postsDir}/${slug as string}.md`;
     const fileResult = await fileSystem.readFile(filePath);
     if (!fileResult.ok) return fileResult;
@@ -103,6 +107,11 @@ export const createAtProtoService = (
     // Parse frontmatter to get post metadata
     const { parse: parseYaml } = await import("@std/yaml");
     const meta = parseYaml(frontmatter) as Record<string, unknown>;
+
+    if (meta.draft === true) {
+      logger.info(`Skipping draft: ${slug}`);
+      return ok({ kind: "skipped", reason: "draft" });
+    }
 
     const htmlResult = markdownToHtml(markdown);
     if (!htmlResult.ok) return htmlResult;
@@ -129,11 +138,13 @@ export const createAtProtoService = (
     const rkey = slugToRkey(slug);
     logger.info(`Publishing: ${slug} -> ${rkey}`);
 
-    return client.putRecord({
+    const putResult = await client.putRecord({
       collection: "site.standard.document",
       rkey,
       record: doc as unknown as Record<string, unknown>,
     });
+    if (!putResult.ok) return putResult;
+    return ok({ kind: "published", response: putResult.value });
   };
 
   const publishAll = async (): Promise<AppResult<PublishReport>> => {
@@ -153,7 +164,14 @@ export const createAtProtoService = (
       const result = await publishPost(slug);
 
       if (result.ok) {
-        published++;
+        switch (result.value.kind) {
+          case "published":
+            published++;
+            break;
+          case "skipped":
+            skipped++;
+            break;
+        }
       } else {
         errors.push(`${slug}: ${result.error.message}`);
         logger.error(`Failed to publish ${slug}`, result.error);
