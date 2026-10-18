@@ -236,6 +236,14 @@ this file.
 - **Phase 1, dead code and tooling.** T1, M1, M2, M3, M11, R1, R2, R3, R4, R5.
   Expected: 0 lint problems; LOC and branches drop (measure); function coverage
   of `result.ts` and `middleware.ts` rises.
+  Result (2026-10-18, commits `312f3d4` to `167b760`): done. 251 passed,
+  0 failed, 6 ignored (the 4 deleted tests covered deleted middleware).
+  `deno task metrics`: 6101 LOC and 836 branches (from 6520 and 903).
+  `deno lint` on `src/`: 0 problems. `deno lint tests/ scripts/`: 86
+  problems (76 `require-await`, 9 `no-unused-vars`, 1 `no-explicit-any`),
+  left for Phase 2. HTTP smoke checks unchanged. `deno task build`: 187
+  pages, 133 fragments, 0 errors; each asset has one hash and the HTML
+  references the new names.
 - **Phase 2, test net.** Q1, Q3-Q10. Expected: `routes.tsx` and `Layout.tsx`
   appear in the coverage report; 0 ignored tests; no test over 1 s.
 - **Phase 3, mechanical rederive.** M4 with T2, M5, M6, M7, M9, M10, M12.
