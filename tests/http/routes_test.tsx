@@ -4,7 +4,8 @@ import type { RouteContext } from "../../src/http/types.ts";
 import type { ContentService } from "../../src/domain/content.ts";
 import type { HealthService } from "../../src/domain/health.ts";
 import type { AnalyticsService } from "../../src/domain/analytics.ts";
-import { ok } from "../../src/lib/result.ts";
+import { err, ok } from "../../src/lib/result.ts";
+import { createError } from "../../src/lib/error.ts";
 import type { Post, PostMeta, Slug, TagName } from "../../src/lib/types.ts";
 
 // --- Test doubles ---
@@ -133,4 +134,51 @@ Deno.test("routes - search-modal escapes matching post titles", async () => {
   const body = await res.text();
   assertStringIncludes(body, "&lt;script&gt;");
   assertEquals(body.includes("<script>"), false);
+});
+
+// --- error pages ---
+
+Deno.test("routes - home returns 500 when posts fail to load", async () => {
+  const handlers = createHandlers(
+    createContentService({
+      loadPostsMetadataWithViews: async () =>
+        err(createError("IOError", "disk failure")),
+    }),
+  );
+  const res = await handlers.home(contextFor("/"));
+  assertEquals(res.status, 500);
+  assertStringIncludes(await res.text(), "Failed to load posts");
+});
+
+Deno.test("routes - production HTML cache skips error pages", async () => {
+  const previous = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "production");
+  try {
+    let failing = true;
+    const handlers = createHandlers(
+      createContentService({
+        loadPostsMetadataWithViews: async () =>
+          failing ? err(createError("IOError", "disk failure")) : ok([POST]),
+      }),
+    );
+
+    const first = await handlers.home(contextFor("/"));
+    assertEquals(first.status, 500);
+    await first.text();
+
+    failing = false;
+    const second = await handlers.home(contextFor("/"));
+    assertEquals(second.status, 200);
+    assertEquals(second.headers.get("X-Cache") === "HIT", false);
+    assertStringIncludes(await second.text(), "Test Post");
+  } finally {
+    if (previous === undefined) Deno.env.delete("DENO_ENV");
+    else Deno.env.set("DENO_ENV", previous);
+  }
+});
+
+Deno.test("routes - tagPosts returns 400 for an invalid tag name", async () => {
+  const handlers = createHandlers();
+  const res = await handlers.tagPosts(contextFor("/tags/"));
+  assertEquals(res.status, 400);
 });

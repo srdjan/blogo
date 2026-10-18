@@ -89,8 +89,13 @@ export const createRouteHandlers = (
   const renderPage = (
     ctx: RouteContext,
     props: Parameters<typeof createLayout>[0],
+    status = 200,
   ): Response => {
-    return isHtmxRequest(ctx.req) ? renderFragment(props) : createLayout(props);
+    const response = isHtmxRequest(ctx.req)
+      ? renderFragment(props)
+      : createLayout(props);
+    if (status === 200) return response;
+    return new Response(response.body, { status, headers: response.headers });
   };
 
   // HTML response cache: caches rendered HTML keyed by route path
@@ -164,7 +169,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <div>Failed to load posts</div>,
-        }),
+        }, 500),
     });
   };
 
@@ -198,7 +203,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <div>Failed to load tags</div>,
-        }),
+        }, 500),
     });
   };
 
@@ -214,7 +219,7 @@ export const createRouteHandlers = (
         path: createUrlPath(ctx.pathname),
         origin: ctx.url.origin,
         children: <div>Invalid tag name</div>,
-      });
+      }, 400);
     }
 
     const tagName = tagNameResult.value;
@@ -237,7 +242,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <div>Failed to load posts for tag</div>,
-        }),
+        }, 500),
     });
   };
 
@@ -336,7 +341,7 @@ export const createRouteHandlers = (
           origin: ctx.url.origin,
           robots: "noindex, nofollow",
           children: <div>Failed to search posts</div>,
-        }),
+        }, 500),
     });
   };
 
@@ -462,7 +467,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <div>Failed to load RSS data</div>,
-        }),
+        }, 500),
     });
   };
 
