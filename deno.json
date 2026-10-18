@@ -50,8 +50,7 @@
     "exactOptionalPropertyTypes": true,
     "useUnknownInCatchVariables": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "hsx",
-    "types": ["./src/types/jsx.d.ts"]
+    "jsxImportSource": "hsx"
   },
   "unstable": ["kv"],
   "deploy": {

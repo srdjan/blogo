@@ -32,7 +32,7 @@ async function validateFile(path: string): Promise<ValidationFailure | null> {
     };
   }
 
-  const frontmatterBlock = match[1];
+  const frontmatterBlock = match[1] ?? "";
 
   let parsed: unknown;
   try {
