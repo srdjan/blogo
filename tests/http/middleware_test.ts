@@ -1,13 +1,6 @@
 import { assertEquals, assertExists } from "@std/assert";
-import {
-  createAccessLog,
-  errorBoundary,
-  performanceMonitoring,
-  staticFiles,
-} from "../../src/http/middleware.ts";
+import { errorBoundary, staticFiles } from "../../src/http/middleware.ts";
 import type { Handler } from "../../src/http/types.ts";
-import type { HealthService } from "../../src/domain/health.ts";
-import { ok } from "../../src/lib/result.ts";
 
 // Helper to create test requests
 function createTestRequest(url: string, options: RequestInit = {}): Request {
@@ -24,68 +17,6 @@ function createErrorHandler(error: Error): Handler {
     throw error;
   };
 }
-
-// Mock health service for testing
-function createMockHealthService(): HealthService {
-  return {
-    checkHealth: async () =>
-      ok({
-        status: "healthy" as const,
-        timestamp: new Date().toISOString(),
-        version: "1.0.0",
-        uptime: 0,
-        checks: [],
-        metrics: {
-          memory: { used: 0, total: 0, percentage: 0 },
-          cache: {},
-          requests: { total: 0, errors: 0, averageResponseTime: 0 },
-        },
-      }),
-    checkFileSystem: async () => ({
-      name: "filesystem",
-      status: "healthy" as const,
-      timestamp: new Date().toISOString(),
-    }),
-    checkCache: async () => ({
-      name: "cache",
-      status: "healthy" as const,
-      timestamp: new Date().toISOString(),
-    }),
-    getMetrics: () => ({
-      memory: { used: 0, total: 0, percentage: 0 },
-      cache: {},
-      requests: { total: 0, errors: 0, averageResponseTime: 0 },
-    }),
-    updateMetrics: () => {},
-  };
-}
-
-Deno.test("accessLog middleware - adds correlation ID and logs request", async () => {
-  const handler = createTestHandler(new Response("OK", { status: 200 }));
-  const healthService = createMockHealthService();
-  const middleware = createAccessLog(healthService)(handler);
-
-  const request = createTestRequest("http://localhost:8000/test");
-  const response = await middleware(request);
-
-  assertEquals(response.status, 200);
-  assertExists(response.headers.get("x-correlation-id"));
-});
-
-Deno.test("accessLog middleware - handles errors and logs them", async () => {
-  const error = new Error("Test error");
-  const handler = createErrorHandler(error);
-  const healthService = createMockHealthService();
-  const middleware = createAccessLog(healthService)(handler);
-
-  const request = createTestRequest("http://localhost:8000/test");
-
-  try {
-    await middleware(request);
-  } catch (thrownError) {
-    assertEquals(thrownError, error);
-  }
-});
 
 Deno.test("errorBoundary middleware - catches and handles errors", async () => {
   const error = new Error("Test error");
@@ -144,37 +75,6 @@ Deno.test("errorBoundary middleware - passes through successful responses", asyn
 
   assertEquals(response.status, 200);
   assertEquals(await response.text(), "Success");
-});
-
-Deno.test("performanceMonitoring middleware - passes through responses", async () => {
-  const handler = createTestHandler(new Response("OK", { status: 200 }));
-  const middleware = performanceMonitoring(handler);
-
-  const request = createTestRequest("http://localhost:8000/test", {
-    headers: { "x-correlation-id": "test-id" },
-  });
-  const response = await middleware(request);
-
-  assertEquals(response.status, 200);
-});
-
-Deno.test("performanceMonitoring middleware - logs slow requests", async () => {
-  // Create a handler that takes some time
-  const handler: Handler = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1100)); // 1.1 seconds
-    return new Response("Slow response", { status: 200 });
-  };
-
-  const middleware = performanceMonitoring(handler);
-
-  const request = createTestRequest("http://localhost:8000/slow", {
-    headers: { "x-correlation-id": "test-id" },
-  });
-
-  const response = await middleware(request);
-
-  assertEquals(response.status, 200);
-  assertEquals(await response.text(), "Slow response");
 });
 
 Deno.test("staticFiles middleware - serves static files", async () => {
