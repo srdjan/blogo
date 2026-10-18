@@ -224,6 +224,15 @@ this file.
 - **Phase 0, bugs (behavior changes, need D1-D3).** B1, B2 (with Q2), B4 (with
   a route test from Q1), B3 if D3 is "hide". Expected: 0 failing tests;
   `_site/` names stable after two builds.
+  Result (2026-10-18, commits `675f793` to `f5d215b`): done. 255 passed,
+  0 failed, 6 ignored. `src/` 6520 LOC and 903 branches (+79 LOC, +25
+  branches from the port methods, the outcome type, and the htmx rule).
+  Branch coverage 81.4%; line coverage 64.8%. The line figure is lower
+  because `routes.tsx` and `Layout.tsx` now enter the report (routes.tsx
+  32.8% lines). Lint: 11 problems. htmx checker: 0 issues. Checked over
+  HTTP against a production server: fragment rule, history-restore full
+  page, `Vary`, cache hit, escaped search query, 404. Not checked: browser
+  behavior of back/forward, scroll restore, and listener re-binding.
 - **Phase 1, dead code and tooling.** T1, M1, M2, M3, M11, R1, R2, R3, R4, R5.
   Expected: 0 lint problems; LOC and branches drop (measure); function coverage
   of `result.ts` and `middleware.ts` rises.
