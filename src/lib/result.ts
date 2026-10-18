@@ -45,35 +45,12 @@ export function map<T, E, U>(
   }
 }
 
-export function mapError<T, E, F>(
-  result: Result<T, E>,
-  fn: (error: E) => F,
-): Result<T, F> {
-  if (result.ok) {
-    return result;
-  } else {
-    return err(fn(result.error));
-  }
-}
-
 export async function tryCatch<T, E = Error>(
   fn: () => Promise<T>,
   errorFn: (error: unknown) => E = (e) => e as E,
 ): Promise<Result<T, E>> {
   try {
     const value = await fn();
-    return ok(value);
-  } catch (error) {
-    return err(errorFn(error));
-  }
-}
-
-export function tryCatchSync<T, E = Error>(
-  fn: () => T,
-  errorFn: (error: unknown) => E = (e) => e as E,
-): Result<T, E> {
-  try {
-    const value = fn();
     return ok(value);
   } catch (error) {
     return err(errorFn(error));
@@ -100,26 +77,6 @@ export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
 
 export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
   return !result.ok;
-}
-
-export function chainAsync<T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => Promise<Result<U, E>>,
-): Promise<Result<U, E>> {
-  if (result.ok) {
-    return fn(result.value);
-  }
-  return Promise.resolve(result);
-}
-
-export async function mapAsync<T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => Promise<U>,
-): Promise<Result<U, E>> {
-  if (result.ok) {
-    return ok(await fn(result.value));
-  }
-  return result;
 }
 
 export const getOrElse = <T, E>(result: Result<T, E>, defaultValue: T): T =>

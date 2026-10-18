@@ -3,7 +3,6 @@ import { err, ok, type Result } from "./result.ts";
 export type Brand<T, K> = T & { readonly __brand: K };
 
 export type Slug = Brand<string, "Slug">;
-export type PostId = Brand<string, "PostId">;
 export type TagName = Brand<string, "TagName">;
 export type UrlPath = Brand<string, "UrlPath">;
 
@@ -12,17 +11,6 @@ export const createSlug = (value: string): Slug => {
     /-+/g,
     "-",
   ) as Slug;
-};
-
-export const createPostId = (value: string): AppResult<PostId> => {
-  const trimmed = value.trim();
-  if (trimmed.length === 0) {
-    return err({
-      kind: "ValidationError",
-      message: "Post ID cannot be empty",
-    });
-  }
-  return ok(trimmed as PostId);
 };
 
 export const createTagName = (value: string): AppResult<TagName> => {
@@ -64,15 +52,6 @@ export type TagInfo = {
   readonly name: TagName;
   readonly count: number;
   readonly posts: readonly Post[];
-};
-
-export type RenderContext = {
-  readonly title: string;
-  readonly posts?: readonly Post[];
-  readonly post?: Post;
-  readonly tags?: readonly TagInfo[];
-  readonly activeTag?: TagName;
-  readonly path: UrlPath;
 };
 
 export type LayoutProps = {

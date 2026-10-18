@@ -60,10 +60,3 @@ export const createLogger = (config: LoggerConfig): Logger => {
     debug: (message: string, data?: unknown) => log("debug", message, data),
   };
 };
-
-export const noopLogger: Logger = {
-  error: () => {},
-  warn: () => {},
-  info: () => {},
-  debug: () => {},
-};
