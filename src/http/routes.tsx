@@ -1,4 +1,18 @@
 import type { RouteHandler } from "./types.ts";
+import {
+  htmlResponse,
+  isHtmxRequest,
+  NOINDEX,
+  pageView,
+  PLAIN_CONTENT_TYPE,
+  renderPageBody,
+  RSS_CONTENT_TYPE,
+  textView,
+  toResponse,
+  type View,
+  type ViewHandler,
+  XML_CONTENT_TYPE,
+} from "./view.ts";
 import type { ContentService } from "../domain/content.ts";
 import type { HealthService } from "../domain/health.ts";
 import type { AnalyticsService } from "../domain/analytics.ts";
@@ -17,16 +31,10 @@ import {
 import { generateRSS, generateTopicRssFeed } from "../rss.ts";
 import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
-import {
-  createSlug,
-  createTagName,
-  createUrlPath,
-  type LayoutProps,
-} from "../lib/types.ts";
+import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
 import { match } from "../lib/result.ts";
 import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
-import { renderVNode } from "./render-vnode.ts";
 import type { RouteContext } from "./types.ts";
 import type { SiteConfig } from "../domain/config.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
@@ -55,25 +63,11 @@ export type RouteHandlers = {
 };
 
 const SITE_AUTHOR = "Srdjan Strbanovic";
-const HTML_CONTENT_TYPE = "text/html; charset=utf-8";
-const RSS_CONTENT_TYPE = "application/rss+xml; charset=utf-8";
-const XML_CONTENT_TYPE = "application/xml; charset=utf-8";
 
-const svgResponse = (svg: string): Response =>
-  new Response(svg, {
-    headers: {
-      "Content-Type": "image/svg+xml",
-      "Cache-Control": "max-age=3600",
-    },
-  });
-
-const xmlResponse = (body: string, contentType: string): Response =>
-  new Response(body, {
-    headers: {
-      "Content-Type": contentType,
-      "Cache-Control": "max-age=3600",
-    },
-  });
+const SEARCH_MODAL_TEXT_HEADERS = {
+  "Content-Type": PLAIN_CONTENT_TYPE,
+  "X-Robots-Tag": NOINDEX,
+} as const;
 
 export type RouteDependencies = {
   readonly contentService: ContentService;
@@ -87,46 +81,14 @@ export type RouteDependencies = {
 export const createRouteHandlers = (
   deps: RouteDependencies,
 ): RouteHandlers => {
-  const { contentService, healthService, analyticsService, atConfig, isProd } =
-    deps;
-
-  const htmlCacheHeaders = isProd
-    ? {
-      "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
-    }
-    : {
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      "Pragma": "no-cache",
-      "Expires": "0",
-    };
-
-  // htmx 4 marks body-targeted requests (including history restore) as "full".
-  // Those need the whole page, not a fragment.
-  const isHtmxRequest = (req: Request): boolean =>
-    req.headers.get("HX-Request") === "true" &&
-    req.headers.get("HX-Request-Type") !== "full";
-
-  const htmlResponse = (body: string, status = 200): Response =>
-    new Response(body, {
-      status,
-      headers: {
-        "Content-Type": HTML_CONTENT_TYPE,
-        ...htmlCacheHeaders,
-        "Vary": "HX-Request, HX-Request-Type",
-      },
-    });
-
-  const renderPage = (
-    ctx: RouteContext,
-    props: LayoutProps,
-    status = 200,
-  ): Response =>
-    htmlResponse(
-      isHtmxRequest(ctx.req)
-        ? renderVNode(props.children)
-        : renderLayout(props, deps.site),
-      status,
-    );
+  const {
+    contentService,
+    healthService,
+    analyticsService,
+    atConfig,
+    site,
+    isProd,
+  } = deps;
 
   // HTML response cache: caches rendered HTML keyed by route path
   const htmlCache: Cache<string> = createInMemoryCache<string>();
@@ -136,52 +98,42 @@ export const createRouteHandlers = (
     htmlCache.clear();
   };
 
-  const cachedRender = (
-    handler: RouteHandler,
-  ): RouteHandler =>
-  async (ctx) => {
-    if (htmlCacheTtlMs === 0) return handler(ctx);
+  const plain = (handler: ViewHandler): RouteHandler => async (ctx) =>
+    toResponse(await handler(ctx), ctx, { site, isProd });
+
+  const cachedRender = (handler: ViewHandler): RouteHandler => async (ctx) => {
+    if (htmlCacheTtlMs === 0) {
+      return toResponse(await handler(ctx), ctx, { site, isProd });
+    }
 
     const prefix = isHtmxRequest(ctx.req) ? "htmx:" : "page:";
     const cacheKey = `${prefix}${ctx.pathname}`;
 
     const cached = htmlCache.get(cacheKey);
     if (cached.ok && cached.value.status === "hit") {
-      return new Response(cached.value.value, {
-        headers: {
-          "Content-Type": HTML_CONTENT_TYPE,
-          ...htmlCacheHeaders,
-          "Vary": "HX-Request, HX-Request-Type",
-          "X-Cache": "HIT",
-        },
+      return htmlResponse(cached.value.value, isProd, 200, {
+        "X-Cache": "HIT",
       });
     }
 
-    const response = await handler(ctx);
+    const view = await handler(ctx);
 
-    // Only cache successful HTML responses
-    if (response.status === 200) {
-      const body = await response.text();
+    // Only cache successful HTML pages
+    if (view.kind === "page" && view.status === 200) {
+      const body = renderPageBody(view.props, ctx, site);
       htmlCache.set(cacheKey, body, htmlCacheTtlMs);
-      return new Response(body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: new Headers([
-          ...response.headers.entries(),
-          ["X-Cache", "MISS"],
-        ]),
-      });
+      return htmlResponse(body, isProd, 200, { "X-Cache": "MISS" });
     }
 
-    return response;
+    return toResponse(view, ctx, { site, isProd });
   };
 
-  const home: RouteHandler = async (ctx) => {
+  const home: ViewHandler = async (ctx) => {
     const postsResult = await contentService.loadPostsMetadataWithViews();
 
     return match(postsResult, {
       ok: (posts) =>
-        renderPage(ctx, {
+        pageView({
           title: "Blog - Home",
           description: "A minimal blog built with hsx",
           path: createUrlPath(ctx.pathname),
@@ -190,7 +142,7 @@ export const createRouteHandlers = (
           author: SITE_AUTHOR,
         }),
       error: () =>
-        renderPage(ctx, {
+        pageView({
           title: "Error - Blog",
           description: "Failed to load posts",
           path: createUrlPath(ctx.pathname),
@@ -200,8 +152,8 @@ export const createRouteHandlers = (
     });
   };
 
-  const about: RouteHandler = (ctx) => {
-    return renderPage(ctx, {
+  const about: ViewHandler = (ctx) => {
+    return pageView({
       title: "About - Blog",
       description: "About this blog and its features",
       path: createUrlPath(ctx.pathname),
@@ -210,12 +162,12 @@ export const createRouteHandlers = (
     });
   };
 
-  const tags: RouteHandler = async (ctx) => {
+  const tags: ViewHandler = async (ctx) => {
     const tagsResult = await contentService.getTags();
 
     return match(tagsResult, {
       ok: (tags) =>
-        renderPage(ctx, {
+        pageView({
           title: "Tags - Blog",
           description: "Browse posts by tags",
           path: createUrlPath(ctx.pathname),
@@ -224,7 +176,7 @@ export const createRouteHandlers = (
           author: SITE_AUTHOR,
         }),
       error: () =>
-        renderPage(ctx, {
+        pageView({
           title: "Error - Blog",
           description: "Failed to load tags",
           path: createUrlPath(ctx.pathname),
@@ -234,13 +186,13 @@ export const createRouteHandlers = (
     });
   };
 
-  const tagPosts: RouteHandler = async (ctx) => {
+  const tagPosts: ViewHandler = async (ctx) => {
     const tagNameResult = createTagName(
       decodeURIComponent(ctx.pathname.replace("/tags/", "")),
     );
 
     if (!tagNameResult.ok) {
-      return renderPage(ctx, {
+      return pageView({
         title: "Error - Blog",
         description: "Invalid tag name",
         path: createUrlPath(ctx.pathname),
@@ -254,7 +206,7 @@ export const createRouteHandlers = (
 
     return match(postsResult, {
       ok: (posts) =>
-        renderPage(ctx, {
+        pageView({
           title: `Posts tagged "${tagName}" - Blog`,
           description: `All posts tagged with ${tagName}`,
           path: createUrlPath(ctx.pathname),
@@ -263,7 +215,7 @@ export const createRouteHandlers = (
           author: SITE_AUTHOR,
         }),
       error: () =>
-        renderPage(ctx, {
+        pageView({
           title: "Error - Blog",
           description: "Failed to load posts for tag",
           path: createUrlPath(ctx.pathname),
@@ -273,18 +225,18 @@ export const createRouteHandlers = (
     });
   };
 
-  const post: RouteHandler = async (ctx) => {
+  const post: ViewHandler = async (ctx) => {
     const slug = createSlug(ctx.pathname.replace("/posts/", ""));
     const postResult = await contentService.getPostBySlug(slug);
 
     if (!postResult.ok) {
-      return new Response("Failed to load post", { status: 500 });
+      return textView("Failed to load post", 500);
     }
 
     const post = postResult.value;
 
     if (!post) {
-      return new Response("Post not found", { status: 404 });
+      return textView("Post not found", 404);
     }
 
     // Fire-and-forget: increment view count without blocking response
@@ -299,7 +251,7 @@ export const createRouteHandlers = (
       ? `at://${atConfig.did}/site.standard.document/${slugToRkey(slug)}`
       : undefined;
 
-    return renderPage(ctx, {
+    return pageView({
       title: `${post.title} - Blog`,
       description: post.excerpt || `Read ${post.title}`,
       path: createUrlPath(ctx.pathname),
@@ -314,11 +266,11 @@ export const createRouteHandlers = (
     });
   };
 
-  const search: RouteHandler = async (ctx) => {
+  const search: ViewHandler = async (ctx) => {
     const query = ctx.searchParams.get("q");
 
     if (!query) {
-      return renderPage(ctx, {
+      return pageView({
         title: "Search - Blog",
         description: "Search blog posts",
         path: createUrlPath(ctx.pathname),
@@ -350,7 +302,7 @@ export const createRouteHandlers = (
 
     return match(postsResult, {
       ok: (posts) =>
-        renderPage(ctx, {
+        pageView({
           title: `Search: "${query}" - Blog`,
           description: `Search results for ${query}`,
           path: createUrlPath(ctx.pathname),
@@ -360,7 +312,7 @@ export const createRouteHandlers = (
           children: <SearchResults posts={posts} query={query} />,
         }),
       error: () =>
-        renderPage(ctx, {
+        pageView({
           title: "Error - Blog",
           description: "Failed to search posts",
           path: createUrlPath(ctx.pathname),
@@ -371,33 +323,28 @@ export const createRouteHandlers = (
     });
   };
 
-  const searchModal: RouteHandler = async (ctx) => {
+  const searchModal: ViewHandler = async (ctx) => {
     const query = ctx.searchParams.get("q");
 
     if (!query) {
-      return new Response("Missing query parameter", {
+      return {
+        kind: "text",
+        body: "Missing query parameter",
         status: 400,
-        headers: {
-          "Content-Type": "text/plain; charset=utf-8",
-          "X-Robots-Tag": "noindex, nofollow",
-        },
-      });
+        headers: SEARCH_MODAL_TEXT_HEADERS,
+      };
     }
 
     const postsResult = await contentService.searchPosts(query);
 
     return match(postsResult, {
-      ok: (posts) => {
+      ok: (posts): View => {
         if (posts.length === 0) {
-          return new Response(
-            `<p>No posts found for "${escapeHtml(query)}".</p>`,
-            {
-              headers: {
-                "Content-Type": "text/html; charset=utf-8",
-                "X-Robots-Tag": "noindex, nofollow",
-              },
-            },
-          );
+          return {
+            kind: "fragment",
+            html: `<p>No posts found for "${escapeHtml(query)}".</p>`,
+            headers: { "X-Robots-Tag": NOINDEX },
+          };
         }
 
         const listItems = posts.map((post) =>
@@ -416,25 +363,22 @@ export const createRouteHandlers = (
         const html =
           `<ul style="list-style: none; padding: 0; margin: 0;">${listItems}</ul>`;
 
-        return new Response(html, {
-          headers: {
-            "Content-Type": "text/html; charset=utf-8",
-            "X-Robots-Tag": "noindex, nofollow",
-          },
-        });
+        return {
+          kind: "fragment",
+          html,
+          headers: { "X-Robots-Tag": NOINDEX },
+        };
       },
-      error: () =>
-        new Response("Search failed", {
-          status: 500,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            "X-Robots-Tag": "noindex, nofollow",
-          },
-        }),
+      error: (): View => ({
+        kind: "text",
+        body: "Search failed",
+        status: 500,
+        headers: SEARCH_MODAL_TEXT_HEADERS,
+      }),
     });
   };
 
-  const rss: RouteHandler = async (ctx) => {
+  const rss: ViewHandler = async (ctx) => {
     const postsResult = await contentService.loadPosts();
 
     return match(postsResult, {
@@ -447,14 +391,14 @@ export const createRouteHandlers = (
           "A minimal blog built with hsx",
         );
 
-        return xmlResponse(rssContent, RSS_CONTENT_TYPE);
+        return { kind: "xml", body: rssContent, contentType: RSS_CONTENT_TYPE };
       },
-      error: () => new Response("Failed to generate RSS", { status: 500 }),
+      error: () => textView("Failed to generate RSS", 500),
     });
   };
 
   // RSS subscription page
-  const rssPage: RouteHandler = async (ctx) => {
+  const rssPage: ViewHandler = async (ctx) => {
     const postsResult = await contentService.loadPostsMetadata();
     return match(postsResult, {
       ok: (posts) => {
@@ -473,7 +417,7 @@ export const createRouteHandlers = (
           feedPath: `/rss/topic/${topicToSlug(topicName)}`,
           count: topicCounts.get(topicName) ?? 0,
         }));
-        return renderPage(ctx, {
+        return pageView({
           title: "RSS Subscriptions - Blog",
           description: "Subscribe to the full feed or topic-specific feeds",
           path: createUrlPath(ctx.pathname),
@@ -482,7 +426,7 @@ export const createRouteHandlers = (
         });
       },
       error: () =>
-        renderPage(ctx, {
+        pageView({
           title: "Error - Blog",
           description: "Failed to load RSS data",
           path: createUrlPath(ctx.pathname),
@@ -493,10 +437,10 @@ export const createRouteHandlers = (
   };
 
   // Topic-specific RSS feed
-  const rssByTopic: RouteHandler = async (ctx) => {
+  const rssByTopic: ViewHandler = async (ctx) => {
     const slug = ctx.pathname.replace("/rss/topic/", "");
     const topic = slugToTopic(slug);
-    if (!topic) return new Response("Topic not found", { status: 404 });
+    if (!topic) return textView("Topic not found", 404);
 
     const postsResult = await contentService.loadPosts();
     return match(postsResult, {
@@ -513,41 +457,48 @@ export const createRouteHandlers = (
           baseUrl,
           `/rss/topic/${slug}`,
         );
-        return xmlResponse(xml, RSS_CONTENT_TYPE);
+        return { kind: "xml", body: xml, contentType: RSS_CONTENT_TYPE };
       },
-      error: () => new Response("Failed to generate RSS", { status: 500 }),
+      error: () => textView("Failed to generate RSS", 500),
     });
   };
 
-  const sitemap: RouteHandler = async (ctx) => {
+  const sitemap: ViewHandler = async (ctx) => {
     const postsResult = await contentService.loadPosts();
     return match(postsResult, {
       ok: (posts) => {
         const baseUrl = ctx.url.origin;
         const sitemapContent = generateSitemap(Array.from(posts), baseUrl);
-        return xmlResponse(sitemapContent, XML_CONTENT_TYPE);
+        return {
+          kind: "xml",
+          body: sitemapContent,
+          contentType: XML_CONTENT_TYPE,
+        };
       },
-      error: () => new Response("Failed to generate sitemap", { status: 500 }),
+      error: () => textView("Failed to generate sitemap", 500),
     });
   };
 
-  const robots: RouteHandler = (ctx) => {
+  const robots: ViewHandler = (ctx) => {
     const baseUrl = ctx.url.origin;
     const robotsContent = generateRobotsTxt(baseUrl);
 
-    return new Response(robotsContent, {
+    return {
+      kind: "text",
+      body: robotsContent,
+      status: 200,
       headers: {
-        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Type": PLAIN_CONTENT_TYPE,
         "Cache-Control": "max-age=86400",
       },
-    });
+    };
   };
 
-  const ogImageDefault: RouteHandler = () => {
-    return svgResponse(generateDefaultOGImage());
+  const ogImageDefault: ViewHandler = () => {
+    return { kind: "svg", body: generateDefaultOGImage() };
   };
 
-  const ogImagePost: RouteHandler = async (ctx) => {
+  const ogImagePost: ViewHandler = async (ctx) => {
     const slug = createSlug(
       ctx.pathname.replace("/images/og/", "").replace(".svg", ""),
     );
@@ -555,65 +506,57 @@ export const createRouteHandlers = (
 
     return match(postResult, {
       ok: (post) => {
-        if (!post) return new Response("Not Found", { status: 404 });
+        if (!post) return textView("Not Found", 404);
 
-        return svgResponse(generateOGImage(
-          post.title,
-          post.excerpt,
-          post.tags?.map((tag) => tag as string),
-        ));
+        return {
+          kind: "svg",
+          body: generateOGImage(
+            post.title,
+            post.excerpt,
+            post.tags?.map((tag) => tag as string),
+          ),
+        };
       },
-      error: () => new Response("Failed to generate OG image", { status: 500 }),
+      error: () => textView("Failed to generate OG image", 500),
     });
   };
 
-  const health: RouteHandler = async () => {
+  const health: ViewHandler = async () => {
     const healthResult = await healthService.checkHealth();
 
     return match(healthResult, {
       ok: (health) => {
         const status = health.status === "unhealthy" ? 503 : 200;
 
-        return new Response(JSON.stringify(health, null, 2), {
-          status,
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            "Cache-Control": "no-cache",
-            "X-Robots-Tag": "noindex, nofollow",
-          },
-        });
+        return { kind: "json", body: health, status };
       },
-      error: (error) => {
+      error: (error): View => {
         const errorResponse = {
           status: "unhealthy",
           timestamp: new Date().toISOString(),
           error: error.message,
         };
 
-        return new Response(JSON.stringify(errorResponse, null, 2), {
-          status: 503,
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            "Cache-Control": "no-cache",
-            "X-Robots-Tag": "noindex, nofollow",
-          },
-        });
+        return { kind: "json", body: errorResponse, status: 503 };
       },
     });
   };
 
-  const atprotoVerification: RouteHandler = () => {
+  const atprotoVerification: ViewHandler = () => {
     if (!atConfig) {
-      return new Response("Not Found", { status: 404 });
+      return textView("Not Found", 404);
     }
 
     const uri = `at://${atConfig.did}/site.standard.publication/self`;
-    return new Response(uri, {
+    return {
+      kind: "text",
+      body: uri,
+      status: 200,
       headers: {
-        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Type": PLAIN_CONTENT_TYPE,
         "Cache-Control": "max-age=3600",
       },
-    });
+    };
   };
 
   return {
@@ -622,17 +565,17 @@ export const createRouteHandlers = (
     tags: cachedRender(tags),
     tagPosts: cachedRender(tagPosts),
     post: cachedRender(post),
-    search,
-    searchModal,
-    rss,
+    search: plain(search),
+    searchModal: plain(searchModal),
+    rss: plain(rss),
     rssPage: cachedRender(rssPage),
-    rssByTopic,
-    sitemap,
-    robots,
-    ogImageDefault,
-    ogImagePost,
-    health,
-    atprotoVerification,
+    rssByTopic: plain(rssByTopic),
+    sitemap: plain(sitemap),
+    robots: plain(robots),
+    ogImageDefault: plain(ogImageDefault),
+    ogImagePost: plain(ogImagePost),
+    health: plain(health),
+    atprotoVerification: plain(atprotoVerification),
     clearHtmlCache,
   };
 };
