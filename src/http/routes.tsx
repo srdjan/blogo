@@ -48,6 +48,27 @@ export type RouteHandlers = {
   readonly clearHtmlCache: () => void;
 };
 
+const SITE_AUTHOR = "Srdjan Strbanovic";
+const HTML_CONTENT_TYPE = "text/html; charset=utf-8";
+const RSS_CONTENT_TYPE = "application/rss+xml; charset=utf-8";
+const XML_CONTENT_TYPE = "application/xml; charset=utf-8";
+
+const svgResponse = (svg: string): Response =>
+  new Response(svg, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "max-age=3600",
+    },
+  });
+
+const xmlResponse = (body: string, contentType: string): Response =>
+  new Response(body, {
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": "max-age=3600",
+    },
+  });
+
 export const createRouteHandlers = (
   contentService: ContentService,
   healthService: HealthService,
@@ -117,12 +138,9 @@ export const createRouteHandlers = (
 
     const cached = htmlCache.get(cacheKey);
     if (cached.ok && cached.value.status === "hit") {
-      const contentType = prefix === "htmx:"
-        ? "text/html; charset=utf-8"
-        : "text/html; charset=utf-8";
       return new Response(cached.value.value, {
         headers: {
-          "Content-Type": contentType,
+          "Content-Type": HTML_CONTENT_TYPE,
           ...htmlCacheHeaders,
           "Vary": "HX-Request, HX-Request-Type",
           "X-Cache": "HIT",
@@ -160,7 +178,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <PostList posts={posts} />,
-          author: "Srdjan Strbanovic",
+          author: SITE_AUTHOR,
         }),
       error: () =>
         renderPage(ctx, {
@@ -194,7 +212,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <TopicsIndex groups={groupTagsByTopic(tags)} />,
-          author: "Srdjan Strbanovic",
+          author: SITE_AUTHOR,
         }),
       error: () =>
         renderPage(ctx, {
@@ -233,7 +251,7 @@ export const createRouteHandlers = (
           path: createUrlPath(ctx.pathname),
           origin: ctx.url.origin,
           children: <PostList posts={posts} activeTag={tagName} />,
-          author: "Srdjan Strbanovic",
+          author: SITE_AUTHOR,
         }),
       error: () =>
         renderPage(ctx, {
@@ -267,7 +285,6 @@ export const createRouteHandlers = (
     });
 
     // Use existing view count from post (may lag by one view, acceptable for analytics)
-    const postWithViews: typeof post = { ...post, viewCount: post.viewCount };
 
     const atprotoDocUri = atConfig
       ? `at://${atConfig.did}/site.standard.document/${slugToRkey(slug)}`
@@ -278,12 +295,12 @@ export const createRouteHandlers = (
       description: post.excerpt || `Read ${post.title}`,
       path: createUrlPath(ctx.pathname),
       origin: ctx.url.origin,
-      children: <PostView post={postWithViews} />,
+      children: <PostView post={post} />,
       type: "article",
       publishedTime: post.date,
       ...(post.modified && { modifiedTime: post.modified }),
       ...(post.tags && { tags: post.tags }),
-      author: "Srdjan Strbanovic",
+      author: SITE_AUTHOR,
       ...(atprotoDocUri ? { atprotoDocUri } : {}),
     });
   };
@@ -316,7 +333,7 @@ export const createRouteHandlers = (
             </a>
           </section>
         ),
-        author: "Srdjan Strbanovic",
+        author: SITE_AUTHOR,
       });
     }
 
@@ -421,12 +438,7 @@ export const createRouteHandlers = (
           "A minimal blog built with hsx",
         );
 
-        return new Response(rssContent, {
-          headers: {
-            "Content-Type": "application/rss+xml; charset=utf-8",
-            "Cache-Control": "max-age=3600",
-          },
-        });
+        return xmlResponse(rssContent, RSS_CONTENT_TYPE);
       },
       error: () => new Response("Failed to generate RSS", { status: 500 }),
     });
@@ -492,12 +504,7 @@ export const createRouteHandlers = (
           baseUrl,
           `/rss/topic/${slug}`,
         );
-        return new Response(xml, {
-          headers: {
-            "Content-Type": "application/rss+xml; charset=utf-8",
-            "Cache-Control": "max-age=3600",
-          },
-        });
+        return xmlResponse(xml, RSS_CONTENT_TYPE);
       },
       error: () => new Response("Failed to generate RSS", { status: 500 }),
     });
@@ -509,12 +516,7 @@ export const createRouteHandlers = (
       ok: (posts) => {
         const baseUrl = ctx.url.origin;
         const sitemapContent = generateSitemap(Array.from(posts), baseUrl);
-        return new Response(sitemapContent, {
-          headers: {
-            "Content-Type": "application/xml; charset=utf-8",
-            "Cache-Control": "max-age=3600",
-          },
-        });
+        return xmlResponse(sitemapContent, XML_CONTENT_TYPE);
       },
       error: () => new Response("Failed to generate sitemap", { status: 500 }),
     });
@@ -533,14 +535,7 @@ export const createRouteHandlers = (
   };
 
   const ogImageDefault: RouteHandler = () => {
-    const svgContent = generateDefaultOGImage();
-
-    return new Response(svgContent, {
-      headers: {
-        "Content-Type": "image/svg+xml",
-        "Cache-Control": "max-age=3600",
-      },
-    });
+    return svgResponse(generateDefaultOGImage());
   };
 
   const ogImagePost: RouteHandler = async (ctx) => {
@@ -552,37 +547,16 @@ export const createRouteHandlers = (
     return match(postResult, {
       ok: (post) => {
         if (!post) {
-          const svgContent = generateDefaultOGImage();
-          return new Response(svgContent, {
-            headers: {
-              "Content-Type": "image/svg+xml",
-              "Cache-Control": "max-age=3600",
-            },
-          });
+          return svgResponse(generateDefaultOGImage());
         }
 
-        const svgContent = generateOGImage(
+        return svgResponse(generateOGImage(
           post.title,
           post.excerpt,
           post.tags?.map((tag) => tag as string),
-        );
-
-        return new Response(svgContent, {
-          headers: {
-            "Content-Type": "image/svg+xml",
-            "Cache-Control": "max-age=3600",
-          },
-        });
+        ));
       },
-      error: () => {
-        const svgContent = generateDefaultOGImage();
-        return new Response(svgContent, {
-          headers: {
-            "Content-Type": "image/svg+xml",
-            "Cache-Control": "max-age=3600",
-          },
-        });
-      },
+      error: () => svgResponse(generateDefaultOGImage()),
     });
   };
 
@@ -591,11 +565,7 @@ export const createRouteHandlers = (
 
     return match(healthResult, {
       ok: (health) => {
-        const status = health.status === "healthy"
-          ? 200
-          : health.status === "degraded"
-          ? 200
-          : 503;
+        const status = health.status === "unhealthy" ? 503 : 200;
 
         return new Response(JSON.stringify(health, null, 2), {
           status,
