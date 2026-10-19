@@ -2,11 +2,14 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { createRouteHandlers } from "../../src/http/routes.tsx";
 import type { RouteContext } from "../../src/http/types.ts";
 import type { ContentService } from "../../src/domain/content.ts";
-import type { HealthService } from "../../src/domain/health.ts";
 import type { AnalyticsService } from "../../src/domain/analytics.ts";
 import { err, ok } from "../../src/lib/result.ts";
 import { createError } from "../../src/lib/error.ts";
 import { createMemoryContentService } from "../helpers/content_service.ts";
+import {
+  createMemoryHealthService,
+  type HealthDoubleOptions,
+} from "../helpers/health_service.ts";
 import type { AtProtoConfig } from "../../src/config/atproto.ts";
 import type { Post, Slug, TagName } from "../../src/lib/types.ts";
 
@@ -31,51 +34,7 @@ const createContentService = (
   overrides: Partial<ContentService> = {},
 ): ContentService => createMemoryContentService([POST], overrides);
 
-type HealthDoubleOptions = {
-  readonly status?: "healthy" | "degraded" | "unhealthy";
-  readonly failWith?: string;
-};
-
-const createHealthService = (
-  options: HealthDoubleOptions = {},
-): HealthService => ({
-  checkHealth: () =>
-    Promise.resolve(
-      options.failWith !== undefined
-        ? err(createError("IOError", options.failWith))
-        : ok({
-          status: options.status ?? "healthy",
-          timestamp: "2025-01-15T00:00:00.000Z",
-          version: "test",
-          uptime: 1,
-          checks: [],
-          metrics: {
-            memory: { used: 1, total: 2, percentage: 50 },
-            cache: {},
-            requests: { total: 0, errors: 0, averageResponseTime: 0 },
-          },
-        }),
-    ),
-  checkFileSystem: () =>
-    Promise.resolve({
-      name: "filesystem",
-      status: "healthy" as const,
-      timestamp: "2025-01-15T00:00:00.000Z",
-    }),
-  checkCache: () =>
-    Promise.resolve({
-      name: "cache",
-      status: "healthy" as const,
-      timestamp: "2025-01-15T00:00:00.000Z",
-    }),
-  getMetrics: () => ({
-    memory: { used: 1, total: 2, percentage: 50 },
-    cache: {},
-    requests: { total: 0, errors: 0, averageResponseTime: 0 },
-  }),
-  updateMetrics: () => {},
-});
-
+const createHealthService = createMemoryHealthService;
 const healthService = createHealthService();
 
 const analyticsService: AnalyticsService = {
