@@ -62,18 +62,33 @@ const dateRule = (now: Date): Rule => (obj) => {
   if (!DATE_REGEX.test(dateString)) {
     return ["Date must be in YYYY-MM-DD format"];
   }
+  if (!isCalendarDate(dateString)) {
+    return ["Date must be a valid calendar date"];
+  }
   return new Date(dateString) > now && !obj.draft
     ? ["Published posts cannot have future dates"]
     : [];
 };
 
-const optionalString =
-  (field: string, typeMessage: string, check?: StringCheck): Rule => (obj) => {
-    const value = obj[field];
-    if (value === undefined) return [];
-    if (typeof value !== "string") return [typeMessage];
-    return check && !check.test(value) ? [check.message] : [];
-  };
+// The first failing check gives the only message for the field
+const optionalString = (
+  field: string,
+  typeMessage: string,
+  ...checks: readonly StringCheck[]
+): Rule =>
+(obj) => {
+  const value = obj[field];
+  if (value === undefined) return [];
+  if (typeof value !== "string") return [typeMessage];
+  const failed = checks.find((check) => !check.test(value));
+  return failed ? [failed.message] : [];
+};
+
+const isCalendarDate = (value: string): boolean => {
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === value;
+};
 
 const maxLength = (max: number, message: string): StringCheck => ({
   test: (value) => value.length <= max,
@@ -161,10 +176,18 @@ export function validateFrontmatter(
       singular: "Topic",
       lower: "topics",
     }),
-    optionalString("modified", "Modified date must be a string", {
-      test: (value) => DATE_REGEX.test(value),
-      message: "Modified date must be in YYYY-MM-DD format",
-    }),
+    optionalString(
+      "modified",
+      "Modified date must be a string",
+      {
+        test: (value) => DATE_REGEX.test(value),
+        message: "Modified date must be in YYYY-MM-DD format",
+      },
+      {
+        test: isCalendarDate,
+        message: "Modified date must be a valid calendar date",
+      },
+    ),
     draftRule,
     optionalString(
       "author",

@@ -493,7 +493,11 @@ function parseFrontmatter(
   slug: Slug,
 ): AppResult<PostMeta> {
   try {
-    const meta = parseYaml(frontmatter) as Record<string, unknown>;
+    // Core schema keeps dates as strings, so impossible dates reach validation
+    const meta = parseYaml(frontmatter, { schema: "core" }) as Record<
+      string,
+      unknown
+    >;
 
     // Use comprehensive frontmatter validation
     const validationResult = validateFrontmatter(meta);

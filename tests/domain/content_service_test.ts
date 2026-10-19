@@ -1,4 +1,4 @@
-import { assertEquals, assertExists } from "@std/assert";
+import { assertEquals, assertExists, assertStringIncludes } from "@std/assert";
 import { createContentService } from "../../src/domain/content.ts";
 import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import { createRecordingLogger } from "../helpers/logger.ts";
@@ -585,4 +585,39 @@ Deno.test("ContentService - view-count failures give 0 in both WithViews readers
     full.ok && full.value.map((p) => p.viewCount),
     [0, 0],
   );
+});
+
+Deno.test("ContentService - rejects an unquoted impossible date in frontmatter", async () => {
+  const { service } = createService({
+    [`${POSTS_DIR}/bad.md`]: postFile("Bad", "2025-02-30"),
+  });
+
+  const result = await service.loadPosts();
+
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(result.error.kind, "ValidationError");
+    assertStringIncludes(
+      result.error.message,
+      "Date must be a valid calendar date",
+    );
+  }
+});
+
+Deno.test("ContentService - accepts an unquoted modified date", async () => {
+  const { service } = createService({
+    [`${POSTS_DIR}/mod.md`]: `---
+title: Modified
+date: 2025-01-10
+modified: 2025-01-16
+---
+
+# Modified`,
+  });
+
+  const result = await service.loadPosts();
+
+  assertEquals(result.ok && result.value.map((p) => p.modified), [
+    "2025-01-16",
+  ]);
 });

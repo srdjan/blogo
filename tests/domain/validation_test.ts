@@ -368,15 +368,45 @@ for (const { name, input, message } of boundaryCases) {
   });
 }
 
-Deno.test("validateFrontmatter - accepts the impossible date 2025-02-30", () => {
+Deno.test("validateFrontmatter - rejects the impossible date 2025-02-30", () => {
   const result = validateFrontmatter({
     title: "Test Post",
     date: "2025-02-30",
   });
 
-  // Current behavior; see plan finding B11
+  // Fixed: plan finding B11
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(
+      result.error.message,
+      `${PREFIX}Date must be a valid calendar date`,
+    );
+  }
+});
+
+Deno.test("validateFrontmatter - accepts the leap day 2024-02-29", () => {
+  const result = validateFrontmatter({
+    title: "Test Post",
+    date: "2024-02-29",
+  });
+
   assertEquals(result.ok, true);
-  if (result.ok) assertEquals(result.value.date, "2025-02-30");
+});
+
+Deno.test("validateFrontmatter - rejects the modified date 2025-13-01", () => {
+  const result = validateFrontmatter({
+    title: "Test Post",
+    date: "2025-01-15",
+    modified: "2025-13-01",
+  });
+
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(
+      result.error.message,
+      `${PREFIX}Modified date must be a valid calendar date`,
+    );
+  }
 });
 
 Deno.test("validateFrontmatter uses the supplied now for the future-date check", () => {

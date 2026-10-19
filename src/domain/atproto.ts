@@ -106,7 +106,10 @@ export const createAtProtoService = (
 
     // Parse frontmatter to get post metadata
     const { parse: parseYaml } = await import("@std/yaml");
-    const meta = parseYaml(frontmatter) as Record<string, unknown>;
+    const meta = parseYaml(frontmatter, { schema: "core" }) as Record<
+      string,
+      unknown
+    >;
 
     if (meta.draft === true) {
       logger.info(`Skipping draft: ${slug}`);

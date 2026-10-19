@@ -36,7 +36,7 @@ async function validateFile(path: string): Promise<ValidationFailure | null> {
 
   let parsed: unknown;
   try {
-    parsed = parse(frontmatterBlock);
+    parsed = parse(frontmatterBlock, { schema: "core" });
   } catch (error) {
     return {
       path,
