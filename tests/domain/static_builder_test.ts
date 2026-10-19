@@ -2,7 +2,8 @@ import { assertEquals } from "@std/assert";
 import { createStaticBuilder } from "../../src/domain/static-builder.ts";
 import type { ContentService } from "../../src/domain/content.ts";
 import type { FileWriter } from "../../src/ports/writer.ts";
-import type { Logger } from "../../src/ports/logger.ts";
+import { createRecordingLogger } from "../helpers/logger.ts";
+import { createMemoryContentService } from "../helpers/content_service.ts";
 import type { RouteHandlers } from "../../src/http/routes.tsx";
 import type { RouteContext } from "../../src/http/types.ts";
 import { err, ok } from "../../src/lib/result.ts";
@@ -18,6 +19,7 @@ import type {
 
 // --- Mock helpers ---
 
+// Local: models an in-memory writer with fail-on-write and copied public files.
 function createMockFileWriter(
   publicFiles: Record<string, string> = {},
   failWriteFor?: string,
@@ -74,15 +76,6 @@ function createMockFileWriter(
   };
 }
 
-function createMockLogger(): Logger {
-  return {
-    error: () => {},
-    warn: () => {},
-    info: () => {},
-    debug: () => {},
-  };
-}
-
 const MOCK_POST: Post = {
   title: "Test Post",
   date: "2025-01-15",
@@ -99,19 +92,7 @@ const MOCK_TAG: TagInfo = {
   posts: [MOCK_POST],
 };
 
-function createMockContentService(): ContentService {
-  return {
-    loadPosts: async () => ok([MOCK_POST]),
-    loadPostsMetadata: async () => ok([MOCK_POST as PostMeta]),
-    loadPostsMetadataWithViews: async () => ok([MOCK_POST]),
-    loadPostsWithViews: async () => ok([MOCK_POST]),
-    getPostBySlug: async () => ok(MOCK_POST),
-    getPostsByTag: async () => ok([MOCK_POST]),
-    getTags: async () => ok([MOCK_TAG]),
-    searchPosts: async () => ok([]),
-  };
-}
-
+// Local: stub route handlers with fixed bodies, specific to the builder.
 function createMockRoutes(): RouteHandlers {
   const htmlHandler = (_ctx: RouteContext) =>
     new Response("<html><body>Page</body></html>", {
@@ -159,10 +140,10 @@ function createMockRoutes(): RouteHandlers {
 Deno.test("StaticBuilder - generates index.html for root", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -178,10 +159,10 @@ Deno.test("StaticBuilder - generates index.html for root", async () => {
 Deno.test("StaticBuilder - generates per-post pages", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -199,10 +180,10 @@ Deno.test("StaticBuilder - generates per-post pages", async () => {
 Deno.test("StaticBuilder - generates fragment files alongside full pages", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -221,10 +202,10 @@ Deno.test("StaticBuilder - generates fragment files alongside full pages", async
 Deno.test("StaticBuilder - generates non-HTML routes", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -245,10 +226,10 @@ Deno.test("StaticBuilder - generates non-HTML routes", async () => {
 Deno.test("StaticBuilder - generates per-tag pages", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -266,10 +247,10 @@ Deno.test("StaticBuilder - generates per-tag pages", async () => {
 Deno.test("StaticBuilder - report counts match generated files", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -291,10 +272,10 @@ Deno.test("StaticBuilder - report counts match generated files", async () => {
 Deno.test("StaticBuilder - generates OG images for posts", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -312,10 +293,10 @@ Deno.test("StaticBuilder - generates OG images for posts", async () => {
 Deno.test("StaticBuilder - generates well-known verification route", async () => {
   const fileWriter = createMockFileWriter();
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -340,10 +321,10 @@ Deno.test("StaticBuilder - fragment render request carries HX-Request-Type parti
     return new Response("<html><body>Page</body></html>");
   };
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: { ...routes, home: recordingHome },
     fileWriter: createMockFileWriter(),
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -363,10 +344,10 @@ Deno.test("StaticBuilder - fingerprints assets and rewrites HTML references", as
     "static.html": '<link rel="stylesheet" href="/css/main.css">',
   });
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 
@@ -399,10 +380,10 @@ Deno.test("StaticBuilder - building twice does not double-hash assets", async ()
     "css/main.css": "body{color:red}",
   });
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
   const options = {
@@ -421,10 +402,10 @@ Deno.test("StaticBuilder - building twice does not double-hash assets", async ()
 Deno.test("StaticBuilder - a failed page write is reported with its route path", async () => {
   const fileWriter = createMockFileWriter({}, "_site/about/index.html");
   const builder = createStaticBuilder({
-    contentService: createMockContentService(),
+    contentService: createMemoryContentService([MOCK_POST]),
     routes: createMockRoutes(),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     publicDir: "public",
   });
 

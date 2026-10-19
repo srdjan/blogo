@@ -1,74 +1,9 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { createContentService } from "../../src/domain/content.ts";
-import type { FileSystem } from "../../src/ports/file-system.ts";
-import type { Logger } from "../../src/ports/logger.ts";
+import { createMemoryFileSystem } from "../helpers/file_system.ts";
+import { createRecordingLogger } from "../helpers/logger.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import {
-  type AppResult,
-  createSlug,
-  type Post,
-  type PostMeta,
-} from "../../src/lib/types.ts";
-import { err, ok } from "../../src/lib/result.ts";
-
-// Mock FileSystem implementation for testing
-function createMockFileSystem(files: Record<string, string>): FileSystem {
-  return {
-    readFile: async (path: string): Promise<AppResult<string>> => {
-      if (path in files) {
-        return ok(files[path] ?? "");
-      }
-      return err({
-        kind: "IOError",
-        message: `File not found: ${path}`,
-      });
-    },
-
-    readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
-      const prefix = path.endsWith("/") ? path : `${path}/`;
-      const entries = Object.keys(files)
-        .filter((filePath) => filePath.startsWith(prefix))
-        .map((filePath) => filePath.substring(prefix.length))
-        .filter((name) => !name.includes("/"));
-      return ok(entries);
-    },
-
-    exists: async (path: string): Promise<boolean> => {
-      return path in files;
-    },
-
-    stat: async (path: string) => {
-      if (!(path in files)) return null;
-      return {
-        name: path.split("/").pop() ?? path,
-        isFile: true,
-        isDirectory: false,
-        size: files[path]?.length ?? 0,
-        mtime: new Date(),
-      };
-    },
-  };
-}
-
-// Mock Logger implementation for testing
-function createMockLogger(): Logger {
-  const logs: Array<{ level: string; message: string; data?: unknown }> = [];
-
-  return {
-    error: (message: string, data?: unknown) => {
-      logs.push({ level: "error", message, data });
-    },
-    warn: (message: string, data?: unknown) => {
-      logs.push({ level: "warn", message, data });
-    },
-    info: (message: string, data?: unknown) => {
-      logs.push({ level: "info", message, data });
-    },
-    debug: (message: string, data?: unknown) => {
-      logs.push({ level: "debug", message, data });
-    },
-  };
-}
+import { createSlug, type Post, type PostMeta } from "../../src/lib/types.ts";
 
 Deno.test("ContentService - loads valid posts successfully", async () => {
   const mockFiles = {
@@ -95,8 +30,8 @@ date: 2025-01-14
 More content here.`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -132,8 +67,8 @@ invalid yaml: [
 This post has invalid frontmatter.`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -157,8 +92,8 @@ This post has invalid frontmatter.`,
 });
 
 Deno.test("ContentService - handles missing files gracefully", async () => {
-  const fileSystem = createMockFileSystem({});
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem({});
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -190,8 +125,8 @@ date: 2025-01-15
 # Test Content`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -224,8 +159,8 @@ date: 2025-01-15
 # Test Content`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -267,8 +202,8 @@ date: 2025-01-14
 # Untagged Content`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -314,8 +249,8 @@ tags:
 # Content 2`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -364,8 +299,8 @@ date: 2025-01-14
 This is about JavaScript.`,
   };
 
-  const fileSystem = createMockFileSystem(mockFiles);
-  const logger = createMockLogger();
+  const fileSystem = createMemoryFileSystem(mockFiles);
+  const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
   const metadataCache = createInMemoryCache<readonly PostMeta[]>();
   const postCache = createInMemoryCache<Post>();
@@ -416,8 +351,8 @@ Hidden content about zebras.`,
 
   const postCache = createInMemoryCache<Post>();
   const contentService = createContentService({
-    fileSystem: createMockFileSystem(mockFiles),
-    logger: createMockLogger(),
+    fileSystem: createMemoryFileSystem(mockFiles),
+    logger: createRecordingLogger(),
     cache: createInMemoryCache<readonly Post[]>(),
     metadataCache: createInMemoryCache<readonly PostMeta[]>(),
     postCache,

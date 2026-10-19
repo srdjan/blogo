@@ -1,9 +1,9 @@
 import { assertEquals } from "@std/assert";
 import { createAtProtoService } from "../../src/domain/atproto.ts";
 import type { AtProtoClient } from "../../src/ports/atproto.ts";
-import type { FileSystem } from "../../src/ports/file-system.ts";
+import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import type { FileWriter } from "../../src/ports/writer.ts";
-import type { Logger } from "../../src/ports/logger.ts";
+import { createRecordingLogger } from "../helpers/logger.ts";
 import type { AtProtoConfig } from "../../src/config/atproto.ts";
 import type { AppResult } from "../../src/lib/types.ts";
 import { ok } from "../../src/lib/result.ts";
@@ -18,6 +18,7 @@ import type {
 
 type StoredRecord = { readonly record: Record<string, unknown> };
 
+// Local: models an AT Protocol record store.
 function createMockClient(): AtProtoClient & {
   readonly store: Map<string, StoredRecord>;
 } {
@@ -84,32 +85,7 @@ function createMockClient(): AtProtoClient & {
   };
 }
 
-function createMockFileSystem(
-  files: Record<string, string>,
-): FileSystem {
-  return {
-    readFile: async (path: string): Promise<AppResult<string>> => {
-      if (path in files) {
-        return ok(files[path] ?? "");
-      }
-      return {
-        ok: false,
-        error: { kind: "IOError", message: `Not found: ${path}` },
-      };
-    },
-    readDir: async (path: string): Promise<AppResult<readonly string[]>> => {
-      const prefix = path.endsWith("/") ? path : `${path}/`;
-      const entries = Object.keys(files)
-        .filter((f) => f.startsWith(prefix))
-        .map((f) => f.substring(prefix.length))
-        .filter((n) => !n.includes("/"));
-      return ok(entries);
-    },
-    exists: async (path: string): Promise<boolean> => path in files,
-    stat: async () => null,
-  };
-}
-
+// Local: records written files for the AT Protocol tests.
 function createMockFileWriter(): FileWriter & {
   readonly written: Map<string, string>;
 } {
@@ -130,15 +106,6 @@ function createMockFileWriter(): FileWriter & {
     readBytes: async (): Promise<AppResult<Uint8Array>> => ok(new Uint8Array()),
     readText: async (): Promise<AppResult<string>> => ok(""),
     rename: async (): Promise<AppResult<void>> => ok(undefined),
-  };
-}
-
-function createMockLogger(): Logger {
-  return {
-    error: () => {},
-    warn: () => {},
-    info: () => {},
-    debug: () => {},
   };
 }
 
@@ -168,9 +135,9 @@ Deno.test("AtProtoService - ensurePublication creates publication record", async
   const client = createMockClient();
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem({}),
+    fileSystem: createMemoryFileSystem({}),
     fileWriter: createMockFileWriter(),
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -205,9 +172,9 @@ Deno.test("AtProtoService - publishPost creates correct document record", async 
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem(files),
+    fileSystem: createMemoryFileSystem(files),
     fileWriter: createMockFileWriter(),
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -242,9 +209,9 @@ Deno.test("AtProtoService - publishAll publishes all markdown files", async () =
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem(files),
+    fileSystem: createMemoryFileSystem(files),
     fileWriter: createMockFileWriter(),
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -272,9 +239,9 @@ Deno.test("AtProtoService - publishAll skips draft posts", async () => {
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem(files),
+    fileSystem: createMemoryFileSystem(files),
     fileWriter: createMockFileWriter(),
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -317,9 +284,9 @@ Deno.test("AtProtoService - pullAll writes documents as markdown files", async (
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem({}), // empty - no existing files
+    fileSystem: createMemoryFileSystem({}), // empty - no existing files
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -368,9 +335,9 @@ Deno.test("AtProtoService - pullAll skips existing files without force", async (
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem(existingFiles),
+    fileSystem: createMemoryFileSystem(existingFiles),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",
@@ -414,9 +381,9 @@ Deno.test("AtProtoService - pullAll overwrites with force flag", async () => {
 
   const service = createAtProtoService({
     client,
-    fileSystem: createMockFileSystem(existingFiles),
+    fileSystem: createMemoryFileSystem(existingFiles),
     fileWriter,
-    logger: createMockLogger(),
+    logger: createRecordingLogger(),
     config: TEST_CONFIG,
     postsDir: "content/posts",
     publicUrl: "https://blog.example.com",

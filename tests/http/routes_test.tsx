@@ -6,7 +6,8 @@ import type { HealthService } from "../../src/domain/health.ts";
 import type { AnalyticsService } from "../../src/domain/analytics.ts";
 import { err, ok } from "../../src/lib/result.ts";
 import { createError } from "../../src/lib/error.ts";
-import type { Post, PostMeta, Slug, TagName } from "../../src/lib/types.ts";
+import { createMemoryContentService } from "../helpers/content_service.ts";
+import type { Post, Slug, TagName } from "../../src/lib/types.ts";
 
 // --- Test doubles ---
 
@@ -24,17 +25,7 @@ const POST = makePost("Test Post", "test-post");
 
 const createContentService = (
   overrides: Partial<ContentService> = {},
-): ContentService => ({
-  loadPosts: async () => ok([POST]),
-  loadPostsMetadata: async () => ok([POST as PostMeta]),
-  loadPostsMetadataWithViews: async () => ok([POST]),
-  loadPostsWithViews: async () => ok([POST]),
-  getPostBySlug: async () => ok(POST),
-  getPostsByTag: async () => ok([POST]),
-  getTags: async () => ok([]),
-  searchPosts: async () => ok([]),
-  ...overrides,
-});
+): ContentService => createMemoryContentService([POST], overrides);
 
 const healthService = {} as HealthService;
 
