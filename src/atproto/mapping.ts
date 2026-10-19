@@ -96,18 +96,8 @@ export const documentToMarkdown = (
 
 // --- Helpers ---
 
-const extractBody = (content: DocumentContent | undefined): string => {
-  if (!content) return "";
-
-  switch (content.$type) {
-    case "site.standard.content.markdown":
-      return content.value ?? "";
-    case "site.standard.content.html":
-      return content.value ?? "";
-    default:
-      return (content as { value?: string }).value ?? "";
-  }
-};
+const extractBody = (content: DocumentContent | undefined): string =>
+  content?.value ?? "";
 
 const stripMarkdown = (md: string): string =>
   md
