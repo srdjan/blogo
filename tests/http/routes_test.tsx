@@ -11,6 +11,7 @@ import {
   type HealthDoubleOptions,
 } from "../helpers/health_service.ts";
 import type { AtProtoConfig } from "../../src/config/atproto.ts";
+import type { SiteConfig } from "../../src/domain/config.ts";
 import type { Post, Slug, TagName } from "../../src/lib/types.ts";
 
 // A shell value must not switch on the production HTML cache.
@@ -44,9 +45,24 @@ const analyticsService: AnalyticsService = {
   close: () => {},
 };
 
+const SITE: SiteConfig = {
+  canonicalUrl: "https://blog.example",
+  name: "Test Blog",
+  twitterHandle: "@test",
+};
+
 const createHandlers = (
   contentService: ContentService = createContentService(),
-) => createRouteHandlers(contentService, healthService, analyticsService, null);
+  isProd = false,
+) =>
+  createRouteHandlers({
+    contentService,
+    healthService,
+    analyticsService,
+    atConfig: null,
+    site: SITE,
+    isProd,
+  });
 
 const AT_CONFIG: AtProtoConfig = {
   did: "did:plc:test",
@@ -170,32 +186,26 @@ Deno.test("routes - home returns 500 when posts fail to load", async () => {
 });
 
 Deno.test("routes - production HTML cache skips error pages", async () => {
-  const previous = Deno.env.get("DENO_ENV");
-  Deno.env.set("DENO_ENV", "production");
-  try {
-    let failing = true;
-    const handlers = createHandlers(
-      createContentService({
-        loadPostsMetadataWithViews: () =>
-          Promise.resolve(
-            failing ? err(createError("IOError", "disk failure")) : ok([POST]),
-          ),
-      }),
-    );
+  let failing = true;
+  const handlers = createHandlers(
+    createContentService({
+      loadPostsMetadataWithViews: () =>
+        Promise.resolve(
+          failing ? err(createError("IOError", "disk failure")) : ok([POST]),
+        ),
+    }),
+    true,
+  );
 
-    const first = await handlers.home(contextFor("/"));
-    assertEquals(first.status, 500);
-    await first.text();
+  const first = await handlers.home(contextFor("/"));
+  assertEquals(first.status, 500);
+  await first.text();
 
-    failing = false;
-    const second = await handlers.home(contextFor("/"));
-    assertEquals(second.status, 200);
-    assertEquals(second.headers.get("X-Cache") === "HIT", false);
-    assertStringIncludes(await second.text(), "Test Post");
-  } finally {
-    if (previous === undefined) Deno.env.delete("DENO_ENV");
-    else Deno.env.set("DENO_ENV", previous);
-  }
+  failing = false;
+  const second = await handlers.home(contextFor("/"));
+  assertEquals(second.status, 200);
+  assertEquals(second.headers.get("X-Cache") === "HIT", false);
+  assertStringIncludes(await second.text(), "Test Post");
 });
 
 Deno.test("routes - tagPosts returns 400 for an invalid tag name", async () => {
@@ -272,12 +282,14 @@ Deno.test("routes - post renders the post page with layout metadata", async () =
 });
 
 Deno.test("routes - post links the AT Protocol document when configured", async () => {
-  const handlers = createRouteHandlers(
-    createContentService(),
+  const handlers = createRouteHandlers({
+    contentService: createContentService(),
     healthService,
     analyticsService,
-    AT_CONFIG,
-  );
+    atConfig: AT_CONFIG,
+    site: SITE,
+    isProd: false,
+  });
   const { body } = await textOf(handlers.post(contextFor("/posts/test-post")));
   assertStringIncludes(
     body,
@@ -311,12 +323,14 @@ Deno.test("routes - post increments the view count once", async () => {
       return Promise.resolve(ok(1));
     },
   };
-  const handlers = createRouteHandlers(
-    createContentService(),
+  const handlers = createRouteHandlers({
+    contentService: createContentService(),
     healthService,
-    recording,
-    null,
-  );
+    analyticsService: recording,
+    atConfig: null,
+    site: SITE,
+    isProd: false,
+  });
   await textOf(handlers.post(contextFor("/posts/test-post")));
   assertEquals(incremented, ["test-post"]);
 });
@@ -544,12 +558,14 @@ const healthCases: ReadonlyArray<
 
 for (const [name, options, expected] of healthCases) {
   Deno.test(`routes - health returns ${expected} when ${name}`, async () => {
-    const handlers = createRouteHandlers(
-      createContentService(),
-      createHealthService(options),
+    const handlers = createRouteHandlers({
+      contentService: createContentService(),
+      healthService: createHealthService(options),
       analyticsService,
-      null,
-    );
+      atConfig: null,
+      site: SITE,
+      isProd: false,
+    });
     const { status, type, body } = await textOf(
       handlers.health(contextFor("/health")),
     );
@@ -560,12 +576,14 @@ for (const [name, options, expected] of healthCases) {
 }
 
 Deno.test("routes - health returns 503 when the check itself fails", async () => {
-  const handlers = createRouteHandlers(
-    createContentService(),
-    createHealthService({ failWith: "probe failed" }),
+  const handlers = createRouteHandlers({
+    contentService: createContentService(),
+    healthService: createHealthService({ failWith: "probe failed" }),
     analyticsService,
-    null,
-  );
+    atConfig: null,
+    site: SITE,
+    isProd: false,
+  });
   const { status, body } = await textOf(handlers.health(contextFor("/health")));
   assertEquals(status, 503);
   assertStringIncludes(body, '"status": "unhealthy"');
@@ -584,12 +602,14 @@ Deno.test("routes - atprotoVerification returns 404 without config", async () =>
 });
 
 Deno.test("routes - atprotoVerification returns the publication URI with config", async () => {
-  const handlers = createRouteHandlers(
-    createContentService(),
+  const handlers = createRouteHandlers({
+    contentService: createContentService(),
     healthService,
     analyticsService,
-    AT_CONFIG,
-  );
+    atConfig: AT_CONFIG,
+    site: SITE,
+    isProd: false,
+  });
   const { status, body } = await textOf(
     handlers.atprotoVerification(
       contextFor("/.well-known/site.standard.publication"),

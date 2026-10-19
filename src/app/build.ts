@@ -63,12 +63,14 @@ async function main() {
 
   const atConfig = createAtProtoConfig();
 
-  const routes = createRouteHandlers(
+  const routes = createRouteHandlers({
     contentService,
     healthService,
-    analyticsStub,
+    analyticsService: analyticsStub,
     atConfig,
-  );
+    site: config.site,
+    isProd: config.env === "production",
+  });
 
   const builder = createStaticBuilder({
     contentService,

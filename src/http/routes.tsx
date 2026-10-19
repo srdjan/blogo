@@ -23,6 +23,7 @@ import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 import { renderVNode } from "./render-vnode.ts";
 import type { RouteContext } from "./types.ts";
+import type { SiteConfig } from "../domain/config.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
 import { slugToRkey } from "../atproto/mapping.ts";
 import { type Cache, createInMemoryCache } from "../ports/cache.ts";
@@ -69,14 +70,20 @@ const xmlResponse = (body: string, contentType: string): Response =>
     },
   });
 
+export type RouteDependencies = {
+  readonly contentService: ContentService;
+  readonly healthService: HealthService;
+  readonly analyticsService: AnalyticsService;
+  readonly atConfig: AtProtoConfig | null;
+  readonly site: SiteConfig;
+  readonly isProd: boolean;
+};
+
 export const createRouteHandlers = (
-  contentService: ContentService,
-  healthService: HealthService,
-  analyticsService: AnalyticsService,
-  atConfig?: AtProtoConfig | null,
+  deps: RouteDependencies,
 ): RouteHandlers => {
-  const env = Deno.env.get("DENO_ENV") || "development";
-  const isProd = env === "production";
+  const { contentService, healthService, analyticsService, atConfig, isProd } =
+    deps;
 
   const htmlCacheHeaders = isProd
     ? {

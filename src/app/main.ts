@@ -65,12 +65,14 @@ async function main() {
     logger.info(`AT Protocol configured for ${atConfig.did}`);
   }
 
-  const routes = createRouteHandlers(
+  const routes = createRouteHandlers({
     contentService,
     healthService,
     analyticsService,
     atConfig,
-  );
+    site: config.site,
+    isProd: config.env === "production",
+  });
 
   // Load posts and metadata, then fill the individual post cache
   const warmCaches = async (): Promise<void> => {
