@@ -157,7 +157,7 @@ date: 2025-01-15
   }
 });
 
-Deno.test("ContentService - getPostBySlug returns null for non-existent post", async () => {
+Deno.test("ContentService - getPostBySlug returns a NotFound error for a non-existent post", async () => {
   const mockFiles = {
     "content/posts/test-post.md": `---
 title: Test Post
@@ -184,9 +184,9 @@ date: 2025-01-15
 
   const result = await contentService.getPostBySlug(createSlug("non-existent"));
 
-  assertEquals(result.ok, true);
-  if (result.ok) {
-    assertEquals(result.value, null);
+  assertEquals(result.ok, false);
+  if (!result.ok) {
+    assertEquals(result.error.kind, "NotFound");
   }
 });
 
@@ -382,7 +382,7 @@ Hidden content about zebras.`,
   assertEquals(search.ok && search.value.length, 0);
 
   const draft = await contentService.getPostBySlug(createSlug("draft-post"));
-  assertEquals(draft.ok && draft.value, null);
+  assertEquals(!draft.ok && draft.error.kind, "NotFound");
   const cached = postCache.get("draft-post");
   assertEquals(cached.ok && cached.value.status, "miss");
 });

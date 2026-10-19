@@ -36,6 +36,7 @@ import { match } from "../lib/result.ts";
 import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
 import type { RouteContext } from "./types.ts";
+import type { AppError } from "../lib/types.ts";
 import type { SiteConfig } from "../domain/config.ts";
 import type { AtProtoConfig } from "../config/atproto.ts";
 import { slugToRkey } from "../atproto/mapping.ts";
@@ -68,6 +69,15 @@ const SEARCH_MODAL_TEXT_HEADERS = {
   "Content-Type": PLAIN_CONTENT_TYPE,
   "X-Robots-Tag": NOINDEX,
 } as const;
+
+const missingPostView = (
+  error: AppError,
+  notFoundBody: string,
+  failureBody: string,
+): View =>
+  error.kind === "NotFound"
+    ? textView(notFoundBody, 404)
+    : textView(failureBody, 500);
 
 export type RouteDependencies = {
   readonly contentService: ContentService;
@@ -230,14 +240,14 @@ export const createRouteHandlers = (
     const postResult = await contentService.getPostBySlug(slug);
 
     if (!postResult.ok) {
-      return textView("Failed to load post", 500);
+      return missingPostView(
+        postResult.error,
+        "Post not found",
+        "Failed to load post",
+      );
     }
 
     const post = postResult.value;
-
-    if (!post) {
-      return textView("Post not found", 404);
-    }
 
     // Fire-and-forget: increment view count without blocking response
     // Use cached view count for display; increment happens in background
@@ -505,19 +515,16 @@ export const createRouteHandlers = (
     const postResult = await contentService.getPostBySlug(slug);
 
     return match(postResult, {
-      ok: (post) => {
-        if (!post) return textView("Not Found", 404);
-
-        return {
-          kind: "svg",
-          body: generateOGImage(
-            post.title,
-            post.excerpt,
-            post.tags?.map((tag) => tag as string),
-          ),
-        };
-      },
-      error: () => textView("Failed to generate OG image", 500),
+      ok: (post): View => ({
+        kind: "svg",
+        body: generateOGImage(
+          post.title,
+          post.excerpt,
+          post.tags?.map((tag) => tag as string),
+        ),
+      }),
+      error: (error) =>
+        missingPostView(error, "Not Found", "Failed to generate OG image"),
     });
   };
 

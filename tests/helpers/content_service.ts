@@ -2,7 +2,8 @@ import {
   aggregateTags,
   type ContentService,
 } from "../../src/domain/content.ts";
-import { ok } from "../../src/lib/result.ts";
+import { err, ok } from "../../src/lib/result.ts";
+import { createError } from "../../src/lib/error.ts";
 import type { Post, PostMeta } from "../../src/lib/types.ts";
 
 /**
@@ -17,8 +18,12 @@ export const createMemoryContentService = (
   loadPostsMetadata: () => Promise.resolve(ok(posts as readonly PostMeta[])),
   loadPostsMetadataWithViews: () => Promise.resolve(ok(posts)),
   loadPostsWithViews: () => Promise.resolve(ok(posts)),
-  getPostBySlug: (slug) =>
-    Promise.resolve(ok(posts.find((post) => post.slug === slug) ?? null)),
+  getPostBySlug: (slug) => {
+    const post = posts.find((candidate) => candidate.slug === slug);
+    return Promise.resolve(
+      post ? ok(post) : err(createError("NotFound", `Post not found: ${slug}`)),
+    );
+  },
   getPostsByTag: (tag) =>
     Promise.resolve(
       ok(posts.filter((post) => post.tags?.includes(tag) ?? false)),

@@ -74,7 +74,7 @@ export interface ContentService {
     AppResult<readonly Post[]>
   >;
   readonly loadPostsWithViews: () => Promise<AppResult<readonly Post[]>>;
-  readonly getPostBySlug: (slug: Slug) => Promise<AppResult<Post | null>>;
+  readonly getPostBySlug: (slug: Slug) => Promise<AppResult<Post>>;
   readonly getPostsByTag: (
     tagName: TagName,
   ) => Promise<AppResult<readonly Post[]>>;
@@ -374,7 +374,10 @@ export const createContentService = (
     );
   };
 
-  const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {
+  const notFound = (slug: Slug) =>
+    err(createError("NotFound", `Post not found: ${slug}`));
+
+  const getPostBySlug = async (slug: Slug): Promise<AppResult<Post>> => {
     // Check individual post cache first (fast path)
     const cached = postCache.get(slug as string);
     if (cached.ok && cached.value.status === "hit") {
@@ -389,8 +392,8 @@ export const createContentService = (
       // Fallback: check if slug exists with different casing in full posts list
       const postsResult = await loadPosts();
       if (!postsResult.ok) return postsResult;
-      const post = postsResult.value.find((p) => p.slug === slug) ?? null;
-      return ok(post);
+      const post = postsResult.value.find((p) => p.slug === slug);
+      return post ? ok(post) : notFound(slug);
     }
 
     // Parse the single post directly
@@ -398,7 +401,7 @@ export const createContentService = (
     if (!postResult.ok) return postResult;
 
     // A draft looks like a missing post and stays out of the cache
-    if (postResult.value.draft) return ok(null);
+    if (postResult.value.draft) return notFound(slug);
 
     postCache.set(slug as string, postResult.value, Infinity);
     return postResult;

@@ -296,7 +296,10 @@ Deno.test("routes - post links the AT Protocol document when configured", async 
 
 Deno.test("routes - post returns 404 for an unknown slug", async () => {
   const handlers = createHandlers(
-    createContentService({ getPostBySlug: () => Promise.resolve(ok(null)) }),
+    createContentService({
+      getPostBySlug: () =>
+        Promise.resolve(err(createError("NotFound", "missing"))),
+    }),
   );
   assertEquals(
     await textOf(handlers.post(contextFor("/posts/missing"))),
@@ -526,7 +529,10 @@ Deno.test("routes - ogImagePost returns an SVG with the post title", async () =>
 
 Deno.test("routes - ogImagePost returns 404 for an unknown slug", async () => {
   const handlers = createHandlers(
-    createContentService({ getPostBySlug: () => Promise.resolve(ok(null)) }),
+    createContentService({
+      getPostBySlug: () =>
+        Promise.resolve(err(createError("NotFound", "missing"))),
+    }),
   );
   const { status, body } = await textOf(
     handlers.ogImagePost(contextFor("/images/og/missing.svg")),
