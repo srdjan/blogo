@@ -15,13 +15,19 @@ import type { AppResult, Post, Slug, TagName } from "../../src/lib/types.ts";
 function createMockFileWriter(
   publicFiles: Record<string, string> = {},
   failWriteFor?: string,
+  failOn?: {
+    readonly method: "clean" | "ensureDir" | "copyDir";
+    readonly message: string;
+  },
 ): FileWriter & {
   readonly written: Map<string, string>;
 } {
+  const failure = (): Promise<AppResult<void>> =>
+    Promise.resolve(err(createError("IOError", failOn?.message ?? "")));
   const written = new Map<string, string>();
   const missing = (path: string): AppResult<never> =>
     err(createError("IOError", `Not found: ${path}`, undefined, { path }));
-  return {
+  const writer: FileWriter & { readonly written: Map<string, string> } = {
     written,
     writeFile: (
       path: string,
@@ -74,6 +80,8 @@ function createMockFileWriter(
       return Promise.resolve(ok(undefined));
     },
   };
+  if (failOn === undefined) return writer;
+  return { ...writer, [failOn.method]: failure };
 }
 
 const MOCK_POST: Post = {
@@ -417,3 +425,67 @@ Deno.test("StaticBuilder - a failed page write is reported with its route path",
     );
   }
 });
+
+const failureCases = [
+  { method: "clean", message: "clean exploded" },
+  { method: "ensureDir", message: "ensureDir exploded" },
+  { method: "copyDir", message: "copyDir exploded" },
+] as const;
+
+for (const failOn of failureCases) {
+  Deno.test(`StaticBuilder - build stops when ${failOn.method} fails`, async () => {
+    const fileWriter = createMockFileWriter({}, undefined, failOn);
+    const builder = createStaticBuilder({
+      contentService: createMemoryContentService([MOCK_POST]),
+      routes: createMockRoutes(),
+      fileWriter,
+      logger: createRecordingLogger(),
+      publicDir: "public",
+    });
+
+    const result = await builder.build({
+      outputDir: "_site",
+      baseUrl: "https://blog.example.com",
+    });
+
+    assertEquals(result.ok, false);
+    if (!result.ok) {
+      assertEquals(result.error.kind, "IOError");
+      assertEquals(result.error.message, failOn.message);
+    }
+    assertEquals(fileWriter.written.has("_site/index.html"), false);
+  });
+}
+
+const contentFailureCases = [
+  { method: "loadPosts", message: "loadPosts exploded" },
+  { method: "getTags", message: "getTags exploded" },
+] as const;
+
+for (const failOn of contentFailureCases) {
+  Deno.test(`StaticBuilder - build stops when ${failOn.method} fails`, async () => {
+    const fileWriter = createMockFileWriter();
+    const builder = createStaticBuilder({
+      contentService: createMemoryContentService([MOCK_POST], {
+        [failOn.method]: () =>
+          Promise.resolve(err(createError("ParseError", failOn.message))),
+      }),
+      routes: createMockRoutes(),
+      fileWriter,
+      logger: createRecordingLogger(),
+      publicDir: "public",
+    });
+
+    const result = await builder.build({
+      outputDir: "_site",
+      baseUrl: "https://blog.example.com",
+    });
+
+    assertEquals(result.ok, false);
+    if (!result.ok) {
+      assertEquals(result.error.kind, "ParseError");
+      assertEquals(result.error.message, failOn.message);
+    }
+    assertEquals(fileWriter.written.has("_site/index.html"), false);
+  });
+}
