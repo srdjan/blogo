@@ -1,11 +1,13 @@
 import type { LayoutProps } from "../lib/types.ts";
+import type { SiteConfig } from "../domain/config.ts";
 import { renderVNode } from "../http/render-vnode.ts";
 
 // Inline script to initialize theme/palette from localStorage before first paint.
 // Must run synchronously (no defer/async) to prevent flash of wrong theme.
-const themeInitScript = `(function(){var d=document.documentElement;var t=localStorage.getItem("theme");if(!t){t=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"}d.setAttribute("data-theme",t);var p=localStorage.getItem("palette")||"automerge";d.setAttribute("data-palette",p)})();`;
+const themeInitScript =
+  `(function(){var d=document.documentElement;var t=localStorage.getItem("theme");if(!t){t=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"}d.setAttribute("data-theme",t);var p=localStorage.getItem("palette")||"automerge";d.setAttribute("data-palette",p)})();`;
 
-export const createLayout = (props: LayoutProps): Response => {
+export const renderLayout = (props: LayoutProps, site: SiteConfig): string => {
   const {
     title,
     description,
@@ -24,14 +26,9 @@ export const createLayout = (props: LayoutProps): Response => {
     atprotoDocUri,
   } = props;
 
-  const env = Deno.env.get("DENO_ENV") || "development";
-  const isProd = env === "production";
-
-  const fallbackOrigin = Deno.env.get("PUBLIC_URL") ||
-    "https://blogo.timok.deno.net";
-  const siteOrigin = origin || fallbackOrigin;
-  const siteName = "Blogo - Modern Development Blog";
-  const twitterHandle = Deno.env.get("TWITTER_HANDLE") || "@blogo_dev";
+  const siteOrigin = origin || site.canonicalUrl;
+  const siteName = site.name;
+  const twitterHandle = site.twitterHandle;
 
   const canonicalTarget = canonicalPath ?? path;
   const canonicalUrl = (() => {
@@ -467,21 +464,5 @@ export const createLayout = (props: LayoutProps): Response => {
   );
 
   // Convert JSX VNode to HTML string using our custom renderer
-  const htmlString = "<!DOCTYPE html>" + renderVNode(html);
-
-  return new Response(htmlString, {
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      ...(isProd
-        ? {
-          "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
-        }
-        : {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
-        }),
-      "Vary": "HX-Request, HX-Request-Type",
-    },
-  });
+  return "<!DOCTYPE html>" + renderVNode(html);
 };

@@ -14,9 +14,6 @@ import type { AtProtoConfig } from "../../src/config/atproto.ts";
 import type { SiteConfig } from "../../src/domain/config.ts";
 import type { Post, Slug, TagName } from "../../src/lib/types.ts";
 
-// A shell value must not switch on the production HTML cache.
-Deno.env.delete("DENO_ENV");
-
 // --- Test doubles ---
 
 const makePost = (title: string, slug: string): Post => ({

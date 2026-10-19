@@ -2,7 +2,7 @@ import type { RouteHandler } from "./types.ts";
 import type { ContentService } from "../domain/content.ts";
 import type { HealthService } from "../domain/health.ts";
 import type { AnalyticsService } from "../domain/analytics.ts";
-import { createLayout } from "../components/Layout.tsx";
+import { renderLayout } from "../components/Layout.tsx";
 import { PostList } from "../components/PostList.tsx";
 import { PostView } from "../components/PostView.tsx";
 import { TopicsIndex } from "../components/TopicsIndex.tsx";
@@ -17,7 +17,12 @@ import {
 import { generateRSS, generateTopicRssFeed } from "../rss.ts";
 import { SearchResults } from "../components/SearchResults.tsx";
 import { About } from "../components/About.tsx";
-import { createSlug, createTagName, createUrlPath } from "../lib/types.ts";
+import {
+  createSlug,
+  createTagName,
+  createUrlPath,
+  type LayoutProps,
+} from "../lib/types.ts";
 import { match } from "../lib/result.ts";
 import { generateRobotsTxt, generateSitemap } from "../sitemap.ts";
 import { generateDefaultOGImage, generateOGImage } from "../og-image.ts";
@@ -101,30 +106,27 @@ export const createRouteHandlers = (
     req.headers.get("HX-Request") === "true" &&
     req.headers.get("HX-Request-Type") !== "full";
 
-  const renderFragment = (
-    props: Parameters<typeof createLayout>[0],
-  ): Response => {
-    const fragmentHtml = renderVNode(props.children);
-    return new Response(fragmentHtml, {
+  const htmlResponse = (body: string, status = 200): Response =>
+    new Response(body, {
+      status,
       headers: {
-        "Content-Type": "text/html; charset=utf-8",
+        "Content-Type": HTML_CONTENT_TYPE,
         ...htmlCacheHeaders,
         "Vary": "HX-Request, HX-Request-Type",
       },
     });
-  };
 
   const renderPage = (
     ctx: RouteContext,
-    props: Parameters<typeof createLayout>[0],
+    props: LayoutProps,
     status = 200,
-  ): Response => {
-    const response = isHtmxRequest(ctx.req)
-      ? renderFragment(props)
-      : createLayout(props);
-    if (status === 200) return response;
-    return new Response(response.body, { status, headers: response.headers });
-  };
+  ): Response =>
+    htmlResponse(
+      isHtmxRequest(ctx.req)
+        ? renderVNode(props.children)
+        : renderLayout(props, deps.site),
+      status,
+    );
 
   // HTML response cache: caches rendered HTML keyed by route path
   const htmlCache: Cache<string> = createInMemoryCache<string>();
