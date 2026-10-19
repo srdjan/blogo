@@ -270,3 +270,111 @@ This post has no images, just text content.`;
     assertEquals(result.value.length, 0);
   }
 });
+
+// --- boundaries with exact messages ---
+
+const PREFIX = "Frontmatter validation failed: ";
+const BASE = { title: "Test Post", date: "2025-01-15" };
+
+const repeat = (char: string, count: number): string => char.repeat(count);
+const unique = (prefix: string, count: number): string[] =>
+  Array.from({ length: count }, (_, i) => `${prefix}${i}`);
+
+type BoundaryCase = {
+  readonly name: string;
+  readonly input: Record<string, unknown>;
+  readonly message?: string;
+};
+
+const boundaryCases: readonly BoundaryCase[] = [
+  { name: "title of 200 characters", input: { title: repeat("t", 200) } },
+  {
+    name: "title of 201 characters",
+    input: { title: repeat("t", 201) },
+    message: "Title must be between 1 and 200 characters",
+  },
+  {
+    name: "empty title",
+    input: { title: "" },
+    message: "Title is required and must be a string",
+  },
+  {
+    name: "non-string title",
+    input: { title: 42 },
+    message: "Title is required and must be a string",
+  },
+  { name: "10 tags", input: { tags: unique("tag", 10) } },
+  {
+    name: "11 tags",
+    input: { tags: unique("tag", 11) },
+    message: "Cannot have more than 10 tags",
+  },
+  { name: "tag of 50 characters", input: { tags: [repeat("g", 50)] } },
+  {
+    name: "tag of 51 characters",
+    input: { tags: [repeat("g", 51)] },
+    message: `Tag "${repeat("g", 51)}" is too long (max 50 characters)`,
+  },
+  {
+    name: "non-array tags",
+    input: { tags: "typescript" },
+    message: "Tags must be an array",
+  },
+  { name: "excerpt of 500 characters", input: { excerpt: repeat("e", 500) } },
+  {
+    name: "excerpt of 501 characters",
+    input: { excerpt: repeat("e", 501) },
+    message: "Excerpt must be no more than 500 characters",
+  },
+  { name: "author of 100 characters", input: { author: repeat("a", 100) } },
+  {
+    name: "author of 101 characters",
+    input: { author: repeat("a", 101) },
+    message: "Author name must be no more than 100 characters",
+  },
+  { name: "category of 50 characters", input: { category: repeat("c", 50) } },
+  {
+    name: "category of 51 characters",
+    input: { category: repeat("c", 51) },
+    message: "Category must be no more than 50 characters",
+  },
+  { name: "10 topics", input: { topics: unique("topic", 10) } },
+  {
+    name: "11 topics",
+    input: { topics: unique("topic", 11) },
+    message: "Cannot have more than 10 topics",
+  },
+  { name: "topic of 50 characters", input: { topics: [repeat("p", 50)] } },
+  {
+    name: "topic of 51 characters",
+    input: { topics: [repeat("p", 51)] },
+    message: `Topic "${repeat("p", 51)}" is too long (max 50 characters)`,
+  },
+];
+
+for (const { name, input, message } of boundaryCases) {
+  Deno.test(`validateFrontmatter - ${name} ${message ? "fails" : "passes"}`, () => {
+    const result = validateFrontmatter({ ...BASE, ...input });
+
+    if (message === undefined) {
+      assertEquals(result.ok, true);
+      return;
+    }
+    assertEquals(result.ok, false);
+    if (!result.ok) {
+      assertEquals(result.error.kind, "ValidationError");
+      assertEquals(result.error.message, `${PREFIX}${message}`);
+    }
+  });
+}
+
+Deno.test("validateFrontmatter - accepts the impossible date 2025-02-30", () => {
+  const result = validateFrontmatter({
+    title: "Test Post",
+    date: "2025-02-30",
+  });
+
+  // Current behavior; see plan finding B11
+  assertEquals(result.ok, true);
+  if (result.ok) assertEquals(result.value.date, "2025-02-30");
+});
