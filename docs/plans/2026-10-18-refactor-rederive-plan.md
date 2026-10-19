@@ -289,6 +289,15 @@ this file.
   `createRouteHandlers`: the same 16 routes, the same status codes and
   headers as the Phase 2 characterization tests record, and HTMX requests get
   a fragment with `Vary: HX-Request`.
+  Result (2026-10-18, commits `bc30dea` to `ee10106`): done. 358 passed,
+  0 failed; lint 0 at HEAD (C4 `5df3892` and C5 `21a8470` were committed
+  with 2 unused-import lint errors, fixed in `ee10106`). `deno task
+  metrics`: 6192 LOC, 802 branches. `routes.tsx` 39 branches plus
+  `view.ts` 10 (49, from 47; the exhaustive `toResponse` switch moved
+  here). Environment reads in `src/`: only the config adapter, the atproto
+  credentials, and the AT publication name and description in two scripts.
+  Build output identical to the baseline except `lastBuildDate` in the
+  feeds. HTTP smoke checks unchanged.
 - **Phase 5, ports.** B5, T6, T8, B12, and the remaining items of section 5.
 
 Note (2026-10-18): `tests/test-api.js` and `tests/curl-test.sh` were

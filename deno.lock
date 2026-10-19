@@ -1,9 +1,11 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@srdjan/bluesky-bot@1.5.0": "1.5.0",
     "jsr:@srdjan/bluesky-bot@^1.5.0": "1.5.0",
     "jsr:@srdjan/hsx@2.0.0": "2.0.0",
     "jsr:@srdjan/rendermaid@0.7.0": "0.7.0",
+    "jsr:@std/assert@*": "1.0.19",
     "jsr:@std/assert@1.0.19": "1.0.19",
     "jsr:@std/fs@1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.12": "1.0.14",
