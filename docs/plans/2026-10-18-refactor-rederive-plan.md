@@ -289,7 +289,12 @@ this file.
   `createRouteHandlers`: the same 16 routes, the same status codes and
   headers as the Phase 2 characterization tests record, and HTMX requests get
   a fragment with `Vary: HX-Request`.
-- **Phase 5, ports.** B5, T6, T8, and the remaining items of section 5.
+- **Phase 5, ports.** B5, T6, T8, B12, and the remaining items of section 5.
+
+Note (2026-10-18): `tests/test-api.js` and `tests/curl-test.sh` were
+deleted in commit `26963dd`, whose message names only the Phase 3 spec. The
+deletion was already staged when that commit ran. History was not
+rewritten.
 - **Phase 6, docs.** Section 6 and the `CLAUDE.md` fixes.
 
 ## 9. What not to touch
