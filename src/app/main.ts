@@ -72,19 +72,23 @@ async function main() {
     atConfig,
   );
 
+  // Load posts and metadata, then fill the individual post cache
+  const warmCaches = async (): Promise<void> => {
+    const [postsResult] = await Promise.all([
+      contentService.loadPosts(),
+      contentService.loadPostsMetadataWithViews(),
+    ]);
+    if (postsResult.ok) {
+      for (const post of postsResult.value) {
+        postCache.set(post.slug as string, post, Infinity);
+      }
+    }
+  };
+
   // Pre-warm all caches at startup (production only)
   if (config.env === "production") {
     const warmStart = performance.now();
-    Promise.all([
-      contentService.loadPosts(),
-      contentService.loadPostsMetadataWithViews(),
-    ]).then(([postsResult, _metaResult]) => {
-      // Populate individual post cache entries
-      if (postsResult.ok) {
-        for (const post of postsResult.value) {
-          postCache.set(post.slug as string, post, Infinity);
-        }
-      }
+    warmCaches().then(() => {
       const elapsed = (performance.now() - warmStart).toFixed(0);
       logger.info(`Cache pre-warming completed in ${elapsed}ms`);
     }).catch((error) => {
@@ -148,7 +152,9 @@ async function main() {
         if (rewarmInProgress) continue;
 
         rewarmInProgress = true;
-        logger.info(`File change detected (${event.kind}), invalidating caches`);
+        logger.info(
+          `File change detected (${event.kind}), invalidating caches`,
+        );
 
         // Clear all caches
         cache.clear();
@@ -158,15 +164,7 @@ async function main() {
 
         // Re-warm
         try {
-          const [postsResult] = await Promise.all([
-            contentService.loadPosts(),
-            contentService.loadPostsMetadataWithViews(),
-          ]);
-          if (postsResult.ok) {
-            for (const post of postsResult.value) {
-              postCache.set(post.slug as string, post, Infinity);
-            }
-          }
+          await warmCaches();
           logger.info("Cache re-warming completed after file change");
         } catch (error) {
           logger.warn("Failed to re-warm caches after file change", error);
