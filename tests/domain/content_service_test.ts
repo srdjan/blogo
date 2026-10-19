@@ -4,11 +4,14 @@ import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import { createRecordingLogger } from "../helpers/logger.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
 import {
+  type AppResult,
   createSlug,
   type Post,
   type PostMeta,
   type TagName,
 } from "../../src/lib/types.ts";
+import { createError } from "../../src/lib/error.ts";
+import { err, ok } from "../../src/lib/result.ts";
 
 Deno.test("ContentService - loads valid posts successfully", async () => {
   const mockFiles = {
@@ -96,7 +99,7 @@ This post has invalid frontmatter.`,
   }
 });
 
-Deno.test("ContentService - handles missing files gracefully", async () => {
+Deno.test("ContentService - returns an empty list for an empty posts directory", async () => {
   const fileSystem = createMemoryFileSystem({});
   const logger = createRecordingLogger();
   const cache = createInMemoryCache<readonly Post[]>();
@@ -382,4 +385,204 @@ Hidden content about zebras.`,
   assertEquals(draft.ok && draft.value, null);
   const cached = postCache.get("draft-post");
   assertEquals(cached.ok && cached.value.status, "miss");
+});
+
+// --- edge cases: sorting, filtering, caching, search, view counts ---
+
+const POSTS_DIR = "content/posts";
+
+const postFile = (
+  title: string,
+  date: string,
+  extra: { readonly tags?: readonly string[]; readonly body?: string } = {},
+): string =>
+  `---
+title: ${title}
+date: ${date}
+${
+    extra.tags
+      ? `tags:\n${extra.tags.map((t) => `  - ${t}`).join("\n")}\n`
+      : ""
+  }---
+
+${extra.body ?? `# ${title}`}`;
+
+type AnalyticsDouble = {
+  readonly getAllViewCounts: () => Promise<AppResult<Record<string, number>>>;
+};
+
+const createService = (
+  files: Record<string, string>,
+  options: {
+    readonly analyticsService?: AnalyticsDouble;
+    readonly failDirs?: ReadonlySet<string>;
+  } = {},
+) => {
+  const fileSystem = createMemoryFileSystem(
+    files,
+    options.failDirs ? { failOn: options.failDirs } : {},
+  );
+  const service = createContentService({
+    fileSystem,
+    logger: createRecordingLogger(),
+    cache: createInMemoryCache<readonly Post[]>(),
+    metadataCache: createInMemoryCache<readonly PostMeta[]>(),
+    postCache: createInMemoryCache<Post>(),
+    postsDir: POSTS_DIR,
+    ...(options.analyticsService
+      ? { analyticsService: options.analyticsService }
+      : {}),
+  });
+  return { service, fileSystem };
+};
+
+const TWO_POSTS = {
+  [`${POSTS_DIR}/post-a.md`]: postFile("Post A", "2025-01-10", {
+    tags: ["TypeScript"],
+    body: "# Alpha\n\nDeno runtime notes.",
+  }),
+  [`${POSTS_DIR}/post-b.md`]: postFile("Post B", "2025-02-10"),
+};
+
+Deno.test("ContentService - sorts posts newest first", async () => {
+  const { service } = createService({
+    [`${POSTS_DIR}/old.md`]: postFile("Old", "2025-01-10"),
+    [`${POSTS_DIR}/new.md`]: postFile("New", "2025-03-01"),
+    [`${POSTS_DIR}/mid.md`]: postFile("Mid", "2025-02-01"),
+  });
+
+  const result = await service.loadPosts();
+
+  assertEquals(result.ok && result.value.map((p) => p.title), [
+    "New",
+    "Mid",
+    "Old",
+  ]);
+});
+
+Deno.test("ContentService - ignores files that are not markdown", async () => {
+  const { service } = createService({
+    ...TWO_POSTS,
+    [`${POSTS_DIR}/notes.txt`]: "not a post, no frontmatter",
+    [`${POSTS_DIR}/.DS_Store`]: "binary",
+  });
+
+  const result = await service.loadPosts();
+
+  assertEquals(result.ok && result.value.length, 2);
+});
+
+Deno.test("ContentService - returns an error result when the posts directory cannot be read", async () => {
+  const { service } = createService(TWO_POSTS, {
+    failDirs: new Set([POSTS_DIR]),
+  });
+
+  const result = await service.loadPosts();
+
+  assertEquals(result.ok, false);
+  if (!result.ok) assertEquals(result.error.kind, "IOError");
+});
+
+Deno.test("ContentService - a second loadPosts call reads nothing from the file system", async () => {
+  const { service, fileSystem } = createService(TWO_POSTS);
+
+  const first = await service.loadPosts();
+  const readsAfterFirst = { ...fileSystem.calls };
+  const second = await service.loadPosts();
+
+  assertEquals(readsAfterFirst.readDir, 1);
+  assertEquals(readsAfterFirst.readFile, 2);
+  assertEquals(fileSystem.calls, readsAfterFirst);
+  assertEquals(second, first);
+});
+
+Deno.test("ContentService - search ignores case in the query and in the post", async () => {
+  const { service } = createService(TWO_POSTS);
+
+  for (const query of ["typescript", "TYPESCRIPT", "deno RUNTIME"]) {
+    const result = await service.searchPosts(query);
+    assertEquals(
+      result.ok && result.value.map((p) => p.title),
+      ["Post A"],
+      query,
+    );
+  }
+});
+
+Deno.test("ContentService - an empty search query returns every post", async () => {
+  const { service } = createService(TWO_POSTS);
+
+  const result = await service.searchPosts("");
+
+  assertEquals(result.ok && result.value.length, 2);
+});
+
+Deno.test("ContentService - getPostsByTag returns an empty list for an unknown tag", async () => {
+  const { service } = createService(TWO_POSTS);
+
+  const result = await service.getPostsByTag("Nothing" as TagName);
+
+  assertEquals(result, ok([]));
+});
+
+Deno.test("ContentService - getPostsByTag ignores the case of the tag", async () => {
+  const { service } = createService(TWO_POSTS);
+
+  const result = await service.getPostsByTag("typescript" as TagName);
+
+  assertEquals(result.ok && result.value.map((p) => p.title), ["Post A"]);
+});
+
+const viewCounts = (counts: Record<string, number>): AnalyticsDouble => ({
+  getAllViewCounts: () => Promise.resolve(ok(counts)),
+});
+
+const failingViewCounts: AnalyticsDouble = {
+  getAllViewCounts: () =>
+    Promise.resolve(err(createError("IOError", "analytics down"))),
+};
+
+Deno.test("ContentService - loadPostsMetadataWithViews merges view counts and uses 0 for a missing count", async () => {
+  const { service } = createService(TWO_POSTS, {
+    analyticsService: viewCounts({ "post-a": 5 }),
+  });
+
+  const result = await service.loadPostsMetadataWithViews();
+
+  assertEquals(
+    result.ok && result.value.map((p) => [p.title, p.viewCount]),
+    [["Post B", 0], ["Post A", 5]],
+  );
+});
+
+Deno.test("ContentService - loadPostsWithViews merges view counts and uses 0 for a missing count", async () => {
+  const { service } = createService(TWO_POSTS, {
+    analyticsService: viewCounts({ "post-a": 5 }),
+  });
+
+  const result = await service.loadPostsWithViews();
+
+  assertEquals(
+    result.ok && result.value.map((p) => [p.title, p.viewCount]),
+    [["Post B", 0], ["Post A", 5]],
+  );
+});
+
+Deno.test("ContentService - view-count failures differ between the two WithViews readers", async () => {
+  const metadata = await createService(TWO_POSTS, {
+    analyticsService: failingViewCounts,
+  }).service.loadPostsMetadataWithViews();
+  const full = await createService(TWO_POSTS, {
+    analyticsService: failingViewCounts,
+  }).service.loadPostsWithViews();
+
+  // Current behavior; see plan finding B10
+  assertEquals(
+    metadata.ok && metadata.value.map((p) => p.viewCount),
+    [0, 0],
+  );
+  assertEquals(
+    full.ok && full.value.map((p) => p.viewCount),
+    [undefined, undefined],
+  );
 });
