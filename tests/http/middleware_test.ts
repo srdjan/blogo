@@ -213,7 +213,7 @@ Deno.test("staticFiles middleware - a bare .json path falls through to the next 
       createTestRequest("http://localhost:8000/test.json"),
     );
 
-    // Current behavior; see plan finding B7
+    // Intended: only allow-listed paths are served (plan finding B7, closed)
     assertEquals(response.status, 404);
     assertEquals(await response.text(), "Not found");
   });
@@ -279,16 +279,27 @@ Deno.test("compress middleware - skips a body under minSize", async () => {
   assertEquals(await response.text(), "tiny");
 });
 
-Deno.test("compress middleware - compresses a small body that has no Content-Length", async () => {
+Deno.test("compress middleware - a small body without Content-Length is not compressed", async () => {
   const response = await compress()(bodyHandler("tiny"))(
     createTestRequest("http://localhost:8000/", {
       headers: { "Accept-Encoding": "gzip" },
     }),
   );
 
-  // Current behavior; see plan finding B8
+  // Fixed: plan finding B8
+  assertEquals(response.headers.get("Content-Encoding"), null);
+  assertEquals(await response.text(), "tiny");
+});
+
+Deno.test("compress middleware - a large body without Content-Length is compressed and decodes to the original", async () => {
+  const response = await compress()(bodyHandler(bigBody))(
+    createTestRequest("http://localhost:8000/", {
+      headers: { "Accept-Encoding": "gzip" },
+    }),
+  );
+
   assertEquals(response.headers.get("Content-Encoding"), "gzip");
-  assertEquals(await gunzip(response), "tiny");
+  assertEquals(await gunzip(response), bigBody);
 });
 
 Deno.test("compress middleware - skips a request without Accept-Encoding", async () => {

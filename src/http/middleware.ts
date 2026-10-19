@@ -144,7 +144,21 @@ async (req) => {
     });
   }
 
-  const stream = res.body.pipeThrough(
+  // Without Content-Length the size is unknown: read the body to apply minSize
+  let source: ReadableStream<Uint8Array<ArrayBuffer>> = res.body;
+  if (!length) {
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.length < minSize) {
+      return new Response(bytes, {
+        status: res.status,
+        statusText: res.statusText,
+        headers: res.headers,
+      });
+    }
+    source = new Blob([bytes]).stream();
+  }
+
+  const stream = source.pipeThrough(
     new CompressionStream(encoding as CompressionFormat),
   );
   return new Response(stream, {
