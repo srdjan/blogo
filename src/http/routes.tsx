@@ -546,9 +546,7 @@ export const createRouteHandlers = (
 
     return match(postResult, {
       ok: (post) => {
-        if (!post) {
-          return svgResponse(generateDefaultOGImage());
-        }
+        if (!post) return new Response("Not Found", { status: 404 });
 
         return svgResponse(generateOGImage(
           post.title,
@@ -556,7 +554,7 @@ export const createRouteHandlers = (
           post.tags?.map((tag) => tag as string),
         ));
       },
-      error: () => svgResponse(generateDefaultOGImage()),
+      error: () => new Response("Failed to generate OG image", { status: 500 }),
     });
   };
 

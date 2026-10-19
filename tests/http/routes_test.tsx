@@ -513,26 +513,25 @@ Deno.test("routes - ogImagePost returns an SVG with the post title", async () =>
   assertStringIncludes(body, "Test Post");
 });
 
-Deno.test("routes - ogImagePost falls back to the default SVG for an unknown slug", async () => {
+Deno.test("routes - ogImagePost returns 404 for an unknown slug", async () => {
   const handlers = createHandlers(
     createContentService({ getPostBySlug: () => Promise.resolve(ok(null)) }),
   );
-  const { status, type, body } = await textOf(
+  const { status, body } = await textOf(
     handlers.ogImagePost(contextFor("/images/og/missing.svg")),
   );
-  // Current behavior; see plan finding B9
-  assertEquals(status, 200);
-  assertEquals(type, "image/svg+xml");
-  assertStringIncludes(body, '<svg width="1200"');
+  // Fixed: plan finding B9
+  assertEquals(status, 404);
+  assertEquals(body, "Not Found");
 });
 
-Deno.test("routes - ogImagePost falls back to the default SVG on a content error", async () => {
-  const { status, type } = await textOf(
+Deno.test("routes - ogImagePost returns 500 on a content error", async () => {
+  const { status, body } = await textOf(
     createHandlers(failing()).ogImagePost(contextFor("/images/og/x.svg")),
   );
-  // Current behavior; see plan finding B9
-  assertEquals(status, 200);
-  assertEquals(type, "image/svg+xml");
+  // Fixed: plan finding B9
+  assertEquals(status, 500);
+  assertEquals(body, "Failed to generate OG image");
 });
 
 const healthCases: ReadonlyArray<
