@@ -262,6 +262,15 @@ this file.
   references the new names.
 - **Phase 2, test net.** Q1, Q3-Q10. Expected: `routes.tsx` and `Layout.tsx`
   appear in the coverage report; 0 ignored tests; no test over 1 s.
+  Result (2026-10-18, commits `4df4be4` to `c4ecd14`): done except one
+  step. 342 passed, 0 failed, 0 ignored; slowest test 163 ms. Lint 0 on
+  `src/`, `tests/`, `scripts/`. Coverage: all files 84.1% branches, 90.0%
+  lines; `routes.tsx` 96.8% lines, `Layout.tsx` 98.9%, `middleware.ts`
+  74.5%, `content.ts` 83.6%, `validation.ts` 82.4%,
+  `markdown-renderer.tsx` 86.8%. No change under `src/` or `public/`.
+  Mutation check: removing the search escape and the draft filter each made
+  a test fail. Open: the auto-mode permission check denied deleting
+  `tests/test-api.js` and `tests/curl-test.sh`; the user decides.
 - **Phase 3, mechanical rederive.** M4 with T2, M5, M6, M7, M9, M10, M12.
   Expected: `validation.ts` maxCC at or below 15; `content.ts` branches drop
   (measure).
