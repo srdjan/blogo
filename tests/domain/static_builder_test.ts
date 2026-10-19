@@ -147,6 +147,7 @@ Deno.test("StaticBuilder - generates index.html for root", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   const result = await builder.build({
@@ -166,6 +167,7 @@ Deno.test("StaticBuilder - generates per-post pages", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -187,6 +189,7 @@ Deno.test("StaticBuilder - generates fragment files alongside full pages", async
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -209,6 +212,7 @@ Deno.test("StaticBuilder - generates non-HTML routes", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -233,6 +237,7 @@ Deno.test("StaticBuilder - generates per-tag pages", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -254,6 +259,7 @@ Deno.test("StaticBuilder - report counts match generated files", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   const result = await builder.build({
@@ -279,6 +285,7 @@ Deno.test("StaticBuilder - generates OG images for posts", async () => {
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -300,6 +307,7 @@ Deno.test("StaticBuilder - generates well-known verification route", async () =>
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -307,12 +315,67 @@ Deno.test("StaticBuilder - generates well-known verification route", async () =>
     baseUrl: "https://blog.example.com",
   });
 
-  // The .well-known path should be generated as a non-HTML route
-  // Check it was written (path may vary based on implementation)
-  const wellKnownWritten = [...fileWriter.written.keys()].some((k) =>
-    k.includes("site.standard.publication")
+  assertEquals(
+    fileWriter.written.has("_site/.well-known/site.standard.publication"),
+    true,
   );
-  assertEquals(wellKnownWritten, true);
+});
+
+Deno.test("StaticBuilder - skips the well-known route when atproto is disabled", async () => {
+  const fileWriter = createMockFileWriter();
+  const builder = createStaticBuilder({
+    contentService: createMemoryContentService([MOCK_POST]),
+    routes: createMockRoutes(),
+    fileWriter,
+    logger: createRecordingLogger(),
+    publicDir: "public",
+    atprotoEnabled: false,
+  });
+
+  const result = await builder.build({
+    outputDir: "_site",
+    baseUrl: "https://blog.example.com",
+  });
+
+  assertEquals(result.ok, true);
+  assertEquals(
+    [...fileWriter.written.keys()].some((k) =>
+      k.includes("site.standard.publication")
+    ),
+    false,
+  );
+  if (result.ok) assertEquals(result.value.errors.length, 0);
+});
+
+Deno.test("StaticBuilder - a non-2xx response is reported and not written", async () => {
+  const fileWriter = createMockFileWriter();
+  const failing = (_ctx: RouteContext) => new Response("boom", { status: 500 });
+  const builder = createStaticBuilder({
+    contentService: createMemoryContentService([MOCK_POST]),
+    routes: { ...createMockRoutes(), about: failing, robots: failing },
+    fileWriter,
+    logger: createRecordingLogger(),
+    publicDir: "public",
+    atprotoEnabled: true,
+  });
+
+  const result = await builder.build({
+    outputDir: "_site",
+    baseUrl: "https://blog.example.com",
+  });
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.errors.includes("/about: HTTP 500"), true);
+    assertEquals(
+      result.value.errors.includes("/about (fragment): HTTP 500"),
+      true,
+    );
+    assertEquals(result.value.errors.includes("/robots.txt: HTTP 500"), true);
+  }
+  assertEquals(fileWriter.written.has("_site/about/index.html"), false);
+  assertEquals(fileWriter.written.has("_site/about/fragment.html"), false);
+  assertEquals(fileWriter.written.has("_site/robots.txt"), false);
 });
 
 Deno.test("StaticBuilder - fragment render request carries HX-Request-Type partial", async () => {
@@ -328,6 +391,7 @@ Deno.test("StaticBuilder - fragment render request carries HX-Request-Type parti
     fileWriter: createMockFileWriter(),
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   await builder.build({
@@ -351,6 +415,7 @@ Deno.test("StaticBuilder - fingerprints assets and rewrites HTML references", as
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   const result = await builder.build({
@@ -387,6 +452,7 @@ Deno.test("StaticBuilder - building twice does not double-hash assets", async ()
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
   const options = {
     outputDir: "_site",
@@ -409,6 +475,7 @@ Deno.test("StaticBuilder - a failed page write is reported with its route path",
     fileWriter,
     logger: createRecordingLogger(),
     publicDir: "public",
+    atprotoEnabled: true,
   });
 
   const result = await builder.build({
@@ -441,6 +508,7 @@ for (const failOn of failureCases) {
       fileWriter,
       logger: createRecordingLogger(),
       publicDir: "public",
+      atprotoEnabled: true,
     });
 
     const result = await builder.build({
@@ -474,6 +542,7 @@ for (const failOn of contentFailureCases) {
       fileWriter,
       logger: createRecordingLogger(),
       publicDir: "public",
+      atprotoEnabled: true,
     });
 
     const result = await builder.build({

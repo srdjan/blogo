@@ -78,6 +78,7 @@ async function main() {
     fileWriter,
     logger,
     publicDir: "public",
+    atprotoEnabled: atConfig !== null,
   });
 
   logger.info(`Building static site to ${outputDir}/`);

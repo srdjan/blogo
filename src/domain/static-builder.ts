@@ -29,12 +29,30 @@ export type StaticBuilderDependencies = {
   readonly fileWriter: FileWriter;
   readonly logger: Logger;
   readonly publicDir: string;
+  readonly atprotoEnabled: boolean;
+};
+
+type RouteKind = "page" | "asset";
+
+type RouteEntry = {
+  readonly path: string;
+  readonly handler: (
+    ctx: RouteContext,
+  ) => Promise<Response> | Response;
+  readonly kind: RouteKind;
 };
 
 export const createStaticBuilder = (
   deps: StaticBuilderDependencies,
 ): StaticBuilder => {
-  const { contentService, routes, fileWriter, logger, publicDir } = deps;
+  const {
+    contentService,
+    routes,
+    fileWriter,
+    logger,
+    publicDir,
+    atprotoEnabled,
+  } = deps;
 
   const synthesizeContext = (
     path: string,
@@ -58,15 +76,22 @@ export const createStaticBuilder = (
     };
   };
 
+  type RenderedRoute = {
+    readonly status: number;
+    readonly body: string;
+  };
+
+  const isSuccess = (status: number): boolean => status >= 200 && status < 300;
+
   const renderRoute = async (
     handler: (ctx: RouteContext) => Promise<Response> | Response,
     path: string,
     baseUrl: string,
     htmx: boolean,
-  ): Promise<string> => {
+  ): Promise<RenderedRoute> => {
     const ctx = synthesizeContext(path, baseUrl, htmx);
     const response = await handler(ctx);
-    return response.text();
+    return { status: response.status, body: await response.text() };
   };
 
   const rewriteHtmxUrls = (html: string): string => {
@@ -86,11 +111,13 @@ export const createStaticBuilder = (
       );
   };
 
-  const outputPath = (dir: string, routePath: string): string => {
+  const outputPath = (
+    dir: string,
+    routePath: string,
+    kind: RouteKind,
+  ): string => {
+    if (kind === "asset") return `${dir}${routePath}`;
     if (routePath === "/") return `${dir}/index.html`;
-    if (routePath.endsWith(".xml")) return `${dir}${routePath}`;
-    if (routePath.endsWith(".txt")) return `${dir}${routePath}`;
-    if (routePath.endsWith(".svg")) return `${dir}${routePath}`;
     return `${dir}${routePath}/index.html`;
   };
 
@@ -142,50 +169,45 @@ export const createStaticBuilder = (
     const tags = tagsResult.value;
 
     // 4. Build route list
-    type RouteEntry = {
-      readonly path: string;
-      readonly handler: (
-        ctx: RouteContext,
-      ) => Promise<Response> | Response;
-      readonly html: boolean;
-    };
-
     const routeEntries: RouteEntry[] = [
       // Fixed HTML routes
-      { path: "/", handler: routes.home, html: true },
-      { path: "/about", handler: routes.about, html: true },
-      { path: "/tags", handler: routes.tags, html: true },
-      { path: "/rss", handler: routes.rssPage, html: true },
-      { path: "/search", handler: routes.search, html: true },
+      { path: "/", handler: routes.home, kind: "page" },
+      { path: "/about", handler: routes.about, kind: "page" },
+      { path: "/tags", handler: routes.tags, kind: "page" },
+      { path: "/rss", handler: routes.rssPage, kind: "page" },
+      { path: "/search", handler: routes.search, kind: "page" },
 
       // Non-HTML routes
-      { path: "/feed.xml", handler: routes.rss, html: false },
-      { path: "/rss.xml", handler: routes.rss, html: false },
-      { path: "/sitemap.xml", handler: routes.sitemap, html: false },
-      { path: "/robots.txt", handler: routes.robots, html: false },
+      { path: "/feed.xml", handler: routes.rss, kind: "asset" },
+      { path: "/rss.xml", handler: routes.rss, kind: "asset" },
+      { path: "/sitemap.xml", handler: routes.sitemap, kind: "asset" },
+      { path: "/robots.txt", handler: routes.robots, kind: "asset" },
       {
         path: "/images/og-default.svg",
         handler: routes.ogImageDefault,
-        html: false,
-      },
-      {
-        path: "/.well-known/site.standard.publication",
-        handler: routes.atprotoVerification,
-        html: false,
+        kind: "asset",
       },
     ];
+
+    if (atprotoEnabled) {
+      routeEntries.push({
+        path: "/.well-known/site.standard.publication",
+        handler: routes.atprotoVerification,
+        kind: "asset",
+      });
+    }
 
     // Per-post routes
     for (const post of posts) {
       routeEntries.push({
         path: `/posts/${post.slug as string}`,
         handler: routes.post,
-        html: true,
+        kind: "page",
       });
       routeEntries.push({
         path: `/images/og/${post.slug as string}.svg`,
         handler: routes.ogImagePost,
-        html: false,
+        kind: "asset",
       });
     }
 
@@ -194,7 +216,7 @@ export const createStaticBuilder = (
       routeEntries.push({
         path: `/tags/${encodeURIComponent(tag.name as string)}`,
         handler: routes.tagPosts,
-        html: true,
+        kind: "page",
       });
     }
 
@@ -202,41 +224,51 @@ export const createStaticBuilder = (
     for (const entry of routeEntries) {
       try {
         // Full page render
-        const content = await renderRoute(
+        const page = await renderRoute(
           entry.handler,
           entry.path,
           baseUrl,
           false,
         );
 
-        const outFile = outputPath(outputDir, entry.path);
-        const fullContent = entry.html ? rewriteHtmxUrls(content) : content;
-        const writeResult = await fileWriter.writeFile(outFile, fullContent);
-
-        if (writeResult.ok) {
-          pages++;
-          logger.debug(`Generated: ${outFile}`);
+        if (!isSuccess(page.status)) {
+          errors.push(`${entry.path}: HTTP ${page.status}`);
         } else {
-          errors.push(`${entry.path}: ${writeResult.error.message}`);
+          const outFile = outputPath(outputDir, entry.path, entry.kind);
+          const fullContent = entry.kind === "page"
+            ? rewriteHtmxUrls(page.body)
+            : page.body;
+          const writeResult = await fileWriter.writeFile(outFile, fullContent);
+
+          if (writeResult.ok) {
+            pages++;
+            logger.debug(`Generated: ${outFile}`);
+          } else {
+            errors.push(`${entry.path}: ${writeResult.error.message}`);
+          }
         }
 
-        // Fragment render for HTML routes
-        if (entry.html) {
+        // Fragment render for page routes
+        if (entry.kind === "page") {
           const frag = await renderRoute(
             entry.handler,
             entry.path,
             baseUrl,
             true,
           );
-          const fragFile = fragmentPath(outputDir, entry.path);
-          const fragResult = await fileWriter.writeFile(fragFile, frag);
-
-          if (fragResult.ok) {
-            fragments++;
+          if (!isSuccess(frag.status)) {
+            errors.push(`${entry.path} (fragment): HTTP ${frag.status}`);
           } else {
-            errors.push(
-              `${entry.path} (fragment): ${fragResult.error.message}`,
-            );
+            const fragFile = fragmentPath(outputDir, entry.path);
+            const fragResult = await fileWriter.writeFile(fragFile, frag.body);
+
+            if (fragResult.ok) {
+              fragments++;
+            } else {
+              errors.push(
+                `${entry.path} (fragment): ${fragResult.error.message}`,
+              );
+            }
           }
         }
       } catch (e) {
