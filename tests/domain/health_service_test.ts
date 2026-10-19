@@ -3,9 +3,7 @@ import { createHealthService } from "../../src/domain/health.ts";
 import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import type { Cache } from "../../src/ports/cache.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import { createClock, createFixedClock } from "../../src/ports/clock.ts";
-import type { AppResult } from "../../src/lib/types.ts";
-import { err, ok } from "../../src/lib/result.ts";
+import { createClock } from "../../src/ports/clock.ts";
 
 const HEALTHY_FILES = {
   "content/posts/file1.md": "mock content",

@@ -9,13 +9,11 @@ function createTestRequest(url: string, options: RequestInit = {}): Request {
 
 // Helper to create test handlers
 function createTestHandler(response: Response): Handler {
-  return async () => response;
+  return () => Promise.resolve(response);
 }
 
 function createErrorHandler(error: Error): Handler {
-  return async () => {
-    throw error;
-  };
+  return () => Promise.reject(error);
 }
 
 Deno.test("errorBoundary middleware - catches and handles errors", async () => {

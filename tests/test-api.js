@@ -27,7 +27,7 @@ fetch(url, {
     try {
       const json = JSON.parse(text);
       console.log("Parsed JSON:", json);
-    } catch (e) {
+    } catch {
       console.log("Response is not valid JSON");
     }
   })

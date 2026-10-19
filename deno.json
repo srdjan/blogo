@@ -30,7 +30,9 @@
   },
   "lint": {
     "include": [
-      "src/"
+      "src/",
+      "tests/",
+      "scripts/"
     ]
   },
   "imports": {

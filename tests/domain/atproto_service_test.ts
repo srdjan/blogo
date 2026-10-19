@@ -11,7 +11,6 @@ import type {
   GetRecordResponse,
   ListRecordsResponse,
   PutRecordResponse,
-  StandardDocument,
 } from "../../src/atproto/types.ts";
 
 // --- Mock helpers ---
@@ -26,35 +25,35 @@ function createMockClient(): AtProtoClient & {
 
   return {
     store,
-    putRecord: async (params): Promise<AppResult<PutRecordResponse>> => {
+    putRecord: (params): Promise<AppResult<PutRecordResponse>> => {
       const key = `${params.collection}/${params.rkey}`;
       store.set(key, { record: params.record });
-      return ok({
+      return Promise.resolve(ok({
         uri: `at://did:plc:test/${params.collection}/${params.rkey}`,
         cid: "bafytest",
-      });
+      }));
     },
-    getRecord: async <T>(
+    getRecord: <T>(
       params: { readonly collection: string; readonly rkey: string },
     ): Promise<AppResult<GetRecordResponse<T>>> => {
       const key = `${params.collection}/${params.rkey}`;
       const entry = store.get(key);
       if (!entry) {
-        return {
+        return Promise.resolve({
           ok: false,
           error: {
-            kind: "NotFound",
+            kind: "NotFound" as const,
             message: `Record not found: ${key}`,
           },
-        };
+        });
       }
-      return ok({
+      return Promise.resolve(ok({
         uri: `at://did:plc:test/${params.collection}/${params.rkey}`,
         cid: "bafytest",
         value: entry.record as unknown as T,
-      });
+      }));
     },
-    listRecords: async <T>(
+    listRecords: <T>(
       params: {
         readonly collection: string;
         readonly limit?: number;
@@ -76,10 +75,10 @@ function createMockClient(): AtProtoClient & {
           });
         }
       }
-      return ok({ records });
+      return Promise.resolve(ok({ records }));
     },
-    deleteRecord: async (): Promise<AppResult<void>> => {
-      return ok(undefined);
+    deleteRecord: (): Promise<AppResult<void>> => {
+      return Promise.resolve(ok(undefined));
     },
     getDid: () => "did:plc:test",
   };
@@ -92,20 +91,22 @@ function createMockFileWriter(): FileWriter & {
   const written = new Map<string, string>();
   return {
     written,
-    writeFile: async (
+    writeFile: (
       path: string,
       content: string,
     ): Promise<AppResult<void>> => {
       written.set(path, content);
-      return ok(undefined);
+      return Promise.resolve(ok(undefined));
     },
-    ensureDir: async (): Promise<AppResult<void>> => ok(undefined),
-    copyDir: async (): Promise<AppResult<void>> => ok(undefined),
-    clean: async (): Promise<AppResult<void>> => ok(undefined),
-    listFiles: async (): Promise<AppResult<readonly string[]>> => ok([]),
-    readBytes: async (): Promise<AppResult<Uint8Array>> => ok(new Uint8Array()),
-    readText: async (): Promise<AppResult<string>> => ok(""),
-    rename: async (): Promise<AppResult<void>> => ok(undefined),
+    ensureDir: (): Promise<AppResult<void>> => Promise.resolve(ok(undefined)),
+    copyDir: (): Promise<AppResult<void>> => Promise.resolve(ok(undefined)),
+    clean: (): Promise<AppResult<void>> => Promise.resolve(ok(undefined)),
+    listFiles: (): Promise<AppResult<readonly string[]>> =>
+      Promise.resolve(ok([])),
+    readBytes: (): Promise<AppResult<Uint8Array>> =>
+      Promise.resolve(ok(new Uint8Array())),
+    readText: (): Promise<AppResult<string>> => Promise.resolve(ok("")),
+    rename: (): Promise<AppResult<void>> => Promise.resolve(ok(undefined)),
   };
 }
 

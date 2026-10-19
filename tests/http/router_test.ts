@@ -9,7 +9,7 @@ function createTestRequest(url: string, method = "GET"): Request {
 
 Deno.test("Router - handles simple GET route", async () => {
   const router = createRouter()
-    .get("/test", async () => new Response("Test response"));
+    .get("/test", () => Promise.resolve(new Response("Test response")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000/test");
@@ -21,7 +21,7 @@ Deno.test("Router - handles simple GET route", async () => {
 
 Deno.test("Router - handles POST route", async () => {
   const router = createRouter()
-    .post("/api/data", async () => new Response("Posted"));
+    .post("/api/data", () => Promise.resolve(new Response("Posted")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000/api/data", "POST");
@@ -33,7 +33,7 @@ Deno.test("Router - handles POST route", async () => {
 
 Deno.test("Router - handles PUT route", async () => {
   const router = createRouter()
-    .put("/api/data/123", async () => new Response("Updated"));
+    .put("/api/data/123", () => Promise.resolve(new Response("Updated")));
 
   const handler = router.handler();
   const request = createTestRequest(
@@ -48,7 +48,7 @@ Deno.test("Router - handles PUT route", async () => {
 
 Deno.test("Router - handles DELETE route", async () => {
   const router = createRouter()
-    .delete("/api/data/123", async () => new Response("Deleted"));
+    .delete("/api/data/123", () => Promise.resolve(new Response("Deleted")));
 
   const handler = router.handler();
   const request = createTestRequest(
@@ -63,11 +63,11 @@ Deno.test("Router - handles DELETE route", async () => {
 
 Deno.test("Router - handles route parameters", async () => {
   const router = createRouter()
-    .get("/posts/:slug", async (ctx: RouteContext) => {
+    .get("/posts/:slug", (ctx: RouteContext) => {
       const url = new URL(ctx.req.url);
       const pathParts = url.pathname.split("/");
       const slug = pathParts[pathParts.length - 1];
-      return new Response(`Post: ${slug}`);
+      return Promise.resolve(new Response(`Post: ${slug}`));
     });
 
   const handler = router.handler();
@@ -80,12 +80,12 @@ Deno.test("Router - handles route parameters", async () => {
 
 Deno.test("Router - handles multiple route parameters", async () => {
   const router = createRouter()
-    .get("/users/:userId/posts/:postId", async (ctx: RouteContext) => {
+    .get("/users/:userId/posts/:postId", (ctx: RouteContext) => {
       const url = new URL(ctx.req.url);
       const pathParts = url.pathname.split("/");
       const userId = pathParts[2];
       const postId = pathParts[4];
-      return new Response(`User: ${userId}, Post: ${postId}`);
+      return Promise.resolve(new Response(`User: ${userId}, Post: ${postId}`));
     });
 
   const handler = router.handler();
@@ -100,11 +100,11 @@ Deno.test("Router - handles multiple route parameters", async () => {
 
 Deno.test("Router - handles regex routes", async () => {
   const router = createRouter()
-    .get(/^\/images\/og\/(.+)\.png$/, async (ctx: RouteContext) => {
+    .get(/^\/images\/og\/(.+)\.png$/, (ctx: RouteContext) => {
       const url = new URL(ctx.req.url);
       const match = url.pathname.match(/^\/images\/og\/(.+)\.png$/);
       const slug = match?.[1] || "unknown";
-      return new Response(`OG Image for: ${slug}`);
+      return Promise.resolve(new Response(`OG Image for: ${slug}`));
     });
 
   const handler = router.handler();
@@ -119,7 +119,7 @@ Deno.test("Router - handles regex routes", async () => {
 
 Deno.test("Router - returns 404 for unmatched routes", async () => {
   const router = createRouter()
-    .get("/test", async () => new Response("Test"));
+    .get("/test", () => Promise.resolve(new Response("Test")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000/nonexistent");
@@ -131,8 +131,8 @@ Deno.test("Router - returns 404 for unmatched routes", async () => {
 
 Deno.test("Router - matches exact paths", async () => {
   const router = createRouter()
-    .get("/test", async () => new Response("Exact match"))
-    .get("/test/sub", async () => new Response("Sub path"));
+    .get("/test", () => Promise.resolve(new Response("Exact match")))
+    .get("/test/sub", () => Promise.resolve(new Response("Sub path")));
 
   const handler = router.handler();
 
@@ -151,9 +151,9 @@ Deno.test("Router - matches exact paths", async () => {
 
 Deno.test("Router - handles query parameters", async () => {
   const router = createRouter()
-    .get("/search", async (ctx: RouteContext) => {
+    .get("/search", (ctx: RouteContext) => {
       const query = ctx.searchParams.get("q") || "no query";
-      return new Response(`Search: ${query}`);
+      return Promise.resolve(new Response(`Search: ${query}`));
     });
 
   const handler = router.handler();
@@ -166,7 +166,7 @@ Deno.test("Router - handles query parameters", async () => {
 
 Deno.test("Router - provides correct context", async () => {
   const router = createRouter()
-    .get("/context-test", async (ctx: RouteContext) => {
+    .get("/context-test", (ctx: RouteContext) => {
       const data = {
         pathname: ctx.pathname,
         method: ctx.method,
@@ -174,7 +174,7 @@ Deno.test("Router - provides correct context", async () => {
         hasReq: !!ctx.req,
         hasSearchParams: !!ctx.searchParams,
       };
-      return new Response(JSON.stringify(data));
+      return Promise.resolve(new Response(JSON.stringify(data)));
     });
 
   const handler = router.handler();
@@ -194,9 +194,7 @@ Deno.test("Router - provides correct context", async () => {
 
 Deno.test("Router - handles route handler errors", async () => {
   const router = createRouter()
-    .get("/error", async () => {
-      throw new Error("Route handler error");
-    });
+    .get("/error", () => Promise.reject(new Error("Route handler error")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000/error");
@@ -208,7 +206,7 @@ Deno.test("Router - handles route handler errors", async () => {
 
 Deno.test("Router - method matching is case sensitive", async () => {
   const router = createRouter()
-    .get("/test", async () => new Response("GET response"));
+    .get("/test", () => Promise.resolve(new Response("GET response")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000/test", "POST");
@@ -219,11 +217,11 @@ Deno.test("Router - method matching is case sensitive", async () => {
 
 Deno.test("Router - supports chaining multiple routes", async () => {
   const router = createRouter()
-    .get("/", async () => new Response("Home"))
-    .get("/about", async () => new Response("About"))
-    .post("/contact", async () => new Response("Contact posted"))
-    .put("/update", async () => new Response("Updated"))
-    .delete("/delete", async () => new Response("Deleted"));
+    .get("/", () => Promise.resolve(new Response("Home")))
+    .get("/about", () => Promise.resolve(new Response("About")))
+    .post("/contact", () => Promise.resolve(new Response("Contact posted")))
+    .put("/update", () => Promise.resolve(new Response("Updated")))
+    .delete("/delete", () => Promise.resolve(new Response("Deleted")));
 
   const handler = router.handler();
 
@@ -248,7 +246,7 @@ Deno.test("Router - supports chaining multiple routes", async () => {
 
 Deno.test("Router - handles empty path", async () => {
   const router = createRouter()
-    .get("/", async () => new Response("Empty path"));
+    .get("/", () => Promise.resolve(new Response("Empty path")));
 
   const handler = router.handler();
   const request = createTestRequest("http://localhost:8000");

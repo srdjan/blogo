@@ -1,6 +1,5 @@
 import { assertEquals } from "@std/assert";
 import { createStaticBuilder } from "../../src/domain/static-builder.ts";
-import type { ContentService } from "../../src/domain/content.ts";
 import type { FileWriter } from "../../src/ports/writer.ts";
 import { createRecordingLogger } from "../helpers/logger.ts";
 import { createMemoryContentService } from "../helpers/content_service.ts";
@@ -8,14 +7,7 @@ import type { RouteHandlers } from "../../src/http/routes.tsx";
 import type { RouteContext } from "../../src/http/types.ts";
 import { err, ok } from "../../src/lib/result.ts";
 import { createError } from "../../src/lib/error.ts";
-import type {
-  AppResult,
-  Post,
-  PostMeta,
-  Slug,
-  TagInfo,
-  TagName,
-} from "../../src/lib/types.ts";
+import type { AppResult, Post, Slug, TagName } from "../../src/lib/types.ts";
 
 // --- Mock helpers ---
 
@@ -31,47 +23,55 @@ function createMockFileWriter(
     err(createError("IOError", `Not found: ${path}`, undefined, { path }));
   return {
     written,
-    writeFile: async (
+    writeFile: (
       path: string,
       content: string,
     ): Promise<AppResult<void>> => {
       if (path === failWriteFor) {
-        return err(createError("IOError", `Failed to write file: ${path}`));
+        return Promise.resolve(
+          err(createError("IOError", `Failed to write file: ${path}`)),
+        );
       }
       written.set(path, content);
-      return ok(undefined);
+      return Promise.resolve(ok(undefined));
     },
-    ensureDir: async (): Promise<AppResult<void>> => ok(undefined),
-    copyDir: async (_src: string, dest: string): Promise<AppResult<void>> => {
+    ensureDir: (): Promise<AppResult<void>> => Promise.resolve(ok(undefined)),
+    copyDir: (_src: string, dest: string): Promise<AppResult<void>> => {
       for (const [relative, content] of Object.entries(publicFiles)) {
         written.set(`${dest}/${relative}`, content);
       }
-      return ok(undefined);
+      return Promise.resolve(ok(undefined));
     },
-    clean: async (path: string): Promise<AppResult<void>> => {
+    clean: (path: string): Promise<AppResult<void>> => {
       for (const key of [...written.keys()]) {
         if (key.startsWith(`${path}/`)) written.delete(key);
       }
-      return ok(undefined);
+      return Promise.resolve(ok(undefined));
     },
-    listFiles: async (dir: string): Promise<AppResult<readonly string[]>> =>
-      ok([...written.keys()].filter((key) => key.startsWith(`${dir}/`))),
-    readBytes: async (path: string): Promise<AppResult<Uint8Array>> => {
+    listFiles: (dir: string): Promise<AppResult<readonly string[]>> =>
+      Promise.resolve(
+        ok([...written.keys()].filter((key) => key.startsWith(`${dir}/`))),
+      ),
+    readBytes: (path: string): Promise<AppResult<Uint8Array>> => {
       const content = written.get(path);
-      return content === undefined
-        ? missing(path)
-        : ok(new TextEncoder().encode(content));
+      return Promise.resolve(
+        content === undefined
+          ? missing(path)
+          : ok(new TextEncoder().encode(content)),
+      );
     },
-    readText: async (path: string): Promise<AppResult<string>> => {
+    readText: (path: string): Promise<AppResult<string>> => {
       const content = written.get(path);
-      return content === undefined ? missing(path) : ok(content);
+      return Promise.resolve(
+        content === undefined ? missing(path) : ok(content),
+      );
     },
-    rename: async (from: string, to: string): Promise<AppResult<void>> => {
+    rename: (from: string, to: string): Promise<AppResult<void>> => {
       const content = written.get(from);
-      if (content === undefined) return missing(from);
+      if (content === undefined) return Promise.resolve(missing(from));
       written.delete(from);
       written.set(to, content);
-      return ok(undefined);
+      return Promise.resolve(ok(undefined));
     },
   };
 }
@@ -84,12 +84,6 @@ const MOCK_POST: Post = {
   excerpt: "A test post",
   tags: ["TypeScript" as TagName],
   formattedDate: "1/15/2025",
-};
-
-const MOCK_TAG: TagInfo = {
-  name: "TypeScript" as TagName,
-  count: 1,
-  posts: [MOCK_POST],
 };
 
 // Local: stub route handlers with fixed bodies, specific to the builder.

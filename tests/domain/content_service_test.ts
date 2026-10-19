@@ -3,7 +3,12 @@ import { createContentService } from "../../src/domain/content.ts";
 import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import { createRecordingLogger } from "../helpers/logger.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import { createSlug, type Post, type PostMeta } from "../../src/lib/types.ts";
+import {
+  createSlug,
+  type Post,
+  type PostMeta,
+  type TagName,
+} from "../../src/lib/types.ts";
 
 Deno.test("ContentService - loads valid posts successfully", async () => {
   const mockFiles = {
@@ -217,7 +222,7 @@ date: 2025-01-14
     postsDir: "content/posts",
   });
 
-  const result = await contentService.getPostsByTag("JavaScript" as any);
+  const result = await contentService.getPostsByTag("JavaScript" as TagName);
 
   assertEquals(result.ok, true);
   if (result.ok) {

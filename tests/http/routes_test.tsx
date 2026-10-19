@@ -30,9 +30,9 @@ const createContentService = (
 const healthService = {} as HealthService;
 
 const analyticsService: AnalyticsService = {
-  getViewCount: async () => ok(0),
-  incrementViewCount: async () => ok(1),
-  getAllViewCounts: async () => ok({}),
+  getViewCount: () => Promise.resolve(ok(0)),
+  incrementViewCount: () => Promise.resolve(ok(1)),
+  getAllViewCounts: () => Promise.resolve(ok({})),
   close: () => {},
 };
 
@@ -119,7 +119,7 @@ Deno.test("routes - search-modal escapes the query when nothing matches", async 
 Deno.test("routes - search-modal escapes matching post titles", async () => {
   const evil = makePost("<script>x</script>", "evil-post");
   const handlers = createHandlers(
-    createContentService({ searchPosts: async () => ok([evil]) }),
+    createContentService({ searchPosts: () => Promise.resolve(ok([evil])) }),
   );
   const res = await handlers.searchModal(contextFor("/search-modal?q=x"));
   const body = await res.text();
@@ -132,8 +132,8 @@ Deno.test("routes - search-modal escapes matching post titles", async () => {
 Deno.test("routes - home returns 500 when posts fail to load", async () => {
   const handlers = createHandlers(
     createContentService({
-      loadPostsMetadataWithViews: async () =>
-        err(createError("IOError", "disk failure")),
+      loadPostsMetadataWithViews: () =>
+        Promise.resolve(err(createError("IOError", "disk failure"))),
     }),
   );
   const res = await handlers.home(contextFor("/"));
@@ -148,8 +148,10 @@ Deno.test("routes - production HTML cache skips error pages", async () => {
     let failing = true;
     const handlers = createHandlers(
       createContentService({
-        loadPostsMetadataWithViews: async () =>
-          failing ? err(createError("IOError", "disk failure")) : ok([POST]),
+        loadPostsMetadataWithViews: () =>
+          Promise.resolve(
+            failing ? err(createError("IOError", "disk failure")) : ok([POST]),
+          ),
       }),
     );
 
