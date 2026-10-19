@@ -274,6 +274,17 @@ this file.
 - **Phase 3, mechanical rederive.** M4 with T2, M5, M6, M7, M9, M10, M12.
   Expected: `validation.ts` maxCC at or below 15; `content.ts` branches drop
   (measure).
+  Result (2026-10-18, commits `b52b882` to `8619d68`, Part A and Phase 3b):
+  done. 348 passed, 0 failed, 0 ignored; lint 0. `deno task metrics`: 6070
+  LOC, 808 branches (from 6101 and 836). `validateFrontmatter` maxCC 11
+  (was 54); the file row shows 16 from the untouched
+  `validateMarkdownContent`. Part A edited no existing test. Fixed: B6,
+  B8, B9, B10, B11 (frontmatter now parsed with the YAML core schema, so
+  impossible dates reach validation). B7 closed as intended. M12
+  cancelled. New finding B12: the static builder writes `response.text()`
+  without a status check, so a content error in a build would write error
+  text into a `.svg` file. Build: 187 pages, 0 errors; HTTP smoke checks
+  unchanged; gzip of the home page works.
 - **Phase 4, HTTP rederive.** T3, T4, T5 (absorbs M8 and B4), T7. Contract for
   `createRouteHandlers`: the same 16 routes, the same status codes and
   headers as the Phase 2 characterization tests record, and HTMX requests get
