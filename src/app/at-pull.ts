@@ -1,3 +1,4 @@
+import { createConfig } from "../domain/config.ts";
 import { createAtProtoConfig } from "../config/atproto.ts";
 import { createAtProtoClient } from "../ports/atproto.ts";
 import { createFileSystem } from "../ports/file-system.ts";
@@ -28,9 +29,9 @@ async function main() {
   }
 
   const force = Deno.args.includes("--force");
-  const publicUrl = Deno.env.get("PUBLIC_URL") ||
-    "https://blogo.timok.deno.net";
-  const postsDir = Deno.env.get("POSTS_DIR") || "content/posts";
+  const config = createConfig();
+  const publicUrl = config.site.canonicalUrl;
+  const postsDir = config.blog.postsDir;
 
   const service = createAtProtoService({
     client: clientResult.value,

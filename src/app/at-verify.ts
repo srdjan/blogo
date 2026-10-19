@@ -1,3 +1,4 @@
+import { createConfig } from "../domain/config.ts";
 import { createAtProtoConfig } from "../config/atproto.ts";
 
 async function main() {
@@ -10,8 +11,7 @@ async function main() {
   }
   console.log(`[PASS] AT Protocol configured for ${atConfig.did}`);
 
-  const publicUrl = Deno.env.get("PUBLIC_URL") ||
-    "https://blogo.timok.deno.net";
+  const publicUrl = createConfig().site.canonicalUrl;
   const expectedUri = `at://${atConfig.did}/site.standard.publication/self`;
 
   // Check 2: Well-known endpoint

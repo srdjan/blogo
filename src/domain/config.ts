@@ -19,31 +19,47 @@ export type DebugConfig = {
   readonly showStackTraces: boolean;
 };
 
+export type SiteConfig = {
+  readonly canonicalUrl: string;
+  readonly name: string;
+  readonly twitterHandle: string;
+};
+
 export type Config = {
   readonly server: ServerConfig;
   readonly blog: BlogConfig;
+  readonly site: SiteConfig;
   readonly env: Environment;
   readonly debug: DebugConfig;
 };
 
-const getEnvironment = (): Environment => {
-  const env = Deno.env.get("DENO_ENV") || "development";
-  const validEnvs: readonly Environment[] = [
-    "development",
-    "production",
-    "test",
-  ];
+type EnvRecord = Readonly<Record<string, string | undefined>>;
 
-  if (!validEnvs.includes(env as Environment)) {
-    console.warn(`Invalid environment "${env}", defaulting to "development"`);
-    return "development";
-  }
+const validEnvs: readonly Environment[] = [
+  "development",
+  "production",
+  "test",
+];
 
-  return env as Environment;
+const isEnvironment = (value: string): value is Environment =>
+  (validEnvs as readonly string[]).includes(value);
+
+const parseEnvironment = (
+  env: EnvRecord,
+): {
+  readonly environment: Environment;
+  readonly warnings: readonly string[];
+} => {
+  const raw = env["DENO_ENV"] || "development";
+  if (isEnvironment(raw)) return { environment: raw, warnings: [] };
+  return {
+    environment: "development",
+    warnings: [`Invalid environment "${raw}", defaulting to "development"`],
+  };
 };
 
-const getPort = (): number => {
-  const portStr = Deno.env.get("PORT");
+const parsePort = (env: EnvRecord): number => {
+  const portStr = env["PORT"];
   if (portStr) {
     const port = parseInt(portStr, 10);
     if (!isNaN(port) && port > 0 && port < 65536) {
@@ -77,24 +93,40 @@ const getDebugSettings = (env: Environment): DebugConfig => {
   }
 };
 
-export const createConfig = (): Config => {
-  const environment = getEnvironment();
-  const port = getPort();
+export const parseConfig = (
+  env: EnvRecord,
+): { readonly config: Config; readonly warnings: readonly string[] } => {
+  const { environment, warnings } = parseEnvironment(env);
+  const port = parsePort(env);
 
   return {
-    server: {
-      port,
-      host: "localhost",
-      publicUrl: Deno.env.get("PUBLIC_URL") || `http://localhost:${port}`,
+    config: {
+      server: {
+        port,
+        host: "localhost",
+        publicUrl: env["PUBLIC_URL"] || `http://localhost:${port}`,
+      },
+      blog: {
+        title: env["BLOG_TITLE"] || "Minimal Blog",
+        description: env["BLOG_DESCRIPTION"] ||
+          "A minimal blog vibe coded with Claude",
+        postsDir: env["POSTS_DIR"] || "content/posts",
+        postsPerPage: parseInt(env["POSTS_PER_PAGE"] || "10", 10),
+      },
+      site: {
+        canonicalUrl: env["PUBLIC_URL"] || "https://blogo.timok.deno.net",
+        name: "Blogo - Modern Development Blog",
+        twitterHandle: env["TWITTER_HANDLE"] || "@blogo_dev",
+      },
+      env: environment,
+      debug: getDebugSettings(environment),
     },
-    blog: {
-      title: Deno.env.get("BLOG_TITLE") || "Minimal Blog",
-      description: Deno.env.get("BLOG_DESCRIPTION") ||
-        "A minimal blog vibe coded with Claude",
-      postsDir: Deno.env.get("POSTS_DIR") || "content/posts",
-      postsPerPage: parseInt(Deno.env.get("POSTS_PER_PAGE") || "10", 10),
-    },
-    env: environment,
-    debug: getDebugSettings(environment),
+    warnings,
   };
+};
+
+export const createConfig = (): Config => {
+  const { config, warnings } = parseConfig(Deno.env.toObject());
+  for (const warning of warnings) console.warn(warning);
+  return config;
 };

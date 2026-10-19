@@ -7,6 +7,7 @@ import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
 import { createClock } from "../ports/clock.ts";
 import { createStaticBuilder } from "../domain/static-builder.ts";
+import { createConfig } from "../domain/config.ts";
 import { createAtProtoConfig } from "../config/atproto.ts";
 import { match, ok } from "../lib/result.ts";
 import type { Post, PostMeta } from "../lib/types.ts";
@@ -24,9 +25,9 @@ async function main() {
   const clock = createClock();
   const startTime = clock.timestamp();
 
-  const postsDir = Deno.env.get("POSTS_DIR") || "content/posts";
-  const publicUrl = Deno.env.get("PUBLIC_URL") ||
-    "https://blogo.timok.deno.net";
+  const config = createConfig();
+  const postsDir = config.blog.postsDir;
+  const publicUrl = config.site.canonicalUrl;
   const outputDir = Deno.args[0] || "_site";
 
   const cache = createInMemoryCache<readonly Post[]>();
