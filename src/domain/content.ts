@@ -351,7 +351,7 @@ export const createContentService = (
     const viewCounts = viewCountsResult.value;
     return ok(
       metadataResult.value.map((meta) =>
-        toListItem(meta, viewCounts[meta.slug] || 0)
+        toListItem(meta, viewCounts[meta.slug] ?? 0)
       ),
     );
   };
@@ -360,24 +360,18 @@ export const createContentService = (
     const postsResult = await loadPosts();
     if (!postsResult.ok) return postsResult;
 
-    if (!analyticsService) {
-      // If no analytics service, return posts without view counts
-      return postsResult;
-    }
-
     const viewCountsResult = await getAllViewCountsCached();
     if (!viewCountsResult.ok) {
       logger.warn("Failed to load view counts, returning posts without views");
-      return postsResult;
     }
+    const viewCounts = viewCountsResult.ok ? viewCountsResult.value : {};
 
-    const viewCounts = viewCountsResult.value;
-    const postsWithViews = postsResult.value.map((post) => ({
-      ...post,
-      viewCount: viewCounts[post.slug] || 0,
-    }));
-
-    return ok(postsWithViews);
+    return ok(
+      postsResult.value.map((post) => ({
+        ...post,
+        viewCount: viewCounts[post.slug] ?? 0,
+      })),
+    );
   };
 
   const getPostBySlug = async (slug: Slug): Promise<AppResult<Post | null>> => {

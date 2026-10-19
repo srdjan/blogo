@@ -568,7 +568,7 @@ Deno.test("ContentService - loadPostsWithViews merges view counts and uses 0 for
   );
 });
 
-Deno.test("ContentService - view-count failures differ between the two WithViews readers", async () => {
+Deno.test("ContentService - view-count failures give 0 in both WithViews readers", async () => {
   const metadata = await createService(TWO_POSTS, {
     analyticsService: failingViewCounts,
   }).service.loadPostsMetadataWithViews();
@@ -576,13 +576,13 @@ Deno.test("ContentService - view-count failures differ between the two WithViews
     analyticsService: failingViewCounts,
   }).service.loadPostsWithViews();
 
-  // Current behavior; see plan finding B10
+  // Fixed: plan finding B10
   assertEquals(
     metadata.ok && metadata.value.map((p) => p.viewCount),
     [0, 0],
   );
   assertEquals(
     full.ok && full.value.map((p) => p.viewCount),
-    [undefined, undefined],
+    [0, 0],
   );
 });
