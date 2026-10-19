@@ -1,85 +1,67 @@
 # Blogo SEO Implementation
 
-This document outlines the SEO features implemented in the Blogo website.
+This document describes the SEO features that Blogo implements. Each claim in
+the first two sections matches the code at the time of writing.
 
-## ✅ Implemented SEO Features
+## Implemented SEO Features
 
-### Core Meta Tags & Open Graph
+### Core Meta Tags and Open Graph
 
-- Complete Open Graph implementation with fallbacks
-- Twitter Card support with proper image sizing
-- Canonical URLs for all pages
-- Dynamic meta descriptions from post excerpts
-- Article-specific meta tags (published_time, modified_time, author, tags)
-- Proper robots meta tag with crawler directives
-- Theme color and locale specification
+`src/components/Layout.tsx` renders these tags:
+
+- Open Graph tags with fallbacks
+- Twitter Card tags (`summary_large_image`)
+- A canonical URL for each page
+- A meta description from the post excerpt
+- Article tags for posts: published time, modified time, author, tags, section
+- A robots meta tag
+- Theme color and locale
 
 ### Structured Data (JSON-LD)
 
-- BlogPosting schema for articles
-- WebSite schema for static pages
-- Breadcrumb navigation schema
-- Author, publisher, and organization markup
-- Article dates and keywords integration
+- `BlogPosting` schema for posts
+- `WebSite` schema for other pages
+- Organization markup for the publisher
+- Author, dates, and keywords for posts
 
-### Dynamic Content
+### Generated Files
 
-- Auto-generated Open Graph images for posts (`/images/og/{slug}.png`)
-- XML sitemap with proper lastmod dates (`/sitemap.xml`)
-- RSS feed with full content (`/feed.xml`)
-- Robots.txt with sitemap reference
+- Open Graph images for posts at `/images/og/{slug}.svg`
+- Default Open Graph image at `/images/og-default.svg`
+- XML sitemap at `/sitemap.xml` with `lastmod` dates
+- RSS feeds at `/feed.xml` and `/rss.xml`
+- `robots.txt` with a sitemap reference
 
-### Progressive Web App
+### Web App Manifest
 
-- Web App Manifest (`/manifest.json`)
-- PWA icons (SVG format for scalability)
-- Service worker ready structure
+- Manifest at `/manifest.json`
+- Icons in SVG format
 
-### Performance Optimization
+### Performance
 
-- Preconnect hints for critical resources
-- DNS prefetch for external domains
-- Resource preloading for critical scripts
-- Optimized font loading
+- A preload hint for the JetBrains Mono font
+- Pages without client-side rendering
+- Fingerprinted static assets in the static build
 
-### Navigation & UX
+## Helpers That No Page Uses Yet
 
-- Breadcrumb navigation with Schema.org markup
-- Reading time calculation and display
-- Semantic HTML structure with proper headings
+Two modules in `src/utils/` are tested helpers. No page calls them yet. The
+project kept them on purpose (decision D4).
 
-## 🔧 Technical Implementation
+- `src/utils/seo-helpers.ts` contains `analyzeSEO`, `generateFAQSchema`, and
+  `generateHowToSchema`.
+- `src/utils/reading-time.ts` contains `calculateReadingTime` and
+  `getReadingTimeMeta`.
 
-### Layout Component (`src/components/Layout.tsx`)
+The site does not render a reading-time display. The site does not render a
+breadcrumb navigation or a breadcrumb schema. The file
+`src/components/Breadcrumbs.tsx` does not exist.
 
-The main layout component handles all SEO meta tags dynamically:
-
-- Conditional meta tags based on page type
-- Dynamic OG image generation
-- Proper structured data injection
-
-### SEO Utilities (`src/utils/seo-helpers.ts`)
-
-Comprehensive SEO analysis tools:
-
-- Content analysis and recommendations
-- Reading time calculation
-- Heading structure validation
-- FAQ and HowTo schema generators
-
-### Breadcrumbs Component (`src/components/Breadcrumbs.tsx`)
-
-SEO-friendly navigation:
-
-- Schema.org BreadcrumbList markup
-- Accessible ARIA attributes
-- Auto-generated based on URL structure
-
-## 📊 Content Guidelines
+## Content Guidelines
 
 ### Blog Post Frontmatter
 
-Each post should include:
+Each post can include these fields:
 
 ```yaml
 title: "Descriptive Title (30-60 characters)"
@@ -91,74 +73,40 @@ excerpt: "Compelling meta description (120-160 characters)"
 
 ### SEO Best Practices
 
-1. **Titles**: 30-60 characters, include target keywords
-2. **Descriptions**: 120-160 characters, compelling and descriptive
-3. **Content**: Minimum 300 words for substantial content
-4. **Headings**: Use proper hierarchy (H1 → H2 → H3)
-5. **Images**: Include descriptive alt text
-6. **Internal Linking**: Link to related posts where relevant
+These are general guidelines. The build does not enforce them.
 
-## 🎯 Performance Metrics
+1. Titles: use 30 to 60 characters and include the target keywords.
+2. Descriptions: use 120 to 160 characters.
+3. Content: write at least 300 words for a substantial post.
+4. Headings: keep the hierarchy H1, H2, H3.
+5. Images: add descriptive alt text.
+6. Internal links: link to related posts.
 
-### Core Web Vitals
+## Deployment Checklist
 
-The site is optimized for:
+Before you deploy, do these checks:
 
-- **LCP (Largest Contentful Paint)**: Fast text rendering with optimized fonts
-- **FID (First Input Delay)**: Minimal JavaScript, progressive enhancement
-- **CLS (Cumulative Layout Shift)**: Stable layouts, proper image sizing
+1. Verify that all images have alt text.
+2. Check that the meta descriptions have 120 to 160 characters.
+3. Check the heading hierarchy.
+4. Open a post Open Graph image in a browser.
+5. Validate the structured data with Google Rich Results Test.
+6. Check the sitemap output.
+7. Check the RSS feed output.
 
-### SEO Score Components
+## Monitoring
 
-- **Technical SEO**: 95/100 (excellent markup, sitemap, robots.txt)
-- **Content SEO**: 85/100 (good structure, needs more internal linking)
-- **UX SEO**: 90/100 (fast loading, mobile-friendly, accessible)
+Use these external tools. This repository has no measurements from them.
 
-## 🚀 Deployment Checklist
+- Google Search Console: search performance
+- PageSpeed Insights: Core Web Vitals
+- Rich Results Test: structured data
+- Mobile-Friendly Test: mobile usability
 
-Before deploying:
+## Maintenance
 
-1. Verify all images have alt text
-2. Check meta descriptions are 120-160 characters
-3. Ensure proper heading hierarchy
-4. Test Open Graph images generation
-5. Validate structured data with Google's Rich Results Test
-6. Check sitemap generation
-7. Verify RSS feed functionality
-
-## 📈 Monitoring & Analytics
-
-### Recommended Tools
-
-- **Google Search Console**: Monitor search performance
-- **PageSpeed Insights**: Track Core Web Vitals
-- **Rich Results Test**: Validate structured data
-- **Mobile-Friendly Test**: Ensure mobile compatibility
-
-### Key Metrics to Track
-
-- Organic search traffic
-- Click-through rates from search results
-- Page loading speeds
-- Mobile usability scores
-- Rich results impressions
-
-## 🔄 Maintenance
-
-### Regular Tasks
-
-- Monitor and fix crawl errors in Search Console
-- Update meta descriptions for better CTR
-- Add internal links to new related content
-- Optimize images and update alt text
-- Review and update structured data
-
-### Content Optimization
-
-- Use the SEO analysis tools in `src/utils/seo-helpers.ts`
-- Regularly audit content for keyword optimization
-- Update evergreen content with fresh information
-- Monitor and improve page loading speeds
-
-This SEO implementation provides a solid foundation for search engine visibility
-while maintaining fast performance and excellent user experience.
+- Fix crawl errors that Search Console reports.
+- Update meta descriptions when click-through rates are low.
+- Add internal links to new related posts.
+- Update the alt text of images.
+- Review the structured data when `Layout.tsx` changes.

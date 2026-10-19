@@ -1,5 +1,7 @@
 # RSS Feed Aggregation for Blogo
 
+Status: proposal. Not implemented. The tasks and files it names do not exist.
+
 ## Context
 
 Blogo is a Deno blog engine using server-side JSX (hsx), HTMX navigation, manual DI via factory functions, and Result types for error handling. The user wants to subscribe to external RSS feeds and display aggregated content on a dedicated "/reads" page, cleanly separated from original blog posts. External content must not leak into search, the blog's own RSS output, the sitemap, or analytics.

@@ -1,5 +1,7 @@
 # Blogo Admin Panel Design Document
 
+Status: proposal. Not implemented. The tasks and files it names do not exist.
+
 **Version:** 1.0 **Date:** 2025-10-16 **Status:** Design Phase
 
 ## Table of Contents
