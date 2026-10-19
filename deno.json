@@ -1,6 +1,6 @@
 {
   "name": "@srdjan/blogo",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "tasks": {
     "start": "deno run --allow-net --allow-read --allow-env --allow-write --unstable-kv src/app/main.ts",
     "dev": "deno run --allow-net --allow-read --allow-env --allow-write --unstable-kv --watch src/app/main.ts",
