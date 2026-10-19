@@ -112,6 +112,22 @@ override, and turns an unquoted YAML date into a `Date.toString()` string.
 Fix: reuse `parseFrontmatter` from `content.ts`. Test: publish a post with an
 unquoted date and assert `publishedAt`.
 
+**B6-B11 Found during Phase 2 validation (behavior, not yet fixed).** Phase 2
+tests pin each one with a "Current behavior" comment. Each needs a user
+decision before a fix.
+- B6 `markdown-renderer.tsx` `processImageAttributes`: the space-separated
+  form `{width=300 height=200}` gives `width="300 height"`. Posts use only
+  single attributes today.
+- B7 `middleware.ts:13-23` `staticFiles`: `.json` at the root (for example
+  `/test.json`) is not served; only files under known prefixes are.
+- B8 `middleware.ts:112-115` `compress`: `minSize` is checked only against
+  `Content-Length`, so small bodies without that header are compressed.
+- B9 `routes.tsx` `ogImagePost`: an unknown slug or a content error gives the
+  default SVG with 200, not 404 or 500.
+- B10 `content.ts`: on an analytics error, `loadPostsMetadataWithViews`
+  gives `viewCount: 0` but `loadPostsWithViews` leaves it undefined.
+- B11 `validation.ts`: an impossible date such as `2025-02-30` passes.
+
 ### Mechanical findings (judge by branch count, with equal or higher coverage)
 
 | Id | Location | Change | Expected delta | Risk |
