@@ -10,6 +10,7 @@ import { createContentService } from "../domain/content.ts";
 import { createConfig } from "../domain/config.ts";
 import { createHealthService } from "../domain/health.ts";
 import { createAnalyticsService } from "../domain/analytics.ts";
+import { openDenoKvViewStore } from "../ports/kv.ts";
 import { createFileSystem } from "../ports/file-system.ts";
 import { createLogger } from "../ports/logger.ts";
 import { createInMemoryCache } from "../ports/cache.ts";
@@ -34,12 +35,12 @@ async function main() {
   const postCache = createInMemoryCache<Post>();
   const healthCache = createInMemoryCache<unknown>();
 
-  const analyticsResult = await createAnalyticsService();
-  if (!analyticsResult.ok) {
-    logger.error("Failed to initialize analytics", analyticsResult.error);
+  const viewStoreResult = await openDenoKvViewStore();
+  if (!viewStoreResult.ok) {
+    logger.error("Failed to initialize analytics", viewStoreResult.error);
     Deno.exit(1);
   }
-  const analyticsService = analyticsResult.value;
+  const analyticsService = createAnalyticsService(viewStoreResult.value);
 
   const contentService = createContentService({
     fileSystem,

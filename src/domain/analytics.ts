@@ -1,7 +1,7 @@
 import type { Slug } from "../lib/types.ts";
 import type { AppResult } from "../lib/types.ts";
-import { err, ok, tryCatch } from "../lib/result.ts";
-import { createError } from "../lib/error.ts";
+import { err, ok } from "../lib/result.ts";
+import type { ViewCountStore } from "../ports/kv.ts";
 
 type ViewsData = Record<string, number>;
 
@@ -12,25 +12,15 @@ export type AnalyticsService = {
   readonly close: () => void;
 };
 
-export const createAnalyticsService = async (): Promise<
-  AppResult<AnalyticsService>
-> => {
-  const kvResult = await tryCatch(
-    () => Deno.openKv(),
-    (e) => createError("IOError", `Failed to open Deno KV: ${e}`),
-  );
+const MAX_INCREMENT_ATTEMPTS = 10;
 
-  if (!kvResult.ok) {
-    return kvResult;
-  }
-
-  const kv = kvResult.value;
-
+export const createAnalyticsService = (
+  store: ViewCountStore,
+): AnalyticsService => {
   const getViewCount = async (slug: Slug): Promise<AppResult<number>> => {
     try {
-      const key = ["views", slug];
-      const result = await kv.get<number>(key);
-      return ok(result.value ?? 0);
+      const current = await store.get(slug);
+      return ok(current.value ?? 0);
     } catch (error) {
       return err({
         kind: "IOError",
@@ -42,26 +32,23 @@ export const createAnalyticsService = async (): Promise<
 
   const incrementViewCount = async (slug: Slug): Promise<AppResult<number>> => {
     try {
-      const key = ["views", slug];
-
-      // Use atomic operation to safely increment
-      let newCount = 0;
-      let success = false;
-
-      while (!success) {
-        const current = await kv.get<number>(key);
-        const currentCount = current.value ?? 0;
-        newCount = currentCount + 1;
-
-        const atomic = kv.atomic();
-        atomic.check(current);
-        atomic.set(key, newCount);
-
-        const result = await atomic.commit();
-        success = result.ok;
+      // Compare-and-set loop: retry when another writer changed the value
+      for (let attempt = 0; attempt < MAX_INCREMENT_ATTEMPTS; attempt++) {
+        const current = await store.get(slug);
+        const newCount = (current.value ?? 0) + 1;
+        const committed = await store.compareAndSet(
+          slug,
+          current.versionstamp,
+          newCount,
+        );
+        if (committed) return ok(newCount);
       }
 
-      return ok(newCount);
+      return err({
+        kind: "IOError",
+        message:
+          `Failed to increment view count for ${slug}: too many conflicts`,
+      });
     } catch (error) {
       return err({
         kind: "IOError",
@@ -74,14 +61,9 @@ export const createAnalyticsService = async (): Promise<
   const getAllViewCounts = async (): Promise<AppResult<ViewsData>> => {
     try {
       const viewsData: ViewsData = {};
-      const entries = kv.list<number>({ prefix: ["views"] });
-
-      for await (const entry of entries) {
-        // Extract slug from key: ["views", slug]
-        const slug = entry.key[1] as string;
-        viewsData[slug] = entry.value;
+      for (const entry of await store.list()) {
+        viewsData[entry.slug] = entry.value;
       }
-
       return ok(viewsData);
     } catch (error) {
       return err({
@@ -92,14 +74,10 @@ export const createAnalyticsService = async (): Promise<
     }
   };
 
-  const close = () => {
-    kv.close();
-  };
-
-  return ok({
+  return {
     getViewCount,
     incrementViewCount,
     getAllViewCounts,
-    close,
-  });
+    close: () => store.close(),
+  };
 };
