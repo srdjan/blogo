@@ -198,6 +198,57 @@ Deno.test("AtProtoService - publishPost creates correct document record", async 
   assertEquals(record["path"], "/posts/test-post");
 });
 
+Deno.test("AtProtoService - publishedAt is midnight UTC of the post date", async () => {
+  const client = createMockClient();
+  const service = createAtProtoService({
+    client,
+    fileSystem: createMemoryFileSystem({
+      "content/posts/test-post.md": POST_CONTENT,
+    }),
+    fileWriter: createMockFileWriter(),
+    logger: createRecordingLogger(),
+    config: TEST_CONFIG,
+    postsDir: "content/posts",
+    publicUrl: "https://blog.example.com",
+    blogName: "Test Blog",
+    blogDescription: "A test blog",
+  });
+
+  await service.publishAll();
+
+  const record = client.store.get("site.standard.document/test-post")?.record;
+  assertEquals(record?.["publishedAt"], "2025-01-15T00:00:00.000Z");
+});
+
+Deno.test("AtProtoService - publishAll reports invalid frontmatter and does not publish it", async () => {
+  const client = createMockClient();
+  const service = createAtProtoService({
+    client,
+    fileSystem: createMemoryFileSystem({
+      "content/posts/bad-post.md": POST_CONTENT.replace(
+        "title: Test Post",
+        'title: ""',
+      ),
+    }),
+    fileWriter: createMockFileWriter(),
+    logger: createRecordingLogger(),
+    config: TEST_CONFIG,
+    postsDir: "content/posts",
+    publicUrl: "https://blog.example.com",
+    blogName: "Test Blog",
+    blogDescription: "A test blog",
+  });
+
+  const result = await service.publishAll();
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.published, 0);
+    assertEquals(result.value.errors.length, 1);
+  }
+  assertEquals(client.store.size, 0);
+});
+
 Deno.test("AtProtoService - publishAll publishes all markdown files", async () => {
   const client = createMockClient();
   const files: Record<string, string> = {

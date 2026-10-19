@@ -1,4 +1,4 @@
-import type { AppResult, Slug, TagName } from "../lib/types.ts";
+import type { AppResult, Post, Slug } from "../lib/types.ts";
 import { createSlug } from "../lib/types.ts";
 import { err, ok } from "../lib/result.ts";
 import { createError } from "../lib/error.ts";
@@ -17,7 +17,7 @@ import {
   postToDocument,
   slugToRkey,
 } from "../atproto/mapping.ts";
-import { extractFrontmatter } from "./content.ts";
+import { extractFrontmatter, parseFrontmatter } from "./content.ts";
 import { markdownToHtml } from "../markdown-renderer.tsx";
 
 export type PublishReport = {
@@ -104,12 +104,9 @@ export const createAtProtoService = (
 
     const { frontmatter, markdown } = fmResult.value;
 
-    // Parse frontmatter to get post metadata
-    const { parse: parseYaml } = await import("@std/yaml");
-    const meta = parseYaml(frontmatter, { schema: "core" }) as Record<
-      string,
-      unknown
-    >;
+    const metaResult = parseFrontmatter(frontmatter, slug);
+    if (!metaResult.ok) return metaResult;
+    const meta = metaResult.value;
 
     if (meta.draft === true) {
       logger.info(`Skipping draft: ${slug}`);
@@ -119,17 +116,7 @@ export const createAtProtoService = (
     const htmlResult = markdownToHtml(markdown);
     if (!htmlResult.ok) return htmlResult;
 
-    const post: import("../lib/types.ts").Post = {
-      title: String(meta.title ?? ""),
-      date: String(meta.date ?? ""),
-      slug,
-      content: htmlResult.value,
-      ...(meta.excerpt ? { excerpt: String(meta.excerpt) } : {}),
-      ...(Array.isArray(meta.tags)
-        ? { tags: meta.tags.map((t: unknown) => String(t) as TagName) }
-        : {}),
-      ...(meta.modified ? { modified: String(meta.modified) } : {}),
-    };
+    const post: Post = { ...meta, content: htmlResult.value };
 
     const doc = postToDocument({
       post,

@@ -491,7 +491,7 @@ export function extractFrontmatter(
   });
 }
 
-function parseFrontmatter(
+export function parseFrontmatter(
   frontmatter: string,
   slug: Slug,
 ): AppResult<PostMeta> {
