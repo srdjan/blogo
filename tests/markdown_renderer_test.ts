@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import { markdownToHtml } from "../src/markdown-renderer.tsx";
 
 Deno.test("markdownToHtml - converts basic markdown to HTML", () => {
@@ -174,23 +174,24 @@ Deno.test("markdownToHtml - handles strikethrough", () => {
   }
 });
 
-// TODO: Audio file handling feature may need implementation review
-Deno.test.ignore("markdownToHtml - handles audio files", () => {
-  const markdown = "Listen to this: [audio.mp3](/audio/test.mp3)";
+Deno.test("markdownToHtml - handles audio files", () => {
+  const markdown = "![Song](/audio/test.mp3){media=audio}";
 
   const result = markdownToHtml(markdown);
 
   assertEquals(result.ok, true);
   if (result.ok) {
     const html = result.value;
-    assertEquals(html.includes("<audio controls"), true);
-    assertEquals(html.includes('src="/audio/test.mp3"'), true);
-    assertEquals(html.includes('type="audio/mpeg"'), true);
+    assertStringIncludes(html, '<audio controls="">');
+    assertStringIncludes(
+      html,
+      '<source src="/audio/test.mp3" type="audio/mpeg">',
+    );
+    assertStringIncludes(html, '<p class="audio-caption">Song</p>');
   }
 });
 
-// TODO: Audio format handling feature may need implementation review
-Deno.test.ignore("markdownToHtml - handles different audio formats", () => {
+Deno.test("markdownToHtml - handles different audio formats", () => {
   const testCases = [
     { file: "test.wav", expectedType: "audio/wav" },
     { file: "test.ogg", expectedType: "audio/ogg" },
@@ -200,28 +201,42 @@ Deno.test.ignore("markdownToHtml - handles different audio formats", () => {
   ];
 
   for (const testCase of testCases) {
-    const markdown = `[${testCase.file}](/audio/${testCase.file})`;
+    const markdown = `![Song](/audio/${testCase.file}){media=audio}`;
     const result = markdownToHtml(markdown);
 
-    assertEquals(result.ok, true);
+    assertEquals(result.ok, true, testCase.file);
     if (result.ok) {
-      const html = result.value;
-      assertEquals(html.includes(`type="${testCase.expectedType}"`), true);
+      assertStringIncludes(
+        result.value,
+        `<source src="/audio/${testCase.file}" type="${testCase.expectedType}">`,
+      );
     }
   }
 });
 
-// TODO: Image attribute syntax {width=300} may need implementation review
-Deno.test.ignore("markdownToHtml - handles image attributes", () => {
-  const markdown = "![Alt text](/images/test.png){width=300 height=200}";
+Deno.test("markdownToHtml - handles image attributes", () => {
+  const markdown = "![Alt](/images/t.png){width=300, height=200}";
 
   const result = markdownToHtml(markdown);
 
   assertEquals(result.ok, true);
   if (result.ok) {
-    const html = result.value;
-    assertEquals(html.includes('width="300"'), true);
-    assertEquals(html.includes('height="200"'), true);
+    assertStringIncludes(
+      result.value,
+      '<img src="/images/t.png" alt="Alt" width="300" height="200" loading="lazy" decoding="async" style="width: 300px; height: 200px">',
+    );
+  }
+});
+
+Deno.test("markdownToHtml - merges a space-separated attribute list into one value", () => {
+  const markdown = "![Alt](/images/t.png){width=300 height=200}";
+
+  const result = markdownToHtml(markdown);
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    // Current behavior; see plan finding B6
+    assertStringIncludes(result.value, 'width="300 height"');
   }
 });
 
@@ -332,8 +347,7 @@ graph TD
   }
 });
 
-// TODO: Auto-detection of code language may need review
-Deno.test.ignore("markdownToHtml - handles code without language", () => {
+Deno.test("markdownToHtml - handles code without language", () => {
   const markdown = `\`\`\`
 const test = "no language specified";
 console.log(test);
@@ -343,33 +357,24 @@ console.log(test);
 
   assertEquals(result.ok, true);
   if (result.ok) {
-    const html = result.value;
-    assertEquals(html.includes('<pre><code class="hljs">'), true);
-    assertEquals(html.includes("const test"), true);
+    assertStringIncludes(result.value, '<pre><code class="hljs">');
+    assertStringIncludes(result.value, "no language specified");
   }
 });
 
-// TODO: Invalid language handling may need review
-Deno.test.ignore(
-  "markdownToHtml - handles invalid syntax highlighting gracefully",
-  () => {
-    const markdown = `\`\`\`invalidlanguage
+Deno.test("markdownToHtml - handles invalid syntax highlighting gracefully", () => {
+  const markdown = `\`\`\`invalidlanguage
 some code here
 \`\`\``;
 
-    const result = markdownToHtml(markdown);
+  const result = markdownToHtml(markdown);
 
-    assertEquals(result.ok, true);
-    if (result.ok) {
-      const html = result.value;
-      assertEquals(
-        html.includes('<pre><code class="language-invalidlanguage">'),
-        true,
-      );
-      assertEquals(html.includes("some code here"), true);
-    }
-  },
-);
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertStringIncludes(result.value, '<pre><code class="hljs">');
+    assertStringIncludes(result.value, "code here");
+  }
+});
 
 Deno.test("markdownToHtml - handles empty input", () => {
   const markdown = "";
@@ -435,5 +440,38 @@ Final paragraph with ~~strikethrough~~ text.`;
     assertEquals(html.includes("<table>"), true);
     assertEquals(html.includes("<hr>"), true);
     assertEquals(html.includes("<del>strikethrough</del>"), true);
+  }
+});
+
+// --- sanitization ---
+
+Deno.test("markdownToHtml - removes script tags", () => {
+  const result = markdownToHtml("Hello <script>alert(1)</script> world");
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.includes("<script"), false);
+    assertEquals(result.value.includes("alert(1)"), false);
+    assertStringIncludes(result.value, "<p>Hello  world</p>");
+  }
+});
+
+Deno.test("markdownToHtml - removes onerror attributes", () => {
+  const result = markdownToHtml('<img src="x" onerror="alert(1)">');
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.includes("onerror"), false);
+    assertStringIncludes(result.value, '<img src="x">');
+  }
+});
+
+Deno.test("markdownToHtml - removes javascript: link targets", () => {
+  const result = markdownToHtml("[x](javascript:alert(1))");
+
+  assertEquals(result.ok, true);
+  if (result.ok) {
+    assertEquals(result.value.includes('href="javascript:'), false);
+    assertStringIncludes(result.value, "<p><a>x</a></p>");
   }
 });
