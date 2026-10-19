@@ -3,7 +3,7 @@ export const About = () => {
     <div class="about-content" role="presentation">
       <h1>Hi, I'm Srdjan...</h1>
       <p>
-        This is my personal, minimal blog built for experimenting with AI agents
+        This is my personal blog built for experimenting with AI agents
         and ability to fine tune custom writing styles.
       </p>
       <p>
@@ -22,19 +22,14 @@ export const About = () => {
         <a href="https://htmx.org/" target="_blank" rel="noopener noreferrer">
           HTMX
         </a>{" "}
-        for interactivity, this blog loads instantly and works without
-        JavaScript.
+        for interactivity.
       </p>
 
       <h2>About me</h2>
       <p>
-        I have extensive experience in leadership roles within various companies
-        in the technology industry. Currently, as an SVP of Architecture at
-        First Advantage, currently, I lead Cloud migration efforts and product
-        platform modernization. With previous roles such as Technical Principal
-        at ThoughtWorks, Chief Architect at Lifion by ADP and CTO at Cignium
-        Technologies, I have a strong background in software development and
-        agile culture advisory.
+        I have extensive experience in product & technology leadership roles, and currently, as an SVP of Architecture at
+        First Advantage, I lead product platform modernization. Previous roles include Technical Principal
+        at ThoughtWorks, Chief Architect at Lifion by ADP and CTO at Cignium Technologies.
       </p>
       <nav class="social-links" aria-label="Social media links">
         <a
