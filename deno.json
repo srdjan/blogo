@@ -57,7 +57,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hsx"
   },
-  "unstable": ["kv"],
+  "unstable": ["kv", "no-legacy-abort"],
   "deploy": {
     "exclude": [
       "**/node_modules",
