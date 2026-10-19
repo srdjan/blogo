@@ -304,7 +304,25 @@ Note (2026-10-18): `tests/test-api.js` and `tests/curl-test.sh` were
 deleted in commit `26963dd`, whose message names only the Phase 3 spec. The
 deletion was already staged when that commit ran. History was not
 rewritten.
+  Result (2026-10-19, commits `fdfc6d5` to `d151e39`): done. B12 fixed
+  (non-2xx responses are reported and not written); the atproto
+  well-known file is written only when atproto is configured, at its exact
+  path. B5 fixed (atproto publishing uses the validated parser). T6, T8
+  (store port, 10 attempts), and health timing through the clock done.
+  Closed: the view-count cache state in `content.ts` is per-service
+  state, not module state. Deferred: `console.warn` and the global
+  `marked` setup in `markdown-renderer.tsx`. The only `Deno.env`,
+  `Deno.openKv`, file, or `performance.now` use left in `src/domain` is
+  the config adapter.
 - **Phase 6, docs.** Section 6 and the `CLAUDE.md` fixes.
+  Result (2026-10-19, commits `ec0868b`, `a801b6e`): done. README,
+  `docs/SEO.md`, and the proposal status lines updated. `CLAUDE.md` is
+  gitignored, so its update has no commit.
+
+Final state after Phase 6: 368 passed, 0 failed, 0 ignored; lint 0 over
+`src/`, `tests/`, `scripts/`; `deno task metrics` 6258 LOC and 800
+branches (start: 6441 LOC and 878 branches, with 238 passed and 1 failing
+test); build 186 pages, 0 errors.
 
 ## 9. What not to touch
 
