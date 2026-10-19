@@ -378,3 +378,11 @@ Deno.test("validateFrontmatter - accepts the impossible date 2025-02-30", () => 
   assertEquals(result.ok, true);
   if (result.ok) assertEquals(result.value.date, "2025-02-30");
 });
+
+Deno.test("validateFrontmatter uses the supplied now for the future-date check", () => {
+  const input = { title: "T", date: "2025-06-01" };
+  const before = validateFrontmatter(input, new Date("2025-05-31T00:00:00Z"));
+  assertEquals(before.ok, false);
+  const after = validateFrontmatter(input, new Date("2025-06-02T00:00:00Z"));
+  assertEquals(after.ok, true);
+});

@@ -29,11 +29,106 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 // Slug validation regex (lowercase letters, numbers, hyphens)
 const SLUG_REGEX = /^[a-z0-9-]+$/;
 
+type Rule = (obj: Readonly<Record<string, unknown>>) => readonly string[];
+
+type StringCheck = {
+  readonly test: (value: string) => boolean;
+  readonly message: string;
+};
+
+// Convert a YAML Date or a string to a string; other values give undefined
+const normalizeDate = (value: unknown): string | undefined => {
+  if (value instanceof Date) return value.toISOString().split("T")[0] ?? "";
+  return typeof value === "string" ? value : undefined;
+};
+
+const titleRule: Rule = ({ title }) => {
+  if (!title || typeof title !== "string") {
+    return ["Title is required and must be a string"];
+  }
+  return title.length < TITLE_MIN_LENGTH || title.length > TITLE_MAX_LENGTH
+    ? [
+      `Title must be between ${TITLE_MIN_LENGTH} and ${TITLE_MAX_LENGTH} characters`,
+    ]
+    : [];
+};
+
+// Date is required (YAML may supply a Date object); future dates fail unless draft
+const dateRule = (now: Date): Rule => (obj) => {
+  if (!obj.date) return ["Date is required"];
+  const dateString = normalizeDate(obj.date);
+  if (dateString === undefined) return ["Date must be a string or Date object"];
+  if (!dateString) return [];
+  if (!DATE_REGEX.test(dateString)) {
+    return ["Date must be in YYYY-MM-DD format"];
+  }
+  return new Date(dateString) > now && !obj.draft
+    ? ["Published posts cannot have future dates"]
+    : [];
+};
+
+const optionalString =
+  (field: string, typeMessage: string, check?: StringCheck): Rule => (obj) => {
+    const value = obj[field];
+    if (value === undefined) return [];
+    if (typeof value !== "string") return [typeMessage];
+    return check && !check.test(value) ? [check.message] : [];
+  };
+
+const maxLength = (max: number, message: string): StringCheck => ({
+  test: (value) => value.length <= max,
+  message,
+});
+
+const stringList = (
+  field: string,
+  words: {
+    readonly plural: string; // "Tags"
+    readonly singular: string; // "Tag"
+    readonly lower: string; // "tags"
+  },
+): Rule =>
+(obj) => {
+  const list = obj[field];
+  if (list === undefined) return [];
+  if (!Array.isArray(list)) return [`${words.plural} must be an array`];
+  const itemMessages = list.flatMap((item: unknown, index: number) => {
+    if (typeof item !== "string") {
+      return [`${words.singular} at index ${index} must be a string`];
+    }
+    if (item.length > TAG_MAX_LENGTH) {
+      return [
+        `${words.singular} "${item}" is too long (max ${TAG_MAX_LENGTH} characters)`,
+      ];
+    }
+    return item.trim() !== item
+      ? [
+        `${words.singular} "${item}" cannot have leading or trailing whitespace`,
+      ]
+      : [];
+  });
+  return [
+    ...(list.length > MAX_TAGS
+      ? [`Cannot have more than ${MAX_TAGS} ${words.lower}`]
+      : []),
+    ...itemMessages,
+    ...(new Set(list).size !== list.length
+      ? [`Duplicate ${words.lower} are not allowed`]
+      : []),
+  ];
+};
+
+const draftRule: Rule = ({ draft }) =>
+  draft !== undefined && typeof draft !== "boolean"
+    ? ["Draft flag must be a boolean"]
+    : [];
+
 /**
  * Validate frontmatter data against schema
  */
 export function validateFrontmatter(
   data: unknown,
+  now: Date = new Date(),
 ): AppResult<FrontmatterSchema> {
   if (!data || typeof data !== "object") {
     return err(createError(
@@ -45,160 +140,45 @@ export function validateFrontmatter(
   }
 
   const obj = data as Record<string, unknown>;
-  const errors: string[] = [];
-
-  // Validate required title
-  if (!obj.title || typeof obj.title !== "string") {
-    errors.push("Title is required and must be a string");
-  } else if (
-    obj.title.length < TITLE_MIN_LENGTH || obj.title.length > TITLE_MAX_LENGTH
-  ) {
-    errors.push(
-      `Title must be between ${TITLE_MIN_LENGTH} and ${TITLE_MAX_LENGTH} characters`,
-    );
-  }
-
-  // Validate required date (can be string or Date object from YAML parsing)
-  if (!obj.date) {
-    errors.push("Date is required");
-  } else {
-    let dateString: string;
-
-    if (obj.date instanceof Date) {
-      dateString = obj.date.toISOString().split("T")[0] ?? "";
-    } else if (typeof obj.date === "string") {
-      dateString = obj.date;
-    } else {
-      errors.push("Date must be a string or Date object");
-      dateString = "";
-    }
-
-    if (dateString && !DATE_REGEX.test(dateString)) {
-      errors.push("Date must be in YYYY-MM-DD format");
-    } else if (dateString) {
-      // Validate date is not in the future (unless draft)
-      const postDate = new Date(dateString);
-      const now = new Date();
-      if (postDate > now && !obj.draft) {
-        errors.push("Published posts cannot have future dates");
-      }
-    }
-  }
-
-  // Validate optional slug
-  if (obj.slug !== undefined) {
-    if (typeof obj.slug !== "string") {
-      errors.push("Slug must be a string");
-    } else if (!SLUG_REGEX.test(obj.slug)) {
-      errors.push(
-        "Slug must contain only lowercase letters, numbers, and hyphens",
-      );
-    }
-  }
-
-  // Validate optional excerpt
-  if (obj.excerpt !== undefined) {
-    if (typeof obj.excerpt !== "string") {
-      errors.push("Excerpt must be a string");
-    } else if (obj.excerpt.length > EXCERPT_MAX_LENGTH) {
-      errors.push(
+  const rules: readonly Rule[] = [
+    titleRule,
+    dateRule(now),
+    optionalString("slug", "Slug must be a string", {
+      test: (value) => SLUG_REGEX.test(value),
+      message: "Slug must contain only lowercase letters, numbers, and hyphens",
+    }),
+    optionalString(
+      "excerpt",
+      "Excerpt must be a string",
+      maxLength(
+        EXCERPT_MAX_LENGTH,
         `Excerpt must be no more than ${EXCERPT_MAX_LENGTH} characters`,
-      );
-    }
-  }
+      ),
+    ),
+    stringList("tags", { plural: "Tags", singular: "Tag", lower: "tags" }),
+    stringList("topics", {
+      plural: "Topics",
+      singular: "Topic",
+      lower: "topics",
+    }),
+    optionalString("modified", "Modified date must be a string", {
+      test: (value) => DATE_REGEX.test(value),
+      message: "Modified date must be in YYYY-MM-DD format",
+    }),
+    draftRule,
+    optionalString(
+      "author",
+      "Author must be a string",
+      maxLength(100, "Author name must be no more than 100 characters"),
+    ),
+    optionalString(
+      "category",
+      "Category must be a string",
+      maxLength(50, "Category must be no more than 50 characters"),
+    ),
+  ];
 
-  // Validate optional tags
-  if (obj.tags !== undefined) {
-    if (!Array.isArray(obj.tags)) {
-      errors.push("Tags must be an array");
-    } else {
-      if (obj.tags.length > MAX_TAGS) {
-        errors.push(`Cannot have more than ${MAX_TAGS} tags`);
-      }
-
-      for (const [index, tag] of obj.tags.entries()) {
-        if (typeof tag !== "string") {
-          errors.push(`Tag at index ${index} must be a string`);
-        } else if (tag.length > TAG_MAX_LENGTH) {
-          errors.push(
-            `Tag "${tag}" is too long (max ${TAG_MAX_LENGTH} characters)`,
-          );
-        } else if (tag.trim() !== tag) {
-          errors.push(
-            `Tag "${tag}" cannot have leading or trailing whitespace`,
-          );
-        }
-      }
-
-      // Check for duplicate tags
-      const uniqueTags = new Set(obj.tags);
-      if (uniqueTags.size !== obj.tags.length) {
-        errors.push("Duplicate tags are not allowed");
-      }
-    }
-  }
-  // Validate optional topics (same constraints as tags)
-  if (obj.topics !== undefined) {
-    if (!Array.isArray(obj.topics)) {
-      errors.push("Topics must be an array");
-    } else {
-      if (obj.topics.length > MAX_TAGS) {
-        errors.push(`Cannot have more than ${MAX_TAGS} topics`);
-      }
-
-      for (const [index, topic] of obj.topics.entries()) {
-        if (typeof topic !== "string") {
-          errors.push(`Topic at index ${index} must be a string`);
-        } else if (topic.length > TAG_MAX_LENGTH) {
-          errors.push(
-            `Topic "${topic}" is too long (max ${TAG_MAX_LENGTH} characters)`,
-          );
-        } else if (topic.trim() !== topic) {
-          errors.push(
-            `Topic "${topic}" cannot have leading or trailing whitespace`,
-          );
-        }
-      }
-
-      const uniqueTopics = new Set(obj.topics);
-      if (uniqueTopics.size !== obj.topics.length) {
-        errors.push("Duplicate topics are not allowed");
-      }
-    }
-  }
-
-  // Validate optional modified date
-  if (obj.modified !== undefined) {
-    if (typeof obj.modified !== "string") {
-      errors.push("Modified date must be a string");
-    } else if (!DATE_REGEX.test(obj.modified)) {
-      errors.push("Modified date must be in YYYY-MM-DD format");
-    }
-  }
-
-  // Validate optional draft flag
-  if (obj.draft !== undefined && typeof obj.draft !== "boolean") {
-    errors.push("Draft flag must be a boolean");
-  }
-
-  // Validate optional author
-  if (obj.author !== undefined) {
-    if (typeof obj.author !== "string") {
-      errors.push("Author must be a string");
-    } else if (obj.author.length > 100) {
-      errors.push("Author name must be no more than 100 characters");
-    }
-  }
-
-  // Validate optional category
-  if (obj.category !== undefined) {
-    if (typeof obj.category !== "string") {
-      errors.push("Category must be a string");
-    } else if (obj.category.length > 50) {
-      errors.push("Category must be no more than 50 characters");
-    }
-  }
-
+  const errors = rules.flatMap((rule) => rule(obj));
   if (errors.length > 0) {
     return err(createError(
       "ValidationError",
@@ -208,13 +188,8 @@ export function validateFrontmatter(
     ));
   }
 
-  // Normalize the date field to string format
-  const normalizedObj = { ...obj };
-  if (normalizedObj.date instanceof Date) {
-    normalizedObj.date = normalizedObj.date.toISOString().split("T")[0] ?? "";
-  }
-
-  return ok(normalizedObj as FrontmatterSchema);
+  // Normalize the date field to string format; unknown keys survive
+  return ok({ ...obj, date: normalizeDate(obj.date) } as FrontmatterSchema);
 }
 
 /**
