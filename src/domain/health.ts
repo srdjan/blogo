@@ -5,6 +5,15 @@ import type { FileSystem } from "../ports/file-system.ts";
 import type { Cache } from "../ports/cache.ts";
 import type { Clock } from "../ports/clock.ts";
 
+// Best-effort runtime metric: only some runtimes expose performance.memory.
+const readHeapMemory = (): {
+  readonly usedJSHeapSize: number;
+  readonly totalJSHeapSize: number;
+} | undefined =>
+  (performance as unknown as {
+    memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+  }).memory;
+
 export type HealthStatus = "healthy" | "degraded" | "unhealthy";
 
 export type HealthCheck = {
@@ -78,7 +87,7 @@ export const createHealthService = (
   };
 
   const checkFileSystem = async (): Promise<HealthCheck> => {
-    const start = performance.now();
+    const start = clock.monotonic();
 
     // Check if posts directory exists and is readable
     const exists = await fileSystem.exists(postsDir);
@@ -87,7 +96,7 @@ export const createHealthService = (
         name: "filesystem",
         status: "unhealthy",
         message: `Posts directory not found: ${postsDir}`,
-        duration: performance.now() - start,
+        duration: clock.monotonic() - start,
         timestamp: clock.isoString(),
       };
     }
@@ -100,7 +109,7 @@ export const createHealthService = (
         name: "filesystem",
         status: "unhealthy",
         message: `File system error: ${readResult.error.message}`,
-        duration: performance.now() - start,
+        duration: clock.monotonic() - start,
         timestamp: clock.isoString(),
       };
     }
@@ -109,13 +118,13 @@ export const createHealthService = (
       name: "filesystem",
       status: "healthy",
       message: "File system accessible",
-      duration: performance.now() - start,
+      duration: clock.monotonic() - start,
       timestamp: clock.isoString(),
     };
   };
 
   const checkCache = (): Promise<HealthCheck> => {
-    const start = performance.now();
+    const start = clock.monotonic();
 
     try {
       // Test cache operations
@@ -128,7 +137,7 @@ export const createHealthService = (
           name: "cache",
           status: "unhealthy",
           message: "Cache set operation failed",
-          duration: performance.now() - start,
+          duration: clock.monotonic() - start,
           timestamp: clock.isoString(),
         });
       }
@@ -139,7 +148,7 @@ export const createHealthService = (
           name: "cache",
           status: "unhealthy",
           message: "Cache get operation failed",
-          duration: performance.now() - start,
+          duration: clock.monotonic() - start,
           timestamp: clock.isoString(),
         });
       }
@@ -151,7 +160,7 @@ export const createHealthService = (
         name: "cache",
         status: "healthy",
         message: "Cache operations working",
-        duration: performance.now() - start,
+        duration: clock.monotonic() - start,
         timestamp: clock.isoString(),
       });
     } catch (error) {
@@ -161,16 +170,14 @@ export const createHealthService = (
         message: `Cache error: ${
           error instanceof Error ? error.message : String(error)
         }`,
-        duration: performance.now() - start,
+        duration: clock.monotonic() - start,
         timestamp: clock.isoString(),
       });
     }
   };
 
   const getMemoryMetrics = () => {
-    const memoryUsage = (performance as unknown as {
-      memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
-    }).memory;
+    const memoryUsage = readHeapMemory();
 
     if (memoryUsage) {
       return {

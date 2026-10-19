@@ -3,7 +3,7 @@ import { createHealthService } from "../../src/domain/health.ts";
 import { createMemoryFileSystem } from "../helpers/file_system.ts";
 import type { Cache } from "../../src/ports/cache.ts";
 import { createInMemoryCache } from "../../src/ports/cache.ts";
-import { createClock } from "../../src/ports/clock.ts";
+import { createClock, createFixedClock } from "../../src/ports/clock.ts";
 
 const HEALTHY_FILES = {
   "content/posts/file1.md": "mock content",
@@ -221,4 +221,25 @@ Deno.test("HealthService - includes timestamps in checks", async () => {
       assertEquals(isNaN(Date.parse(check.timestamp)), false);
     }
   }
+});
+
+Deno.test("HealthService - cache check duration comes from the injected clock", async () => {
+  const readings = [10, 25];
+  const clock = createFixedClock(
+    new Date("2025-01-15T00:00:00.000Z"),
+    () => readings.shift() ?? 0,
+  );
+
+  const healthService = createHealthService({
+    fileSystem: createMemoryFileSystem(HEALTHY_FILES),
+    cache: createInMemoryCache<unknown>(),
+    postsDir: "content/posts",
+    startTime: clock.timestamp(),
+    clock,
+  });
+
+  const check = await healthService.checkCache();
+
+  assertEquals(check.duration, 15);
+  assertEquals(check.timestamp, "2025-01-15T00:00:00.000Z");
 });
