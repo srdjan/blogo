@@ -228,15 +228,17 @@ Deno.test("markdownToHtml - handles image attributes", () => {
   }
 });
 
-Deno.test("markdownToHtml - merges a space-separated attribute list into one value", () => {
-  const markdown = "![Alt](/images/t.png){width=300 height=200}";
+Deno.test("markdownToHtml - accepts a space-separated attribute list", () => {
+  const spaced = markdownToHtml("![Alt](/images/t.png){width=300 height=200}");
+  const commas = markdownToHtml("![Alt](/images/t.png){width=300, height=200}");
 
-  const result = markdownToHtml(markdown);
-
-  assertEquals(result.ok, true);
-  if (result.ok) {
-    // Current behavior; see plan finding B6
-    assertStringIncludes(result.value, 'width="300 height"');
+  assertEquals(spaced.ok, true);
+  assertEquals(commas.ok, true);
+  if (spaced.ok && commas.ok) {
+    // Fixed: plan finding B6
+    assertEquals(spaced.value, commas.value);
+    assertStringIncludes(spaced.value, 'width="300"');
+    assertStringIncludes(spaced.value, 'height="200"');
   }
 });
 

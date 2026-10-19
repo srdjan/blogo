@@ -52,7 +52,9 @@ renderer.code = function (token) {
         `Failed to highlight code block with language "${lang}":`,
         err,
       );
-      return `<pre><code class="language-${escapeHtml(lang)}">${escapeHtml(code)}</code></pre>`;
+      return `<pre><code class="language-${escapeHtml(lang)}">${
+        escapeHtml(code)
+      }</code></pre>`;
     }
   }
 
@@ -101,7 +103,7 @@ const processImageAttributes = (html: string): string => {
 
   return html.replace(imgAttributeRegex, (match, imgAttributes, attributes) => {
     // Parse the attributes from {width=400} format
-    const attrPairs = attributes.split(",").map((attr: string) => attr.trim());
+    const attrPairs: string[] = attributes.split(/[,\s]+/).filter(Boolean);
     const styleAttributes: string[] = [];
     const htmlAttributes: string[] = [];
     let isAudio = false;
