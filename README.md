@@ -142,17 +142,23 @@ Open `http://localhost:8000`
 
 ```bash
 deno task dev          # Development server with hot reload
-deno task start        # Production server
+deno task start        # Server without hot reload
 deno task build        # Generate static site to _site/
 deno task test         # Run tests
-deno task check        # Type check
+deno task test:watch   # Run tests on file change
+deno task coverage     # Run tests with a coverage report
+deno task check        # Type check src/, tests/, and scripts/
 deno task fmt          # Format code
 deno task lint         # Lint code
+deno task metrics      # Per-module size and branch metrics for src/
+deno task frontmatter:check  # Validate the frontmatter of every post
+deno task setup        # Create public/ and content/posts/ and download htmx
 ```
 
 ### AT Protocol Commands
 
-These require AT Protocol credentials (see [docs/pds-guide.md](docs/pds-guide.md)):
+These require AT Protocol credentials (see
+[docs/pds-guide.md](docs/pds-guide.md)):
 
 ```bash
 deno task at:publish   # Publish all posts to your PDS
@@ -162,13 +168,14 @@ deno task at:verify    # Verify well-known endpoint and link tags
 
 ## Static Site Generation
 
-`deno task build` renders every route (pages, fragments, feeds, sitemaps) into
-a `_site/` directory that can be deployed to any static host. HTMX navigation
-continues to work via pre-rendered fragment files.
+`deno task build` renders every route (pages, fragments, feeds, sitemaps) into a
+`_site/` directory that can be deployed to any static host. HTMX navigation
+continues to work via pre-rendered fragment files. The build checks the HTTP
+status of every route and reports each non-2xx response as an error.
 
 ```bash
 deno task build
-# Build complete: 98 pages, 42 fragments
+# Build complete: 186 pages, 133 fragments
 ```
 
 When AT Protocol environment variables are set at build time, the static output
@@ -208,17 +215,26 @@ src/
     at-publish.ts      # CLI: publish posts to PDS
     at-pull.ts         # CLI: pull documents from PDS
     at-verify.ts       # CLI: verify AT Protocol setup
-  http/                # Routes, server, middleware
+  http/                # Routes, router, server, middleware
+    view.ts            # View type and toResponse
     render-vnode.ts    # hsx VNode to HTML renderer
   components/          # JSX components (Layout, PostView, etc.)
-  domain/              # Business logic (content, atproto, static-builder)
+  domain/              # Business logic (content, analytics, health, atproto,
+                       #   config, validation, static-builder)
   atproto/             # Standard.site lexicon types and mapping
-  config/              # Configuration (atproto env vars)
-  ports/               # Dependency interfaces (filesystem, cache, atproto, writer)
+  config/              # Settings (atproto env vars, topics)
+  ports/               # Dependency interfaces (filesystem, writer, cache,
+                       #   clock, kv, logger, atproto)
   lib/                 # Core utilities (Result types, etc.)
+  utils/               # Tested helpers that no page uses yet
+  markdown-renderer.tsx  # Markdown to HTML
+  mermaid-renderer.ts    # Mermaid diagrams to SVG
+  rss.ts, sitemap.ts, og-image.ts  # Feed, sitemap, and OG image generators
+scripts/               # Frontmatter check, tag list, metrics
+tests/                 # Tests and in-memory doubles (tests/helpers/)
 content/posts/         # Markdown blog posts
 public/                # Static assets
-docs/                  # Guides (PDS setup)
+docs/                  # Guides and design proposals
 ```
 
 ## Creating Content
@@ -258,7 +274,7 @@ Alternatively, generate a static site with `deno task build` and deploy the
 | ------------- | ----------------------------------------------------------- |
 | Runtime       | Deno v2.x                                                   |
 | Rendering     | [hsx](https://github.com/srdjan/hsx) (server-side JSX)      |
-| Interactivity | HTMX v2.x                                                   |
+| Interactivity | htmx 4                                                      |
 | Styling       | Modern CSS (nesting, container queries, logical properties) |
 | Content       | Markdown with marked                                        |
 | Syntax        | Highlight.js                                                |
