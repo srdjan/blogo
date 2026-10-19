@@ -121,7 +121,11 @@ export const createContentService = (
     analyticsService.getAllViewCounts().then((result) => {
       if (result.ok) {
         lastKnownViewCounts = result.value;
-        viewCountsCache.set(viewCountsCacheKey, result.value, viewCountsCacheTtlMs);
+        viewCountsCache.set(
+          viewCountsCacheKey,
+          result.value,
+          viewCountsCacheTtlMs,
+        );
       }
     }).catch(() => {
       // Silently ignore background refresh errors
@@ -230,7 +234,13 @@ export const createContentService = (
     return parseFrontmatter(frontmatter, slug);
   };
 
-  const loadPostsFromDisk = async (): Promise<AppResult<readonly Post[]>> => {
+  const loadFromDisk = async <T extends PostMeta>(
+    parse: (filePath: string, slug: Slug) => Promise<AppResult<T>>,
+    labels: {
+      readonly failed: string;
+      readonly loaded: (count: number) => string;
+    },
+  ): Promise<AppResult<readonly T[]>> => {
     const entriesResult = await fileSystem.readDir(postsDir);
     if (!entriesResult.ok) return entriesResult;
 
@@ -243,108 +253,88 @@ export const createContentService = (
       return ok([]);
     }
 
-    const postResults = await Promise.all(
-      markdownFiles.map(async (filename) => {
-        const slug = createSlug(filename.replace(/\.md$/, ""));
-        const filePath = `${postsDir}/${filename}`;
-        return await parseMarkdown(filePath, slug);
-      }),
+    const results = await Promise.all(
+      markdownFiles.map((filename) =>
+        parse(
+          `${postsDir}/${filename}`,
+          createSlug(filename.replace(/\.md$/, "")),
+        )
+      ),
     );
 
-    const combinedResult = combine(postResults);
+    const combinedResult = combine(results);
 
     if (!combinedResult.ok) {
-      logger.error("Failed to load some posts", combinedResult.error);
+      logger.error(labels.failed, combinedResult.error);
       return combinedResult;
     }
 
     // Drafts are never published
-    const sortedPosts = combinedResult.value.filter((p) => !p.draft).sort((
-      a: Post,
-      b: Post,
+    const sorted = combinedResult.value.filter((item) => !item.draft).sort((
+      a: T,
+      b: T,
     ) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    logger.info(`Loaded ${sortedPosts.length} posts`);
-    return ok(sortedPosts);
+    logger.info(labels.loaded(sorted.length));
+    return ok(sorted);
   };
 
-  const loadPostsMetadataFromDisk = async (): Promise<
-    AppResult<readonly PostMeta[]>
-  > => {
-    const entriesResult = await fileSystem.readDir(postsDir);
-    if (!entriesResult.ok) return entriesResult;
-
-    const markdownFiles = entriesResult.value.filter((name) =>
-      name.endsWith(".md")
-    );
-
-    if (markdownFiles.length === 0) {
-      logger.warn(`No markdown files found in ${postsDir}`);
-      return ok([]);
-    }
-
-    const metaResults = await Promise.all(
-      markdownFiles.map(async (filename) => {
-        const slug = createSlug(filename.replace(/\.md$/, ""));
-        const filePath = `${postsDir}/${filename}`;
-        return await parseMetadata(filePath, slug);
-      }),
-    );
-
-    const combinedResult = combine(metaResults);
-
-    if (!combinedResult.ok) {
-      logger.error("Failed to load some post metadata", combinedResult.error);
-      return combinedResult;
-    }
-
-    // Drafts are never published
-    const sortedMeta = combinedResult.value.filter((m) => !m.draft).sort((
-      a: PostMeta,
-      b: PostMeta,
-    ) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    logger.info(`Loaded metadata for ${sortedMeta.length} posts`);
-    return ok(sortedMeta);
-  };
-
-  const loadPosts = async (): Promise<AppResult<readonly Post[]>> => {
-    const cached = cache.get("posts");
+  const cachedLoad = async <T>(
+    cacheStore: Cache<readonly T[]>,
+    key: string,
+    labels: { readonly cached: string; readonly loading: string },
+    loader: () => Promise<AppResult<readonly T[]>>,
+  ): Promise<AppResult<readonly T[]>> => {
+    const cached = cacheStore.get(key);
 
     if (cached.ok && cached.value.status === "hit") {
-      logger.debug("Using cached posts");
+      logger.debug(labels.cached);
       return ok(cached.value.value);
     }
 
-    logger.info("Loading posts from disk");
-    const result = await loadPostsFromDisk();
+    logger.info(labels.loading);
+    const result = await loader();
 
     if (result.ok) {
-      cache.set("posts", result.value, Infinity);
+      cacheStore.set(key, result.value, Infinity);
     }
 
     return result;
   };
 
-  const loadPostsMetadata = async (): Promise<
-    AppResult<readonly PostMeta[]>
-  > => {
-    const cached = metadataCache.get("metadata");
+  const loadPosts = (): Promise<AppResult<readonly Post[]>> =>
+    cachedLoad(
+      cache,
+      "posts",
+      { cached: "Using cached posts", loading: "Loading posts from disk" },
+      () =>
+        loadFromDisk(parseMarkdown, {
+          failed: "Failed to load some posts",
+          loaded: (n) => `Loaded ${n} posts`,
+        }),
+    );
 
-    if (cached.ok && cached.value.status === "hit") {
-      logger.debug("Using cached post metadata");
-      return ok(cached.value.value);
-    }
+  const loadPostsMetadata = (): Promise<AppResult<readonly PostMeta[]>> =>
+    cachedLoad(
+      metadataCache,
+      "metadata",
+      {
+        cached: "Using cached post metadata",
+        loading: "Loading post metadata from disk",
+      },
+      () =>
+        loadFromDisk(parseMetadata, {
+          failed: "Failed to load some post metadata",
+          loaded: (n) => `Loaded metadata for ${n} posts`,
+        }),
+    );
 
-    logger.info("Loading post metadata from disk");
-    const result = await loadPostsMetadataFromDisk();
-
-    if (result.ok) {
-      metadataCache.set("metadata", result.value, Infinity);
-    }
-
-    return result;
-  };
+  const toListItem = (meta: PostMeta, viewCount: number): Post => ({
+    ...meta,
+    content: "", // Empty content for metadata-only posts
+    formattedDate: formatDate(meta.date),
+    viewCount,
+  });
 
   const loadPostsMetadataWithViews = async (): Promise<
     AppResult<readonly Post[]>
@@ -352,38 +342,18 @@ export const createContentService = (
     const metadataResult = await loadPostsMetadata();
     if (!metadataResult.ok) return metadataResult;
 
-    if (!analyticsService) {
-      // Convert metadata to Post format without view counts
-      const postsWithoutContent = metadataResult.value.map((meta) => ({
-        ...meta,
-        content: "", // Empty content for metadata-only posts
-        formattedDate: formatDate(meta.date),
-        viewCount: 0,
-      }));
-      return ok(postsWithoutContent);
-    }
-
     const viewCountsResult = await getAllViewCountsCached();
     if (!viewCountsResult.ok) {
       logger.warn("Failed to load view counts, returning posts without views");
-      const postsWithoutViews = metadataResult.value.map((meta) => ({
-        ...meta,
-        content: "", // Empty content for metadata-only posts
-        formattedDate: formatDate(meta.date),
-        viewCount: 0,
-      }));
-      return ok(postsWithoutViews);
+      return ok(metadataResult.value.map((meta) => toListItem(meta, 0)));
     }
 
     const viewCounts = viewCountsResult.value;
-    const postsWithViews = metadataResult.value.map((meta) => ({
-      ...meta,
-      content: "", // Empty content for metadata-only posts
-      formattedDate: formatDate(meta.date),
-      viewCount: viewCounts[meta.slug] || 0,
-    }));
-
-    return ok(postsWithViews);
+    return ok(
+      metadataResult.value.map((meta) =>
+        toListItem(meta, viewCounts[meta.slug] || 0)
+      ),
+    );
   };
 
   const loadPostsWithViews = async (): Promise<AppResult<readonly Post[]>> => {
