@@ -1,59 +1,173 @@
-# Repository Guidelines
+# AGENTS.md
 
-## Project Structure
+This file guides coding agents that work in this repository.
 
-- `src/` – Deno TypeScript app. Key areas: `app/` (entrypoint), `http/` (router,
-  server, middleware), `domain/` (content/config/analytics services),
-  `components/` (mono‑jsx views), `ports/` (adapters like cache/filesystem),
-  `utils/` and `lib/` (shared helpers/types).
-- `content/posts/` – Markdown posts with YAML frontmatter. Slugs are kebab‑case
-  filenames (e.g., `my-post-title.md`).
-- `public/` – Static assets served as‑is (CSS, JS, images).
-- `tests/` – Deno tests mirroring `src/` modules; `_test.ts` suffix.
-- `scripts/` – Maintenance tools (frontmatter checks, tag listing).
-- `docs/` – Design notes and longer architecture docs.
+## Commands
 
-## Build, Test, and Development Commands
+```bash
+deno task dev                # Development server with hot reload (port 8000)
+deno task start              # Server without hot reload
+deno task build              # Build the static site into _site/
+deno task test               # Run all tests
+deno task test:watch         # Run tests on file change
+deno task smoke              # Fast smoke tests (run by the pre-commit hook)
+deno task check              # Type check src/, tests/, and scripts/
+deno task lint               # Lint src/, tests/, and scripts/
+deno task fmt                # Format code
+deno task metrics            # Per-module LOC, branch count, and fan-in for src/
+deno task coverage           # Run tests with coverage and print the report
+deno task frontmatter:check  # Validate the frontmatter of every post
+deno task at:publish         # Publish posts to AT Protocol
+deno task at:pull            # Pull documents from AT Protocol into content/posts/
+deno task at:verify          # Check the AT Protocol configuration
+deno task setup              # Create public/ and content/posts/ and download htmx
+deno task hooks:install      # Enable pre-commit and pre-push hooks
+```
 
-Use Deno tasks from `deno.json`:
+The pre-commit hook in `.githooks/pre-commit` runs `frontmatter:check` and `smoke`.
 
-- `deno task dev` – Run server in watch mode for local development.
-- `deno task start` – Start production server.
-- `deno task check` – Type‑check `src/app/main.ts`.
-- `deno task test` / `deno task test:watch` – Run full test suite.
-- `deno task smoke` – Fast subset used by hooks.
-- `deno task fmt` / `deno task lint` – Format and lint code.
-- `deno task frontmatter:check` – Validate post frontmatter.
-- `deno task setup` – Create default folders and download HTMX.
+Run a single test file:
+```bash
+deno test --allow-read --allow-write --allow-env tests/result_test.ts
+```
 
-## Coding Style & Naming Conventions
+## Architecture
 
-- Formatting is enforced by `deno fmt` (2‑space indent, 80‑col line width). Run
-  `deno task fmt` before PRs.
-- Keep semicolons and explicit `.ts`/`.tsx` import extensions as in existing
-  code.
-- File naming: kebab‑case for non‑component files (`render-vnode.ts`),
-  PascalCase for JSX components in `components/` matching exported symbols
-  (`PostView.tsx`).
-- Prefer small, pure functions and dependency injection (see `create*Service`
-  patterns).
+This is a Deno blog. It uses hsx (server-side JSX without React) and htmx 4 for client interactivity.
 
-## Testing Guidelines
+### Layer Structure
 
-- Tests use Deno’s built‑in runner and `@std/assert`.
-- Name tests `*_test.ts` and colocate under `tests/` following module structure.
-- Ensure `deno task test` passes; hooks also require `deno task smoke`.
+```
+src/app/                   Entry points: main.ts (server), build.ts, at-publish.ts, at-pull.ts, at-verify.ts
+src/http/                  HTTP layer: routes.tsx, router.ts, middleware.ts, server.ts, types.ts, view.ts, render-vnode.ts
+src/components/            JSX components (Layout.tsx, PostView.tsx, etc.)
+src/domain/                Business logic: content.ts, health.ts, analytics.ts, atproto.ts,
+                           config.ts, static-builder.ts, validation.ts
+src/ports/                 Dependency interfaces: file-system.ts, writer.ts, cache.ts, logger.ts,
+                           clock.ts, kv.ts, atproto.ts
+src/atproto/               AT Protocol record types and mapping (mapping.ts, types.ts)
+src/config/                Static settings: atproto.ts (AT Protocol environment), topics.ts
+src/lib/                   Core utilities: result.ts, types.ts, error.ts
+src/utils/                 Tested helpers that no page uses yet: reading-time.ts, seo-helpers.ts
+src/utils.ts               Shared string helpers
+src/markdown-renderer.tsx  Markdown to HTML with marked and highlight.js
+src/mermaid-renderer.ts    Mermaid diagrams to SVG
+src/rss.ts                 RSS feed generation
+src/sitemap.ts             Sitemap and robots.txt generation
+src/og-image.ts            Open Graph SVG images
+```
 
-## Commit & Pull Request Guidelines
+### Key Patterns
 
-- Commit messages in history are short, verb‑led summaries (e.g., “fixed
-  counting”, “added more blog posts”). Follow that style: one line, imperative,
-  scoped if helpful.
-- PRs should include: a brief summary, linked issue (if any), and screenshots
-  for UI/content changes. Note any new env vars or tasks.
+**Result Types for Errors**: Use `Result<T, E>` from `src/lib/result.ts` instead of exceptions. Pattern match with `match()`, chain with `chain()` and `map()`.
 
-## Configuration Tips
+```typescript
+const result = await contentService.loadPosts();
+return match(result, {
+  ok: (posts) => renderPage(posts),
+  error: (err) => renderError(err),
+});
+```
 
-Local settings live in `.env`; common vars include `DENO_ENV`, `PORT`,
-`PUBLIC_URL`, `BLOG_TITLE`, `POSTS_DIR`, and `POSTS_PER_PAGE`. Don’t commit
-secrets.
+**Branded Types**: Domain types like `Slug`, `TagName`, `UrlPath` are branded strings for type safety. Create them with factory functions: `createSlug()`, `createTagName()`.
+
+**Ports Pattern for DI**: Services define interfaces. Factory functions receive the implementations.
+
+```typescript
+export const createContentService = (deps: ContentDependencies): ContentService => {
+  const { fileSystem, logger, cache } = deps;
+  // ...
+};
+```
+
+**JSX with hsx**: Components use JSX that renders to HTML strings on the server. Use `html()` from `render-vnode.ts` to render raw HTML content (like markdown).
+
+**View type**: A route handler returns a `View` (defined in `src/http/view.ts`). A `View` is a tagged union with the kinds `page`, `fragment`, `text`, `xml`, `svg`, and `json`. The function `toResponse(view, ctx, deps)` turns a `View` into a `Response` and handles each kind in an exhaustive `switch`.
+
+**htmx 4**: The server sends a fragment only when `HX-Request` is `true` and `HX-Request-Type` is not `full`. Otherwise the server sends the whole page. The check is `isHtmxRequest` in `src/http/view.ts`. The static builder writes `fragment.html` next to each page for the same reason.
+
+**Configuration**: `parseConfig(env)` in `src/domain/config.ts` is a pure function. `createConfig()` calls it once with `Deno.env.toObject()`. The AT Protocol settings are the exception: `src/config/atproto.ts` reads them from the environment.
+
+**Drafts**: A post with `draft: true` is hidden everywhere. The listing, tag, search, feed, and sitemap data never include it. `getPostBySlug()` returns `NotFound` for a draft. AT Protocol publishing skips it.
+
+**Frontmatter**: `parseFrontmatter()` in `src/domain/content.ts` parses YAML with the `core` schema, so dates stay strings. Then `validateFrontmatter()` in `src/domain/validation.ts` checks the fields. The AT Protocol service uses the same parser.
+
+### Testing
+
+Tests use simple in-memory doubles, not mocking frameworks. The shared doubles are in `tests/helpers/`:
+
+- `createMemoryFileSystem(files, options)` in `file_system.ts`
+- `createRecordingLogger()` in `logger.ts`
+- `createMemoryContentService(posts, overrides)` in `content_service.ts`
+- `createMemoryHealthService(options)` in `health_service.ts`
+
+A test builds a double from a plain object and passes it to a service factory:
+
+```typescript
+const fileSystem = createMemoryFileSystem({
+  "content/posts/hello.md": "---\ntitle: Hello\ndate: 2025-01-15\n---\n\nBody",
+});
+const service = createContentService({
+  fileSystem,
+  logger: createRecordingLogger(),
+  cache: createInMemoryCache(),
+  metadataCache: createInMemoryCache(),
+  postCache: createInMemoryCache(),
+  postsDir: "content/posts",
+  enableValidation: false,
+});
+```
+
+The static builder test keeps its own local `FileWriter` double in `tests/domain/static_builder_test.ts`.
+
+## Content
+
+Blog posts are markdown files in `content/posts/` with YAML frontmatter:
+
+```yaml
+---
+title: Post Title
+date: 2025-01-15
+tags: [Tag1, Tag2]
+excerpt: Brief description
+modified: 2025-01-16  # Optional
+draft: true           # Optional: hides the post
+---
+```
+
+Use the `gotai:blog-writer` skill to write posts in the blog's voice.
+
+Name new post files in kebab-case, for example `my-post-title.md`. A few older posts do not follow this rule.
+
+## Performance
+
+The content service uses a multi-tier caching strategy:
+
+- `cache`: All posts (for listing pages)
+- `metadataCache`: Post metadata only (for home page)
+- `postCache`: Individual posts by slug (for single post views)
+
+**Key optimizations**:
+- `getPostBySlug()` reads one file directly instead of loading all posts
+- The view count increment does not block the response
+- Mermaid diagrams are cached by content hash in `mermaid-renderer.ts`
+- YAML parsing uses a static import (not dynamic)
+
+## Other directories
+
+- `public/`: static assets served as they are (CSS, JS, images).
+- `scripts/`: maintenance tools, such as the frontmatter check and the tag listing.
+- `docs/`: design notes, plans, and longer architecture documents.
+
+## Coding Style
+
+- `deno fmt` enforces the format: 2-space indent, 80-column line width. Run `deno task fmt` before a pull request.
+- Keep semicolons and explicit `.ts` or `.tsx` import extensions, as in the existing code.
+- Name non-component files in kebab-case (`render-vnode.ts`). Name JSX component files in PascalCase after the exported symbol (`PostView.tsx`).
+- Name test files `*_test.ts` (or `*_test.tsx` for JSX tests) under `tests/`, in a layout that mirrors `src/`. Tests use the Deno runner and `@std/assert`.
+
+## Pull Requests and Configuration
+
+A pull request needs a brief summary, a linked issue if one exists, and screenshots for UI or content changes. Note any new environment variable or task.
+
+Local settings live in `.env`, which git ignores. Common variables are `DENO_ENV`, `PORT`, `PUBLIC_URL`, `BLOG_TITLE`, `POSTS_DIR`, and `POSTS_PER_PAGE`. Do not commit secrets.
