@@ -19,9 +19,9 @@ around it is heavy.
 
 So I built **Effektive**. It is a small functional language that transpiles to
 Effect-TS 4. You write direct code that looks like a strict TypeScript subset.
-Each function states its contract in plain words: what it returns, what it
-`fails` with, what it `uses`. The compiler checks that contract and writes the
-Effect code for you.
+Each exported function states its contract in plain words: what it returns, what
+it `fails` with, what it `uses`. Local helpers let the compiler infer it. The
+compiler checks every contract and writes the Effect code for you.
 
 Website and mini book:
 [effektive.timok.deno.net](https://effektive.timok.deno.net/)
@@ -85,18 +85,26 @@ to list `PaymentDeclined` on a function that charges a card, the compiler stops
 you:
 
 ```text
-pay.eff:50:3: error failure-contract/001: the body can fail with PaymentDeclined, which the `fails` clause does not list
+pay.eff:45:3: error failure-contract/001: the body can fail with PaymentDeclined, which the `fails` clause does not list
 ```
 
 And if you forget the capability:
 
 ```text
-pay.eff:50:3: error requirement-contract/001: the body requires Payments.charge, which the `uses` clause does not list
+pay.eff:45:3: error requirement-contract/001: the body requires Payments.charge, which the `uses` clause does not list
 ```
 
 Those are real messages from the compiler, not something I typed for the post.
 In VS Code you also get a quick fix that adds the missing failure or capability
 to the signature.
+
+The contract must be written only where it matters: on exported functions, the
+public surface of a module. A local helper can skip `fails` and `uses`, and the
+compiler infers them from the body. This also works for recursive helpers. The
+export that calls them still has to declare everything they can do, so nothing
+escapes the module unannounced. In the editor, inlay hints show the inferred
+`fails` and `uses` next to each helper, so you can still read the contract
+without writing it.
 
 To me is interesting that the `uses` clause is _finer_ than Effect itself. In
 Effect-TS the requirement type is the whole `Users` service. In Effektive,
@@ -193,26 +201,21 @@ exactly the text that nobody wants to read.
 Now the logic. In Effektive:
 
 ```typescript
-const findOrder = (id: OrderId): Order
-  fails OrderNotFound
-  uses Orders.find =>
+const findOrder = (id: OrderId) =>
   match Orders.find(id) {
     Some(order) => order,
     None => fail(OrderNotFound({ id }))
   }
 
-const chargeOrder = (order: Order): Order
-  fails PaymentDeclined
-  uses Payments.charge => {
+const chargeOrder = (order: Order) => {
   retry(() => Payments.charge(order.totalCents), { times: 2 })
   order
 }
 
-const markPaid = (order: Order): Order =>
+const markPaid = (order: Order) =>
   ({ ...order, status: "paid" })
 
-const saveOrder = (order: Order): Order
-  uses Orders.save => {
+const saveOrder = (order: Order) => {
   Orders.save(order)
   order
 }
@@ -226,6 +229,10 @@ export const pay = (id: OrderId): Order
     |> markPaid
     |> saveOrder
 ```
+
+The helpers have no contracts, because they are local. The compiler knows that
+`findOrder` fails with `OrderNotFound` and uses `Orders.find`, and it checks
+that `pay` declares all of it.
 
 Look at `pay`. It is a pipeline of four steps, and the pipeline does not care
 which steps are effectful. `markPaid` is a pure function. `findOrder` talks to a
@@ -268,15 +275,15 @@ export const pay = (id: OrderId): Effect.Effect<
   );
 ```
 
-Here the gap is smaller, and I want to be honest about it. The Effektive
-functions have 557 characters, the Effect-TS functions have 664. But the
-Effect-TS helpers have no written contract at all. Give them the same explicit
-return types as the Effektive helpers, and Effect-TS grows to 787. So for the
-same information, the logic is about 30% shorter. More important than the
-number: the Effektive version is direct code. A service call is a call. A `void`
-step is a line. You never think about `Effect.as` to keep a value after a write.
+Here the gap is smaller, but it is still real. The Effektive functions have 446
+characters, the Effect-TS functions have 664. Both versions let the helpers
+infer their types, and both write a full contract on the exported `pay`. So for
+the same information, the logic is about a third shorter. More important than
+the number: the Effektive version is direct code. A service call is a call. A
+`void` step is a line. You never think about `Effect.as` to keep a value after a
+write.
 
-Whole module: 871 characters in Effektive against 1504 in Effect-TS.
+Whole module: 760 characters in Effektive against 1504 in Effect-TS.
 
 ## What the Compiler Writes
 
@@ -332,6 +339,20 @@ handles only declared domain failures. It does not catch defects or
 interruption. In Effect terms, this is `Effect.catchTag`, and the compiler
 removes the tag from the error type for you.
 
+**Named error sets.** When the same list of errors repeats, give it a name and
+use the name in `fails`:
+
+```typescript
+type PayFailure = OrderNotFound | PaymentDeclined
+
+export const pay = (id: OrderId): Order
+  fails PayFailure
+  uses Orders | Payments.charge => ...
+```
+
+The compiler expands the name, so the contract and the generated
+`Effect.Effect<Order, OrderNotFound | PaymentDeclined, ...>` stay the same.
+
 **Pipelines and collections.** `map`, `filter`, and `fold` come from the
 prelude, and they work on the right side of `|>`:
 
@@ -348,7 +369,7 @@ export const activeNames = (): Name[]
 plain string cannot pass where an `OrderId` is expected:
 
 ```text
-pay.eff:59:40: error type-mismatch/003: argument 1 has type Raw, but OrderId is expected
+pay.eff:54:40: error type-mismatch/003: argument 1 has type Raw, but OrderId is expected
 ```
 
 **Streams, resources, and schedules.** The language also has streams with
@@ -360,6 +381,8 @@ retry schedules. Here is a piece of a stream processor:
 const incoming = bufferStream(unfold(0, (index) => Input.next(input, index)), { capacity: 2 })
 const converted = mapEffect(incoming, (item) => convert(item), { concurrency: 2 })
 const batches = transduceStream(converted, takeSink(2))
+runStream(batches, sinkForEach((batch) =>
+  if ((batch |> fold(0, (count, _item) => count + 1)) > 0) { Output.write(output, batch) } else {}))
 ```
 
 **Host boundary.** Real drivers live in TypeScript. A small interface file
@@ -377,10 +400,11 @@ calls `provide(UsersLive, () => displayName("u1"))` to run with it.
 
 A language without tools is a toy, so Effektive ships with them. The CLI has
 `check`, `build`, and `watch`. The language server gives diagnostics, hover,
-go-to-definition, references, rename, completion, semantic tokens, and the
-contract quick fixes from above. The VS Code extension shows the generated
-TypeScript next to your source and writes it on save. There is also a browser
-playground that runs the compiler core in the browser.
+go-to-definition, references, rename, completion, semantic tokens, inlay hints
+for inferred contracts, and the contract quick fixes from above. The VS Code
+extension shows the generated TypeScript next to your source and writes it on
+save. There is also a browser playground that runs the compiler core in the
+browser.
 
 ## Real Talk: Tradeoffs
 
@@ -401,6 +425,11 @@ needs a combinator outside that set, you write it in TypeScript.
 **Numbers are strict.** `int` means a safe integer, and overflow is a defect,
 not a silent wrap. Division always gives `number`. Good for money, a little
 annoying for percent math.
+
+**Inferred contracts live in the tools.** A local helper without `fails` and
+`uses` is shorter, but in a plain text view you see its contract only at the
+export that calls it. The editor shows it as an inlay hint. A named error set
+also moves the list of errors away from the place where you use it.
 
 **Another layer to debug.** Source maps help, but you now have a compiler
 between you and the runtime. When something looks wrong, sometimes you read the
