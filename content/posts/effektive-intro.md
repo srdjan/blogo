@@ -3,7 +3,7 @@ title: "Effektive: Effect-TS Contracts Without the Ceremony"
 date: 2026-10-24
 tags: [TypeScript, Functional, Compilers, Effect]
 excerpt: Effektive is a small functional language that compiles to Effect-TS, so you write direct code and the compiler writes the Effect plumbing.
-draft: true
+draft: false
 ---
 
 I love Effect-TS. I wrote about
