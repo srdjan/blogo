@@ -106,11 +106,11 @@ generated TypeScript still needs the whole `Users` service, because that is what
 Effect tracks. The finer check lives in the compiler's typed intermediate
 representation. It is a static check for review, not a sandbox for adapters.
 
-## A Payment Pipeline
+## Declarations: Where the Ceremony Lives
 
-Small examples can lie, so let's take something with a few moving parts. Find an
-order, charge it with a retry, mark it as paid, save it. Here is the complete
-Effektive module, types, errors, and services included:
+Let's take something with a few moving parts: find an order, charge it with a
+retry, mark it as paid, save it. Before any logic, you need a record, two
+errors, and two services. Here they are in Effektive:
 
 ```typescript
 type Cents = int
@@ -134,7 +134,65 @@ service Orders {
 service Payments {
   charge(amount: Cents): ChargeId fails PaymentDeclined
 }
+```
 
+And here is the same in idiomatic Effect-TS:
+
+```typescript
+import { Context, Effect, Option, Schema } from "effect";
+
+const Cents = Schema.Int;
+type Cents = typeof Cents.Type;
+type ChargeId = string;
+
+const OrderId = Schema.String.pipe(Schema.brand("OrderId"));
+type OrderId = typeof OrderId.Type;
+
+const Order = Schema.Struct({
+  id: OrderId,
+  totalCents: Cents,
+  status: Schema.Literals(["pending", "paid"]),
+});
+type Order = typeof Order.Type;
+
+class OrderNotFound extends Schema.TaggedError<OrderNotFound>()(
+  "OrderNotFound",
+  { id: OrderId },
+) {}
+
+class PaymentDeclined extends Schema.TaggedError<PaymentDeclined>()(
+  "PaymentDeclined",
+  { reason: Schema.String },
+) {}
+
+class Orders extends Context.Service<Orders, {
+  readonly find: (id: OrderId) => Effect.Effect<Option.Option<Order>>;
+  readonly save: (order: Order) => Effect.Effect<void>;
+}>()("Orders") {}
+
+class Payments extends Context.Service<Payments, {
+  readonly charge: (
+    amount: Cents,
+  ) => Effect.Effect<ChargeId, PaymentDeclined>;
+}>()("Payments") {}
+```
+
+Look at the errors. In Effektive an error is one line: a name and its fields. In
+Effect-TS it is a class that repeats its own name three times. Every type comes
+twice, once as a schema value and once as `typeof X.Type`. Every service method
+wraps its result in `Effect.Effect<...>`, even though the service is the place
+where effects obviously live.
+
+I counted non-whitespace characters, with the TypeScript formatted by
+`deno fmt`. The Effektive declarations have 314. The Effect-TS declarations
+have 840. That is about 2.7 times more text for the same information, and it is
+exactly the text that nobody wants to read.
+
+## A Payment Pipeline
+
+Now the logic. In Effektive:
+
+```typescript
 const findOrder = (id: OrderId): Order
   fails OrderNotFound
   uses Orders.find =>
@@ -175,9 +233,8 @@ service and can fail. They compose with the same `|>`. In Effect you must pick
 the right combinator for each step: `flatMap` for the effectful ones, `map` for
 the pure one. Pick wrong and you read a long type error.
 
-Here is the business part of my hand-written Effect-TS version. I kept it
-idiomatic and let TypeScript infer the helper return types, so it is as short as
-I can make it honestly:
+Here is my Effect-TS version. I kept it idiomatic and let TypeScript infer the
+helper return types, so it is as short as I can make it honestly:
 
 ```typescript
 const findOrder = (id: OrderId) =>
@@ -211,17 +268,15 @@ export const pay = (id: OrderId): Effect.Effect<
   );
 ```
 
-On top of that come the declarations: `Schema.Struct` for the record,
-`Schema.TaggedError` classes for both errors, and `Context.Service` classes for
-both services.
+Here the gap is smaller, and I want to be honest about it. The Effektive
+functions have 557 characters, the Effect-TS functions have 664. But the
+Effect-TS helpers have no written contract at all. Give them the same explicit
+return types as the Effektive helpers, and Effect-TS grows to 787. So for the
+same information, the logic is about 30% shorter. More important than the
+number: the Effektive version is direct code. A service call is a call. A `void`
+step is a line. You never think about `Effect.as` to keep a value after a write.
 
-I measured both complete modules, with the TypeScript file formatted by
-`deno fmt`. The Effektive file has 871 non-whitespace characters. The Effect-TS
-file has 1504. Line counts are closer, 45 against 54, so the difference is not
-in the number of lines. It is in how much noise sits on every line. And
-remember: the Effektive version declares a full contract on _every_ helper,
-while the TypeScript version infers them. The smaller file still carries more
-explicit type information.
+Whole module: 871 characters in Effektive against 1504 in Effect-TS.
 
 ## What the Compiler Writes
 
